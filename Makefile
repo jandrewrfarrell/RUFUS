@@ -14,8 +14,8 @@ all: $(BINS)
 CXX = g++
 CXXFLAGS = -std=gnu++0x -fopenmp
 
-
 $(BINS): $(BIN_SOURCES)
+	mkdir ./bin
 	$(CXX) src/$(notdir $@).cpp -o $@ $(CXXFLAGS)
 
 clean:
