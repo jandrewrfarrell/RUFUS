@@ -359,17 +359,25 @@ int main (int argc, char *argv[])
 		return 0;
 	}
 	
-
-
+	string filename = argv[2];
 	ifstream MutFile;
-	MutFile.open (argv[2]);
- 	if ( MutFile.is_open())
-	{}      //cout << "##File Opend\n";
-	else
-	{
-		cout << "Error, MutFile could not be opened";
-		return 0;
-	}
+ 	if (filename == "stdin")
+        {
+                cout << "MutFile is STDIN" << endl;
+                MutFile.open ("/dev/stdin");
+        }
+        else
+        {
+                cout << "MutFile is " << argv[3] << endl;
+                MutFile.open (argv[3]);
+        }
+        if ( MutFile.is_open())
+        {      cout << "##File Opend\n";}
+        else
+        {
+                cout << "Error, MutFile could not be opened";
+                return 0;
+        }
 
 	ofstream MutOutFile;
 	string FirstPassFile = argv[3]; 
