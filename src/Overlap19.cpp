@@ -761,21 +761,21 @@ int main (int argc, char *argv[])
 	temp = argv[4];
         MinCoverage = atoi(temp.c_str());
 	
-	temp = argv[6];
+	temp = argv[5];
 	SearchHash = atoi(temp.c_str());
 	
-	temp = argv[7];
+	temp = argv[6];
 	ACT = atoi(temp.c_str());
 	
-	temp = argv[9];
+	temp = argv[7];
 	int TrimLCcuttoff = atoi(temp.c_str());
-	temp = argv[10];
+	temp = argv[8];
 	int Threads = atoi(temp.c_str());
 	int Buffer = 100 * Threads;
 	ofstream report;
 	std::stringstream ss;
 	string FirstPassFile = argv[1];
-	ss << argv[8] << ".fastq";
+	ss << argv[9] << ".fastq";
         FirstPassFile = ss.str();
         report.open (FirstPassFile.c_str());
         if (report.is_open())
