@@ -738,7 +738,7 @@ int main (int argc, char *argv[])
 	int MinOverlap ;
 	int MinCoverage ;			
 	cout << "you gave "<< argc << " Arguments"  << endl;
-	if (argc != 11)
+	if (argc != 10)
 	{cout << "ERROR, wrong numbe of arguemnts\nCall is: FASTQ, MinPercent, MinOverlap, MinCoverage, ReportStub, SearchHashSize, ACT, OutFile LCendTrimEpth Threads"<< endl; return 0;}
 		
 	
