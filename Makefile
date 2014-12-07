@@ -4,7 +4,8 @@ BIN_SOURCES = src/ModelDist2.cpp \
 		src/Overlap19.cpp \
 		src/OverlapRegion2.cpp \
 		src/RUFUSv5.Filter.cpp \
-		src/RUFUSv6.BuildHash.cpp 
+		src/RUFUSv6.BuildHash.cpp \
+		src/ReplaceQwithDinFASTQD.cpp
 
 #BINS = $(BIN_SOURCES:.cpp=)
 BINS = $(addprefix bin/,$(notdir $(BIN_SOURCES:.cpp=)))
