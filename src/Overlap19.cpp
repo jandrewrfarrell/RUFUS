@@ -694,7 +694,7 @@ string TrimLowCoverageEnds(string S,string& quals, string& depth, int cutoff)
 }
 string AdjustBases(string sequence, string qual)
 {
-	int MinQ = 10;
+	int MinQ = 5;
 	int QualOffset = 33;
 	string NewString = "";
 	for(int i=0; i<sequence.size(); i++)
@@ -739,7 +739,8 @@ int main (int argc, char *argv[])
 	int MinCoverage ;			
 	cout << "you gave "<< argc << " Arguments"  << endl;
 	if (argc != 10)
-	{cout << "ERROR, wrong numbe of arguemnts\nCall is: FASTQ, MinPercent, MinOverlap, MinCoverage, ReportStub, SearchHashSize, ACT, OutFile LCendTrimEpth Threads"<< endl; return 0;}
+	//						     1		2	3		4	 5		6	  7	     8        9           
+	{cout << "ERROR, wrong numbe of arguemnts\nCall is: FASTQ, MinPercent, MinOverlap, MinCoverage, SearchHashSize, ACT, LCendTrimEpth Threads outfile"<< endl; return 0;}
 		
 	
 	ifstream fastq;

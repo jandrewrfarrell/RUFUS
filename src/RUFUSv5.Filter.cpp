@@ -368,8 +368,8 @@ int main (int argc, char *argv[])
         }
         else
         {
-                cout << "MutFile is " << argv[3] << endl;
-                MutFile.open (argv[3]);
+                cout << "MutFile is " << argv[2] << endl;
+                MutFile.open (argv[2]);
         }
         if ( MutFile.is_open())
         {      cout << "##File Opend\n";}
