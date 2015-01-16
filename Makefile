@@ -9,11 +9,12 @@ BIN_SOURCES = src/ModelDist2.cpp \
 
 #BINS = $(BIN_SOURCES:.cpp=)
 BINS = $(addprefix bin/,$(notdir $(BIN_SOURCES:.cpp=)))
+GIT_VERSION := $(shell git describe --abbrev=4 --dirty --always)
 
 all: $(BINS)
 
 CXX = g++
-CXXFLAGS = -std=gnu++0x -fopenmp
+CXXFLAGS = -std=gnu++0x -fopenmp  -Wall -DVERSION=\"$(GIT_VERSION)\"
 
 bin:
 	mkdir -p ./bin

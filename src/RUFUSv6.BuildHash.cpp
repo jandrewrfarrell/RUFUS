@@ -153,76 +153,85 @@ void process_mem_usage(double& vm_usage, double& resident_set, double& MAXvm, do
 }
 
 
+void printHelp(void){
+  cerr << "Usage:" << endl << endl;
+  cerr << "      RUFUSv6.BuildHash Parent_hash Mutant_Hash FilterLiestOutFile hashsize MaxParDepth MinMutDepth MaxDepth Threads" << endl << endl;
+  cerr << "Version:" << endl;
+  cerr << "        " << VERSION << endl;
+  
+}
+
 
 int main (int argc, char *argv[])
 {
-     cout << "Call is Parent_hash Mutant_Hash FilterLiestOutFile hashsize MaxParDepth MinMutDepth MaxDepth Threads" << endl;
 
-    double vm, rss, MAXvm, MAXrss;
-    MAXvm = 0;
-    MAXrss = 0;
-    process_mem_usage(vm, rss, MAXvm, MAXrss);
+  printHelp();
+  
+  double vm, rss, MAXvm, MAXrss;
+  MAXvm = 0;
+  MAXrss = 0;
+  process_mem_usage(vm, rss, MAXvm, MAXrss);
+  
+  string temp = argv[4];
+  int HashSize = atoi(temp.c_str());
+  temp = argv[5];
+  int MaxParDepth = atoi(temp.c_str());
+  
+  temp = argv[6];
+  int MinMutDepth = atoi(temp.c_str());
+  temp = argv[7];
+  int TooHigh = atoi(temp.c_str());
+  temp = argv[8];
+  int Threads = atoi(temp.c_str());
+  
+  int BufferSize = 10000 ;
+  
+  cout << "Paramaters are:\n  Parent_Hash = " << argv[1] <<
+    "\n  Mutant_Hash = " << argv[2] <<
+    "\n  FilterLiestOutFile = " << argv[3] <<
+    "\n  HashSize = " << argv[4] <<
+    "\n  Max Parent Depth = " << argv[5] <<
+    "\n  Min Mut Depth = " << argv[6] <<
+    "\n  Maximum count = " << argv[7] <<
+    "\n  Threads = " << argv[8] << endl;
+  
+  // Read in file passed to the program on the command line
 
-    string temp = argv[4];
-    int HashSize = atoi(temp.c_str());
-     temp = argv[5];
-    int MaxParDepth = atoi(temp.c_str());
-
-     temp = argv[6];
-    int MinMutDepth = atoi(temp.c_str());
-    temp = argv[7];
-    int TooHigh = atoi(temp.c_str());
-    temp = argv[8];
-    int Threads = atoi(temp.c_str());
-
-    int BufferSize = 10000 ;
-
- cout << "Paramaters are:\n  Parent_Hash = " << argv[1] <<
-        "\n  Mutant_Hash = " << argv[2] <<
-        "\n  FilterLiestOutFile = " << argv[3] <<
-        "\n  HashSize = " << argv[4] <<
-        "\n  Max Parent Depth = " << argv[5] <<
-        "\n  Min Mut Depth = " << argv[6] <<
-        "\n  Maximum count = " << argv[7] <<
-        "\n  Threads = " << argv[8] << endl;
-
-        // Read in file passed to the program on the command line
-
-
-    ifstream ParentFile;
-    ParentFile.open (argv[1]);
-    if ( ParentFile.is_open())
+  
+  ifstream ParentFile;
+  ParentFile.open (argv[1]);
+  if ( ParentFile.is_open())
     { cout << "Parent File open - " << argv[1] << endl;}    //cout << "##File Opend\n";
     else
-    {
+      {
         cout << "Error, ParentFile could not be opened";
         return 0;
-    }
-
-
-    ifstream MutHashFile;
-    MutHashFile.open (argv[2]);
-    if ( MutHashFile.is_open())
+      }
+  
+  
+  ifstream MutHashFile;
+  MutHashFile.open (argv[2]);
+  if ( MutHashFile.is_open())
     {}
-    else
+  else
     {
         cout << "Error, MutHashFile could not be opened";
         return 0;
     }
-
+  
     ofstream HashTable;
     string HashTablePath = argv[3];
     HashTable.open (HashTablePath.c_str());
     if (HashTable.is_open())
-    {}
+      {}
     else
-    {
+      {
         cout << "Error HashTableFilter file couldnt be opened - " << HashTablePath << endl;
         return 0;
-    }
+      }
 
-
-
+    
+    
     string line;
     //unordered_map  <unsigned long, vector<unsigned char> > Phash;
     unordered_map  <unsigned long, bool > Plow;
@@ -234,9 +243,9 @@ int main (int argc, char *argv[])
     unordered_map  <unsigned long, bool > good;
     //std::unordered_map<std::bitmap, bool> ParentHashes;
     cout << "Reading in both hash talbes\n";
-
+    
     int lines = 0;
-
+    
     string L1;
     string L2;
     string L3;
