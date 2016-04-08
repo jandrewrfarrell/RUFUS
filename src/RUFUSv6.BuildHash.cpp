@@ -272,7 +272,7 @@ int main (int argc, char *argv[])
         {
             string B1 = Pstack[bam];
             vector<string> stuff;
-            stuff = Split(B1, '\t');
+            stuff = Split(B1, ' ');
             int Bcount = atoi(stuff[1].c_str());
            // unsigned char Bcount;
             //if (Bcount > 250){Bcount = 251;}else{Bcount = Bcount;}
