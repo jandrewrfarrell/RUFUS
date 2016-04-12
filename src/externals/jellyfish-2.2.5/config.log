@@ -707,6 +707,7 @@ config.status:1189: creating Makefile
 config.status:1189: creating tests/compat.sh
 config.status:1189: creating jellyfish-2.0.pc
 config.status:1189: creating config.h
+config.status:1370: config.h is unchanged
 config.status:1418: executing depfiles commands
 config.status:1418: executing libtool commands
 
