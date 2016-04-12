@@ -1,7 +1,7 @@
 
 g++ src/AnnotateOverlap.cpp -o bin/AnnotateOverlap -std=gnu++0x
 g++ src/ConvertFASTqD.to.FASTQ.cpp -o bin/ConvertFASTqD.to.FASTQ 
-g++ src/ModelDist.cpp -o bin/ModelDist 
+g++ src/ModelDist.cpp -o bin/ModelDist -fopenmp 
 g++ src/Overlap.cpp -o bin/Overlap -std=gnu++0x -fopenmp 
 g++ src/OverlapRegion.cpp -o bin/OverlapRegion -std=gnu++0x -fopenmp 
 g++ src/ReplaceQwithDinFASTQD.cpp -o bin/ReplaceQwithDinFASTQD

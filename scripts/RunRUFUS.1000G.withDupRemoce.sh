@@ -25,33 +25,34 @@ then
 	exit
 fi
 
-PATH=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/bin/RUFUS_git/RUFUS/
+RDIR=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/bin/RUFUS_git/RUFUS/
 
-RUFUSmodel=$PATH/bin/ModelDist
-RUFUSbuild=$PATH/bin/RUFUS.Build 
-RUFUSfilter=$PATH/bin/RUFUS.Filter
-RUFUSOverlap=$PATH/scripts/OverlapBashMultiThread.sh
-DeDupDump=$PATH/scripts/HumanDedup.grenrator.tenplate
+RUFUSmodel=$RDIR/bin/ModelDist
+RUFUSbuild=$RDIR/bin/RUFUS.Build 
+RUFUSfilter=$RDIR/bin/RUFUS.Filter
+RUFUSOverlap=$RDIR/scripts/OverlapBashMultiThread.sh
+DeDupDump=$RDIR/scripts/HumanDedup.grenrator.tenplate
 
 
-perl -ni -e 's/ /\t/;print' $MutantGenerator.histo
-perl -ni -e 's/ /\t/;print' $Parent1.histo
-perl -ni -e 's/ /\t/;print' $Parent2.histo
-perl -ni -e 's/ /\t/;print' $Parent3.histo
+perl -ni -e 's/ /\t/;print' $MutantGenerator.Jhash.histo
+perl -ni -e 's/ /\t/;print' $Parent1.Jhash.histo
+perl -ni -e 's/ /\t/;print' $Parent2.Jhash.histo
+perl -ni -e 's/ /\t/;print' $Parent3.Jhash.histo
 
 echo "staring model"
-if [ -e "$MutantGenerator.histo.7.7.model" ]
+if [ -e "$MutantGenerator.Jhash.histo.7.7.model" ]
 then 
 	echo "skipping model"
 else
-	/usr/bin/time -v $RUFUSmodel $MutantGenerator.histo $K 150 $Threads > $Out.Run.out 
-	/usr/bin/time -v $RUFUSmodel $Parent1.histo $K 150 $Threads > $Out.Run.out
-	/usr/bin/time -v $RUFUSmodel $Parent2.histo $K 150 $Threads > $Out.Run.out
-	/usr/bin/time -v $RUFUSmodel $Parent3.histo $K 150 $Threads > $Out.Run.out
+	/usr/bin/time -v $RUFUSmodel $MutantGenerator.Jhash.histo $K 150 $Threads > $Out.Run.out 
+	/usr/bin/time -v $RUFUSmodel $Parent1.Jhash.histo $K 150 $Threads > $Out.Run.out
+	/usr/bin/time -v $RUFUSmodel $Parent2.Jhash.histo $K 150 $Threads > $Out.Run.out
+	/usr/bin/time -v $RUFUSmodel $Parent3.Jhash.histo $K 150 $Threads > $Out.Run.out
 	echo "done with model "
 fi
+exit
 ParentMaxE=0 
-MutantMinCov=$(head -2 $MutantGenerator.histo.7.7.model | tail -1 )
+MutantMinCov=$(head -2 $MutantGenerator.Jhash.histo.7.7.model | tail -1 )
 echo "$ParentMaxE \n $MutantMinCov \n"
 
 
@@ -73,7 +74,9 @@ else
 
 awk '{print $4 "\t" $3}' $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList.prefilter > $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList.prefilter.rearrange
 
-$RUFUSfilter -d ' ' -c /uufs/chpc.utah.edu/common/home/u0991464/lustr/RUFUS.1000g.reference/1000G.RUFUSreference.sorted.min45.tab  -s $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList.prefilter.rearrange  -o $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList -hs $k -mS $MutantMinCov -mC 0 -max $Max -t 20
+cp $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList.prefilter $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList
+
+#$RUFUSfilter -d ' ' -c /uufs/chpc.utah.edu/common/home/u0991464/lustr/RUFUS.1000g.reference/1000G.RUFUSreference.sorted.min45.tab  -s $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList.prefilter.rearrange  -o $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList -hs $k -mS $MutantMinCov -mC 0 -max $Max -t 20
 fi
 
 
