@@ -50,7 +50,7 @@ else
 	/usr/bin/time -v $RUFUSmodel $Parent3.Jhash.histo $K 150 $Threads > $Out.Run.out
 	echo "done with model "
 fi
-exit
+
 ParentMaxE=0 
 MutantMinCov=$(head -2 $MutantGenerator.Jhash.histo.7.7.model | tail -1 )
 echo "$ParentMaxE \n $MutantMinCov \n"
@@ -63,7 +63,7 @@ if [ -e "$Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList.prefilter" ]
 then 
 	echo "Skipping build"
 else
-	/usr/bin/time -v $RUFUSbuild -c $Parent1.sorted.min2.tab -c $Parent2.sorted.min2.tab -c $Parent3.sorted.min2.tab  -s $MutantGenerator.sorted.min2.tab -o $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList.prefilter -hs $K -mS $MutantMinCov -mC $ParentMaxE  -max $Max -t 1  >> $Out.Run.out
+	/usr/bin/time -v $RUFUSbuild -c $Parent1.Jhash.sorted.min2.tab -c $Parent2.Jhash.sorted.min2.tab -c $Parent3.Jhash.sorted.min2.tab  -s $MutantGenerator.Jhash.sorted.min2.tab -o $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList.prefilter -hs $K -mS $MutantMinCov -mC $ParentMaxE  -max $Max -t 1  >> $Out.Run.out
 fi 
 
 
@@ -88,7 +88,7 @@ mkfifo $MutantGenerator.temp
 /usr/bin/time -v  bash $DeDupDump $MutantBam >  $MutantGenerator.temp &
 /usr/bin/time -v   $RUFUSfilter  $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList $MutantGenerator.temp $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".filtered.fq $K 0 5 10 $Threads >> $Out.Run.out   & 
 wait
-
+exit
 echo "startin RUFUS overlap"
 /usr/bin/time -v bash $RUFUSOverlap $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".filtered.fq.Mutations.fastq 5 $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov" $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList $Threads 
 echo "done with everything "
