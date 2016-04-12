@@ -1,0 +1,1 @@
+~/bin/bamtools/bin/bamtools filter -in $1 -isDuplicate false | ~/bin/bamtools/bin/bamtools convert -format fastq 

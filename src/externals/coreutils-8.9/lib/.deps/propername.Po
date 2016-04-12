@@ -1,0 +1,156 @@
+propername.o: propername.c config.h propername.h ctype.h \
+ /usr/include/ctype.h /usr/include/features.h /usr/include/sys/cdefs.h \
+ /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
+ /usr/include/gnu/stubs-64.h /usr/include/bits/types.h \
+ /usr/include/bits/typesizes.h /usr/include/endian.h \
+ /usr/include/bits/endian.h /usr/include/bits/byteswap.h \
+ /usr/include/xlocale.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stdbool.h \
+ stdio.h /usr/include/stdio.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stddef.h \
+ /usr/include/libio.h /usr/include/_G_config.h wchar.h \
+ /usr/include/wchar.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stdarg.h \
+ /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+ /usr/include/bits/stdio.h /usr/include/sys/types.h time.h \
+ /usr/include/time.h sys/select.h /usr/include/sys/select.h \
+ /usr/include/bits/select.h /usr/include/bits/sigset.h \
+ /usr/include/bits/time.h /usr/include/sys/sysmacros.h \
+ /usr/include/bits/pthreadtypes.h stdlib.h /usr/include/stdlib.h \
+ /usr/include/bits/waitflags.h /usr/include/bits/waitstatus.h alloca.h \
+ string.h /usr/include/string.h /usr/include/bits/string.h \
+ /usr/include/bits/string2.h iconv.h /usr/include/iconv.h trim.h mbchar.h \
+ /usr/include/bits/wchar.h wctype.h /usr/include/wctype.h mbuiter.h \
+ /usr/include/assert.h strnlen1.h localcharset.h c-strcase.h xstriconv.h \
+ xalloc.h gettext.h /usr/include/libintl.h locale.h /usr/include/locale.h \
+ /usr/include/bits/locale.h
+
+config.h:
+
+propername.h:
+
+ctype.h:
+
+/usr/include/ctype.h:
+
+/usr/include/features.h:
+
+/usr/include/sys/cdefs.h:
+
+/usr/include/bits/wordsize.h:
+
+/usr/include/gnu/stubs.h:
+
+/usr/include/gnu/stubs-64.h:
+
+/usr/include/bits/types.h:
+
+/usr/include/bits/typesizes.h:
+
+/usr/include/endian.h:
+
+/usr/include/bits/endian.h:
+
+/usr/include/bits/byteswap.h:
+
+/usr/include/xlocale.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stdbool.h:
+
+stdio.h:
+
+/usr/include/stdio.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stddef.h:
+
+/usr/include/libio.h:
+
+/usr/include/_G_config.h:
+
+wchar.h:
+
+/usr/include/wchar.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stdarg.h:
+
+/usr/include/bits/stdio_lim.h:
+
+/usr/include/bits/sys_errlist.h:
+
+/usr/include/bits/stdio.h:
+
+/usr/include/sys/types.h:
+
+time.h:
+
+/usr/include/time.h:
+
+sys/select.h:
+
+/usr/include/sys/select.h:
+
+/usr/include/bits/select.h:
+
+/usr/include/bits/sigset.h:
+
+/usr/include/bits/time.h:
+
+/usr/include/sys/sysmacros.h:
+
+/usr/include/bits/pthreadtypes.h:
+
+stdlib.h:
+
+/usr/include/stdlib.h:
+
+/usr/include/bits/waitflags.h:
+
+/usr/include/bits/waitstatus.h:
+
+alloca.h:
+
+string.h:
+
+/usr/include/string.h:
+
+/usr/include/bits/string.h:
+
+/usr/include/bits/string2.h:
+
+iconv.h:
+
+/usr/include/iconv.h:
+
+trim.h:
+
+mbchar.h:
+
+/usr/include/bits/wchar.h:
+
+wctype.h:
+
+/usr/include/wctype.h:
+
+mbuiter.h:
+
+/usr/include/assert.h:
+
+strnlen1.h:
+
+localcharset.h:
+
+c-strcase.h:
+
+xstriconv.h:
+
+xalloc.h:
+
+gettext.h:
+
+/usr/include/libintl.h:
+
+locale.h:
+
+/usr/include/locale.h:
+
+/usr/include/bits/locale.h:

@@ -40,7 +40,7 @@ const vector<string> Split(const string& line, const char delim) {
     stringstream lineStream(line);
     string token;
     while ( getline(lineStream, token, delim) )
-        tokens.push_back(token);
+	tokens.push_back(token);
     return tokens;
 }
 string trim (string s)
@@ -61,52 +61,52 @@ return newS;
 
 string LongToHash (unsigned long LongHash, int HashSize)
 {
-        string value = "";
-        bitset<64> test (LongHash);
-        for (int i = 1; i < HashSize*2; i+=2)
-        {
-                if (test[i-1] == 0)
-                {
-                        if (test[i] == 0)
+	string value = "";
+	bitset<64> test (LongHash);
+	for (int i = 1; i < HashSize*2; i+=2)
+	{
+		if (test[i-1] == 0)
+		{
+			if (test[i] == 0)
 			{value = value + "A";}
-                        else
-                        {value = value + "C";}
-                }
-                else
-                {
-                        if (test[i] == 0)
-                        {value = value + "G";}
-                        else
-                        {value = value + "T";}
-                }
-        }
-        return value;
+			else
+			{value = value + "C";}
+		}
+		else
+		{
+			if (test[i] == 0)
+			{value = value + "G";}
+			else
+			{value = value + "T";}
+		}
+	}
+	return value;
 }
 
 
 string RevComp (string Sequence)
 {
-        string NewString = "";
-        //cout << "Start - " << Sequence << "\n";
-        for(int i = Sequence.size()-1; i>=0; i+= -1)
-        {
-                char C = Sequence.c_str()[i];
-        //      cout << C << endl;
-                if (C == 'A')
-                        {NewString += 'T';}
-                else if (C == 'C')
-                       	{NewString += 'G';}
-                else if (C == 'G')
-                        {NewString += 'C';}
-                else if (C == 'T')
-                        {NewString += 'A';}
-                else if (C == 'N')
-                        {NewString += 'N';}
+	string NewString = "";
+	//cout << "Start - " << Sequence << "\n";
+	for(int i = Sequence.size()-1; i>=0; i+= -1)
+	{
+		char C = Sequence.c_str()[i];
+	//      cout << C << endl;
+		if (C == 'A')
+			{NewString += 'T';}
+		else if (C == 'C')
+		       	{NewString += 'G';}
+		else if (C == 'G')
+			{NewString += 'C';}
+		else if (C == 'T')
+			{NewString += 'A';}
+		else if (C == 'N')
+			{NewString += 'N';}
 		else
-                        {cout << "\nERROR IN RevComp - " << C << "\n";}
-        }
-        //cout << "end\n";
-        return NewString;
+			{cout << "\nERROR IN RevComp - " << C << "\n";}
+	}
+	//cout << "end\n";
+	return NewString;
 }
 string RevQual (string Sequence)
 {
@@ -122,82 +122,82 @@ string RevQual (string Sequence)
 
 unsigned long HashToLong (string hash, string calledby)
 {
-        //cout << "booya" << hash << endl;
-        bitset<64> HashBits;
-        int bitcout = 0;
-        for(int i=0; i<hash.size();i++)
-        {
-                if (hash.c_str()[i] == 'A')
-                {
-                        HashBits[bitcout] = 0;
-                        bitcout++;
-                        HashBits[bitcout] = 0;
-                        bitcout++;
-                }
-                else  if (hash.c_str()[i] == 'C')
-                {
-                        HashBits[bitcout] = 0;
-                        bitcout++;
-                        HashBits[bitcout] = 1;
-                        bitcout++;
-                }
-                else  if (hash.c_str()[i] == 'G')
-                {
-                        HashBits[bitcout] = 1;
-                        bitcout++;
-                        HashBits[bitcout] = 0;
-                        bitcout++;
-                }
-                else  if (hash.c_str()[i] == 'T')
-                {
-                        HashBits[bitcout] = 1;
-                        bitcout++;
-                        HashBits[bitcout] = 1;
-                        bitcout++;
-                }
-                else
-                {
-                        cout << "ERROR, invalid character - " << hash.c_str()[i] << ", in hash " << hash << ", called by " << calledby <<  endl;
-                }
-        }
-        //cout <<  HashBits.to_ulong() << "-" << endl;
-        return  HashBits.to_ulong();
+	//cout << "booya" << hash << endl;
+	bitset<64> HashBits;
+	int bitcout = 0;
+	for(int i=0; i<hash.size();i++)
+	{
+		if (hash.c_str()[i] == 'A')
+		{
+			HashBits[bitcout] = 0;
+			bitcout++;
+			HashBits[bitcout] = 0;
+			bitcout++;
+		}
+		else  if (hash.c_str()[i] == 'C')
+		{
+			HashBits[bitcout] = 0;
+			bitcout++;
+			HashBits[bitcout] = 1;
+			bitcout++;
+		}
+		else  if (hash.c_str()[i] == 'G')
+		{
+			HashBits[bitcout] = 1;
+			bitcout++;
+			HashBits[bitcout] = 0;
+			bitcout++;
+		}
+		else  if (hash.c_str()[i] == 'T')
+		{
+			HashBits[bitcout] = 1;
+			bitcout++;
+			HashBits[bitcout] = 1;
+			bitcout++;
+		}
+		else
+		{
+			cout << "ERROR, invalid character - " << hash.c_str()[i] << ", in hash " << hash << ", called by " << calledby <<  endl;
+		}
+	}
+	//cout <<  HashBits.to_ulong() << "-" << endl;
+	return  HashBits.to_ulong();
 }
 /*	
 unsigned long HashToLong (string hash)
 {
-        //cout << "booya" << hash << endl;
-        bitset<64> HashBits;
-        //#pragma omp parellel for
-        for(int i=0; i<hash.size();i++)
-        {
-                if (hash.c_str()[i] == 'A')
-                {
-                        HashBits[i*2] = 0;
-                        HashBits[i*2+1] = 0;
-                }
-                else  if (hash.c_str()[i] == 'C')
-                {
-                        HashBits[i*2] = 0;
-                        HashBits[i*2+1] = 1;
-                }
-                else  if (hash.c_str()[i] == 'G')
-                {
-                        HashBits[i*2] = 1;
-                        HashBits[i*2+1] = 0;
-                }
-                else  if (hash.c_str()[i] == 'T')
-                {
-                        HashBits[i*2] = 1;
-                        HashBits[i*2+1] = 1;
-                }
-                else
-                {
-                        cout << "ERROR, invalid character - " << hash.c_str()[i] << " in " << hash <<  endl;
-                }
-        }
-        //cout <<  HashBits.to_ulong() << "-" << endl;
-        return HashBits.to_ulong();
+	//cout << "booya" << hash << endl;
+	bitset<64> HashBits;
+	//#pragma omp parellel for
+	for(int i=0; i<hash.size();i++)
+	{
+		if (hash.c_str()[i] == 'A')
+		{
+			HashBits[i*2] = 0;
+			HashBits[i*2+1] = 0;
+		}
+		else  if (hash.c_str()[i] == 'C')
+		{
+			HashBits[i*2] = 0;
+			HashBits[i*2+1] = 1;
+		}
+		else  if (hash.c_str()[i] == 'G')
+		{
+			HashBits[i*2] = 1;
+			HashBits[i*2+1] = 0;
+		}
+		else  if (hash.c_str()[i] == 'T')
+		{
+			HashBits[i*2] = 1;
+			HashBits[i*2+1] = 1;
+		}
+		else
+		{
+			cout << "ERROR, invalid character - " << hash.c_str()[i] << " in " << hash <<  endl;
+		}
+	}
+	//cout <<  HashBits.to_ulong() << "-" << endl;
+	return HashBits.to_ulong();
 }
 */
 
@@ -218,8 +218,8 @@ int RebuildHashTable(vector<string>& sequenes, int Ai, int SearchHash, unordered
 		int LoopLimit = Sequence.size()-SearchHash;
 		
 		for( int j = 0; j < LoopLimit; j++)
-                {
-                	string hash = Sequence.substr(j,SearchHash);
+		{
+			string hash = Sequence.substr(j,SearchHash);
 			size_t found = hash.find('N');
   			if (found==std::string::npos)
 			{
@@ -227,9 +227,9 @@ int RebuildHashTable(vector<string>& sequenes, int Ai, int SearchHash, unordered
 				unsigned long  RevHash = HashToLong(RevComp(hash), "Rebuild");
 				#pragma omp critical(updateHash)
 				{Hashes[LongHash].push_back(i);
-                	        Hashes[RevHash].push_back(i);}
+				Hashes[RevHash].push_back(i);}
 			}
-               	}
+	       	}
 	}
 	cout << "\nDone Rebulding HashTable\n";
 	return 0;
@@ -237,63 +237,63 @@ int RebuildHashTable(vector<string>& sequenes, int Ai, int SearchHash, unordered
 int  PrepairSearchList(string A, int Ai, unordered_map<unsigned long, vector<int>>& Hashes,int SearchHash,int ACT, map<int, vector<int>>& array, bool& hitPosLimit, bool& hitIndexLimit, int& NumberPos, int& NumberIndex )
 {
 	int Alength = A.size();
-        map<int,int> Positions;
-        int added = 0 ;
-        for (int i = 0; i<Alength-SearchHash; i++)
-        {
-                string hash = A.substr(i,SearchHash);
-                size_t found = hash.find('N');
-                if (found==std::string::npos)
-                {
-                        unsigned long LongHash = HashToLong(hash, "Align");
+	map<int,int> Positions;
+	int added = 0 ;
+	for (int i = 0; i<Alength-SearchHash; i++)
+	{
+		string hash = A.substr(i,SearchHash);
+		size_t found = hash.find('N');
+		if (found==std::string::npos)
+		{
+			unsigned long LongHash = HashToLong(hash, "Align");
 			int max = Hashes[LongHash].size();
-                        for (vector<int>::size_type i = 0; i < max; i++)
-                        {
-                                int holder = Hashes[LongHash][i];
-                                if(holder > Ai+1 )
-                                {
-                                        if (Positions.count(holder) > 0)
-                                        {
-                                                {Positions[holder]++;added++;}
-                                        }
-                                        else
-                                        {
-                                                {Positions[holder] = 1;added++;}
-                                        }
-                                }
-                                if (added > 100000)
-                                {hitPosLimit = true; NumberPos = added;break;}
-                        }
-                }
-        }
-                                                                        if(FullOut){cout << "done Hasing read" << endl;}
-        NumberPos = added;
+			for (vector<int>::size_type i = 0; i < max; i++)
+			{
+				int holder = Hashes[LongHash][i];
+				if(holder > Ai+1 )
+				{
+					if (Positions.count(holder) > 0)
+					{
+						{Positions[holder]++;added++;}
+					}
+					else
+					{
+						{Positions[holder] = 1;added++;}
+					}
+				}
+				if (added > 100000)
+				{hitPosLimit = true; NumberPos = added;break;}
+			}
+		}
+	}
+									if(FullOut){cout << "done Hasing read" << endl;}
+	NumberPos = added;
 	map <int,int>::iterator uspos;
-        map<double, int> SortedPositions;
-        double trick = 0.0;
-        for (uspos = Positions.begin(); uspos != Positions.end(); ++uspos)
-        {
-                trick++;
-                SortedPositions[(double)uspos->second + (2.0/trick)] = uspos->first;
-        }
-                                                                        if(FullOut){cout << "found - " << Positions.size() << " possible locations" << endl;}
-        map<double, int>::iterator pos;
-        vector<int> indexes;
-        int sanity = 0;
-        for (pos = SortedPositions.end(); pos != SortedPositions.begin(); --pos)
-        {
-                if (pos->first >= ACT)
-                {
-                        indexes.push_back(pos->second+0);
-                        sanity++;
-                        if (sanity > 1000){hitIndexLimit = true; NumberIndex = sanity;break;}
-                }
-        }
+	map<double, int> SortedPositions;
+	double trick = 0.0;
+	for (uspos = Positions.begin(); uspos != Positions.end(); ++uspos)
+	{
+		trick++;
+		SortedPositions[(double)uspos->second + (2.0/trick)] = uspos->first;
+	}
+									if(FullOut){cout << "found - " << Positions.size() << " possible locations" << endl;}
+	map<double, int>::iterator pos;
+	vector<int> indexes;
+	int sanity = 0;
+	for (pos = SortedPositions.end(); pos != SortedPositions.begin(); --pos)
+	{
+		if (pos->first >= ACT)
+		{
+			indexes.push_back(pos->second+0);
+			sanity++;
+			if (sanity > 1000){hitIndexLimit = true; NumberIndex = sanity;break;}
+		}
+	}
 	NumberIndex = sanity;
 	#pragma omp critical
 	{array[Ai] = indexes;}
 	return 1;
-                                                                        if(FullOut){cout << "       " << indexes.size() << " locations passed filter" << endl;}
+									if(FullOut){cout << "       " << indexes.size() << " locations passed filter" << endl;}
 
 
 }
@@ -306,15 +306,15 @@ int Align3 (vector<string>& sequenes, string Ap, string Aq, int Ai, int& overlap
 	int bestScore = 0;
 	
 	#pragma omp parallel for  num_threads(Threads) shared(BestIndex) 	
-        for (int booya = 0 ; booya < indexes.size(); booya++)
-        {
+	for (int booya = 0 ; booya < indexes.size(); booya++)
+	{
 		string A = Ap;
 		int AlengthL = A.size();
 		int j = indexes[booya];	
 		
 		string B, Bq;
 		bool localcheck;
-               	B = sequenes[j];
+	       	B = sequenes[j];
 
 		
 		float score = 0 ; 
@@ -354,7 +354,7 @@ int Align3 (vector<string>& sequenes, string Ap, string Aq, int Ai, int& overlap
 				if(A.c_str()[k+Acount] == B.c_str()[k+Bcount])
 				{if (A.c_str()[k+Acount ] != 'N'){score++;}}
 				if ((k-score) > MM)
-                                {score = -1;break;}
+				{score = -1;break;}
 			  
 			}	
 			if (Asmaller)
@@ -431,7 +431,7 @@ int Align3 (vector<string>& sequenes, string Ap, string Aq, int Ai, int& overlap
 					if (B.c_str()[ Blength - i + k - 1 ] == A.c_str()[ 0+k])
 					{if (A.c_str()[ 0+k] != 'N'){score++;}}
 					 if ((k-score) > MM)
-	        	                      	{score = -1;break;}
+					      	{score = -1;break;}
 				}
 				if(verbose){cout << "  Score = " << score << endl;}
 				
@@ -445,7 +445,7 @@ int Align3 (vector<string>& sequenes, string Ap, string Aq, int Ai, int& overlap
 						Loverlap = Blength-i-1;
 						
 						if (score == i)
-	                                        {break;}
+						{break;}
 					}			
 				}
 			}
@@ -463,7 +463,7 @@ int Align3 (vector<string>& sequenes, string Ap, string Aq, int Ai, int& overlap
 	return bestScore;	
 }
 
-string ColapsContigs(string A, string B, int k, string Aq, string& Bq, string Ad, string& Bd, vector<int> Ah, vector<int>& Bh)
+string ColapsContigs(string A, string B, int k, string Aq, string& Bq, string Ad, string& Bd)
 {
 	bool verbose = false;
 	if (verbose){cout << "Combining; \n" << A << endl << B << endl;} 
@@ -477,7 +477,6 @@ string ColapsContigs(string A, string B, int k, string Aq, string& Bq, string Ad
 	string newString = "";
 	string newQual = "";
 	string newDepth = "";
-	vector<int> newHash;
 	if (k>0)
 	{Aoffset = k;}else{Boffset = abs(k);}
 	if (verbose){cout << "K = " << k << " so Aofset = " << Aoffset << " and Boffset = " << Boffset << endl;}
@@ -489,23 +488,19 @@ string ColapsContigs(string A, string B, int k, string Aq, string& Bq, string Ad
 		char Bqualc = '!';
 		unsigned char Adepc = 0;
 		unsigned char Bdepc = 0;
-		int Ahashc = 0; 
-		int Bhashc = 0;
 
-		//Get current Bases
+		//Get furrent Bases
 		if (((i-Aoffset) >= 0 ) && ((i-Aoffset) < A.size()))
 		{
 			Abase = A.c_str()[i-Aoffset];
 			Aqualc = Aq.c_str()[i-Aoffset];
 			Adepc = Ad.c_str()[i-Aoffset];
-			Ahashc = Ah[i-Aoffset];
 		}
 		else 
 		{
 			Abase = 'Z';
 			Aqualc = '!';
-			Adepc = 0;
-			Ahashc = 0; 
+			Adepc = 0;	
 		}
 
 		if (i-Boffset >= 0 && i-Boffset < B.size())
@@ -513,14 +508,12 @@ string ColapsContigs(string A, string B, int k, string Aq, string& Bq, string Ad
 			Bbase = B.c_str()[i-Boffset];
 			Bqualc = Bq.c_str()[i-Boffset];
 			Bdepc = Bd.c_str()[i-Boffset];
-			Bhashc = Bh[i-Boffset];
 		}
 		else
 		{
 			Bbase = 'Z';
 			Bqualc = '!';
 			Bdepc = 0;
-			Bhashc = 0;
 		}
 		if (verbose){cout << "I = " << i << " Bi = " << i-Boffset << " Ai = " << i-Aoffset <<  " thus " << Abase << "-" << Bbase<< endl;}
 		
@@ -530,199 +523,185 @@ string ColapsContigs(string A, string B, int k, string Aq, string& Bq, string Ad
 			newString+=Abase;
 			if (Aqualc >= Bqualc){newQual+=Aqualc;}else{newQual+=Bqualc;}
 			if ((int)Adepc+(int)Bdepc<250){newDepth+=(Adepc+Bdepc);}else{newDepth += (char)250;}
-			newHash.push_back(Ahashc+Bhashc);
 		}
 		else if(Abase == 'Z' && Bbase != 'Z')
 		{
 			newString += Bbase;
 			newQual += Bqualc;
 			newDepth += Bdepc;
-			newHash.push_back(Bhashc);
 		}
 		else if(Abase !='Z' && Bbase == 'Z' )
 		{
 			newString += Abase;
 			newQual += Aqualc;
 			newDepth += Adepc;
-			newHash.push_back(Ahashc);
 		}
 		else if (Abase !='Z' && Bbase != 'Z')
 		{
 			/*if (Abase == 'N' && Bbase != 'N')
 			{
 				newString+=Bbase;
-                               	newQual+=Bqual;
-                    		newDepth+=Bdep;
+			       	newQual+=Bqual;
+		    		newDepth+=Bdep;
 				cout << "   A = N" << endl;
 			}
 			else if (Abase != 'N' && Bbase == 'N')
 			{
 				newString+=Abase;
-                                newQual+=Aqual;
-                                newDepth+=Adep;
+				newQual+=Aqual;
+				newDepth+=Adep;
 				cout << "   B = N" << endl;
 			}
-			else*/ if ( Aqualc >= Bqualc)
+			else*/ if ( Adepc > Bdepc)
 			{
 				newString+=Abase;
 				newQual+=Aqualc;
 				newDepth+=Adepc;
-				newHash.push_back(Ahashc);
 			}
+			else if( Adepc < Bdepc)
+			{
+                                newString+=Bbase;
+                                newQual+=Bqualc;
+                                newDepth+=Bdepc;
+                        }
+			else if ( Aqualc >= Bqualc)
+                        {
+                                newString+=Abase;
+                                newQual+=Aqualc;
+                                newDepth+=Adepc;
+                        }
 			else 
 			{
 				newString+=Bbase;
 				newQual+=Bqualc;
 				newDepth+=Bdepc;
-				newHash.push_back(Bhashc);
 			}
 
 		}
 		else if (Abase =='Z' && Bbase == 'Z')
-		{Bq = newQual; Bd = newDepth; Bh = newHash;return newString;}
+		{Bq = newQual; Bd = newDepth;return newString;}
 	}
 	Bq = newQual;
 	Bd = newDepth;
-	Bh = newHash;
 	return newString;
 
 	
 }
 
 
-string TrimNends(string S, string& qual, vector<int>& hashes)
+string TrimNends(string S, string& qual)
 {
-        bool base = false;
-        string NewS = "";
-        string NewQ = "";
-	vector <int> NewH;
-        for (int i = S.size()-1; i>=0; i--)
-        {
-                if (base)
-                {
-                        NewS = S.c_str()[i] + NewS;
-                        NewQ = qual.c_str()[i] +NewQ;
-			vector<int>::iterator it = NewH.begin();
-                        it = NewH.insert(it, hashes[i]);			
-                }
-                else if(S.c_str()[i] != 'A' && S.c_str()[i] != 'C' && S.c_str()[i] != 'G' && S.c_str()[i] != 'T')
-                {}
-                else
-                {
-                        base = true;
-                        NewS = S.c_str()[i] + NewS;
-                        NewQ = qual.c_str()[i] +NewQ;
-                	vector<int>::iterator it = NewH.begin();
-                        it = NewH.insert(it, hashes[i]);	
+	bool base = false;
+	string NewS = "";
+	string NewQ = "";
+	for (int i = S.size()-1; i>=0; i--)
+	{
+		if (base)
+		{
+			NewS = S.c_str()[i] + NewS;
+			NewQ = qual.c_str()[i] +NewQ;
 		}
-        }
+		else if(S.c_str()[i] != 'A' && S.c_str()[i] != 'C' && S.c_str()[i] != 'G' && S.c_str()[i] != 'T')
+		{}
+		else
+		{
+			base = true;
+			NewS = S.c_str()[i] + NewS;
+			NewQ = qual.c_str()[i] +NewQ;
+		}
+	}
 	
 
 	S = NewS;
 	qual = NewQ;
-	hashes = NewH;
-
+	
 	base = false;
-        NewS = "";
-        NewQ = "";
-	NewH.clear();
-        for (int i = 0; i<S.size(); i++)
-        {
-                if (base)
-                {
-                        NewS = NewS + S.c_str()[i] ;
-                        NewQ = NewQ + qual.c_str()[i] ;
-        		NewH.push_back(hashes[i]); 
-	       }
-                else if(S.c_str()[i] != 'A' && S.c_str()[i] != 'C' && S.c_str()[i] != 'G' && S.c_str()[i] != 'T')
-                {}
-                else
-                {
-                        base = true;
-                        NewS = NewS + S.c_str()[i];
-                        NewQ = NewQ + qual.c_str()[i] ;
-			NewH.push_back(hashes[i]);
-                }
-        }
+	NewS = "";
+	NewQ = "";
+	for (int i = 0; i<S.size(); i++)
+	{
+		if (base)
+		{
+			NewS = NewS + S.c_str()[i] ;
+			NewQ = NewQ + qual.c_str()[i] ;
+		}
+		else if(S.c_str()[i] != 'A' && S.c_str()[i] != 'C' && S.c_str()[i] != 'G' && S.c_str()[i] != 'T')
+		{}
+		else
+		{
+			base = true;
+			NewS = NewS + S.c_str()[i];
+			NewQ = NewQ + qual.c_str()[i] ;
+		}
+	}
 
 
 
-        //cout << "Trimmed Laggin N\'s " << endl << S <<endl<< NewS<<endl;
+	//cout << "Trimmed Laggin N\'s " << endl << S <<endl<< NewS<<endl;
 	qual = NewQ;
-	hashes = NewH;
 	return NewS;
 }
 
-string TrimLowCoverageEnds(string S,string& quals, string& depth, vector<int>& hashes, int cutoff)
+string TrimLowCoverageEnds(string S,string& quals, string& depth, int cutoff)
 {
  	//cout << "S = " << S << endl;
        	bool base = false;
-        string NewS = "";
-        string NewD = "";
+	string NewS = "";
+	string NewD = "";
 	string NewQ = "";
-	vector <int> NewH; 
 	//cout << "Starting at left edge" << endl;
-        for (int i = S.size()-1; i>=0; i--)
-        {
+	for (int i = S.size()-1; i>=0; i--)
+	{
 		//cout << "Base " << i << " = " << S.c_str()[i] << " dep = " << (int)depth.c_str()[i] << endl;
-                if (base)
-                {
+		if (base)
+		{
 		//	cout << "found hihgh base" << endl;
-                        NewS = S.c_str()[i] + NewS;
-                        NewD = depth.c_str()[i] + NewD;
+			NewS = S.c_str()[i] + NewS;
+			NewD = depth.c_str()[i] + NewD;
 			NewQ = quals.c_str()[i] + NewQ;
-			vector<int>::iterator it = NewH.begin();
-			it = NewH.insert(it, hashes[i]);	
-                }
-                else if((int)depth.c_str()[i]>cutoff)
-                {
-                //	cout << (int)depth.c_str()[i] << " > " << cutoff << "reading rest of bases" << endl;
-		        base = true;
-                        NewS = S.c_str()[i] + NewS;
-                        NewD = depth.c_str()[i] + NewD;
+		}
+		else if((int)depth.c_str()[i]>cutoff)
+		{
+		//	cout << (int)depth.c_str()[i] << " > " << cutoff << "reading rest of bases" << endl;
+			base = true;
+			NewS = S.c_str()[i] + NewS;
+			NewD = depth.c_str()[i] + NewD;
 			NewQ = quals.c_str()[i] + NewQ;
-			vector<int>::iterator it = NewH.begin();
-                        it = NewH.insert(it, hashes[i]);
-                }
+		}
 		else
 		{}//cout << (int)depth.c_str()[i] << " still too low " << endl;}
-        }
+	}
 	if (NewS.size() > 1)
 	{
 		S = NewS;
 		depth = NewD;
 		quals = NewQ;
-		hashes = NewH;
 		//cout << "so far trimmed to " << S << endl;
 		base = false;
-	        NewS = "";
-	        NewD = "";
+		NewS = "";
+		NewD = "";
 		NewQ = "";
-		NewH.clear();
-	        for (int i = 0; i<S.size(); i++)
-	        {
-	                if (base)
-	                {
-	                        NewS = NewS + S.c_str()[i] ;
-	                        NewD = NewD + depth.c_str()[i];
+		for (int i = 0; i<S.size(); i++)
+		{
+			if (base)
+			{
+				NewS = NewS + S.c_str()[i] ;
+				NewD = NewD + depth.c_str()[i];
 				NewQ = NewQ + quals.c_str()[i];
-				NewH.push_back(hashes[i]);
-	                }
-	                else if((int)depth.c_str()[i]>cutoff)
-	                {
-	                        base = true;
-	                        NewS = NewS + S.c_str()[i];
-	                        NewD = NewD + depth.c_str()[i];
+			}
+			else if((int)depth.c_str()[i]>cutoff)
+			{
+				base = true;
+				NewS = NewS + S.c_str()[i];
+				NewD = NewD + depth.c_str()[i];
 				NewQ = NewQ + quals.c_str()[i];
-				NewH.push_back(hashes[i]);
-	                }
-	        }
+			}
+		}
 	}
-	        //cout << "Trimmed Laggin N\'s " << endl << S <<endl<< NewS<<endl;
+		//cout << "Trimmed Laggin N\'s " << endl << S <<endl<< NewS<<endl;
 	depth = NewD;
 	quals = NewQ;
-	hashes = NewH; 
-        //cout << "returning S = " << NewS << endl <<  "returning D = " << NewD << endl;
+	//cout << "returning S = " << NewS << endl <<  "returning D = " << NewD << endl;
 	return NewS;
 }
 string AdjustBases(string sequence, string qual)
@@ -745,18 +724,18 @@ string AdjustBases(string sequence, string qual)
 bool replace(std::string& str, const std::string& from, const std::string& to) {
     size_t start_pos = str.find(from);
     if(start_pos == std::string::npos)
-        return false;
+	return false;
     str.replace(start_pos, from.size(), to);
     return true;
 }
 int main (int argc, char *argv[])
 {
-	//cout << "Testing Trim \n";
+	cout << "Testing Trim \n";
 	string test = "ANGT";
 	string qu   = "4567";
-	//cout << test << endl << qu << endl;
-	//test = 	TrimNends(test, qu, testH);
-	//cout << test << endl << qu << endl << "done" << endl;
+	cout << test << endl << qu << endl;
+	test = 	TrimNends(test, qu);
+	cout << test << endl << qu << endl << "done" << endl;
 	
 	cout << "Testing HashToLong \n";
 	test = "CACCACCGGCAAGCTGCCCGTGCCCTGCC";
@@ -771,9 +750,8 @@ int main (int argc, char *argv[])
 	int MinOverlap ;
 	int MinCoverage ;			
 	cout << "you gave "<< argc << " Arguments"  << endl;
-	if (argc != 10)
-	//						     1		2	3		4	 5		6	  7	     8        9           
-	{cout << "ERROR, wrong numbe of arguemnts\nCall is: FASTQ, MinPercent, MinOverlap, MinCoverage, SearchHashSize, ACT, LCendTrimEpth Threads outfile"<< endl; return 0;}
+	if (argc != 11)
+	{cout << "ERROR, wrong numbe of arguemnts\nCall is: FASTQ, MinPercent, MinOverlap, MinCoverage, ReportStub, SearchHashSize, ACT, OutFile LCendTrimEpth Threads"<< endl; return 0;}
 		
 	
 	ifstream fastq;
@@ -787,53 +765,72 @@ int main (int argc, char *argv[])
 	}
 	
 	string temp = argv[2];
-        MinPercent = atof(temp.c_str());	
+	MinPercent = atof(temp.c_str());	
 
 	temp = argv[3];
 	MinOverlap = atoi(temp.c_str());
 
 	temp = argv[4];
-        MinCoverage = atoi(temp.c_str());
-	
-	temp = argv[5];
-	SearchHash = atoi(temp.c_str());
+	MinCoverage = atoi(temp.c_str());
 	
 	temp = argv[6];
-	ACT = atoi(temp.c_str());
+	SearchHash = atoi(temp.c_str());
 	
 	temp = argv[7];
+	ACT = atoi(temp.c_str());
+	
+	temp = argv[9];
 	int TrimLCcuttoff = atoi(temp.c_str());
-	temp = argv[8];
+	temp = argv[10];
 	int Threads = atoi(temp.c_str());
 	int Buffer = 100 * Threads;
-
-	cout << "You Gave:\n  Fastq = " << argv[1] << "\n  MinPercent= " << argv[2] << "\n  MinOverlap= " << argv[3] << "\n  MinCoverage= " << argv[4] << "\n  SearchHashSize= " << argv[5] << "\n  ACT= " << argv[6] 
-		<< "\n  LCendTrimDepth= " << argv[7] << "\n  Threads= " << argv[8] << "\n  OutFileStub= " << argv[9] << endl;
-
 	ofstream report;
 	std::stringstream ss;
 	string FirstPassFile = argv[1];
-	ss << argv[9] << ".fastq";
-        FirstPassFile = ss.str();
-        report.open (FirstPassFile.c_str());
-        if (report.is_open())
-        {}
-        else
-        {
-                cout << "ERROR, Mut-Output file could not be opened - " << FirstPassFile << endl;
-                return 0;
-        }
+	ss << argv[8] << ".fastq";
+	FirstPassFile = ss.str();
+	report.open (FirstPassFile.c_str());
+	if (report.is_open())
+	{}
+	else
+	{
+		cout << "ERROR, Mut-Output file could not be opened - " << FirstPassFile << endl;
+		return 0;
+	}
 	
 	ofstream Depreport;
-        FirstPassFile += "dh";
-        Depreport.open (FirstPassFile.c_str());
-        if (report.is_open())
-        {}
-        else
-        {
-                cout << "ERROR, Mut-Output file could not be opened - " << FirstPassFile << endl;
-                return 0;
-        }
+	FirstPassFile += "d";
+	Depreport.open (FirstPassFile.c_str());
+	if (report.is_open())
+	{}
+	else
+	{
+		cout << "ERROR, Mut-Output file could not be opened - " << FirstPassFile << endl;
+		return 0;
+	}
+
+	ofstream good;
+	FirstPassFile = ss.str(); 
+	FirstPassFile += "good.fastq";
+	good.open (FirstPassFile.c_str());
+	if (good.is_open())
+	{}
+	else
+	{
+		cout << "ERROR, Mut-Output file could not be opened - " << FirstPassFile << endl;
+		return 0;
+	}
+	ofstream bad;
+	FirstPassFile = ss.str();
+	FirstPassFile += "bad.fastq";
+	bad.open (FirstPassFile.c_str());
+	if (bad.is_open())
+	{}
+	else
+	{
+		cout << "ERROR, Mut-Output file could not be opened - " << FirstPassFile << endl;
+		return 0;
+	}
 	
 	
 	string line;
@@ -841,169 +838,163 @@ int main (int argc, char *argv[])
 	vector<string> sequenes;// = new vector<string>;
 	vector<string> qual;//= new vector<string>;
 	vector<string> depth;// = new vector<string>;
-	vector<vector<int>> hashLog; 	
+		
 	std::unordered_map<unsigned long, vector<int>> Hashes;
 	
 
 	int lines = -1;
-
+	int goodlines = 0; 
+	int dup = 0; 
 	string L1;
 	string L2;
 	string L3;
 	string L4;
 	string L5;
 	string L6;
-	string L7; 
-	string L8; 
 	int Rejects = 0;
 	
 	//read in fastq
 	//int readcount = 0;
 	string Fastqd = argv[1];
-	size_t found = Fastqd.find(".fastqdh");
-        if (found !=string::npos)	
+	size_t found = Fastqd.find(".fastqd");
+	if (found !=string::npos)	
 	{
 		
 		int counter =0;
-		cout << "ATTENTION - Fastq+depth+hash input detected, reading in FASTqDH file \n";
+		cout << "ATTENTION - Fastq+depth input detected, reading in FASTQD file \n";
 		while (getline(fastq, L1))
-                {
+		{
 			counter++;
 			if (counter % 100 == 1)
-                        {
-                                cout << "Read in " << counter << " lines and rejected " << Rejects << " reads\r";
-                        }
+			{
+				cout << "Read in " << counter << " lines and rejected " << Rejects << " reads\r";
+			}
 
-                        getline(fastq, L2);
-                        getline(fastq, L3);
-                        getline(fastq, L4);
+			getline(fastq, L2);
+			getline(fastq, L3);
+			getline(fastq, L4);
 			getline(fastq, L5);
 			getline(fastq, L6);
-			getline(fastq, L7);
-			getline(fastq, L8);
 			string depths = "";
-			vector<int> hashes ;
 			int ReadSize = L2.size();
 				
 			bool Multiple = false;
-                       	vector<string> temp = Split(L6, ' ');
+		       	vector<string> temp = Split(L6, ' ');
+			 		
 			for (vector<string>::size_type i = 0; i < temp.size(); i++)
-                        {unsigned char C = atoi(temp[i].c_str());depths += C;if((int)C>1){Multiple = true;}}
+			{unsigned char C = atoi(temp[i].c_str());depths += C;if((int)C>1){Multiple = true;}}
 			
-			
-			temp = Split(L8, ' ');
-                        for (vector<string>::size_type i = 0; i < temp.size(); i++)
-                        {int C = atoi(temp[i].c_str());hashes.push_back(C);}
-			
-			
-			if (Multiple == true){L2 = TrimLowCoverageEnds(L2, L4, depths, hashes, TrimLCcuttoff);}
+			Multiple = false;	
+			if (Multiple == true){L2 = TrimLowCoverageEnds(L2, L4, depths,TrimLCcuttoff);}
 			
 			if (L2.size() > SearchHash+1)
 			{
 				lines++;	
 				sequenes.push_back(L2);
-                        	qual.push_back(L4);
+				qual.push_back(L4);
 				depth.push_back(depths);
-				hashLog.push_back(hashes);
 				ReadSize = L2.size();
 			}
 			else
 			{Rejects++;}
-                }
+		}
 		
 
 	}
 	else
 	{
-		
-                cout << "Reading in fastqH file  \n"; 
-                int counter = 0;        
-                while (getline(fastq, L1))
-                {
-                        counter++;
-                        if (counter % 100 == 1)
-                        {
-                                cout << "Read in " << counter << " lines and rejected " << Rejects << " reads\r";
-                        }
-                        //if (lines == 10000)
-                        //{break;}
-                        
-                        getline(fastq, L2);
-                        getline(fastq, L3);
-                        getline(fastq, L4);
-			getline(fastq, L5);
-			getline(fastq, L6);
-                        int ReadSize = L2.size();
-			vector<int> hashes; 
-
-			vector<string> temp = Split(L6, ' ');
-                        for (vector<string>::size_type i = 0; i < temp.size(); i++)
-                        {int C = atoi(temp[i].c_str());hashes.push_back(C);}                        
-
-                        L2 = AdjustBases(L2, L4);
-                        L2 = TrimNends(L2, L4, hashes);
-                        string depths = "";     
-                        if ((double)L2.size()/(double)ReadSize > .6)
-                        {
-                                ReadSize = L2.size()-1;
-                                lines++;
-                                sequenes.push_back(L2);
-                                qual.push_back(L4);
-                                unsigned char C = 1;
-                                for (int i=0; i<=ReadSize;i++)
-                                {depths += C;}
-                                depth.push_back(depths);
-				hashLog.push_back(hashes);
-	//			for (int i = 0; i< hashes.size(); i++)
-	//			cout << hashes[i] << " "; 
-	//			cout << endl;
-                        }
-                       else
-                       {Rejects++;}
-
-                }
-		
-	}
-	/*{
+		vector <string> DupCheck; 
 		cout << "Reading in raw fastq \n"; 
 		int counter = 0;	
 		while (getline(fastq, L1))
-        	{
+		{
 			counter++;
 			if (counter % 100 == 1)
-                	{
-                        	cout << "Read in " << counter << " lines and rejected " << Rejects << " reads\r";
-                	}
+			{
+				cout << "Read in " << counter << " lines, rejected " << Rejects << " reads with " << dup << " duplicates\r";
+			}
 			//if (lines == 10000)
 			//{break;}
 			
 			getline(fastq, L2);
 			getline(fastq, L3);
 			getline(fastq, L4);
-			int ReadSize = L2.size();
-			
-			L2 = AdjustBases(L2, L4);
-			L2 = TrimNends(L2, L4);
-			string depths = "";	
-			if ((double)L2.size()/(double)ReadSize > .6)
-                        {
-				ReadSize = L2.size()-1;
-				lines++;
-                                sequenes.push_back(L2);
-                                qual.push_back(L4);
-                                unsigned char C = 1;
-                                for (int i=0; i<=ReadSize;i++)
-                                {depths += C;}
-                                depth.push_back(depths);
+			int Ns = 0; 
+			for (int i =0; i<L2.size(); i++)
+			{
+				if (L2.c_str()[i] == 'N')
+					{Ns++;}
 			}
-                       else
-                       {Rejects++;}
+			
+			lines++;
+			int ReadSize = L2.size();
+				
+			string depths = "";	
+			ReadSize = L2.size()-1;
+			bool found = false;
+			
+			bool RunDupCheck = true; 
+			if (RunDupCheck)
+			{
+				#pragma omp parallel for  num_threads(Threads) shared(DupCheck, L2, found)
+				for(int i = 0; i < DupCheck.size(); i++) 
+				{
+					if (L2.size() == DupCheck[i].size())
+					{
+						bool AllBasesMatch = true;
+						for (int k = 0; k < L2.size(); k++)
+						{
+							if (L2.c_str()[k] == 'N' or DupCheck[i].c_str()[k] == 'N'){}
+							else if (L2.c_str()[k] == DupCheck[i].c_str()[k]){}
+							else
+							{
+								AllBasesMatch = false;
+								break;
+							}
+						}
 
+						if (AllBasesMatch)
+						{
+							#pragma omp critical
+							{found = true;}
+						}
+					}
+				}
+			
+				if ((double)Ns/(double) L2.size() < 0.20)
+				{DupCheck.push_back(L2);}	
+			}
+			if (found ==  false)
+			{
+				L2 = AdjustBases(L2, L4);
+				L2 = TrimNends(L2, L4);
+				if ((double)L2.size()/(double)ReadSize > .6)
+				{
+					goodlines++;
+					sequenes.push_back(L2);
+					qual.push_back(L4);
+					unsigned char C = 1;
+					for (int i=0; i<=ReadSize;i++)
+					{depths += C;}
+					depth.push_back(depths);
+					good << L1 << endl << L2 << endl << L3 << endl << L4 << endl;
+				} 
+				else
+	       			{Rejects++;}	
+			}
+			else
+			{
+				dup++;
+				bad << L1 << endl << L2 << endl << L3 << endl << L4 << endl;
+			}					
 		}
-	}*/           
+		DupCheck.clear();
+	}	
+	good.close();
+	bad.close();    
 	cout << "done reading "<<endl;
 	int NumReads = sequenes.size();
-	cout << "\nDone reading in \n     Read in a total of " << NumReads+Rejects << " and rejected "<<Rejects << endl; 
+	cout << "\nDone reading in \n     Read in a total of " << lines << " and rejected "<<Rejects  << " with " << dup << " duplicate reads detected for a total of " << goodlines << "good reads" << endl; 
 	
 	RebuildHashTable(sequenes, 0, SearchHash, Hashes, Threads);
 	
@@ -1018,7 +1009,7 @@ int main (int argc, char *argv[])
 	double AverageFPos = 0.0;
 	double AverageFSanity = 0.0;
 	double AverageRPos = 0.0;
-        double AverageRSanity = 0.0;
+	double AverageRSanity = 0.0;
 	
 	for(std::vector<string>::size_type b = 0; b < sequenes.size(); b+=Buffer)
 	{
@@ -1031,7 +1022,7 @@ int main (int argc, char *argv[])
 		vector<string>ToAddHashes;
 		vector<int>ToAddPos;
 		map<int, vector<int>>Forwards;
-                map<int, vector<int>>Revs;
+		map<int, vector<int>>Revs;
 		int max = b+Buffer;
 	
 		if (max > sequenes.size())
@@ -1040,7 +1031,7 @@ int main (int argc, char *argv[])
 		#pragma omp parallel for  num_threads(Threads) shared(Hashes, Forwards) 
 		for (int i = b; i<max; i++)
 		{
-        		string A = sequenes[i];
+			string A = sequenes[i];
 			bool posLimit = false;
 			bool sanityLimit = false;
 			int NumPos = 0;
@@ -1052,44 +1043,42 @@ int main (int argc, char *argv[])
 			AverageFSanity = ((AverageFSanity * (double)b)+(double)NumSanity)/((double)b+1.0);
 		}
 		#pragma omp parallel for  num_threads(Threads) shared( Hashes, Revs) 
-                for (int i = b; i<max; i++)
-                {
-                        string A = RevComp(sequenes[i]);
+		for (int i = b; i<max; i++)
+		{
+			string A = RevComp(sequenes[i]);
 			bool posLimit = false;
-                        bool sanityLimit = false;
-                        int NumPos = 0;
-                        int NumSanity = 0;
-                        PrepairSearchList(A, i, Hashes, SearchHash, ACT, Revs, posLimit, sanityLimit, NumPos, NumSanity);
-                	if (posLimit){NumberHitPosLimit++;}
-                        if(sanityLimit){NumberHitSanityLimit++;};
-                        AverageRPos = ((AverageRPos * (double)b)+(double)NumPos)/((double)b+1.0);
-                        AverageRSanity = ((AverageRSanity * (double)b)+(double)NumSanity)/((double)b+1.0);
+			bool sanityLimit = false;
+			int NumPos = 0;
+			int NumSanity = 0;
+			PrepairSearchList(A, i, Hashes, SearchHash, ACT, Revs, posLimit, sanityLimit, NumPos, NumSanity);
+			if (posLimit){NumberHitPosLimit++;}
+			if(sanityLimit){NumberHitSanityLimit++;};
+			AverageRPos = ((AverageRPos * (double)b)+(double)NumPos)/((double)b+1.0);
+			AverageRSanity = ((AverageRSanity * (double)b)+(double)NumSanity)/((double)b+1.0);
 		}
 								if (FullOut){cout << "Done Bulding List"<< endl;}
 		for (int i = b; i<max; i++)
-                {
+		{
 			string A, Aqual, Adep;
-			vector<int> Ahash; 
-                        A = sequenes[i];
+			A = sequenes[i];
 			Aqual = qual[i];
 			Adep = depth[i];
-			Ahash = hashLog[i];
 			int k;
 			bool PerfectMatch = false;
 			int bestIndex = -1;
 			
 			float Dt;
-                        					if(FullOut){Et = clock();
-                        					Dt = ((double) (Et - St)) / CLOCKS_PER_SEC;
-                        					cout << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<**************************************************************>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"<< endl;}
+								if(FullOut){Et = clock();
+								Dt = ((double) (Et - St)) / CLOCKS_PER_SEC;
+								cout << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<**************************************************************>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"<< endl;}
 
 
-                        if (i % 100 == 5)
-                        {
-                                gettimeofday(&end, NULL);
-                        	float Dt = end.tv_sec - start.tv_sec;
-                                cout << "done " << i << " of " << NumReads << ", \% = " << ((double)i/(double)NumReads)*100.00 <<", TT= " << Dt << " , S/R = " << Dt/i << ", \% match= " << ((double)FoundMatch/(double)i)*100.00  << " %Plimit = " << NumberHitPosLimit/2 << ", " << ((double)NumberHitPosLimit/2.0)/(double)i << " AvP= " << (AverageFPos +AverageRPos)/2.0 << " % ILmit = " << NumberHitSanityLimit << ", " << ((double)NumberHitSanityLimit/2.0)/(double)i << " AvI= " << (AverageRSanity+AverageFSanity)/2.0  << "\r";
-                        }	
+			if (i % 100 == 5)
+			{
+				gettimeofday(&end, NULL);
+				float Dt = end.tv_sec - start.tv_sec;
+				cout << "done " << i << " of " << NumReads << ", \% = " << ((double)i/(double)NumReads)*100.00 <<", TT= " << Dt << " , S/R = " << Dt/i << ", \% match= " << ((double)FoundMatch/(double)i)*100.00  << " %Plimit = " << NumberHitPosLimit/2 << ", " << ((double)NumberHitPosLimit/2.0)/(double)i << " AvP= " << (AverageFPos +AverageRPos)/2.0 << " % ILmit = " << NumberHitSanityLimit << ", " << ((double)NumberHitSanityLimit/2.0)/(double)i << " AvI= " << (AverageRSanity+AverageFSanity)/2.0  << "\r";
+			}	
 
 	
 			int booya = Align3(sequenes, A, Aqual , i,k, bestIndex,  MinPercent , PerfectMatch, MinOverlap, Forwards[i], Threads, NumReads);
@@ -1126,39 +1115,69 @@ int main (int argc, char *argv[])
 			else	
 			{
 				string B, Bqual, Bdep;
-				vector<int> Bhash; 
 				B = sequenes[bestIndex];
 				Bqual = qual[bestIndex];
 				Bdep = depth[bestIndex];
-				Bhash = hashLog[bestIndex];
 				FoundMatch++;
 				
 												if(FullOut){if(k>0){cout << "found match at "<< k  << endl; for( int z = 0; z<k; z++)cout << "+";cout << A << endl << B  << endl;for (int z = 0; z < Bdep.size();z++){int bam = Bdep.c_str()[z];cout << bam;}cout << endl;}else {cout << "found match at "<< k  << endl;cout << A << endl;for( int z = 0; z<abs(k); z++)cout << "-";cout << B  << endl;for( int z = 0; z<abs(k); z++)cout << "-";for (int z = 0; z < Bdep.size();z++){int bam = Bdep.c_str()[z];cout << bam;}cout << endl;}}
 				
-				string combined = ColapsContigs(A, B, k, Aqual, Bqual, Adep, Bdep, Ahash, Bhash);
+				string combined = ColapsContigs(A, B, k, Aqual, Bqual, Adep, Bdep);
 				
 							if (Bqual.size() != combined.size()){cout << "ERRRORRR ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^" << endl;}	
-                                qual[bestIndex] = Bqual;
-                                depth[bestIndex] = Bdep;
-				hashLog[bestIndex] = Bhash;
+				qual[bestIndex] = Bqual;
+				depth[bestIndex] = Bdep;
 				sequenes[bestIndex] = combined;
 				sequenes[i] = "moved";
-
+			
+				//cout << "staring lookup" << endl;
 			
 				#pragma omp parallel for num_threads(Threads) shared(Hashes)
-                                for(  int j = 0; j < A.size()-SearchHash; j++)
-                                {
-                                        string hash = A.substr(j,SearchHash);
-                                        size_t found = hash.find('N');
-                                        if (found==std::string::npos)
-                                        {	
-						#pragma omp critical
-						{	
-							Hashes[HashToLong(hash, "update")].push_back(bestIndex);
-                        				Hashes[HashToLong(RevComp(hash), "upsate")].push_back(bestIndex);
-                                        	}
+				for(  int j = 0; j < A.size()-SearchHash; j++)
+				{
+					string hash = A.substr(j,SearchHash);
+					size_t found = hash.find('N');
+					if (found==std::string::npos)
+					{
+						bool found = false;
+						int k = 0; 
+                                                for ( k = 0; k < Hashes[HashToLong(hash, "update")].size(); k++)
+                                                {
+                                                	if (Hashes[HashToLong(hash, "update")][k] == bestIndex)
+							{
+								found = true; 
+								break; 		
+							}
+						}
+						//cout << "took " << k << "lookups" << endl; 
+						if (found = false)
+						{
+							#pragma omp critical
+							{	
+								Hashes[HashToLong(hash, "update")].push_back(bestIndex);
+							//	Hashes[HashToLong(RevComp(hash), "upsate")].push_back(bestIndex);
+							}
+						}
+						found = false;
+                                                for ( k = 0; k < Hashes[HashToLong(RevComp(hash), "update")].size(); k++)
+                                                {
+                                                        if (Hashes[HashToLong(RevComp(hash), "update")][k] == bestIndex)        
+                                                        {
+                                                                found = true;
+                                                                break;
+                                                        }
+                                                }
+						//cout << "took " << k << "lookups" << endl;
+						if (found = false)
+						{
+                                                	#pragma omp critical
+                                                	{       
+                                                	//      Hashes[HashToLong(hash, "update")].push_back(bestIndex);
+                                                		Hashes[HashToLong(RevComp(hash), "upsate")].push_back(bestIndex);
+                                                	}
+						}
 					}
-                                }							if(FullOut){cout << combined << endl;cout << Bqual << endl;for (int z = 0; z < Bdep.size();z++){int bam = Bdep.c_str()[z];cout << bam;}cout << endl;}			
+				}							if(FullOut){cout << combined << endl;cout << Bqual << endl;for (int z = 0; z < Bdep.size();z++){int bam = Bdep.c_str()[z];cout << bam;}cout << endl;}			
 			}
 		}
 	}
@@ -1189,12 +1208,12 @@ int main (int argc, char *argv[])
 				report << qual[i] << endl;
 
 				Depreport << "@NODE_" << i <<  "_L=" << sequenes[i].size() << "_D=" << maxDep << endl;
-                                Depreport << sequenes[i] << endl;
-                                Depreport << "+" << endl;
-                                Depreport << qual[i] << endl;
+				Depreport << sequenes[i] << endl;
+				Depreport << "+" << endl;
+				Depreport << qual[i] << endl;
 				Depreport << '+' << endl;
 				unsigned char C = depth[i].c_str()[0];
-                                int booya = C;
+				int booya = C;
 				Depreport << booya;
 				for (int w = 1; w < depth[i].size(); w++)
 				{
@@ -1203,15 +1222,7 @@ int main (int argc, char *argv[])
 					booya = C;
 					Depreport << ' ' << booya;
 				}
-				Depreport << endl;	
-				Depreport << '+' << endl;
-				vector<int> H = hashLog[i];
-				Depreport << H[0];
-                                for (int w = 1; w < H.size(); w++)
-                                {
-                                        Depreport << ' ' << H[w];
-                                }
-                                Depreport << endl;
+				Depreport << endl;
 			}
 			//else{cout << "Rejected" << endl;}
 		}

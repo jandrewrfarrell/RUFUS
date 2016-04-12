@@ -1,0 +1,3 @@
+uname-uname.o: uname-uname.c uname.h
+
+uname.h:

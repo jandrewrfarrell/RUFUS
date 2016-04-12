@@ -1,0 +1,3 @@
+gl/lib/randint.c
+lib/euidaccess-stat.c
+gl/tests/.*\.c

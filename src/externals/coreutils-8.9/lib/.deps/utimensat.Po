@@ -1,0 +1,149 @@
+utimensat.o: utimensat.c config.h sys/stat.h /usr/include/sys/types.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h \
+ /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
+ /usr/include/gnu/stubs-64.h /usr/include/bits/types.h \
+ /usr/include/bits/typesizes.h time.h /usr/include/time.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stddef.h \
+ /usr/include/endian.h /usr/include/bits/endian.h \
+ /usr/include/bits/byteswap.h sys/select.h /usr/include/sys/select.h \
+ /usr/include/bits/select.h /usr/include/bits/sigset.h \
+ /usr/include/bits/time.h /usr/include/sys/sysmacros.h \
+ /usr/include/bits/pthreadtypes.h /usr/include/xlocale.h \
+ /usr/include/sys/stat.h /usr/include/bits/stat.h /usr/include/errno.h \
+ /usr/include/bits/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/asm-generic/errno.h \
+ /usr/include/asm-generic/errno-base.h fcntl.h /usr/include/fcntl.h \
+ /usr/include/bits/fcntl.h /usr/include/bits/uio.h stat-time.h timespec.h \
+ utimens.h at-func.c dirname.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stdbool.h \
+ openat.h dirent.h /usr/include/dirent.h /usr/include/bits/dirent.h \
+ /usr/include/bits/posix1_lim.h /usr/include/bits/local_lim.h \
+ /usr/include/linux/limits.h unistd.h /usr/include/unistd.h \
+ /usr/include/bits/posix_opt.h /usr/include/bits/environments.h \
+ /usr/include/bits/confname.h /usr/include/getopt.h openat-priv.h \
+ stdlib.h /usr/include/stdlib.h /usr/include/bits/waitflags.h \
+ /usr/include/bits/waitstatus.h alloca.h save-cwd.h
+
+config.h:
+
+sys/stat.h:
+
+/usr/include/sys/types.h:
+
+/usr/include/features.h:
+
+/usr/include/sys/cdefs.h:
+
+/usr/include/bits/wordsize.h:
+
+/usr/include/gnu/stubs.h:
+
+/usr/include/gnu/stubs-64.h:
+
+/usr/include/bits/types.h:
+
+/usr/include/bits/typesizes.h:
+
+time.h:
+
+/usr/include/time.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stddef.h:
+
+/usr/include/endian.h:
+
+/usr/include/bits/endian.h:
+
+/usr/include/bits/byteswap.h:
+
+sys/select.h:
+
+/usr/include/sys/select.h:
+
+/usr/include/bits/select.h:
+
+/usr/include/bits/sigset.h:
+
+/usr/include/bits/time.h:
+
+/usr/include/sys/sysmacros.h:
+
+/usr/include/bits/pthreadtypes.h:
+
+/usr/include/xlocale.h:
+
+/usr/include/sys/stat.h:
+
+/usr/include/bits/stat.h:
+
+/usr/include/errno.h:
+
+/usr/include/bits/errno.h:
+
+/usr/include/linux/errno.h:
+
+/usr/include/asm/errno.h:
+
+/usr/include/asm-generic/errno.h:
+
+/usr/include/asm-generic/errno-base.h:
+
+fcntl.h:
+
+/usr/include/fcntl.h:
+
+/usr/include/bits/fcntl.h:
+
+/usr/include/bits/uio.h:
+
+stat-time.h:
+
+timespec.h:
+
+utimens.h:
+
+at-func.c:
+
+dirname.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stdbool.h:
+
+openat.h:
+
+dirent.h:
+
+/usr/include/dirent.h:
+
+/usr/include/bits/dirent.h:
+
+/usr/include/bits/posix1_lim.h:
+
+/usr/include/bits/local_lim.h:
+
+/usr/include/linux/limits.h:
+
+unistd.h:
+
+/usr/include/unistd.h:
+
+/usr/include/bits/posix_opt.h:
+
+/usr/include/bits/environments.h:
+
+/usr/include/bits/confname.h:
+
+/usr/include/getopt.h:
+
+openat-priv.h:
+
+stdlib.h:
+
+/usr/include/stdlib.h:
+
+/usr/include/bits/waitflags.h:
+
+/usr/include/bits/waitstatus.h:
+
+alloca.h:
+
+save-cwd.h:

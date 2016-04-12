@@ -206,7 +206,10 @@ int Align3 (vector<string>& sequenes, vector<string>& quals, string Ap, string A
 			for (k = 0; k<window; k++) //base compare loop
 			{
 				if(A.c_str()[k+Acount ] == B.c_str()[k+Bcount])
-				{if ( B.c_str()[k+Bcount] != 'N'){score++;}}
+				{
+					if ( B.c_str()[k+Bcount] != 'N' && (int) Aq.c_str()[k+Bcount] > 5 && (int) A.c_str()[k+Acount ] > 5 )
+					{score++;}
+				}
 				if ((k-score) > MM)
                                 {score = -1;break;}
 			  
@@ -265,7 +268,10 @@ int Align3 (vector<string>& sequenes, vector<string>& quals, string Ap, string A
 					if(verbose){cout << "  k = " << k << " so A = " <<  Alength - i + k << " /\\ B = " <<0+k<<  endl;}
 					if(verbose){cout << "     A >> " << A.c_str()[ Alength - i + k -1] << "=" << B.c_str()[ 0+k] << " << B" << endl;}
 					if (A.c_str()[ Alength - i + k - 1 ] == B.c_str()[ 0+k] )
-					{if ( B.c_str()[ 0+k] != 'N'){score++;}}
+					{
+						if ( B.c_str()[ 0+k] != 'N'  && (int) Aq.c_str()[ Alength - i + k - 1] > 5 && (int) Bq.c_str()[0+k] > 5 )
+						{score++;}
+					}
 					if ((k-score) > MM)
 					{score = -1;break;}
 				}
@@ -303,7 +309,10 @@ int Align3 (vector<string>& sequenes, vector<string>& quals, string Ap, string A
 				for(k = 0; k <= i; k++)
 				{
 					if (B.c_str()[ Blength - i + k - 1 ] == A.c_str()[ 0+k] )
-					{if (A.c_str()[ 0+k] != 'N'){score++;}}
+					{
+						if (A.c_str()[ 0+k] != 'N' && (int) Aq.c_str()[  0+k] > 5 && (int) Bq.c_str()[ Blength - i + k - 1] > 5)
+						{score++;}
+					}
 					 if ((k-score) > MM)
 	                               	{score = -1;break;}
 				}
@@ -658,7 +667,7 @@ int main (int argc, char *argv[])
 		<< argv[2] << "\n     MinOVerlap = " << argv[3] << "\n     MinCoverage = " << argv[4] << "\n     FileStub = " << argv[5] << "\n     NodeStub = " << argv[6] <<  endl; return 0;}
 	
 	cout << "     You Gave\n     File = " << argv[1] << "\n     MinPercent = "
-                << argv[2] << "\n     MinOVerlap = " << argv[3] << "\n     MinCoverage = " << argv[4] << "\n     FileStub = " << argv[5] << "\n     NodeStub = " << argv[6] << "\n     Threads = " << argv[7] <<  endl;	
+                << argv[2] << "\n     MinOVerlap = " << argv[3] << "\n     MinCoverage = " << argv[4] << "\n     FileStub = " << argv[5] << "\n     NodeStub = " << argv[6] << "\n     LCcutoff = " << argv[7] << "\n     Threads = " << argv[8] <<  endl;	
 	
 	ifstream fastq;
 	fastq.open (argv[1]);
@@ -848,12 +857,12 @@ int main (int argc, char *argv[])
 		
 									if(FullOut){cout << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<**************************************************************>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"<< endl;}
 		Et = clock();
-	 	//if ( (int)i%10 < 1 )
-                //{
+	 	if ( (int)i%10 < 1 )
+                {
 			gettimeofday(&end, NULL);
                         float Dt = end.tv_sec - start.tv_sec;
 	       		cout << "aligning " << i << " of " << NumReads << ", \% done = " << ((double)i/(double)NumReads)*100.00 <<", TotalTime= " << Dt << " , second per read = " << Dt/i<< ", \% finding match = " << ((double)FoundMatch/(double)i)*100.00  << "\r";
-                //}
+                }
 									if(FullOut){Dt = ((double) (Et - St)) / CLOCKS_PER_SEC;cout << "aligning " << i << " of " << NumReads << "\% done = " << ((double)i/(double)NumReads)*100.00 <<", TotalTime= " << Dt << " , second per read = " << Dt/i << ", \% finding match = " << ((double)FoundMatch/(double)i)*100.00  << endl <<A << endl;
 									for (int z = 0; z < Adep.length();z++){int bam = Adep.c_str()[z];cout << bam;}
 									cout << endl;}
@@ -927,9 +936,9 @@ int main (int argc, char *argv[])
 			depth[bestIndex] = Bdep;
 			sequenes[i] = "moved";
 			if(FullOut){cout << combined << endl;
-			cout << Bqual << endl;
+			//cout << Bqual << endl;
 			 for (int z = 0; z < Bdep.length();z++){int bam = Bdep.c_str()[z];cout << bam;}
-			cout << endl;
+			//cout << endl;
 			}
 			//cout << "Done colapsing\n";
 		}
@@ -953,9 +962,9 @@ int main (int argc, char *argv[])
 			}
 			if (maxDep >=MinCoverage)
 			{
-				if (sequenes[i].size() !=  qual[i].size() &&  qual[i].size() != depth[i].size()){cout << "ERROR, read " << "@NODE-" << argv[6] << "_" << i << "_L=" <<sequenes[i].size() << "_D=" << maxDep << " Has the wrong size, Seq = " << sequenes[i].size() << " Qual = " << qual[i].size() << " Dep = " <<  depth[i].size() << endl;}
+				if (sequenes[i].size() !=  qual[i].size() &&  qual[i].size() != depth[i].size()){cout << "ERROR, read " << "@NODE_" << argv[6] << "_" << i << "_L=" <<sequenes[i].size() << "_D=" << maxDep << " Has the wrong size, Seq = " << sequenes[i].size() << " Qual = " << qual[i].size() << " Dep = " <<  depth[i].size() << endl;}
 				count ++;
-				report << "@NODE-" << argv[6] << "_" << i << "_L=" <<sequenes[i].size() << "_D=" << maxDep <<  endl;
+				report << "@NODE_" << argv[6] << "_" << i << "_L=" <<sequenes[i].size() << "_D=" << maxDep <<  endl;
 				report << sequenes[i] << endl;
 				report << "+" << endl;
 				report << qual[i] << endl;

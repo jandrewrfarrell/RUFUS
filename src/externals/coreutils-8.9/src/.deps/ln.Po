@@ -1,0 +1,295 @@
+ln.o: ln.c ../lib/config.h ../lib/stdio.h /usr/include/stdio.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h \
+ /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
+ /usr/include/gnu/stubs-64.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stddef.h \
+ /usr/include/bits/types.h /usr/include/bits/typesizes.h \
+ /usr/include/libio.h /usr/include/_G_config.h ../lib/wchar.h \
+ /usr/include/wchar.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stdarg.h \
+ /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+ /usr/include/bits/stdio.h /usr/include/sys/types.h ../lib/time.h \
+ /usr/include/time.h /usr/include/endian.h /usr/include/bits/endian.h \
+ /usr/include/bits/byteswap.h ../lib/sys/select.h \
+ /usr/include/sys/select.h /usr/include/bits/select.h \
+ /usr/include/bits/sigset.h /usr/include/bits/time.h \
+ /usr/include/sys/sysmacros.h /usr/include/bits/pthreadtypes.h \
+ /usr/include/getopt.h system.h ../lib/alloca.h ../lib/sys/stat.h \
+ /usr/include/xlocale.h /usr/include/sys/stat.h /usr/include/bits/stat.h \
+ /usr/include/sys/param.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include-fixed/limits.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include-fixed/syslimits.h \
+ /usr/include/limits.h /usr/include/bits/posix1_lim.h \
+ /usr/include/bits/local_lim.h /usr/include/linux/limits.h \
+ /usr/include/bits/posix2_lim.h /usr/include/bits/xopen_lim.h \
+ /usr/include/linux/param.h /usr/include/asm/param.h \
+ /usr/include/asm-generic/param.h ../lib/unistd.h /usr/include/unistd.h \
+ /usr/include/bits/posix_opt.h /usr/include/bits/environments.h \
+ /usr/include/bits/confname.h ../lib/pathmax.h ../lib/configmake.h \
+ ../lib/sys/time.h /usr/include/sys/time.h ../lib/string.h \
+ /usr/include/string.h /usr/include/bits/string.h \
+ /usr/include/bits/string2.h ../lib/stdlib.h /usr/include/stdlib.h \
+ /usr/include/errno.h /usr/include/bits/errno.h \
+ /usr/include/linux/errno.h /usr/include/asm/errno.h \
+ /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stdbool.h \
+ /usr/include/bits/waitflags.h /usr/include/bits/waitstatus.h version.h \
+ ../lib/exitfail.h ../lib/fcntl.h /usr/include/fcntl.h \
+ /usr/include/bits/fcntl.h /usr/include/bits/uio.h ../lib/dirent.h \
+ /usr/include/dirent.h /usr/include/bits/dirent.h ../lib/inttypes.h \
+ /usr/include/inttypes.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stdint.h \
+ /usr/include/stdint.h /usr/include/bits/wchar.h ../lib/stat-macros.h \
+ ../lib/timespec.h ../lib/ctype.h /usr/include/ctype.h ../lib/locale.h \
+ /usr/include/locale.h /usr/include/bits/locale.h ../lib/gettext.h \
+ /usr/include/libintl.h ../lib/xalloc.h ../lib/verify.h \
+ ../lib/unlocked-io.h ../lib/same-inode.h ../lib/dirname.h \
+ ../lib/openat.h ../lib/closein.h ../lib/closeout.h ../lib/version-etc.h \
+ ../lib/propername.h ../lib/progname.h ../lib/intprops.h \
+ ../lib/inttostr.h ../lib/intprops.h ../lib/backupfile.h ../lib/error.h \
+ ../lib/filenamecat.h ../lib/file-set.h ../lib/hash.h ../lib/hash.h \
+ ../lib/hash-triple.h ../lib/quote.h ../lib/same.h ../lib/yesno.h
+
+../lib/config.h:
+
+../lib/stdio.h:
+
+/usr/include/stdio.h:
+
+/usr/include/features.h:
+
+/usr/include/sys/cdefs.h:
+
+/usr/include/bits/wordsize.h:
+
+/usr/include/gnu/stubs.h:
+
+/usr/include/gnu/stubs-64.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stddef.h:
+
+/usr/include/bits/types.h:
+
+/usr/include/bits/typesizes.h:
+
+/usr/include/libio.h:
+
+/usr/include/_G_config.h:
+
+../lib/wchar.h:
+
+/usr/include/wchar.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stdarg.h:
+
+/usr/include/bits/stdio_lim.h:
+
+/usr/include/bits/sys_errlist.h:
+
+/usr/include/bits/stdio.h:
+
+/usr/include/sys/types.h:
+
+../lib/time.h:
+
+/usr/include/time.h:
+
+/usr/include/endian.h:
+
+/usr/include/bits/endian.h:
+
+/usr/include/bits/byteswap.h:
+
+../lib/sys/select.h:
+
+/usr/include/sys/select.h:
+
+/usr/include/bits/select.h:
+
+/usr/include/bits/sigset.h:
+
+/usr/include/bits/time.h:
+
+/usr/include/sys/sysmacros.h:
+
+/usr/include/bits/pthreadtypes.h:
+
+/usr/include/getopt.h:
+
+system.h:
+
+../lib/alloca.h:
+
+../lib/sys/stat.h:
+
+/usr/include/xlocale.h:
+
+/usr/include/sys/stat.h:
+
+/usr/include/bits/stat.h:
+
+/usr/include/sys/param.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include-fixed/limits.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include-fixed/syslimits.h:
+
+/usr/include/limits.h:
+
+/usr/include/bits/posix1_lim.h:
+
+/usr/include/bits/local_lim.h:
+
+/usr/include/linux/limits.h:
+
+/usr/include/bits/posix2_lim.h:
+
+/usr/include/bits/xopen_lim.h:
+
+/usr/include/linux/param.h:
+
+/usr/include/asm/param.h:
+
+/usr/include/asm-generic/param.h:
+
+../lib/unistd.h:
+
+/usr/include/unistd.h:
+
+/usr/include/bits/posix_opt.h:
+
+/usr/include/bits/environments.h:
+
+/usr/include/bits/confname.h:
+
+../lib/pathmax.h:
+
+../lib/configmake.h:
+
+../lib/sys/time.h:
+
+/usr/include/sys/time.h:
+
+../lib/string.h:
+
+/usr/include/string.h:
+
+/usr/include/bits/string.h:
+
+/usr/include/bits/string2.h:
+
+../lib/stdlib.h:
+
+/usr/include/stdlib.h:
+
+/usr/include/errno.h:
+
+/usr/include/bits/errno.h:
+
+/usr/include/linux/errno.h:
+
+/usr/include/asm/errno.h:
+
+/usr/include/asm-generic/errno.h:
+
+/usr/include/asm-generic/errno-base.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stdbool.h:
+
+/usr/include/bits/waitflags.h:
+
+/usr/include/bits/waitstatus.h:
+
+version.h:
+
+../lib/exitfail.h:
+
+../lib/fcntl.h:
+
+/usr/include/fcntl.h:
+
+/usr/include/bits/fcntl.h:
+
+/usr/include/bits/uio.h:
+
+../lib/dirent.h:
+
+/usr/include/dirent.h:
+
+/usr/include/bits/dirent.h:
+
+../lib/inttypes.h:
+
+/usr/include/inttypes.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stdint.h:
+
+/usr/include/stdint.h:
+
+/usr/include/bits/wchar.h:
+
+../lib/stat-macros.h:
+
+../lib/timespec.h:
+
+../lib/ctype.h:
+
+/usr/include/ctype.h:
+
+../lib/locale.h:
+
+/usr/include/locale.h:
+
+/usr/include/bits/locale.h:
+
+../lib/gettext.h:
+
+/usr/include/libintl.h:
+
+../lib/xalloc.h:
+
+../lib/verify.h:
+
+../lib/unlocked-io.h:
+
+../lib/same-inode.h:
+
+../lib/dirname.h:
+
+../lib/openat.h:
+
+../lib/closein.h:
+
+../lib/closeout.h:
+
+../lib/version-etc.h:
+
+../lib/propername.h:
+
+../lib/progname.h:
+
+../lib/intprops.h:
+
+../lib/inttostr.h:
+
+../lib/intprops.h:
+
+../lib/backupfile.h:
+
+../lib/error.h:
+
+../lib/filenamecat.h:
+
+../lib/file-set.h:
+
+../lib/hash.h:
+
+../lib/hash.h:
+
+../lib/hash-triple.h:
+
+../lib/quote.h:
+
+../lib/same.h:
+
+../lib/yesno.h:

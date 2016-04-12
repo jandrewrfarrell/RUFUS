@@ -1,0 +1,11 @@
+quote.o: quote.c config.h quotearg.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stddef.h \
+ quote.h
+
+config.h:
+
+quotearg.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stddef.h:
+
+quote.h:

@@ -1,0 +1,22 @@
+#!/bin/sh
+GEN=$1
+OUT=$2
+K=$3
+T=$4
+
+PATH=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/bin/RUFUS_git/RUFUS
+JELLYFISH=$PATH/src/externals/jellyfish-2.2.5/bin/jellyfish
+SORT=$PATH/scripts/sort
+ulimit -v 120000000
+ulimit -a
+if [ -e "$OUT.sorted.min2.tab" ]
+then
+        echo "Skipping jelly, $ParentGenerator.Jhash.sorted.min2.tab alreads exists"
+else
+	mkfifo $OUT.temp
+	/usr/bin/time -v $JELLYFISH count -G 20 -g $GEN -m $K -s 1G -t $T -o $OUT -C
+	/usr/bin/time -v $JELLYFISH dump -c -t -L 2 $OUT > $OUT.temp&
+	/usr/bin/time -v $SORT --parallel=$T -S 50% -T ./ $OUT.temp > $OUT.sorted.min2.tab &
+	/usr/bin/time -v $JELLYFISH histo -f -o $OUT.histo $OUT & 
+	wait 
+fi
