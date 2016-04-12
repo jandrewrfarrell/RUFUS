@@ -1,8 +1,0 @@
-xasprintf.o: xasprintf.c config.h xvasprintf.h \
- /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stdarg.h
-
-config.h:
-
-xvasprintf.h:
-
-/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stdarg.h:

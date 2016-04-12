@@ -1,3 +1,0 @@
-ls-vdir.o: ls-vdir.c ls.h
-
-ls.h:

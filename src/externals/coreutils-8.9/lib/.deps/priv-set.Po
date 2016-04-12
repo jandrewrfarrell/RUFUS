@@ -1,5 +1,0 @@
-priv-set.o: priv-set.c config.h priv-set.h
-
-config.h:
-
-priv-set.h:

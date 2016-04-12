@@ -1,5 +1,0 @@
-diacrit.o: diacrit.c config.h diacrit.h
-
-config.h:
-
-diacrit.h:
