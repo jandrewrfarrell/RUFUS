@@ -25,26 +25,67 @@ then
 	exit
 fi
 
-RUFUSmodel=~/d1/home/farrelac/bin/RUFUSAwesome/ModelDist7.7.withDip
-RUFUSbuild=~/d1/home/farrelac/bin/RUFUSAwesome/RUFUS.Build.8.cutoff 
-RUFUSfilter=~/d1/home/farrelac/bin/RUFUS_git/RUFUS/bin/RUFUSv5.Filter
-RUFUSOverlap=~/d1/home/farrelac/bin/RUFUSAwesome/OverlapBashMultiThread.sh
-samtools=~/bin/samtools-1.2/samtools
-RUFUSfilter2=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/bin/RUFUSAwesome/RUFUSv6.FilterHash.memMap.multiTrhead
+PATH=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/bin/RUFUS_git/RUFUS/
+
+RUFUSmodel=$PATH/bin/ModelDist
+RUFUSbuild=$PATH/bin/RUFUS.Build 
+RUFUSfilter=$PATH/bin/RUFUS.Filter
+RUFUSOverlap=$PATH/scripts/OverlapBashMultiThread.sh
+DeDupDump=$PATH/scripts/HumanDedup.grenrator.tenplate
+
 
 perl -ni -e 's/ /\t/;print' $MutantGenerator.histo
 perl -ni -e 's/ /\t/;print' $Parent1.histo
 perl -ni -e 's/ /\t/;print' $Parent2.histo
 perl -ni -e 's/ /\t/;print' $Parent3.histo
 
+echo "staring model"
+if [ -e "$MutantGenerator.histo.7.7.model" ]
+then 
+	echo "skipping model"
+else
+	/usr/bin/time -v $RUFUSmodel $MutantGenerator.histo $K 150 $Threads > $Out.Run.out 
+	/usr/bin/time -v $RUFUSmodel $Parent1.histo $K 150 $Threads > $Out.Run.out
+	/usr/bin/time -v $RUFUSmodel $Parent2.histo $K 150 $Threads > $Out.Run.out
+	/usr/bin/time -v $RUFUSmodel $Parent3.histo $K 150 $Threads > $Out.Run.out
+	echo "done with model "
+fi
 ParentMaxE=0 
 MutantMinCov=$(head -2 $MutantGenerator.histo.7.7.model | tail -1 )
 echo "$ParentMaxE \n $MutantMinCov \n"
 
 
 date
+echo "starting RUFUS build "
+let "Max= $MutantMinCov*100"
+if [ -e "$Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList.prefilter" ]
+then 
+	echo "Skipping build"
+else
+	/usr/bin/time -v $RUFUSbuild -c $Parent1.sorted.min2.tab -c $Parent2.sorted.min2.tab -c $Parent3.sorted.min2.tab  -s $MutantGenerator.sorted.min2.tab -o $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList.prefilter -hs $K -mS $MutantMinCov -mC $ParentMaxE  -max $Max -t 1  >> $Out.Run.out
+fi 
 
-echo "$samtools view $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".overlap.hashcount.fastq.bam | ~/d1/home/farrelac/bin/RUFUSAwesome/RUFUS.interpret -r ~/d1/data/project_fasta/human_g1k_v37_decoy_phix.fasta -hf $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList -o $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".Interpret2 -c $MutantGenerator.sorted.min2.tab -c $Parent1.sorted.min2.tab -c $Parent2.sorted.min2.tab -c $Parent3.sorted.min2.tab #> $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".Interpret2.out "
 
-$samtools view $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".overlap.hashcount.fastq.bam | ~/d1/home/farrelac/bin/RUFUSAwesome/RUFUS.interpret -r ~/d1/data/project_fasta/human_g1k_v37_decoy_phix.fasta -hf $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList -o $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".Interpret2 -c $MutantGenerator.sorted.min2.tab -c $Parent1.sorted.min2.tab -c $Parent2.sorted.min2.tab -c $Parent3.sorted.min2.tab #> $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".Interpret2.out  
- 
+if [ -e "$Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList" ]
+then
+        echo "Skipping filter"
+else
+
+awk '{print $4 "\t" $3}' $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList.prefilter > $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList.prefilter.rearrange
+
+$RUFUSfilter -d ' ' -c /uufs/chpc.utah.edu/common/home/u0991464/lustr/RUFUS.1000g.reference/1000G.RUFUSreference.sorted.min45.tab  -s $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList.prefilter.rearrange  -o $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList -hs $k -mS $MutantMinCov -mC 0 -max $Max -t 20
+fi
+
+
+
+echo "done with RUFUS build "
+echo "startin RUFUS filter"
+rm  $MutantGenerator.temp
+mkfifo $MutantGenerator.temp 
+/usr/bin/time -v  bash $DeDupDump $MutantBam >  $MutantGenerator.temp &
+/usr/bin/time -v   $RUFUSfilter  $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList $MutantGenerator.temp $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".filtered.fq $K 0 5 10 $Threads >> $Out.Run.out   & 
+wait
+
+echo "startin RUFUS overlap"
+/usr/bin/time -v bash $RUFUSOverlap $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".filtered.fq.Mutations.fastq 5 $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov" $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList $Threads 
+echo "done with everything "
