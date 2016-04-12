@@ -5,6 +5,7 @@ g++ src/ModelDist.cpp -o bin/ModelDist
 g++ src/Overlap.cpp -o bin/Overlap -std=gnu++0x -fopenmp 
 g++ src/OverlapRegion.cpp -o bin/OverlapRegion -std=gnu++0x -fopenmp 
 g++ src/ReplaceQwithDinFASTQD.cpp -o bin/ReplaceQwithDinFASTQD
+g++ ./src/RUFUS.Filter.cpp -o ./bin/RUFUS.Filter -std=gnu++0x -fopenmp 
 g++ src/RUFUS.Build.cpp -o bin/RUFUS.Build 
 g++ ./src/RUFUS.interpret.cpp ./src/include/* -o ./bin/RUFUS.interpret -std=gnu++0x
 cd src/externals/
