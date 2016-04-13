@@ -63,7 +63,7 @@ if [ -e "$Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList.prefilter" ]
 then
         echo "Skipping build"
 else
-        /usr/bin/time -v $RUFUSbuild -c $Parent1.sorted.min2.tab -c $Parent2.sorted.min2.tab -c $Parent3.sorted.min2.tab  -s $MutantGenerator.sorted.min2.tab -o $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList.prefilter -hs $K -mS $MutantMinCov -mC $ParentMaxE  -max $Max -t 1  >> $Out.Run.out
+        /usr/bin/time -v $RUFUSbuild -c $Parent1.Jhash.sorted.min2.tab -c $Parent2.Jhash.sorted.min2.tab -c $Parent3.Jhash.sorted.min2.tab  -s $MutantGenerator.Jhash.sorted.min2.tab -o $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList.prefilter -hs $K -mS $MutantMinCov -mC $ParentMaxE  -max $Max -t 1  >> $Out.Run.out
 fi
 
 
