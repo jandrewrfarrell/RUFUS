@@ -19,7 +19,7 @@ ulimit -v 120000000
 ulimit -a
 if [ -e "$OUT.sorted.min2.tab" ]
 then
-        echo "Skipping jelly, $ParentGenerator.Jhash.sorted.min2.tab alreads exists"
+        echo "Skipping jelly, $OUT.sorted.min2.tab alreads exists"
 else
 	echo "here"
 	mkfifo $OUT.temp
@@ -28,5 +28,5 @@ else
 	$SORT --parallel=$T -S 50% -T ./ $OUT.temp > $OUT.sorted.min2.tab &
 	$JELLYFISH histo -f -o $OUT.histo $OUT & 
 	wait
-	rm $ParentGenerator.Jhash 
+	rm $OUT
 fi
