@@ -27,5 +27,6 @@ else
 	$JELLYFISH dump -c -t -L 2 $OUT > $OUT.temp&
 	$SORT --parallel=$T -S 50% -T ./ $OUT.temp > $OUT.sorted.min2.tab &
 	$JELLYFISH histo -f -o $OUT.histo $OUT & 
-	wait 
+	wait
+	rm $ParentGenerator.Jhash 
 fi
