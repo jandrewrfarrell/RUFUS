@@ -16,10 +16,39 @@ g++ ./src/RUFUS.interpret.cpp ./src/include/* -o ./bin/RUFUS.interpret -std=gnu+
 
 
 cd src/externals/
-tar -xvf jellyfish-2.2.5.tar.gz 
-cd jellyfish-2.2.5
-mkdir bin
-./configure --prefix=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/bin/RUFUS_git/RUFUS/src/externals/jellyfish-2.2.5/bin
-make
-make install 
+
+if [ -e ./jellyfish-2.2.5/bin/jellyfish ]
+then 
+	echo "jellyfish already installed: skipping"
+else
+
+	tar -xvf jellyfish-2.2.5.tar.gz 
+	cd jellyfish-2.2.5
+	mkdir bin
+	./configure --prefix=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/bin/RUFUS_git/RUFUS/src/externals/jellyfish-2.2.5/bin
+	make
+	make install
+	cd ..
+fi 
+
+if [ -e ./gkno_launcher/gkno ]
+then 
+	echo "know already built: skipping"
+else
+	git clone https://github.com/gkno/gkno_launcher.git
+	cd gkno_launcher/
+	./gkno build
+	cd ..	
+fi 
+
+if [ -e ./gkno_launcher/resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys.fa ]
+then 
+	echo "human reference paramaters set already downloaded: skipping"
+else
+	cd gkno_launcher
+	./gkno add-resource human
+	./gkno bwa-index -r ./resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys.fa -x ./resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys
+	cd ..
+fi 
+
 cd ../../../

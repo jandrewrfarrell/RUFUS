@@ -14,17 +14,13 @@ Threads=$Threads
 mkdir ./TempOverlap/
 echo "Overlaping $File"
 
-RDIR=/opt/rufus/RUFUS/
-
-OverlapHash=$RDIR/bin/Overlap
-OverlapRebion2=$RDIR/bin/OverlapRegion
-ReplaceQwithDinFASTQD=$RDIR/bin/ReplaceQwithDinFASTQD
+RDIR=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/bin/RUFUS_git/RUFUSReplaceQwithDinFASTQD=$RDIR/bin/ReplaceQwithDinFASTQD
 ConvertFASTqD.to.FASTQ=$RDIR/bin/ConvertFASTqD.to.FASTQ
 AnnotateOverlap=$RDIR/bin/AnnotateOverlap
-gkno=/uufs/chpc.utah.edu/common/home/marth-d1/data/software/chpc/kingspeak.peaks/gkno_launcher/gkno
-samtools=/uufs/chpc.utah.edu/common/home/marth-d1/data/software/chpc/kingspeak.peaks/gkno_launcher/tools/samtools/samtools
+gkno=$RDR/src/externals/gkno_launcher/gkno
+samtools=$RDR/src/externals/gkno_launcher/tools/samtools/samtools
 RUFUS.interpret=$RDIR/bin/RUFUS.interpret
-humanRef=/uufs/chpc.utah.edu/common/home/marth-d1/data/software/chpc/kingspeak.peaks/gkno_launcher/resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys.fa
+humanRef=$RDR/src/externals/gkno_launcher/resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys.fa
 
 time $OverlapHash $File .98 60 0 FP 24 1 ./TempOverlap/$NameStub.1 1 $Threads #> $File.overlap.out
 time $OverlapHash ./TempOverlap/$NameStub.1.fastqd .98 50 2 FP 15 1 ./TempOverlap/$NameStub.2 1 $Threads #>>  $File.overlap.out
