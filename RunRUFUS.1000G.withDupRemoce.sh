@@ -26,6 +26,7 @@ then
 fi
 
 RDIR=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/bin/RUFUS_git/RUFUS
+
 RUFUSmodel=$RDIR/bin/ModelDist
 RUFUSbuild=$RDIR/bin/RUFUS.Build
 RUFUSfilter=$RDIR/bin/RUFUS.Filter
