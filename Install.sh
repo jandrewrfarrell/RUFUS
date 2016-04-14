@@ -1,6 +1,6 @@
 echo "update script paths"
-perl -p -e "s/RDIR=.*\n/RDIR=$( echo $(pwd)| perl -p -e "s/\//\\\\\//g")\n/g" scripts/RunRUFUS.1000G.withDupRemoce.sh
-perl -p -e "s/RDIR=.*\n/RDIR=$( echo $(pwd)| perl -p -e "s/\//\\\\\//g")\n/g"  scripts/OverlapBashMultiThread.sh
+perl -p -i -e "s/RDIR=.*\n/RDIR=$( echo $(pwd)| perl -p -i -e "s/\//\\\\\//g")\n/g" scripts/RunRUFUS.1000G.withDupRemoce.sh
+perl -p -i -e "s/RDIR=.*\n/RDIR=$( echo $(pwd)| perl -p -i -e "s/\//\\\\\//g")\n/g"  scripts/OverlapBashMultiThread.sh
 
 RUFUS_DIR=$(pwd)
 
