@@ -15,7 +15,7 @@ mkdir ./TempOverlap/
 echo "Overlaping $File"
 
 RDIR=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/bin/RUFUS_git/RUFUSReplaceQwithDinFASTQD=$RDIR/bin/ReplaceQwithDinFASTQD
-ConvertFASTqD.to.FASTQ=$RDIR/bin/ConvertFASTqD.to.FASTQ
+ConvertFASTqD=$RDIR/bin/ConvertFASTqD.to.FASTQ
 AnnotateOverlap=$RDIR/bin/AnnotateOverlap
 gkno=$RDR/src/externals/gkno_launcher/gkno
 samtools=$RDR/src/externals/gkno_launcher/tools/samtools/samtools
@@ -28,7 +28,7 @@ $ReplaceQwithDinFASTQD ./TempOverlap/$NameStub.2.fastqd > ./TempOverlap/$NameStu
 time $OverlapRebion2 ./TempOverlap/$NameStub.3.fastqd .95 30 0 ./TempOverlap/$NameStub.4 $NameStub 1 $Threads #>>  $File.overlap.out
 time $OverlapRebion2 ./TempOverlap/$NameStub.4.fastqd .95 30 $FinalCoverage  ./TempOverlap/$NameStub.5 $NameStub 1 $Threads #>>  $File.overlap.out
 $ReplaceQwithDinFASTQD ./TempOverlap/$NameStub.5.fastqd > ./$NameStub.overlap.fastqd
-$ConvertFASTqD.to.FASTQ ./$NameStub.overlap.fastqd > ./$NameStub.overlap.fastq
+$ConvertFASTqD ./$NameStub.overlap.fastqd > ./$NameStub.overlap.fastq
 $AnnotateOverlap $HashList ./$NameStub.overlap.fastq > ./$NameStub.overlap.hashcount.fastq
 $gkno bwa-se -r ~/d1/home/farrelac/references/current/human_reference_v37_decoys  -q ./$NameStub.overlap.hashcount.fastq -id ./$NameStub.overlap.hashcount.fastq -s ./$NameStub.overlap.hashcount.fastq -o ./$NameStub.overlap.hashcount.fastq.bam -p ILLUMINA
 
