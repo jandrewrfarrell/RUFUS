@@ -28,4 +28,5 @@ else
 	/usr/bin/time -v $JELLYFISH histo -f -o $GEN.Jhash.histo $GEN.Jhash & 
 	wait
 	rm $GEN.Jhash
+	rm $GEN.Jhash.temp
 fi
