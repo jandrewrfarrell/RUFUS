@@ -3,20 +3,18 @@ Parent1=$1
 Parent2=$2
 Parent3=$3
 MutantGenerator=$4
-MutantBam=$5
-K=$6
-Threads=$7
-Out=$8
+K=$5
+Threads=$6
+Out=$7
 
 echo "You gave
 Parent1=$1
 Parent2=$2
 Parent3=$2
 MutantGenerator=$4
-MutantBam=$5
-K=$6
-Threads=$7
-Out=$8
+K=$5
+Threads=$6
+Out=$7
 "
 
 if [ -z "$Out" ]
@@ -25,7 +23,7 @@ then
         exit
 fi
 
-RDIR=something
+RDIR=/opt/rufus/RUFUS
 RUFUSmodel=$RDIR/bin/ModelDist
 RUFUSbuild=$RDIR/bin/RUFUS.Build
 RUFUSfilter=$RDIR/bin/RUFUS.Filter
@@ -44,9 +42,9 @@ then
         echo "skipping model"
 else
         /usr/bin/time -v $RUFUSmodel $MutantGenerator.Jhash.histo $K 150 $Threads > $Out.Run.out
-        /usr/bin/time -v $RUFUSmodel $Parent1.Jhash.histo $K 150 $Threads > $Out.Run.out
-        /usr/bin/time -v $RUFUSmodel $Parent2.Jhash.histo $K 150 $Threads > $Out.Run.out
-        /usr/bin/time -v $RUFUSmodel $Parent3.Jhash.histo $K 150 $Threads > $Out.Run.out
+#        /usr/bin/time -v $RUFUSmodel $Parent1.Jhash.histo $K 150 $Threads > $Out.Run.out
+ #       /usr/bin/time -v $RUFUSmodel $Parent2.Jhash.histo $K 150 $Threads > $Out.Run.out
+  #      /usr/bin/time -v $RUFUSmodel $Parent3.Jhash.histo $K 150 $Threads > $Out.Run.out
         echo "done with model "
 fi
 
@@ -58,25 +56,14 @@ echo "$ParentMaxE \n $MutantMinCov \n"
 date
 echo "starting RUFUS build "
 let "Max= $MutantMinCov*100"
-if [ -e "$Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList.prefilter" ]
+if [ -e "$Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList" ]
 then
         echo "Skipping build"
 else
-        /usr/bin/time -v $RUFUSbuild -c $Parent1.Jhash.sorted.min2.tab -c $Parent2.Jhash.sorted.min2.tab -c $Parent3.Jhash.sorted.min2.tab  -s $MutantGenerator.Jhash.sorted.min2.tab -o $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList.prefilter -hs $K -mS $MutantMinCov -mC $ParentMaxE  -max $Max -t 1  >> $Out.Run.out
+        /usr/bin/time -v $RUFUSbuild  -c $Parent1.Jhash.sorted.min2.tab -c $Parent2.Jhash.sorted.min2.tab -c $Parent3.Jhash.sorted.min2.tab  -s $MutantGenerator.Jhash.sorted.min2.tab -o $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList -hs $K -mS $MutantMinCov -mC $ParentMaxE  -max $Max -t 1  >> $Out.Run.out
+        #/usr/bin/time -v $RUFUSbuild -c <(s3cmd  get --no-progress s3://rufus.marth.lab/1000G.RUFUSreference.sorted.min45.tab.gz - | zcat) -c $Parent1.Jhash.sorted.min2.tab -c $Parent2.Jhash.sorted.min2.tab -c $Parent3.Jhash.sorted.min2.tab  -s $MutantGenerator.Jhash.sorted.min2.tab -o $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList -hs $K -mS $MutantMinCov -mC $ParentMaxE  -max $Max -t 1  >> $Out.Run.out
 fi
 
-
-if [ -e "$Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList" ]
-then
-        echo "Skipping filter"
-else
-
-awk '{print $4 "\t" $3}' $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList.prefilter > $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList.prefilter.rearrange
-
-cp $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList.prefilter $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList
-
-#$RUFUSfilter -d ' ' -c /uufs/chpc.utah.edu/common/home/u0991464/lustr/RUFUS.1000g.reference/1000G.RUFUSreference.sorted.min45.tab  -s $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList.prefilter.rearrange  -o $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList -hs $k -mS $MutantMinCov -mC 0 -max $Max -t 20
-fi
 
 
 
@@ -84,7 +71,7 @@ echo "done with RUFUS build "
 echo "startin RUFUS filter"
 rm  $MutantGenerator.temp
 mkfifo $MutantGenerator.temp
-/usr/bin/time -v  bash $DeDupDump $MutantBam >  $MutantGenerator.temp &
+/usr/bin/time -v  bash $MutantGenerator >  $MutantGenerator.temp &
 /usr/bin/time -v   $RUFUSfilter  $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList $MutantGenerator.temp $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".filtered.fq $K 0 5 10 $Threads >> $Out.Run.out   &
 wait
 
