@@ -25,9 +25,12 @@ then
         exit
 fi
 
-RDIR=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/bin/RUFUS_git/RUFUSRUFUSOverlap=$RDIR/scripts/OverlapBashMultiThread.sh
+RDIR=something
+RUFUSmodel=$RDIR/bin/ModelDist
+RUFUSbuild=$RDIR/bin/RUFUS.Build
+RUFUSfilter=$RDIR/bin/RUFUS.Filter
+RUFUSOverlap=$RDIR/scripts/OverlapBashMultiThread.sh
 DeDupDump=$RDIR/scripts/HumanDedup.grenrator.tenplate
-
 
 
 perl -ni -e 's/ /\t/;print' $MutantGenerator.Jhash.histo
