@@ -6,7 +6,7 @@ GEN=$1
 K=$2
 T=$3
 
-RDIR="/opt/rufus/RUFUS"
+RDIR=/opt/rufus/RUFUS
 JELLYFISH="$RDIR/src/externals/jellyfish-2.2.5/bin/jellyfish"
 SORT="$RDIR/scripts/sort"
 	
