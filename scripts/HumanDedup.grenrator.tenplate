@@ -1,1 +1,5 @@
-~/bin/bamtools/bin/bamtools filter -in $1 -isDuplicate false | ~/bin/bamtools/bin/bamtools convert -format fastq 
+#!/bin/bash
+RDIR=/opt/rufus/RUFUS
+BAMTOOLS=$RDIR/src/externals/gkno_launcher/tools/bamtools/bin/bamtools
+
+$BAMTOOLS filter -in $1 -isDuplicate false | $BAMTOOLS convert -format fastq 
