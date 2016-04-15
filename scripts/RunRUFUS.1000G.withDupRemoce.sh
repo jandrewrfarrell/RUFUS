@@ -23,7 +23,7 @@ then
         exit
 fi
 
-RDIR=/opt/rufus/RUFUS
+RDIR=/home/ubuntu/RUFUS
 RUFUSmodel=$RDIR/bin/ModelDist
 RUFUSbuild=$RDIR/bin/RUFUS.Build
 RUFUSfilter=$RDIR/bin/RUFUS.Filter

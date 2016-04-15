@@ -14,7 +14,7 @@ Threads=$Threads
 mkdir ./TempOverlap/
 echo "Overlaping $File"
 
-RDIR=/opt/rufus/RUFUS
+RDIR=/home/ubuntu/RUFUS
 
 OverlapHash=$RDIR/bin/Overlap
 OverlapRebion2=$RDIR/bin/OverlapRegion

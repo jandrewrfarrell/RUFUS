@@ -36,7 +36,7 @@ else
         make install
         cd ..
 fi
-
+exit
 if [ -e ./gkno_launcher/gkno ]
 then
         echo "know already built: skipping"
