@@ -16,7 +16,7 @@ g++ src/Overlap.cpp -o bin/Overlap -std=gnu++0x -fopenmp
 g++ src/OverlapRegion.cpp -o bin/OverlapRegion -std=gnu++0x -fopenmp
 g++ src/ReplaceQwithDinFASTQD.cpp -o bin/ReplaceQwithDinFASTQD
 g++ ./src/RUFUS.Filter.cpp -o ./bin/RUFUS.Filter -std=gnu++0x -fopenmp
-g++ src/RUFUS.Build.cpp -o bin/RUFUS.Build
+g++ src/RUFUS.Build.cpp -o bin/RUFUS.Build -fopenmp
 g++ ./src/RUFUS.interpret.cpp ./src/include/* -o ./bin/RUFUS.interpret -std=gnu++0x
 
 
@@ -31,12 +31,12 @@ else
         tar -xvf jellyfish-2.2.5.tar.gz
         cd jellyfish-2.2.5
         mkdir bin
-        ./configure --prefix=$RUFUS_DIR/src/externals/jellyfish-2.2.5/bin
+        ./configure --prefix=$RUFUS_DIR/bin/jellyfish
         make
         make install
         cd ..
 fi
-exit
+cd $RUFUS_DIR/bin/
 if [ -e ./gkno_launcher/gkno ]
 then
         echo "know already built: skipping"
@@ -57,4 +57,4 @@ else
         cd ..
 fi
 
-cd ../../../
+cd ../
