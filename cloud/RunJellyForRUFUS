@@ -1,0 +1,33 @@
+#!/bin/sh
+
+echo "ok lets do this"
+
+GEN=$1
+K=$2
+T=$3
+
+RDIR=/home/ubuntu/work/RUFUS
+JELLYFISH="$RDIR/bin/jellyfish/bin/jellyfish"
+SORT="$RDIR/scripts/sort"
+	
+echo "$JELLYFISH"
+$JELLYFISH
+
+ulimit -v 3000000
+ulimit -a
+if [ -e "$GEN.Jhash" ]
+then
+        echo "Skipping jelly, $GEN.Jhash.Jhash.sorted.min2.tab alreads exists"
+else
+	echo "here"
+	mkfifo $GEN.Jhash.temp
+	mkfifo $GEN.fq
+	bash $GEN > $GEN.fq &
+	/usr/bin/time -v $JELLYFISH count -m $K -L 2 -s 100 -t $T -o $GEN.Jhash -C $GEN.fq
+	#/usr/bin/time -v $JELLYFISH dump -c -t -L 2 $GEN.Jhash > $GEN.Jhash.temp&
+	#/usr/bin/time -v $SORT --parallel=$T -S 50% -T ./ $GEN.Jhash.temp > $GEN.Jhash.sorted.min2.tab &
+	/usr/bin/time -v $JELLYFISH histo -f -o $GEN.Jhash.histo $GEN.Jhash & 
+	wait
+	#rm $GEN.Jhash
+	rm $GEN.Jhash.temp
+fi
