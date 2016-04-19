@@ -92,7 +92,7 @@ void do_merge(cpp_array<file_info>& files, std::ostream& out, writer_type& write
     vector<string>ids; 
     do {
       sum.push_back( head->val_);
-	cout << "head->val_ = " << head->val_   << '\t' << head->it_ << '\t' << head->pos_ <<  endl;
+	//cout << "head->val_ = " << head->val_   << '\t' << head->it_ << '\t' << head->pos_ <<  endl;
       heap.pop();
       if(head->it_->next())
         heap.push(*head->it_);

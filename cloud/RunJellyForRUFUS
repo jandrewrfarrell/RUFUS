@@ -6,7 +6,7 @@ GEN=$1
 K=$2
 T=$3
 
-RDIR=/home/ubuntu/work/RUFUS
+RDIR=/opt/rufus/RUFUS/
 JELLYFISH="$RDIR/bin/jellyfish/bin/jellyfish"
 SORT="$RDIR/scripts/sort"
 

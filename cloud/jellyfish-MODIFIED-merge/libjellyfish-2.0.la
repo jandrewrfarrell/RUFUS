@@ -17,7 +17,7 @@ old_library='libjellyfish-2.0.a'
 inherited_linker_flags=''
 
 # Libraries that this one depends upon.
-dependency_libs=' /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/../../../../lib64/libstdc++.la'
+dependency_libs=''
 
 # Names of additional weak libraries provided by this library
 weak_library_names=''
@@ -38,4 +38,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/uufs/chpc.utah.edu/common/home/u0991464/bin/jellyfish-2.2.5/bin/lib'
+libdir='/opt/rufus/RUFUS/cloud/jellyfish-MODIFIED-merge/bin/lib'
