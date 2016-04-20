@@ -7,7 +7,7 @@ K=$2
 T=$3
 
 RDIR=/home/ubuntu/RUFUS
-JELLYFISH="$RDIR/src/externals/jellyfish-2.2.5/bin/jellyfish"
+JELLYFISH="$RDIR/bin/jellyfish/bin/jellyfish"
 SORT="$RDIR/scripts/sort"
 	
 echo "$JELLYFISH"
