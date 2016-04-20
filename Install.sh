@@ -18,7 +18,7 @@ g++ src/ReplaceQwithDinFASTQD.cpp -o bin/ReplaceQwithDinFASTQD
 g++ ./src/RUFUS.Filter.cpp -o ./bin/RUFUS.Filter -std=gnu++0x -fopenmp
 g++ src/RUFUS.Build.cpp -o bin/RUFUS.Build -fopenmp
 g++ ./src/RUFUS.interpret.cpp ./src/include/* -o ./bin/RUFUS.interpret -std=gnu++0x
-
+g++ ./src/RUFUS.1kg.filter.cpp -o ./bin/RUFUS.1kg.filter -std=gnu++0x -fopenmp
 
 echo "bulding external programs"
 cd src/externals/
@@ -36,6 +36,7 @@ else
         make install
         cd ..
 fi
+exit
 cd $RUFUS_DIR/bin/
 if [ -e ./gkno_launcher/gkno ]
 then
