@@ -30,6 +30,7 @@ RUFUSfilter=$RDIR/bin/RUFUS.Filter
 RUFUSOverlap=$RDIR/scripts/OverlapBashMultiThread.sh
 DeDupDump=$RDIR/scripts/HumanDedup.grenrator.tenplate
 PullSampleHashes=$RDIR/cloud/C
+RUFUS1kgFilter=$RDIR/bin/RUFUS.1kg.filter
 
 perl -ni -e 's/ /\t/;print' $ProbandGenerator.Jhash.histo
 perl -ni -e 's/ /\t/;print' $Parent1Generator.Jhash.histo
@@ -41,7 +42,7 @@ if [ -e "$ProbandGenerator.Jhash.histo.7.7.model" ]
 then
         echo "skipping model"
 else
-        /usr/bin/time -v $RUFUSmodel $ProbandGenerator.Jhash.histo $K 150 $Threads > $Out.Run.out
+        /usr/bin/time -v $RUFUSmodel $ProbandGenerator.Jhash.histo $K 150 $Threads 
 #        /usr/bin/time -v $RUFUSmodel $Parent1Generator.Jhash.histo $K 150 $Threads > $Out.Run.out
  #       /usr/bin/time -v $RUFUSmodel $Parent2Generator.Jhash.histo $K 150 $Threads > $Out.Run.out
   #      /usr/bin/time -v $RUFUSmodel $SiblingGenerator.Jhash.histo $K 150 $Threads > $Out.Run.out
@@ -67,7 +68,7 @@ if [ -d "Family.Unique.HashList" ]
 then 
  	echo "skipping 1kg filter"
 else
-	##add 1kg filter  
+	$RUFUS1kgFilter $RDIR/cloud/1000G.RUFUSreference.sorted.min45.tab  Family.Unique.HashList.prefilter  Family.Unique.HashList 25 0 7 300 $Threads 
 fi
 
 if [ -e $ProbandGenerator.HashList ]
