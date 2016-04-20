@@ -6,19 +6,18 @@ GEN=$1
 K=$2
 T=$3
 
+
 RDIR=/home/ubuntu/work/RUFUS
 JELLYFISH="$RDIR/bin/jellyfish/bin/jellyfish"
 SORT="$RDIR/scripts/sort"
 	
-echo "$JELLYFISH"
-$JELLYFISH
-
 ulimit -v 3000000
 ulimit -a
 if [ -e "$GEN.Jhash" ]
 then
         echo "Skipping jelly, $GEN.Jhash.Jhash.sorted.min2.tab alreads exists"
 else
+
 	echo "here"
 	mkfifo $GEN.Jhash.temp
 	mkfifo $GEN.fq
@@ -30,4 +29,6 @@ else
 	wait
 	#rm $GEN.Jhash
 	rm $GEN.Jhash.temp
+	rm $GEN.fq
+
 fi
