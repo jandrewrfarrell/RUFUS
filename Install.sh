@@ -36,7 +36,7 @@ else
         make install
         cd ..
 fi
-exit
+
 cd $RUFUS_DIR/bin/
 if [ -e ./gkno_launcher/gkno ]
 then

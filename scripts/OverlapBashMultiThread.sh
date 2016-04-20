@@ -21,10 +21,10 @@ OverlapRebion2=$RDIR/bin/OverlapRegion
 ReplaceQwithDinFASTQD=$RDIR/bin/ReplaceQwithDinFASTQD
 ConvertFASTqD=$RDIR/bin/ConvertFASTqD.to.FASTQ
 AnnotateOverlap=$RDIR/bin/AnnotateOverlap
-gkno=$RDIR/src/externals/gkno_launcher/gkno
-samtools=$RDIR/src/externals/gkno_launcher/tools/samtools/samtools
+gkno=$RDIR/bin/gkno_launcher/gkno
+samtools=$RDIR/bin/gkno_launcher/tools/samtools/samtools
 RUFUSinterpret=$RDIR/bin/RUFUS.interpret
-humanRef=$RDIR/src/externals/gkno_launcher/resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys.fa
+humanRef=$RDIR/bin/gkno_launcher/resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys.fa
 
 
 
