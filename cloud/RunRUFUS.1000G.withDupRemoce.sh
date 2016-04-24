@@ -29,7 +29,7 @@ RUFUSbuild=$RDIR/bin/RUFUS.Build
 RUFUSfilter=$RDIR/bin/RUFUS.Filter
 RUFUSOverlap=$RDIR/scripts/OverlapBashMultiThread.sh
 DeDupDump=$RDIR/scripts/HumanDedup.grenrator.tenplate
-PullSampleHashes=$RDIR/cloud/C
+PullSampleHashes=$RDIR/cloud/CheckJellyHashList.sh
 RUFUS1kgFilter=$RDIR/bin/RUFUS.1kg.filter
 
 perl -ni -e 's/ /\t/;print' $ProbandGenerator.Jhash.histo
@@ -37,68 +37,108 @@ perl -ni -e 's/ /\t/;print' $Parent1Generator.Jhash.histo
 perl -ni -e 's/ /\t/;print' $Parent2Generator.Jhash.histo
 perl -ni -e 's/ /\t/;print' $SiblingGenerator.Jhash.histo
 
-echo "staring model"
 if [ -e "$ProbandGenerator.Jhash.histo.7.7.model" ]
 then
         echo "skipping model"
 else
+	echo "staring model"
         /usr/bin/time -v $RUFUSmodel $ProbandGenerator.Jhash.histo $K 150 $Threads 
-#        /usr/bin/time -v $RUFUSmodel $Parent1Generator.Jhash.histo $K 150 $Threads > $Out.Run.out
- #       /usr/bin/time -v $RUFUSmodel $Parent2Generator.Jhash.histo $K 150 $Threads > $Out.Run.out
-  #      /usr/bin/time -v $RUFUSmodel $SiblingGenerator.Jhash.histo $K 150 $Threads > $Out.Run.out
         echo "done with model "
 fi
 
+if [ -e "$SiblingGenerator.Jhash.histo.7.7.model" ]
+then 
+	 echo "skipping model"
+else
+	 echo "staring model"
+	/usr/bin/time -v $RUFUSmodel $SiblingGenerator.Jhash.histo $K 150 $Threads
+	echo "done with model "
+fi 
+
 ParentMaxE=0
 MutantMinCov=$(head -2 $ProbandGenerator.Jhash.histo.7.7.model | tail -1 )
+SiblingMinCov=$(head -2 $SiblingGenerator.Jhash.histo.7.7.model | tail -1 )
 echo "$ParentMaxE \n $MutantMinCov \n"
-
 
 date
 echo "starting RUFUS build "
 let "Max= $MutantMinCov*100"
-if [ -e "Family.Unique.HashList.prefilter" ]
+if [ -e "Family.Unique.HashList" ]
 then
         echo "Skipping build"
 else
-	/usr/bin/time -v ../RUFUS/bin/jellyfish-MODIFIED/bin/jellyfish merge $Parent1Generator.Jhash  $Parent2Generator.Jhash $SiblingGenerator.Jhash $ProbandGenerator.Jhash >  Family.Unique.HashList.prefilter
+	echo "wellshit"
+	#/usr/bin/time -v ../RUFUS/bin/jellyfish-MODIFIED/bin/jellyfish merge $Parent1Generator.Jhash  $Parent2Generator.Jhash $SiblingGenerator.Jhash $ProbandGenerator.Jhash >  Family.Unique.HashList
 fi
 
-if [ -d "Family.Unique.HashList" ]
-then 
- 	echo "skipping 1kg filter"
-else
-	$RUFUS1kgFilter $RDIR/cloud/1000G.RUFUSreference.sorted.min45.tab  Family.Unique.HashList.prefilter  Family.Unique.HashList 25 0 7 300 $Threads 
-fi
-
-if [ -e $ProbandGenerator.HashList ]
+echo "Mut cov = $MutantMinCov and SiblingMinCov = $SiblingMinCov"
+if [ -e $ProbandGenerator.k$K_c$MutantMinCov.HashList.prefilter ]
 then 
 	echo "skipping $ProbandGenerator.HashList pull "
 else
 
-	$PullSampleHashes  $ProbandGenerator.Jhash Family.Unique.HashList > $ProbandGenerator.HashList
+	/usr/bin/time -v bash $PullSampleHashes $ProbandGenerator.Jhash Family.Unique.HashList $MutantMinCov > $ProbandGenerator.k$K_c$MutantMinCov.HashList.prefilter
 fi 
 
-if [ -e $SiblingGenerator.HashList ]
+if [ -e $SiblingGenerator.k$K_c$SiblingMinCov.HashList.prefilter ]
 then 
 	echo "skipping $SiblingGenerator.HashList pull"
 else
-	$PullSampleHashes $SiblingGenerator.Jhash Family.Unique.HashList > $SiblingGenerator.HashList 
+	/usr/bin/time -v bash $PullSampleHashes $SiblingGenerator.Jhash Family.Unique.HashList $SiblingMinCov > $SiblingGenerator.k$K_c$SiblingMinCov.HashList.prefilter
 fi 
 
 
+if [ -e $ProbandGenerator.k$K_c$MutantMinCov.HashList ]
+then 
+	echo "skipping 1kg filter"
+else
+	 /usr/bin/time -v ../RUFUS/cloud/RUFUS.search.1kg -hf <(awk '{print $1 "\t" $2}' $ProbandGenerator.k$K_c$MutantMinCov.HashList.prefilter ) -o $ProbandGenerator.k$K_c$MutantMinCov.HashList  -c $RDIR/cloud/1000G.RUFUSreference.sorted.min45.tab -hs 25
+fi 
 
+if [ -e $SiblingGenerator.k$K_c$SiblingMinCov.HashList ]
+then
+        echo "skipping 1kg filter"
+else
+         /usr/bin/time -v  ../RUFUS/cloud/RUFUS.search.1kg -hf <(awk '{print $1 "\t" $2}' $SiblingGenerator.k$K_c$SiblingMinCov.HashList.prefilter ) -o $SiblingGenerator.k$K_c$SiblingMinCov.HashList  -c $RDIR/cloud/1000G.RUFUSreference.sorted.min45.tab -hs 25
+fi
+
+
+	
 
 echo "done with RUFUS build "
+
 echo "startin RUFUS filter"
-if [ -e $ProbandGenerator".k$K"_m"$ParentMaxE"_c"$MutantMinCov".Mutations.fq ]
-rm  $ProbandGenerator.temp
-mkfifo $ProbandGenerator.temp
-/usr/bin/time -v  bash $ProbandGenerator >  $ProbandGenerator.temp &
-/usr/bin/time -v   $RUFUSfilter  $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList $ProbandGenerator.temp $ProbandGenerator".k$K"_m"$ParentMaxE"_c"$MutantMinCov" $K 0 5 10 $Threads >> $Out.Run.out   &
+if [ -e $ProbandGenerator.Mutations.fastq ]
+then 
+	echo "skipping filter"
+else 
+	rm  $ProbandGenerator.temp
+#	mkfifo $ProbandGenerator.temp
+	#/usr/bin/time -v  bash $ProbandGenerator >  $ProbandGenerator.temp &
+	#/usr/bin/time -v   $RUFUSfilter  $ProbandGenerator.k$K_c$MutantMinCov.HashList $ProbandGenerator.temp $ProbandGenerator $K 5 5 10 $Threads &
 wait
+fi 
+
 
 echo "startin RUFUS overlap"
-/usr/bin/time -v bash $RUFUSOverlap $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".filtered.fq.Mutations.fastq 5 $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov" $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList $Threads
+/usr/bin/time -v bash $RUFUSOverlap $ProbandGenerator.Mutations.fastq 5 $ProbandGenerator $ProbandGenerator.k$MutantMinCov.HashList $Threads 
 echo "done with everything "
+
+
+echo "startin RUFUS filter"
+if [ -e $SiblingGenerator.Mutations.fastq ]
+then 
+	echo "skipping filter" 
+else
+	rm  $SiblingGenerator.temp
+	#mkfifo $SiblingGenerator.temp
+	#/usr/bin/time -v  bash $SiblingGenerator >  $SiblingGenerator.temp &
+	#/usr/bin/time -v   $RUFUSfilter  $SiblingGenerator.k$K_c$SiblingMinCov.HashList $SiblingGenerator.temp $SiblingGenerator $K 5 5 10 $Threads &
+wait
+fi 
+echo "startin RUFUS overlap"
+	/usr/bin/time -v bash $RUFUSOverlap $SiblingGenerator.Mutations.fastq 5 $SiblingGenerator $SiblingGenerator.k$SiblingMinCov.HashList $Threads
+echo "done with everything "
+
+
 
