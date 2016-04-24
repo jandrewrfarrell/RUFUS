@@ -197,7 +197,7 @@ string RevComp (string Sequence)
         //cout << "end\n";
         return NewString;
 }
-void ProcessStack( stack <string>& Pstack, unordered_map  <unsigned long,  unsigned short >& Phash,unordered_map  <unsigned long,  unsigned short >& Mhash,  int MinMutDepth, int MaxParDepth, int side, unordered_map  <unsigned long, bool >& Mutations, unordered_map  <unsigned long, bool >& CopyNumber, int Par1x, int Mut1x) 
+/*void ProcessStack( stack <string>& Pstack, unordered_map  <unsigned long,  unsigned short >& Phash,unordered_map  <unsigned long,  unsigned short >& Mhash,  int MinMutDepth, int MaxParDepth, int side, unordered_map  <unsigned long, bool >& Mutations, unordered_map  <unsigned long, bool >& CopyNumber, int Par1x, int Mut1x) 
 {
 	//if (side == 0) cout << "Processing Parent " << endl;else cout << "Processing Mutant" << endl;
 //	int size = Pstack.size();
@@ -283,7 +283,7 @@ void ProcessStack( stack <string>& Pstack, unordered_map  <unsigned long,  unsig
 	}
 	//cout << size << " - " << count << endl;
 return;
-}
+}*/
 void process_mem_usage(double& vm_usage, double& resident_set, double& MAXvm, double& MAXrss)
 {
    using std::ios_base;
@@ -393,7 +393,7 @@ int main (int argc, char *argv[])
 
 	
 	string line;
-	unordered_map  <unsigned long, bool> Mutations;
+	unordered_map  <unsigned long, int> Mutations;
 
 	//std::unordered_map<std::bitmap, bool> ParentHashes;
 	cout << "Reading in pre-built hash talbe\n";
@@ -415,11 +415,23 @@ int main (int argc, char *argv[])
 	{
 		//cout << L1 << endl;
 		vector<string>  temp;
-		temp = Split(L1, ' ');
-		unsigned long b = atol(temp[0].c_str());
+		temp = Split(L1, '\t');
+		if (temp.size() == 2)
+		{
+		unsigned long b = HashToLong(temp[0].c_str());
+		//int c = atoi(temp[1].c_str()); 
 		//cout << temp[0] << "\t" << temp[1] << endl << b << "\t" << LongToHash(b, 18) <<  endl<<endl;
-		Mutations.insert(pair<unsigned long, bool> (b, 0));
+		Mutations.insert(pair<unsigned long, int > (b, 0));
 		//break;
+		}
+		else if (temp.size() == 4)
+		{
+			unsigned long b = HashToLong(temp[3].c_str());
+                	//int c = atoi(temp[1].c_str()); 
+                	//cout << temp[0] << "\t" << temp[1] << endl << b << "\t" << LongToHash(b, 18) <<  endl<<endl;
+                	Mutations.insert(pair<unsigned long, int > (b, 0));
+                	//break;
+		}
 	}
 	MutHashFile.close();
 	
@@ -479,57 +491,83 @@ int main (int argc, char *argv[])
 		{
 			string B1, B2, B3, B4;
 			vector<int> positions; 
-			#pragma omp critical (update)
+			//#pragma omp critical (update)
 			{
 				B1 = Buffer[BuffCount];
 				B2 = Buffer[BuffCount +1];
 				B3 = Buffer[BuffCount +2];
 				B4 = Buffer[BuffCount +3];
 			}
-				
+	//		cout << "checking " << B1 << endl << B2 << endl << B3 << endl << B4 << endl;
 			int rejected = 0;
 			int MutHashesFound = 0;
-			for (int i=0; i<B2.length()-HashSize; i++)
+			bool good = true;
+			int streak = 0; 
+			int start = 0;  
+	//	cout << "priming check " << endl;
+			for (int i=0; i<B4.length()-HashSize+1; i++)
 			{
-				string hash = B2.substr (i,HashSize);
-				string Qhash = B4.substr (i,HashSize);	
-				bool good = true;
-				for (int j=0; j<HashSize; j++)
-                        	{
-	                               	int B = hash.c_str()[j];
-        	                        if ( B == 78)
-                	                {
-                        	                good = false;
-                                	        break;
-                                	}
-					B = Qhash.c_str()[j];
-					if (((int)B - 33) < MinQ)
-					{
-						good = false;
+				int t = B4.c_str()[i]; 
+	//			cout << "i = " << i << " = " << t << " = " << B4.c_str()[i]-33 << endl;
+				if ((int)B4.c_str()[i]-33<MinQ or (int)B2.c_str()[i] == 78)
+				{
+					streak = 0;
+					start = i+1;
+					rejected++; 
+	//				cout << "bad base " << start << endl;
+				}
+				else
+				{
+					streak++; 
+					if (streak >= HashSize-1)
 						break;
-					}
-                        	}	
-		 		if (good)
+					
+				}	
+			} 
+			
+			for (int i=start; i<B2.length()-HashSize; i++)
+			{
+				if (((int)B4.c_str()[i+HashSize-1] - 33) < MinQ or (int)B2.c_str()[i+HashSize-1] == 78) 
+				{
+					streak = 0;
+					start = i+HashSize;
+					for (int j=start; j<B4.length(); j++)
+                        		{
+                                		if ((int)B4.c_str()[j]-33 < MinQ or (int)B2.c_str()[j] == 78)
+                                		{
+                                		        streak = 0;
+                                		        start = j+1;
+                                			rejected++; 
+						}
+                                		else
+                                		{
+                                		        streak++;
+                                        		if (streak >= HashSize)
+                                        		        break;
+                                		}
+                        		}
+					rejected++; 
+					i = start;
+			
+				}
+		 		if (streak  >= HashSize-1)
                         	{
-                        	        unsigned long LongHash = HashToLong(hash);
+				
+					string hash = B2.substr (i,HashSize);
+					string rev = RevComp(hash); 
+					unsigned long LongHash = 0; 
+					if (hash < rev)
+                        	        	LongHash = HashToLong(hash);
+					else
+						LongHash = HashToLong(rev); 
 					
 					if (Mutations.count(LongHash) > 0)
 	                                {
 	                                	MutHashesFound++;
 						positions.push_back(i);
 					}
-					else if (Mutations.count(HashToLong(RevComp(hash))) > 0)
-	                        	{
-						MutHashesFound++;
-                                                positions.push_back(i);
-					}
 				}
-	                        else
-	                        {
-					rejected++;
-	                        }
 			}
-				
 			if (MutHashesFound >= HashCountThreshold and rejected < (B2.length()/2))
 			{
 				/*cout << B2 << endl;
@@ -546,14 +584,13 @@ int main (int argc, char *argv[])
                                 	        {counter++;}
 						//else{break;}
                         	        }	
-					//cout << "-"<< counter;
                 	                if (counter > MaxCounter)
         	                        {MaxCounter = counter;}
 	                        }
 				//cout << endl;
 				if (MaxCounter >= HashCountThreshold )
 				{ 
-				//	cout << "   kept - " << MaxCounter << endl;
+	//				cout << "   kept - " << MaxCounter << endl;
 					#pragma omp critical(MutWrite)
 					{MutOutFile << B1 << ":MH" << MutHashesFound << endl << B2 << endl << B3 << endl << B4 << endl;}
 					found ++;

@@ -1701,18 +1701,37 @@ options:\
       	}
 	string line; 
 	getline(HashList, line); 
-	vector<string> temp = Split(line, '\t'); 
-	HashSize = temp[3].length(); 
-	Hash.insert(pair<string, int>(temp[3], atoi(temp[2].c_str())));
-
-	while ( getline(HashList, line))
-	{
-		vector<string> temp = Split(line, '\t');
+	vector<string> temp = Split(line, '\t');
+	if (temp.size() == 4)
+	{ 
+		HashSize = temp[3].length(); 
 		Hash.insert(pair<string, int>(temp[3], atoi(temp[2].c_str())));
-		//cout << "added pair " << temp[3] << "\t" << temp[2] << endl;
-	}
-	HashList.close(); 
 	
+		while ( getline(HashList, line))
+		{
+			vector<string> temp = Split(line, '\t');
+			Hash.insert(pair<string, int>(temp[0], atoi(temp[1].c_str())));
+			//cout << "added pair " << temp[3] << "\t" << temp[2] << endl;
+		}
+		HashList.close(); 
+	}
+	 else if (temp.size() == 2)
+        {
+                HashSize = temp[0].length();
+                Hash.insert(pair<string, int>(temp[0], atoi(temp[1].c_str())));
+
+                while ( getline(HashList, line))
+                {
+                        vector<string> temp = Split(line, '\t');
+                        Hash.insert(pair<string, int>(temp[0], atoi(temp[1].c_str())));
+                        //cout << "added pair " << temp[3] << "\t" << temp[2] << endl;
+                }
+         }
+	else
+	{
+		cout << "error in hash file fomrat" << endl;
+		return 1; 
+	}
 	//map<string, int>::iterator it;
 	//for ( it = Hash.begin(); it != Hash.end(); it++ )
 	//{
