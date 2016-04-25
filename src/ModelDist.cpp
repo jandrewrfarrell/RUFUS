@@ -249,7 +249,7 @@ double testModelLog(double SC, double stdev, double factor, double skew, double 
 	}
         //cout << "Sum of squares is " << SumSquares << " S = " << stdev << " f = " << factor <<endl;
         Rsq = SSres/SStot;
- cout << "   Testing  Model SC = " << SC << " StdDev = " << stdev << " F = " << factor << " skew = " << skew << " bestP = " << power << " with SSQ = " << SSresLog << " R^2 = " << Rsq <<endl;
+// cout << "   Testing  Model SC = " << SC << " StdDev = " << stdev << " F = " << factor << " skew = " << skew << " bestP = " << power << " with SSQ = " << SSresLog << " R^2 = " << Rsq <<endl;
 	return SSresLog;
 }
 double testModel(double SC, double stdev, double factor, double skew, double power, vector<long>& histo, int Inflection, int MaxCopy, double Ybar, double& Rsq)
@@ -505,10 +505,18 @@ int main (int argc, char *argv[])
 	vector<string> temp;
 	vector<long> histo;
 	histo.push_back(0);
-
+	
 	getline(HistoFile, line); // burn the 0 0 line
-	getline(HistoFile, line);
 	temp = Split(line, '\t');
+	cout << "first line = " << temp[0] << " - " << temp[1] << endl;
+	while (atoi(temp[1].c_str()) == 0 or atoi(temp[0].c_str())==0)
+	{
+		cout << "getting another " << endl;
+		getline(HistoFile, line);
+		temp = Split(line, '\t');
+		cout << "got " << temp[0] << " - " << temp[1] << endl;
+	}	
+	cout << "going with " << temp[0] << " - " << temp[1] << endl;
 	value = atol(temp[1].c_str());
 	histo.push_back(value);
 	long last = value;
@@ -602,13 +610,13 @@ for (i = 0; i<=2; i++)
 	double Flow = 1;
         double Fhigh = 20;
         count =0;
-        while (Flow/Fhigh < .999)
+        while (Flow/Fhigh < .999 and Fhigh > 1e-10 )
         {
                 count++;
                 //cout << "Round " << count <<  " - " << endl;;
 		double values[9];
 		
-                #pragma omp parallel for  num_threads(Threads)
+                #pragma omp parallel for  num_threads(11)
                 for(int x = 0; x <=10; x++)
                 {
 			values[x] = testModelLog( bestSC,  bestS, Flow + (((Fhigh-Flow)/10)*x),  bestSK, bestP,  histo2, Inflection, 5, Ybar, Rsq);
@@ -630,16 +638,16 @@ for (i = 0; i<=2; i++)
 		
 		Fhigh = Flow + ((Fhigh-Flow)/10)*(lowestX+1);
 		bestF = Flow + ((Fhigh-Flow)/10)*(lowestX);
-                cout << " Fl = " << Flow << endl; 
-                cout << " Fh = " << Fhigh << endl;
-		cout << " bestF = " << bestF << values[lowestX];
+                //cout << " Fl = " << Flow << endl; 
+                //cout << " Fh = " << Fhigh << endl;
+		//cout << " bestF = " << bestF << values[lowestX];
         }
 	cout << "   best Factor = " << bestF  << " steps = " << count << endl;
 
         double SClow = SC*.9;
         double SChigh = SC*1.1;
         count = 0;
-        while (SClow/SChigh <.999)
+        while (SClow/SChigh <.999 and SChigh > 1e-50)
         {
          count++;
                 //cout << "Round " << count <<  " - " << endl;;
@@ -675,7 +683,7 @@ for (i = 0; i<=2; i++)
         double STlow = stdev*.9;
         double SThigh = stdev*1.1;
         count =0;
-        while (STlow/SThigh < .99)
+        while (STlow/SThigh < .99 and SThigh > 1e-50 )
         {
 		 count++;
                 //cout << "Round " << count <<  " - " << endl;;
@@ -714,7 +722,7 @@ for (i = 0; i<=2; i++)
         double SKlow = 0;
         double SKhigh = 2;
         count =0;
-        while (SKlow/SKhigh < .999  )
+        while (SKlow/SKhigh < .999   and SKhigh < 1e-50)
         {
 
           	count++;
@@ -742,9 +750,9 @@ for (i = 0; i<=2; i++)
 			SKlow = 0; 
                 SKhigh = SKlow + ((SKhigh-SKlow)/10)*(lowestX+1);
                 bestSK = SKlow + ((SKhigh-SKlow)/10)*(lowestX);
-                cout << " SKl = " << SKlow << endl;
-                cout << " SKh = " << SKhigh << endl;
-                cout << " bestSK = " << bestSK << values[lowestX];
+                //cout << " SKl = " << SKlow << endl;
+                //cout << " SKh = " << SKhigh << endl;
+                //cout << " bestSK = " << bestSK << values[lowestX];
 		if (SKlow < 1e-20 and SKhigh < 1e-20)
 		{
 			break;
@@ -755,7 +763,7 @@ for (i = 0; i<=2; i++)
         double Plow = 1;
         double Phigh = 2;
         count =0;
-        while (Plow / Phigh < .999)
+        while (Plow / Phigh < .999 and Phigh > 1e-50 )
         {
           count++;
               //  cout << "Round " << count <<  " - " << endl;;
