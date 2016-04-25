@@ -76,7 +76,7 @@ then
         echo "Skipping build"
 else
 	echo "wellshit"
-	/usr/bin/time -v ../RUFUS/bin/jellyfish-MODIFIED/bin/jellyfish merge $Parent1Generator.Jhash  $Parent2Generator.Jhash $SiblingGenerator.Jhash $ProbandGenerator.Jhash >  Family.Unique.HashList
+	/usr/bin/time -v ../RUFUS/cloud/jellyfish-MODIFIED-merge/bin/jellyfish merge $Parent1Generator.Jhash  $Parent2Generator.Jhash $SiblingGenerator.Jhash $ProbandGenerator.Jhash >  Family.Unique.HashList
 fi
 
 echo "Mut cov = $MutantMinCov and SiblingMinCov = $SiblingMinCov"
