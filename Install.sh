@@ -9,16 +9,16 @@ perl -p -i -e "s/RDIR=.*\n/RDIR=$( echo $(pwd)| perl -p -i -e "s/\//\\\\\//g")\n
 RUFUS_DIR=$(pwd)
 
 echo "bulding rufus executables"
-g++ src/AnnotateOverlap.cpp -o bin/AnnotateOverlap -std=gnu++0x
-g++ src/ConvertFASTqD.to.FASTQ.cpp -o bin/ConvertFASTqD.to.FASTQ
-g++ src/ModelDist.cpp -o bin/ModelDist -fopenmp
-g++ src/Overlap.cpp -o bin/Overlap -std=gnu++0x -fopenmp
-g++ src/OverlapRegion.cpp -o bin/OverlapRegion -std=gnu++0x -fopenmp
-g++ src/ReplaceQwithDinFASTQD.cpp -o bin/ReplaceQwithDinFASTQD
-g++ ./src/RUFUS.Filter.cpp -o ./bin/RUFUS.Filter -std=gnu++0x -fopenmp
-g++ src/RUFUS.Build.cpp -o bin/RUFUS.Build -fopenmp
-g++ ./src/RUFUS.interpret.cpp ./src/include/* -o ./bin/RUFUS.interpret -std=gnu++0x
-g++ ./src/RUFUS.1kg.filter.cpp -o ./bin/RUFUS.1kg.filter -std=gnu++0x -fopenmp
+g++ src/AnnotateOverlap.cpp -o bin/AnnotateOverlap -std=gnu++0x -O3
+g++ src/ConvertFASTqD.to.FASTQ.cpp -o bin/ConvertFASTqD.to.FASTQ -O3
+g++ src/ModelDist.cpp -o bin/ModelDist -fopenmp -O3
+g++ src/Overlap.cpp -o bin/Overlap -std=gnu++0x -fopenmp -O3
+g++ src/OverlapRegion.cpp -o bin/OverlapRegion -std=gnu++0x -fopenmp -O3
+g++ src/ReplaceQwithDinFASTQD.cpp -o bin/ReplaceQwithDinFASTQD  -O3
+g++ ./src/RUFUS.Filter.cpp -o ./bin/RUFUS.Filter -std=gnu++0x -fopenmp -O3
+g++ src/RUFUS.Build.cpp -o bin/RUFUS.Build -fopenmp -O3
+g++ ./src/RUFUS.interpret.cpp ./src/include/* -o ./bin/RUFUS.interpret -std=gnu++0x -O3
+g++ ./src/RUFUS.1kg.filter.cpp -o ./bin/RUFUS.1kg.filter -std=gnu++0x -fopenmp -O3
 
 echo "bulding external programs"
 cd src/externals/
