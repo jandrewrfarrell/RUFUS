@@ -44,9 +44,7 @@ const vector<string> Split(const string& line, const char delim) {
 
 unsigned long HashToLong (string hash)
 {
-	//cout << "booya" << hash << endl;
 	bitset<64> HashBits;
-	//#pragma omp parellel for
 	for(int i=0; i<hash.length();i++)
 	{
 		if (hash.c_str()[i] == 'A')
@@ -74,55 +72,9 @@ unsigned long HashToLong (string hash)
 			cout << "ERROR, invalid character - " << hash.c_str()[i] << endl;
 		}
 	}
-	//cout <<  HashBits.to_ulong() << "-" << endl;
 	return HashBits.to_ulong();
 }
-/*
-unsigned long HashToLong (string hash)
-{
-        //cout << "booya" << hash << endl;
-        bitset<64> HashBits;
-        int bitcout = 0;
-        for(int i=0; i<hash.length();i++)
-        {
-                if (hash.c_str()[i] == 'A')
-                {
-                        HashBits[bitcout] = 0;
-                        bitcout++;
-                        HashBits[bitcout] = 0;
-                        bitcout++;
-                }
-                else  if (hash.c_str()[i] == 'C')
-                {
-                        HashBits[bitcout] = 0;
-                        bitcout++;
-                        HashBits[bitcout] = 1;
-                        bitcout++;
-                }
-                else  if (hash.c_str()[i] == 'G')
-                {
-                        HashBits[bitcout] = 1;
-                        bitcout++;
-                        HashBits[bitcout] = 0;
-                        bitcout++;
-                }
-                else  if (hash.c_str()[i] == 'T')
-                {
-                        HashBits[bitcout] = 1;
-                        bitcout++;
-                        HashBits[bitcout] = 1;
-                        bitcout++;
-                }
-                else
-                {
-                        cout << "ERROR, invalid character - " << hash.c_str()[i] << endl;
-                }
-        }
-        //cout <<  HashBits.to_ulong() << "-" << endl;
-        unsigned long booya;
-	booya = HashBits.to_ulong();
-	return booya;
-}*/
+
 string LongToHash (unsigned long LongHash, int HashSize)
 {
         string value = "";
@@ -171,7 +123,7 @@ string LongToHash (unsigned long LongHash, int HashSize)
 //      cout << test << endl;
 //      cint >> test;
 }
-string RevComp (string Sequence)
+string RevComp (string& Sequence)
 {
         string NewString = "";
         //cout << "Start - " << Sequence << "\n";
@@ -197,93 +149,6 @@ string RevComp (string Sequence)
         //cout << "end\n";
         return NewString;
 }
-/*void ProcessStack( stack <string>& Pstack, unordered_map  <unsigned long,  unsigned short >& Phash,unordered_map  <unsigned long,  unsigned short >& Mhash,  int MinMutDepth, int MaxParDepth, int side, unordered_map  <unsigned long, bool >& Mutations, unordered_map  <unsigned long, bool >& CopyNumber, int Par1x, int Mut1x) 
-{
-	//if (side == 0) cout << "Processing Parent " << endl;else cout << "Processing Mutant" << endl;
-//	int size = Pstack.size();
-//	 int count = 0;
-	while (!Pstack.empty())
- //	#pragma omp parellel for
-//	for ( int bam = 0; bam < size; bam++) 
-	{
-//		count++;
-        	string L1 = Pstack.top();  
-                Pstack.pop();
-                vector<string> stuff;
-                stuff = Split(L1, '\t');
-                int count = atoi(stuff[1].c_str());
-                unsigned short C;
-                if (count > 65534){C = 65535;}else{C = count;}\
-
-		//cout << "line = " << L1 << endl << "       " << stuff[0] << "\t" << C << endl;
-                unsigned long  ParentLongHash = HashToLong(stuff[0]);        
-		if (side == 0)
-		{	
-			if (Mhash.count(ParentLongHash) > 0)
-                        {
-                               	unsigned short M = Mhash[ParentLongHash];     			
-		//		cout << "line = " << L1 << endl << "    P =" << stuff[0] << "\t" << C << endl <<"     M =" << stuff[0] << "\t" << M << endl;
-				if ( M >= MinMutDepth && C <= MaxParDepth)
-                                {
-		//			 cout << "     Find mutation\n";
-					Mutations[ParentLongHash] = 1;
-                                        Mhash.erase(ParentLongHash);totalDeleted++;
-				}
-                                else
-                                {
-					float ParFold = (float) C / (float) Par1x;
-                               	 	float MutFold = (float) M / (float) Mut1x;
-
-                                	if ((fabs(ParFold - MutFold) > 1.9) && (C >= ( Par1x / 2 )) && (M >= ( Mut1x / 2 )) && (C <= ( Par1x * 20 )) && (M <= ( Mut1x * 20 )))
-                                	{
-		//				      cout << "     Find copyNum\n";
-						CopyNumber[ParentLongHash] = 1;
-                                        	Mhash.erase(ParentLongHash);totalDeleted++;
-                                	}
-					else 
-					{Mhash.erase(ParentLongHash);totalDeleted++;}
-				}
-                        }
-                        else
-                        {
-                                Phash.insert (pair<unsigned long,  unsigned short > (ParentLongHash,C));totalAdded++;
-                        }
-		}
-		else if (side == 1)
-		 {
-                        if (Phash.count(ParentLongHash) > 0)
-                        {
-                               	unsigned short P = Phash[ParentLongHash];
-		//		cout << "line = " << L1 << endl << "    M =" << stuff[0] << "\t" << C << endl <<"     P =" << stuff[0] << "\t" << P << endl;
-				if ((int)C >= MinMutDepth && (int)P <= MaxParDepth)
-                                {
-		//			cout << "     Find mutation\n";
-					Mutations[ParentLongHash] = 1;
-                                        Phash.erase(ParentLongHash);totalDeleted++;
-                                }
-				else
-                                {       
-                                        float ParFold = (float) P / (float) Par1x;
-                                        float MutFold = (float) C / (float) Mut1x;
-
-                                        if ((fabs(ParFold - MutFold) > 1.9) && ((int)P >= ( Par1x / 2 )) && ((int)C >= ( Mut1x / 2 )) && ((int)P <= ( Par1x * 20 )) && ((int)C <= ( Mut1x * 20 )))
-                                        {	
-		//				cout << "     Find copyNum\n";
-                                                CopyNumber[ParentLongHash] = 1;
-                                                Phash.erase(ParentLongHash);totalDeleted++;
-                                        }
-                                	else{Phash.erase(ParentLongHash);totalDeleted++;}
-                        	}
-			}
-                        else
-                        {
-                                Mhash.insert (pair<unsigned long,  unsigned short > (ParentLongHash,C));totalAdded++;
-                        }
-                }
-	}
-	//cout << size << " - " << count << endl;
-return;
-}*/
 void process_mem_usage(double& vm_usage, double& resident_set, double& MAXvm, double& MAXrss)
 {
    using std::ios_base;
@@ -333,7 +198,7 @@ int main (int argc, char *argv[])
    	cout << "VM: " << vm << "; RSS: " << rss << endl;	
 	
 	
-	int BufferSize = 1000;
+	int BufferSize = 240;
 
  cout << "Paramaters are:\n  PreBuiltMutHash = " << argv[1] << "\n  Mutant.fq = " << argv[2] << "\n  out stub = " << argv[3] <<"\n  HashSize = " << argv[4] << "\n  MinQ = " << argv[5] << "\n  HashCountThreshold = " << argv[6]  << "\n  Window = " << argv[7] << "\n  Threads = " << argv[8] 
 << endl;
@@ -418,18 +283,22 @@ int main (int argc, char *argv[])
 		temp = Split(L1, '\t');
 		if (temp.size() == 2)
 		{
-		unsigned long b = HashToLong(temp[0].c_str());
+		unsigned long b = HashToLong(temp[0]);
+		unsigned long revb = HashToLong(RevComp(temp[0]));
 		//int c = atoi(temp[1].c_str()); 
 		//cout << temp[0] << "\t" << temp[1] << endl << b << "\t" << LongToHash(b, 18) <<  endl<<endl;
 		Mutations.insert(pair<unsigned long, int > (b, 0));
+		Mutations.insert(pair<unsigned long, int > (revb, 0));
 		//break;
 		}
 		else if (temp.size() == 4)
 		{
-			unsigned long b = HashToLong(temp[3].c_str());
-                	//int c = atoi(temp[1].c_str()); 
+			unsigned long b = HashToLong(temp[3]);
+                	unsigned long revb = HashToLong(RevComp(temp[3]));
+			//int c = atoi(temp[1].c_str()); 
                 	//cout << temp[0] << "\t" << temp[1] << endl << b << "\t" << LongToHash(b, 18) <<  endl<<endl;
                 	Mutations.insert(pair<unsigned long, int > (b, 0));
+			Mutations.insert(pair<unsigned long, int > (revb, 0));
                 	//break;
 		}
 	}
@@ -453,68 +322,46 @@ int main (int argc, char *argv[])
 
 	int found = 0;
 	lines = 0;
+	string Buffer [2400];
 	while (getline(MutFile, L1))
 	{
 		lines++;
-		getline(MutFile, L2);
-                getline(MutFile, L3);
-                getline(MutFile, L4);
+
+                Buffer[0]=L1;
+		getline(MutFile, Buffer[1]);
+                getline(MutFile, Buffer[2]);
+                getline(MutFile, Buffer[3]);
 		
-		vector<string> Buffer;
-		Buffer.push_back(L1);
-	 	Buffer.push_back(L2);
-	 	Buffer.push_back(L3);
-	 	Buffer.push_back(L4);
 		 if (lines % 10000 > 1 && (lines % (10000+Threads) < Threads))
                  {
                         Et = clock();
                         float Dt = ((double) (Et - St)) * CLOCKS_PER_SEC;
                  	cout << "Read in " << lines << " lines: Found " << found << " Reads per sec = " << (float)lines/(float)Dt << " \r";
                  }
-		int stackCount=0;
-		while (Buffer.size()<Threads*4 && getline(MutFile, L1) )
+		int pos = 4; 
+		while (getline(MutFile, Buffer[pos]) )
 		{
-			lines++;
-			getline(MutFile, L2);
-                	getline(MutFile, L3);
-                	getline(MutFile, L4);
+			pos++;
+			if (pos >=BufferSize)
+				break;
 			
-			Buffer.push_back(L1);
-			Buffer.push_back(L2);
-                	Buffer.push_back(L3);
-                	Buffer.push_back(L4);
-		//	 cout << "adding  \n   " << L1 << "\n   " << L2 << "\n   " << L3 << "\n   " << L4 << endl;
 		}
-		//cout << " Buffer has " << Buffer.size() << " lines\n";
 		#pragma omp parallel for shared(MutOutFile) num_threads(Threads)
-		for (int BuffCount = 0; BuffCount < Buffer.size(); BuffCount+=4)
+		for (int BuffCount = 0; BuffCount < pos ; /*BuffCount < Buffer.size();*/ BuffCount+=4)
 		{
-			string B1, B2, B3, B4;
 			vector<int> positions; 
-			//#pragma omp critical (update)
-			{
-				B1 = Buffer[BuffCount];
-				B2 = Buffer[BuffCount +1];
-				B3 = Buffer[BuffCount +2];
-				B4 = Buffer[BuffCount +3];
-			}
-	//		cout << "checking " << B1 << endl << B2 << endl << B3 << endl << B4 << endl;
 			int rejected = 0;
 			int MutHashesFound = 0;
 			bool good = true;
 			int streak = 0; 
 			int start = 0;  
-	//	cout << "priming check " << endl;
-			for (int i=0; i<B4.length()-HashSize+1; i++)
+			for (int i=0; i<Buffer[BuffCount+3].length()-HashSize+1; i++)
 			{
-				int t = B4.c_str()[i]; 
-	//			cout << "i = " << i << " = " << t << " = " << B4.c_str()[i]-33 << endl;
-				if ((int)B4.c_str()[i]-33<MinQ or (int)B2.c_str()[i] == 78)
+				if ((int)Buffer[BuffCount+3].c_str()[i]-33<MinQ or (int)Buffer[BuffCount+1].c_str()[i] == 78)
 				{
 					streak = 0;
 					start = i+1;
 					rejected++; 
-	//				cout << "bad base " << start << endl;
 				}
 				else
 				{
@@ -525,15 +372,15 @@ int main (int argc, char *argv[])
 				}	
 			} 
 			
-			for (int i=start; i<B2.length()-HashSize; i++)
+			for (int i=start; i<Buffer[BuffCount+1].length()-HashSize; i++)
 			{
-				if (((int)B4.c_str()[i+HashSize-1] - 33) < MinQ or (int)B2.c_str()[i+HashSize-1] == 78) 
+				if (((int)Buffer[BuffCount+3].c_str()[i+HashSize-1] - 33) < MinQ or (int)Buffer[BuffCount+1].c_str()[i+HashSize-1] == 78) 
 				{
 					streak = 0;
 					start = i+HashSize;
-					for (int j=start; j<B4.length(); j++)
+					for (int j=start; j<Buffer[BuffCount+3].length(); j++)
                         		{
-                                		if ((int)B4.c_str()[j]-33 < MinQ or (int)B2.c_str()[j] == 78)
+                                		if ((int)Buffer[BuffCount+3].c_str()[j]-33 < MinQ or (int)Buffer[BuffCount+1].c_str()[j] == 78)
                                 		{
                                 		        streak = 0;
                                 		        start = j+1;
@@ -553,27 +400,16 @@ int main (int argc, char *argv[])
 		 		if (streak  >= HashSize-1)
                         	{
 				
-					string hash = B2.substr (i,HashSize);
-					string rev = RevComp(hash); 
-					unsigned long LongHash = 0; 
-					if (hash < rev)
-                        	        	LongHash = HashToLong(hash);
-					else
-						LongHash = HashToLong(rev); 
-					
-					if (Mutations.count(LongHash) > 0)
+					//unsigned long LongHash = HashToLong(Buffer[BuffCount+1].substr (i,HashSize));
+					if (Mutations.count(HashToLong(Buffer[BuffCount+1].substr (i,HashSize))) > 0)
 	                                {
 	                                	MutHashesFound++;
 						positions.push_back(i);
 					}
 				}
 			}
-			if (MutHashesFound >= HashCountThreshold and rejected < (B2.length()/2))
+			if (MutHashesFound >= HashCountThreshold and rejected < (Buffer[BuffCount+1].length()/2))
 			{
-				/*cout << B2 << endl;
-				for (int i = 0; i<positions.size(); i++)
-				{cout << "-" << positions[i]	;}
-				cout << endl;*/
 				int MaxCounter = -1;
                         	for (int i = 0; i<positions.size()-1; i++)
                         	{
@@ -582,21 +418,16 @@ int main (int argc, char *argv[])
                                 	{
                                 	        if (positions[j] - positions[i] <= Window)
                                 	        {counter++;}
-						//else{break;}
                         	        }	
                 	                if (counter > MaxCounter)
         	                        {MaxCounter = counter;}
 	                        }
-				//cout << endl;
 				if (MaxCounter >= HashCountThreshold )
 				{ 
-	//				cout << "   kept - " << MaxCounter << endl;
 					#pragma omp critical(MutWrite)
-					{MutOutFile << B1 << ":MH" << MutHashesFound << endl << B2 << endl << B3 << endl << B4 << endl;}
+					{MutOutFile << Buffer[BuffCount] << ":MH" << MutHashesFound << endl << Buffer[BuffCount+1] << endl << Buffer[BuffCount+2] << endl << Buffer[BuffCount+3] << endl;}
 					found ++;
 				}
-				//else
-				//{cout << "    rejected " << endl;}
 				
 			}
 		}
