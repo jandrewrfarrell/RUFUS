@@ -11,7 +11,7 @@ RUFUS_DIR=$(pwd)
 echo "bulding rufus executables"
 g++ src/AnnotateOverlap.cpp -o bin/AnnotateOverlap -std=gnu++0x -O3
 g++ src/ConvertFASTqD.to.FASTQ.cpp -o bin/ConvertFASTqD.to.FASTQ -O3
-g++ src/ModelDist.cpp -o bin/ModelDist -fopenmp -O3
+g++ src/ModelDist.cpp -o bin/ModelDist -fopenmp 
 g++ src/Overlap.cpp -o bin/Overlap -std=gnu++0x -fopenmp -O3
 g++ src/OverlapRegion.cpp -o bin/OverlapRegion -std=gnu++0x -fopenmp -O3
 g++ src/ReplaceQwithDinFASTQD.cpp -o bin/ReplaceQwithDinFASTQD  -O3
