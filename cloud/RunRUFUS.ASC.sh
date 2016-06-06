@@ -34,10 +34,10 @@ RUFUS1kgFilter=$RDIR/bin/RUFUS.1kg.filter
 RunJelly=$RDIR/cloud/RunJellyForRUFUS
 
 
-aws s3 cp s3://rufus.marth.lab/ASC.generators/$Parent1Generator ./
-aws s3 cp s3://rufus.marth.lab/ASC.generators/$Parent2Generator ./
-aws s3 cp s3://rufus.marth.lab/ASC.generators/$SiblingGenerator ./
-aws s3 cp s3://rufus.marth.lab/ASC.generators/$ProbandGenerator ./
+aws s3 cp s3://marthlab.rufus/ASC.scripts/$Parent1Generator ./
+aws s3 cp s3://marthlab.rufus/ASC.scripts/$Parent2Generator ./
+aws s3 cp s3://marthlab.rufus/ASC.scripts/$SiblingGenerator ./
+aws s3 cp s3://marthlab.rufus/ASC.scripts/$ProbandGenerator ./
 
 /usr/bin/time -v bash $RunJelly $Parent1Generator $K $(echo $Threads -2 | bc)
 if [ "$( tail -n 2 $Parent1Generator.Jelly.chr | head -1)" == "*" ]
@@ -229,12 +229,12 @@ else
 
 fi
 
-for i in *vcf*; do aws s3 cp $i s3://rufus.marth.lab/ASC.out/$Out/ ; done 
-for i in *Mutations.fastq ; do aws s3 cp $i s3://rufus.marth.lab/ASC.out/$Out/ ; done
-for i in *HashList;  do aws s3 cp $i s3://rufus.marth.lab/ASC.out/$Out/ ; done
-for i in *bam; do aws s3 cp $i s3://rufus.marth.lab/ASC.out/$Out/ ; done
-for i in *chr; do aws s3 cp $i s3://rufus.marth.lab/ASC.out/$Out/ ; done
-for i in *generator.V2.overlap.asembly.hash.fastq.*; do aws s3 cp $i s3://rufus.marth.lab/ASC.out/$Out/ ; done
+for i in *vcf*; do aws s3 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done 
+for i in *Mutations.fastq ; do aws s3 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
+for i in *HashList;  do aws s3 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
+for i in *bam; do aws s3 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
+for i in *chr; do aws s3 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
+for i in *generator.V2.overlap.asembly.hash.fastq.*; do aws s3 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
 
 echo "done with everything "
 
