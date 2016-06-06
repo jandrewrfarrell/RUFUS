@@ -40,9 +40,54 @@ aws s3 cp s3://rufus.marth.lab/ASC.generators/$SiblingGenerator ./
 aws s3 cp s3://rufus.marth.lab/ASC.generators/$ProbandGenerator ./
 
 /usr/bin/time -v bash $RunJelly $Parent1Generator $K $(echo $Threads -2 | bc)
+if [ "$( tail -n 2 $Parent1Generator.Jelly.chr | head -1)" == "*" ]
+then 
+	echo "Jelly on $Parent1Generator successfull"
+else
+	echo "ReRunning jelly on $Parent1Generator"
+	rm $Parent1Generator.Jhash
+	rm $Parent1Generator.Jelly.chr
+	/usr/bin/time -v bash $RunJelly $Parent1Generator $K $(echo $Threads -2 | bc)
+fi 
+
 /usr/bin/time -v bash $RunJelly $Parent2Generator $K $(echo $Threads -2 | bc)
+if [ "$( tail -n 2 $Parent2Generator.Jelly.chr | head -1)" == "*" ]
+then
+        echo "Jelly on $Parent2Generator successfull"
+else
+        echo "ReRunning jelly on $Parent2Generator"
+        rm $Parent2Generator.Jhash
+	rm $Parent2Generator.Jelly.chr
+       /usr/bin/time -v bash $RunJelly $Parent2Generator $K $(echo $Threads -2 | bc)
+fi
+
+
+
+
 /usr/bin/time -v bash $RunJelly $SiblingGenerator $K $(echo $Threads -2 | bc)
+if [ "$( tail -n 2 $SiblingGenerator.Jelly.chr | head -1)" == "*" ]
+then
+        echo "Jelly on $SiblingGenerator successfull"
+else
+        echo "ReRunning jelly on $SiblingGenerator"
+        rm $SiblingGenerator.Jhash
+	rm  $SiblingGenerator.Jelly.chr
+       /usr/bin/time -v bash $RunJelly $SiblingGenerator $K $(echo $Threads -2 | bc)
+fi
+
+
+
 /usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc)
+if [ "$( tail -n 2 $ProbandGenerator.Jelly.chr | head -1)" == "*" ]
+then
+        echo "Jelly on $ProbandGenerator successfull"
+else
+        echo "ReRunning jelly on $ProbandGenerator"
+        rm $ProbandGenerator.Jhash
+	rm $ProbandGenerator.Jelly.chr
+        /usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc)
+fi
+exit
 
 
 perl -ni -e 's/ /\t/;print' $ProbandGenerator.Jhash.histo
@@ -127,7 +172,18 @@ echo "crap"
 	mkfifo $ProbandGenerator.temp
 	/usr/bin/time -v  bash $ProbandGenerator | /home/ubuntu/work/RUFUS/cloud/PassThroughSamCheck $ProbandGenerator.filter.chr >  $ProbandGenerator.temp &
 	/usr/bin/time -v   $RUFUSfilter  $ProbandGenerator.k$K_c$MutantMinCov.HashList $ProbandGenerator.temp $ProbandGenerator $K 5 5 10 $(echo $Threads -2 | bc) &
-wait
+	wait
+
+	if [ "$( tail -n 2 $ProbandGenerator.filter.chr | head -1)" == "*" ]
+        then
+                echo "Filter on $ProbandGenerator successfull"
+        else
+                echo "ReRunning filter on $ProbandGenerator"
+		rm  $ProbandGenerator.temp
+	        mkfifo $ProbandGenerator.temp
+	        /usr/bin/time -v  bash $ProbandGenerator | /home/ubuntu/work/RUFUS/cloud/PassThroughSamCheck $ProbandGenerator.filter.chr >  $ProbandGenerator.temp &
+	        /usr/bin/time -v   $RUFUSfilter  $ProbandGenerator.k$K_c$MutantMinCov.HashList $ProbandGenerator.temp $ProbandGenerator $K 5 5 10 $(echo $Threads -2 | bc) &
+	fi
 fi 
 
 if [ -e $ProbandGenerator.V2.overlap.hashcount.fastq.bam.vcf ]
@@ -138,7 +194,7 @@ else
 	/usr/bin/time -v bash $RUFUSOverlap $ProbandGenerator.Mutations.fastq 5 $ProbandGenerator $ProbandGenerator.k$MutantMinCov.HashList $Threads $ProbandGenerator.Jhash $SiblingGenerator.Jhash $Parent1Generator.Jhash $Parent2Generator.Jhash 
 fi
 
-echo "startin RUFUS filter"
+echo "starting RUFUS filter"
 if [ -e $SiblingGenerator.Mutations.fastq ]
 then 
 	echo "skipping filter" 
@@ -147,7 +203,21 @@ else
 	mkfifo $SiblingGenerator.temp
 	/usr/bin/time -v  bash $SiblingGenerator | /home/ubuntu/work/RUFUS/cloud/PassThroughSamCheck $SiblingGenerator.filter.chr >  $SiblingGenerator.temp &
 	/usr/bin/time -v   $RUFUSfilter  $SiblingGenerator.k$K_c$SiblingMinCov.HashList $SiblingGenerator.temp $SiblingGenerator $K 5 5 10 $(echo $Threads -2 | bc) &
-wait
+	wait
+
+	if [ "$( tail -n 2 $SiblingGenerator.filter.chr | head -1)" == "*" ]
+	then
+	        echo "Filter on $SiblingGenerator successfull"
+	else
+	        echo "ReRunning filter on $SiblingGenerator"
+		rm  $SiblingGenerator.temp
+        	mkfifo $SiblingGenerator.temp
+        	/usr/bin/time -v  bash $SiblingGenerator | /home/ubuntu/work/RUFUS/cloud/PassThroughSamCheck $SiblingGenerator.filter.chr >  $SiblingGenerator.temp &
+        	/usr/bin/time -v   $RUFUSfilter  $SiblingGenerator.k$K_c$SiblingMinCov.HashList $SiblingGenerator.temp $SiblingGenerator $K 5 5 10 $(echo $Threads -2 | bc) &
+        	wait
+	fi
+	exit
+
 fi
 
 if [ -e $SiblingGenerator.V2.overlap.hashcount.fastq.bam.vcf ]
@@ -161,6 +231,7 @@ fi
 
 for i in *vcf*; do aws s3 cp $i s3://rufus.marth.lab/ASC.out/$Out/ ; done 
 for i in *Mutations.fastq ; do aws s3 cp $i s3://rufus.marth.lab/ASC.out/$Out/ ; done
+for i in *HashList;  do aws s3 cp $i s3://rufus.marth.lab/ASC.out/$Out/ ; done
 for i in *bam; do aws s3 cp $i s3://rufus.marth.lab/ASC.out/$Out/ ; done
 for i in *chr; do aws s3 cp $i s3://rufus.marth.lab/ASC.out/$Out/ ; done
 for i in *generator.V2.overlap.asembly.hash.fastq.*; do aws s3 cp $i s3://rufus.marth.lab/ASC.out/$Out/ ; done
