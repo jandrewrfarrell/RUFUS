@@ -34,10 +34,15 @@ RUFUS1kgFilter=$RDIR/bin/RUFUS.1kg.filter
 RunJelly=$RDIR/cloud/RunJellyForRUFUS
 
 
-/usr/bin/time -v bash $RunJelly $Parent1Generator $K $(echo $Threads -1 | bc)
-/usr/bin/time -v bash $RunJelly $Parent2Generator $K $(echo $Threads -1 | bc)
-/usr/bin/time -v bash $RunJelly $SiblingGenerator $K $(echo $Threads -1 | bc)
-/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -1 | bc)
+aws s3 cp s3://rufus.marth.lab/ASC.generators/$Parent1Generator ./
+aws s3 cp s3://rufus.marth.lab/ASC.generators/$Parent2Generator ./
+aws s3 cp s3://rufus.marth.lab/ASC.generators/$SiblingGenerator ./
+aws s3 cp s3://rufus.marth.lab/ASC.generators/$ProbandGenerator ./
+
+/usr/bin/time -v bash $RunJelly $Parent1Generator $K $(echo $Threads -2 | bc)
+/usr/bin/time -v bash $RunJelly $Parent2Generator $K $(echo $Threads -2 | bc)
+/usr/bin/time -v bash $RunJelly $SiblingGenerator $K $(echo $Threads -2 | bc)
+/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc)
 
 
 perl -ni -e 's/ /\t/;print' $ProbandGenerator.Jhash.histo
@@ -75,7 +80,6 @@ if [ -e "Family.Unique.HashList" ]
 then
         echo "Skipping build"
 else
-	echo "wellshit"
 	/usr/bin/time -v ../RUFUS/cloud/jellyfish-MODIFIED-merge/bin/jellyfish merge $Parent1Generator.Jhash  $Parent2Generator.Jhash $SiblingGenerator.Jhash $ProbandGenerator.Jhash >  Family.Unique.HashList
 fi
 
@@ -84,7 +88,7 @@ if [ -e $ProbandGenerator.k$K_c$MutantMinCov.HashList.prefilter ]
 then 
 	echo "skipping $ProbandGenerator.HashList pull "
 else
-
+echo "crap"
 	/usr/bin/time -v bash $PullSampleHashes $ProbandGenerator.Jhash Family.Unique.HashList $MutantMinCov > $ProbandGenerator.k$K_c$MutantMinCov.HashList.prefilter
 fi 
 
@@ -100,6 +104,7 @@ if [ -e $ProbandGenerator.k$K_c$MutantMinCov.HashList ]
 then 
 	echo "skipping 1kg filter"
 else
+echo "crap"
 	 /usr/bin/time -v ../RUFUS/cloud/RUFUS.search.1kg -hf <(awk '{print $1 "\t" $2}' $ProbandGenerator.k$K_c$MutantMinCov.HashList.prefilter ) -o $ProbandGenerator.k$K_c$MutantMinCov.HashList  -c $RDIR/cloud/1000G.RUFUSreference.sorted.min45.tab -hs 25
 fi 
 
@@ -117,10 +122,11 @@ if [ -e $ProbandGenerator.Mutations.fastq ]
 then 
 	echo "skipping filter"
 else 
+echo "crap"
 	rm  $ProbandGenerator.temp
 	mkfifo $ProbandGenerator.temp
-	/usr/bin/time -v  bash $ProbandGenerator >  $ProbandGenerator.temp &
-	/usr/bin/time -v   $RUFUSfilter  $ProbandGenerator.k$K_c$MutantMinCov.HashList $ProbandGenerator.temp $ProbandGenerator $K 5 5 10 $(echo $Threads -1 | bc) &
+	/usr/bin/time -v  bash $ProbandGenerator | /home/ubuntu/work/RUFUS/cloud/PassThroughSamCheck $ProbandGenerator.filter.chr >  $ProbandGenerator.temp &
+	/usr/bin/time -v   $RUFUSfilter  $ProbandGenerator.k$K_c$MutantMinCov.HashList $ProbandGenerator.temp $ProbandGenerator $K 5 5 10 $(echo $Threads -2 | bc) &
 wait
 fi 
 
@@ -139,12 +145,12 @@ then
 else
 	rm  $SiblingGenerator.temp
 	mkfifo $SiblingGenerator.temp
-	/usr/bin/time -v  bash $SiblingGenerator >  $SiblingGenerator.temp &
-	/usr/bin/time -v   $RUFUSfilter  $SiblingGenerator.k$K_c$SiblingMinCov.HashList $SiblingGenerator.temp $SiblingGenerator $K 5 5 10 $(echo $Threads -1 | bc) &
+	/usr/bin/time -v  bash $SiblingGenerator | /home/ubuntu/work/RUFUS/cloud/PassThroughSamCheck $SiblingGenerator.filter.chr >  $SiblingGenerator.temp &
+	/usr/bin/time -v   $RUFUSfilter  $SiblingGenerator.k$K_c$SiblingMinCov.HashList $SiblingGenerator.temp $SiblingGenerator $K 5 5 10 $(echo $Threads -2 | bc) &
 wait
 fi
 
-if [ -e $ProbandGenerator.V2.overlap.hashcount.fastq.bam.vcf ]
+if [ -e $SiblingGenerator.V2.overlap.hashcount.fastq.bam.vcf ]
 then
 	echo "skipping overlap"
 else
@@ -153,6 +159,10 @@ else
 
 fi
 
+for i in *vcf*; do aws s3 cp $i s3://rufus.marth.lab/ASC.out/$Out/ ; done 
+for i in *Mutations.fastq ; do aws s3 cp $i s3://rufus.marth.lab/ASC.out/$Out/ ; done
+for i in *bam; do aws s3 cp $i s3://rufus.marth.lab/ASC.out/$Out/ ; done
+for i in *chr; do aws s3 cp $i s3://rufus.marth.lab/ASC.out/$Out/ ; done
 
 echo "done with everything "
 
