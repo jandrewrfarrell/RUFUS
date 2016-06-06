@@ -34,10 +34,10 @@ RUFUS1kgFilter=$RDIR/bin/RUFUS.1kg.filter
 RunJelly=$RDIR/cloud/RunJellyForRUFUS
 
 
-aws s3 cp s3://marthlab.rufus/ASC.scripts/$Parent1Generator ./
-aws s3 cp s3://marthlab.rufus/ASC.scripts/$Parent2Generator ./
-aws s3 cp s3://marthlab.rufus/ASC.scripts/$SiblingGenerator ./
-aws s3 cp s3://marthlab.rufus/ASC.scripts/$ProbandGenerator ./
+aws s3 --region us-east-1 cp s3://marthlab.rufus/ASC.scripts/$Parent1Generator ./
+aws s3 --region us-east-1 cp s3://marthlab.rufus/ASC.scripts/$Parent2Generator ./
+aws s3 --region us-east-1 cp s3://marthlab.rufus/ASC.scripts/$SiblingGenerator ./
+aws s3 --region us-east-1 cp s3://marthlab.rufus/ASC.scripts/$ProbandGenerator ./
 
 /usr/bin/time -v bash $RunJelly $Parent1Generator $K $(echo $Threads -2 | bc)
 if [ "$( tail -n 2 $Parent1Generator.Jelly.chr | head -1)" == "*" ]
