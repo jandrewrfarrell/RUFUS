@@ -23,20 +23,11 @@
 #include <ctime>
 #include <cmath>
 #include "externals/fastahack/Fasta.h"
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <errno.h>
 
-#define NUMINTS  (1000)
-#define FILESIZE (NUMINTS * sizeof(int))
 
 using namespace std;
 
-vector <unordered_map <unsigned long int, int> > ParentHashes; 
-unordered_map  <unsigned long int, int> MutantHashes; 
-
+//map <string, vector<char>> Reff;
 FastaReference Reff;
 int HashSize = 25; 
 int totalDeleted; 
@@ -51,260 +42,6 @@ ofstream Translocations;
 ofstream Unaligned; 
 map <string, int> Hash; 
 /////////////////////////
-const vector<string> Split(const string& line, const char delim) {
-    vector<string> tokens;
-    stringstream lineStream(line);
-    string token;
-    while ( getline(lineStream, token, delim) )
-	tokens.push_back(token);
-    return tokens;
-}
-unsigned long HashToLong (string hash)
-{
-        bitset<64> HashBits;
-        for(int i=0; i<hash.length();i++)
-        {
-                if (hash.c_str()[i] == 'A')
-                {
-                        HashBits[i*2] = 0;
-                        HashBits[i*2+1] = 0;
-                }
-                else  if (hash.c_str()[i] == 'C')
-                {
-                        HashBits[i*2] = 0;
-                        HashBits[i*2+1] = 1;
-                }
-                else  if (hash.c_str()[i] == 'G')
-                {
-                        HashBits[i*2] = 1;
-                        HashBits[i*2+1] = 0;
-                }
-                else  if (hash.c_str()[i] == 'T')
-                {
-                        HashBits[i*2] = 1;
-                        HashBits[i*2+1] = 1;
-                }
-                else
-                {
-                        cout << "ERROR, invalid character - " << hash.c_str()[i] << endl;
-                }
-        }
-        return HashBits.to_ulong();
-}
-
-int checkPage( char *data, string hash, long int pageSize, string line)
-{
-	//cout << "checking page" << "with size = " << pageSize<< endl;
-	bool firstNew = false;
-	for (int i = 0; i <  pageSize; i++)
-	{
-	//      cout << i << endl;
-	//      cout << data[i] << endl;
-		if (data[i] == '\n')
-		{
-	//	      cout << "n found";
-			if (firstNew != true)
-				firstNew = true;
-			else
-			{
-				vector<string> stuff;
-				stuff = Split(line, '\t');
-				string PageHash = stuff[0];
-	//		      cout << "PageHash " << endl;
-				if (hash == PageHash)
-				{
-	  //			      cout << "found a hash " << hash  << " - " << PageHash;
-					return atoi(stuff[1].c_str());
-				}
-				line = "";
-			}
-		}
-		else if (firstNew == true)
-		{
-	//	      cout << "first Newline found" << endl;
-			line += data[i];
-		}
-
-	}
-	return 0;
-}
-
-void ProcessPage(  char *data, string& PageFirstHash, string& PageLastHash, long int pageSize)
-{
-	string line = "";
-	bool firstNew = false;\
-	for (int i = 0; i < pageSize; i++)
-	{
-		if (data[i] == '\n')
-		{
-		
-			if (firstNew == true)
-				break;
-			else
-				firstNew = true;
-		}
-		else if (firstNew == true)
-			line += data[i];
-	}
-
-	vector<string> stuff;
-	stuff = Split(line, '\t');
-	PageFirstHash = stuff[0];
-	firstNew = false;
-	line = "";
-	for (int i = pageSize-1; i > 0; i+=-1)
-	{
-		if ( data[i] == '\n')
-		{
-			if (firstNew == true)
-				break;
-			else
-				firstNew = true;
-		}
-		else if(firstNew == true)
-			line = data[i] + line;
-	}
-	stuff = Split(line, '\t');
-	PageLastHash = stuff[0];
-
-}
-
-
-
-int search(long int& fd, string hash, char* fileptr)
-{
-	//cout << "searching for " << hash << endl;
-	char *data;
-	struct stat sb;
-	fstat(fd, &sb);
-
-	long int pageSize;
-	pageSize = sysconf(_SC_PAGE_SIZE);
-	long int NumPages = sb.st_size/pageSize;
-	//cout << "Number of pages = " << NumPages << endl;
- //       char *fileptr = NULL;
-
-	long int off = 0;
-	long int firstPos;
-	long int lastPos;
-	firstPos = 0;
-	fileptr = (char*)mmap64(NULL, pageSize, PROT_READ, MAP_PRIVATE | MAP_POPULATE, fd, firstPos*pageSize);
-	data =  fileptr;
-	// above should get me first page
-	string FirstPageFirstHash;
-	string FirstPageLastHash;
-	ProcessPage(data, FirstPageFirstHash, FirstPageLastHash, pageSize);
-	if (munmap(fileptr, pageSize) == -1) {
-		perror("Error un-mmapping the file");
-	}
-	//cout << FirstPageFirstHash << endl << FirstPageLastHash << endl;
-	//quck check to see if on first page
-	if (hash >= FirstPageFirstHash and hash <= FirstPageLastHash)
-	{
-	 //     cout << "found on first page" << endl;
-	 	fileptr = (char*)mmap64(NULL, pageSize, PROT_READ, MAP_PRIVATE | MAP_POPULATE, fd, firstPos*pageSize);
-		int val =  checkPage(data, hash, pageSize, "");
-		if (munmap(fileptr, pageSize) == -1) {
-			perror("Error un-mmapping the file");
-		}
-		return val; 
-	}
-	if (hash < FirstPageFirstHash)
-	{
-		cout << "HASH NOT IN FILE " << hash << endl;
-		return 0; 
-	}
-	fileptr = (char*)mmap64(NULL, pageSize, PROT_READ, MAP_PRIVATE | MAP_POPULATE, fd, pageSize*(NumPages-1));
-	data = fileptr;
-	lastPos = NumPages-1;
-	//the above should get me the last two pages, we take two to ensure the last pages isnt just one character or something like that
-
-	string LastPageFirstHash;
-	string LastPageLastHash;
-	ProcessPage(data, LastPageFirstHash, LastPageLastHash, pageSize);
-	if (munmap(fileptr, pageSize) == -1) {
-		perror("Error un-mmapping the file");
-	}
-	//cout << LastPageFirstHash << endl << LastPageLastHash << endl;
-	//quck check to see if on last page
-	if (hash >= LastPageFirstHash and hash <= LastPageLastHash)
-	{
-	      	fileptr = (char*)mmap64(NULL, pageSize, PROT_READ, MAP_PRIVATE | MAP_POPULATE, fd, pageSize*(NumPages-1));
-	//	cout << "found on last page" << endl;
-		int val =  checkPage(data, hash, pageSize, "");
-		if (munmap(fileptr, pageSize) == -1) {
-			perror("Error un-mmapping the file");
-		}
-		return val; 
-	}
-	if (hash > LastPageLastHash)
-	{
-		cout << "HASH NOT IN FILE " << hash << endl;
-		return 0;
-	}
-	//start the search
-	int counter = 0;
-	while (true)
-	{
-	 //     cout << "ON LOOP " << counter << endl << endl;
-		counter++;
-		long int currentPage = lastPos - ((lastPos-firstPos)/2);
-	   //   cout << "checking page " << currentPage << " last = " << lastPos << " and first = " << firstPos << endl;;
-		if (currentPage == lastPos or currentPage == firstPos or lastPos - firstPos < 3)
-		{
-			string extra = "";
-		 //     cout << "\nenvoked this" << endl;
-			fileptr = (char*)mmap64(NULL, pageSize*5, PROT_READ, MAP_PRIVATE | MAP_POPULATE, fd, pageSize * (firstPos-1));
-			data =  fileptr;
-		     // cout << "made it here" << endl;
-			int val = checkPage(data, hash, pageSize*5, extra);
-			if (munmap(fileptr, pageSize*5) == -1) {
-				perror("Error un-mmapping the file");
-			}
-			return val; 
-		}
-		//cout << " fileptr = (char*)mmap64(NULL, " << pageSize*2 <<", PROT_READ, MAP_PRIVATE | MAP_POPULATE, fd, " << pageSize<<" * " << currentPage <<");"<< endl;
-		fileptr = (char*)mmap64(NULL, pageSize, PROT_READ, MAP_PRIVATE | MAP_POPULATE, fd, pageSize*currentPage);
-		data =  fileptr;
-		string CurrentPageFirstHash;
-		string CurrentPageLastHash;
-		ProcessPage(data, CurrentPageFirstHash, CurrentPageLastHash, pageSize);
-		if (munmap(fileptr, pageSize) == -1) {
-			perror("Error un-mmapping the file");
-		}
-	//	cout << " with " << CurrentPageFirstHash << " and " << CurrentPageLastHash << endl;
-		if (hash >= CurrentPageFirstHash and hash <= CurrentPageLastHash)
-		{
-			fileptr = (char*)mmap64(NULL, pageSize, PROT_READ, MAP_PRIVATE | MAP_POPULATE, fd, pageSize*currentPage);
-			int val = checkPage(data, hash, pageSize, "");
-			if (munmap(fileptr, pageSize) == -1) {
-			perror("Error un-mmapping the file");
-			}
-			return val;
-		}
-		else
-		{
-			if (hash < CurrentPageFirstHash)
-			{
-	  //		    cout << "hash " << hash << " is greater than " << CurrentPageFirstHash << " looking above" << endl;
-				lastPos = currentPage;
-				LastPageFirstHash = CurrentPageFirstHash;
-				LastPageLastHash = CurrentPageLastHash;
-			}
-			else if (hash > CurrentPageLastHash)
-			{
-	    //		  cout << "hash \n" << hash << " is less than \n" << CurrentPageLastHash << " looking below" << endl;
-				firstPos = currentPage;
-				FirstPageFirstHash = CurrentPageFirstHash;
-				FirstPageLastHash = CurrentPageLastHash;
-			}
-		}
-
-	}
-	close(fd); 
-
-}
-
 bool fncomp (char lhs, char rhs) {return lhs<rhs;}
 
 struct classcomp {
@@ -339,6 +76,22 @@ string getHash(string seq, int j, int HashSize)
 	}
 	return NewHash;
 }
+const vector<string> Split(const string& line, const char delim) {
+    vector<string> tokens;
+    stringstream lineStream(line);
+    string token;
+    while ( getline(lineStream, token, delim) )
+	tokens.push_back(token);
+    return tokens;
+}
+//string GetRefBases(string chr, int start, int length)
+//{
+//	string sequence;
+///	for (int i = start; i < length; i++)
+//		sequence = sequence + Reff[chr][i+1];
+//	FastaReference fastaTest;
+//	return sequence;
+//}
 
 string RevComp (string Sequence)
 {
@@ -418,8 +171,6 @@ class SamRead
 	string seq;
 	string qual;
 	string RefSeq; 
-	string originalSeq;
-	string originalQual; 
 	string cigarString; 
 	vector<int> alignments; 
 	vector<int> Positions; 
@@ -430,7 +181,7 @@ class SamRead
 	void parse(string read);
 	void getRefSeq(); 
 	void processCigar();
-	void parseMutations( char *argv[] );
+	void parseMutations();
 	void processMultiAlignment(); 
 	void write();
 	void writeVertical();
@@ -491,70 +242,69 @@ void SamRead::writeVertical()
 }
 string compressVar(string line)
 {       
-	char current = line.c_str()[0];
-	int currentCount = 1;
-	string CV = ""; 
-	for (int i = 1; i< line.size(); i++)
-	{       
-		if (line.c_str()[i] == current)
-		{       
-			currentCount++;
-		}
-		else    
-		{       
-			if (currentCount > 2)
-			{       
+        char current = line.c_str()[0];
+        int currentCount = 1;
+        string CV = ""; 
+        for (int i = 1; i< line.size(); i++)
+        {       
+                if (line.c_str()[i] == current)
+                {       
+                        currentCount++;
+                }
+                else    
+                {       
+                        if (currentCount > 2)
+                        {       
 				ostringstream convert;
 				convert << currentCount; 
 				CV+=convert.str();
-				CV+=current;
-			}
-			else if (currentCount ==2)
-			{       
-				CV+=current;
-				CV+=current;
-			}
-			else if (currentCount == 1)
-			{       
-				CV+=current;
-			}
-			else    
-			{       
-				cout << "ERROR in compress " << current << " " << currentCount << endl;
-			}
-			
-			current = line.c_str()[i];
-		currentCount = 1;
-		}
-	}
-	if (currentCount > 2)
-	{       
-		ostringstream convert;
-		convert << currentCount;
-		CV+=convert.str();
+                                CV+=current;
+                        }
+                        else if (currentCount ==2)
+                        {       
+                                CV+=current;
+                                CV+=current;
+                        }
+                        else if (currentCount == 1)
+                        {       
+                                CV+=current;
+                        }
+                        else    
+                        {       
+                                cout << "ERROR in compress " << current << " " << currentCount << endl;
+                        }
+                        
+                        current = line.c_str()[i];
+                currentCount = 1;
+                }
+        }
+        if (currentCount > 2)
+        {       
+                ostringstream convert;
+                convert << currentCount;
+                CV+=convert.str();
 		CV+=current;
-	}
-	else if (currentCount ==2)
-	{       
-		CV+=current;
-		CV+=current;
-	}
-	else if (currentCount == 1)
-	{       
-		CV+=current;
-	}
-	else
-	{
-		cout << "ERROR in compress " << current << " " << currentCount << endl;
-	}
-	
-	return CV;
+        }
+        else if (currentCount ==2)
+        {       
+                CV+=current;
+                CV+=current;
+        }
+        else if (currentCount == 1)
+        {       
+                CV+=current;
+        }
+        else
+        {
+        	cout << "ERROR in compress " << current << " " << currentCount << endl;
+        }
+        
+        return CV;
 }
-void SamRead::parseMutations( char *argv[])
+void SamRead::parseMutations()
 {
-	
 	cout << "Parsing Mutations " << endl;
-	write(); 
+	//write(); 
 	
 	vector<bool> PeakMap; 
 	int max = -1; 
@@ -585,99 +335,13 @@ void SamRead::parseMutations( char *argv[])
 		}
 		i = i +k; 
 	}	
-	
-	//cout << "testhing hash search" << endl;
-	vector <string> hashes;
-	vector <bool> varHash; 
-	for (int i = 0; i <  seq.size() - HashSize; i++)
-	{
-		string newHash = "";
-		newHash += seq.c_str()[i];
-		int count = 0; 
-		if ((cigarString.c_str()[i] != 'D' and cigarString.c_str()[i] != 'R' and cigarString.c_str()[i] != 'H'))
-		{
-			for (int j = 1; j<seq.size() - i and count < HashSize-1 ; j++)
-			{
-				
-				if (cigarString.c_str()[i+j] != 'D' and cigarString.c_str()[i+j] != 'R'  and cigarString.c_str()[i+j] != 'H')
-				{
-					newHash += seq.c_str()[i+j]; 
-					count++;
-		//			cout << cigarString.c_str()[i+j] << " - " << i+j<< endl;
-		//			cout << newHash << endl; 
-				}
-	//			else
-		//		cout << "yay cigar was not ok - "   << cigarString.c_str()[i+j]<< endl;
-			}
-		}
-		hashes.push_back(newHash);
-		//cout << newHash << endl; 
-		if (Hash.count(newHash) > 0 or Hash.count(RevComp(newHash)) > 0)
-			varHash.push_back(true); 
-		else
-			varHash.push_back(false); 
-	}
-	//cout << "made hash list to check " << endl; 
-	vector <vector<int>> parentCounts;
-	//vector <long int> ParentHash;
-	for(int pi = 0; pi<ParentHashes.size(); pi++)
-	{
-		vector <int> counts;
-		for(int i = 0; i< hashes.size(); i++)
-		{
-			string hash =  hashes[i];
-			//cout << "Hash = " << hash << endl;
-			bool checkHash = true; 
-			for (int j = 0; j < 25; j++)
-			{
-				if (!(hash[j] == 'A' or hash[j] == 'C' or hash[j] == 'G' or hash[j] == 'T'))
-				{
-					checkHash = false; 
-					break; 
-				}
-			}
-			if (checkHash)
-			{
-				//cout << "passed" << endl;
-				unsigned long int LongHash = HashToLong(hash);
-				//cout << "herhe " << LongHash << endl;
-				if (ParentHashes[pi].count(LongHash) >0)
-				{
-					//cout << "exists" << endl;
-					counts.push_back(ParentHashes[pi][LongHash]);
-				}
-				else
-				{
-					//cout << "dosnt exist" << endl;
-					counts.push_back(0);
-				}
-			}
-			else 
-			{
-				//cout << "didnt pass" << endl;
-				counts.push_back(-1);
-			} 
-		}
-		parentCounts.push_back(counts);
-	}
-	//cout << "here" << endl;
-	for(int i =0; i < hashes.size(); i++)
-	{
-		cout << i << "\t" << hashes[i] << "\t" << varHash[i] << "\t" << PeakMap[i] << "\t" << (int) qual.c_str()[i]-33;
-		for (int j = 0; j < parentCounts.size(); j++)
-		{
-				cout << "\t" <<  parentCounts[j][i];
-		}
-		cout << endl;
-	}
 
-	
-	//cout << "Peak map = " << PeakMap.size() << endl;
-	//cout << "qual string = " << qual.size() << endl;
+	cout << "Peak map = " << PeakMap.size() << endl;
+	cout << "qual string = " << qual.size() << endl;
 	for (int i = 0; i < qual.size(); i++)
 	{
 		int qualcount =  qual.c_str()[i] - 33; 
-	//	cout <<  qual.c_str()[i] << " - " << qualcount << " - " << PeakMap[i] << seq.c_str()[i]<< endl;
+		cout <<  qual.c_str()[i] << " - " << qualcount << " - " << PeakMap[i] << seq.c_str()[i]<< endl;
 	}
 
 	string reff = "";
@@ -707,43 +371,11 @@ void SamRead::parseMutations( char *argv[])
 					if (qual.c_str()[i+j] > '!')
 						AnyBasesOver0 = true;
 					if (PeakMap[i+j] == 1)
-						Denovo = "DeNovo";
+        		                        Denovo = "DeNovo";
 	
 				}
 				else //if (qual.c_str()[i+j] == '!')
 					break; 
-			}
-			bool LowCov = false; 
-			int low = i - 30; 
-			if (low < 0){low = 0;}
-			cout << "checking bases " << low << " to " << i+size+5 << endl;
-			for(int j = low; j < i+size+5 and j < hashes.size(); j++)
-			{
-				bool AllPar0 = true; 
-				for (int k = 0; k < parentCounts.size(); k++)
-				{
-					if (parentCounts[k][j] != 0 )
-						AllPar0 = false;	
-				}
-				if ( AllPar0 )
-				{
-					varHash[j] = true; 
-				}
-				if (hashes[j].size() == HashSize and varHash[j] == false)
-				{
-					 cout << "base " << j ; 
-					 
-					for (int k = 0; k < parentCounts.size(); k++)
-					{
-						if (parentCounts[k][j] <= 5 and parentCounts[k][j] > 0)
-						{
-							cout << "\t" << parentCounts[k][j] ; 
-							LowCov = true;
-						}
-						 
-					}
-					cout << endl;
-				}
 			}
 			if (AnyBasesOver0)  //enabling this will only report varites covered by hashes 
 			{
@@ -823,14 +455,6 @@ void SamRead::parseMutations( char *argv[])
 				//write();
 				string CompressedVarType = compressVar(varType); 
 				cout <<  chr << "\t" << pos+i << "\t" << CompressedVarType /*"."*/ << "\t" << reff << "\t" << alt << "\t" << HashCountsOG.size() << "\t" << varType << "\t" << "." << "\t" << "." << "\t" << "." << endl;
-				if (LowCov)
-				{
-					cout << "LOW COVERAGE" << endl;
-					Denovo = "LowCov"; 
-				}
-				else
-				   	cout << "GOOD COVERAGE" << endl;
-				cout << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << HashCountsOG.size() << "\t" << "." << "\t" << "CVT=" << CompressedVarType << ":HD=";	
 				VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << HashCountsOG.size() << "\t" << "." << "\t" << "CVT=" << CompressedVarType << ":HD="; 
 				for (int j = 0; j < HashCounts.size(); j++)
 				{	VCFOutFile << HashCounts[j] << "_"; }
@@ -1135,8 +759,6 @@ void SamRead::processCigar()
 
 void SamRead::getRefSeq()
 {
-	originalSeq = seq; 
-	originalQual = qual; 
 	RefSeq = ""; 
 	string NewSeq = "";
 	string NewQual = "";
@@ -1971,17 +1593,14 @@ By Andrew Farrell\n\
 \n\ 
 options:\
   -h [ --help ]	  Print help message\n\
-  -sam  arg		Path to input SAM file, omit for stdin\n\
+  -s  arg		Path to input SAM file, omit for stdin\n\
   -r  arg		Path to reference file \n\
   -hf arg		Path to HashFile from RUFUS.build\n\
-  -o  arg		Output stub\n\
-  -m  arg		Maximum varient size: default 1Mb\n\
-			(Sorry it has to be a num, no 1kb, must be 1000\n\
-  -c  arg		Path to sorted.tab file for the parent sample\n\
-  -s  arg 		Path to sorted.tab file for the subject sample\n\
+  -o  arg		 Output stub\n\
+  -m  arg		 Maximum varient size: default 1Mb\n\
+			 (Sorry it has to be a num, no 1kb, must be 1000\n\
 ";
 	
-	string MutHashFilePath = "" ;
 	MaxVarentSize = 1000000;
 	string RefFile = ""; 
 	string HashListFile = "" ; 	
@@ -1992,7 +1611,6 @@ options:\
 		cout << i << " = " << argv[i] << endl; 
 	}
 	cout <<"****************************************************************************************" << endl;
-	vector <int> ParentHashFilePaths; 
 	for(int i = 1; i< argc; i++)
 	{
 		string p = argv[i];
@@ -2009,7 +1627,7 @@ options:\
 			i=i+1;
 			 cout << "YAAAY added RefFile = " << RefFile << endl;	
 		}
-		else if (p == "-sam")
+		else if (p == "-s")
 		{
 			samFile =  argv[i+1];
 			i++;
@@ -2029,18 +1647,6 @@ options:\
 			MaxVarentSize =  atoi(argv[i+1]);
 			i++;
 			cout << "YAAAY added MaxVarSize = " << MaxVarentSize << endl;
-		}
-		else if (p == "-c")
-		{
-			cout << "Par Hash = " << argv[i+1] << endl;
-			ParentHashFilePaths.push_back(i+1);
-			i=i+1;
-		}
-		else if (p == "-s")
-		{
-			cout << "Sub Hash = " << argv[i+1] << endl;
-			MutHashFilePath = argv[i+1];
-			i+=1;
 		}
 		else
 		{
@@ -2070,47 +1676,8 @@ options:\
 			return -1; 
 		}
 	}
-
-	for (int i = 0; i < ParentHashFilePaths.size(); i++)
-	{
-		ifstream reader; 
-		reader.open (argv[ParentHashFilePaths[i]]); 
-		string line = "";
-		unordered_map <unsigned long int, int> hl;  
-		while (getline(reader, line))
-		{
-			vector <string> temp = Split(line, ' '); 
-			unsigned long hash = HashToLong(temp[0]); 
-			hl[hash] = atoi(temp[1].c_str());
-			hash = HashToLong(RevComp(temp[0])); 
-			hl[hash] = atoi(temp[1].c_str()); 
-		}
-		ParentHashes.push_back(hl); 
-		reader.close(); 
-	}
-	cout << "check parent thing" << endl; 
-	for(int i =0; i < ParentHashes.size(); i++)
-	{
-		cout << "sample " << i << endl;
-	}
-	
-	ifstream reader;
-	reader.open (MutHashFilePath);
-	string line = "";
-	while (getline(reader, line))
-	{
-		
-		vector <string> temp = Split(line, ' ');
-		unsigned long hash = HashToLong(temp[0]);
-		MutantHashes[hash] = atoi(temp[1].c_str());
-		hash = HashToLong(RevComp(temp[0]));
-		MutantHashes[hash] = atoi(temp[1].c_str());
-	}
-	reader.close(); 
-			
-	
 	//***********************************************
-	//cout << "Call is Reference Contigs.fa OutStub HashList MaxVarientSize" << endl;
+	cout << "Call is Reference Contigs.fa OutStub HashList MaxVarientSize" << endl;
 	double vm, rss, MAXvm, MAXrss;
 	MAXvm = 0;
 	MAXrss = 0;
@@ -2132,12 +1699,10 @@ options:\
       		cout << "Error, HashList could not be opened";
       		return 0;
       	}
-	line = "";
-	getline(HashList, line);
-	cout << "line = " << line << endl; 
+	string line; 
+	getline(HashList, line); 
 	vector<string> temp = Split(line, '\t');
-	cout << "split = " << temp[0] << " and " << temp[1] << endl;
-	if (temp.size() ==4)
+	if (temp.size() == 4)
 	{ 
 		HashSize = temp[3].length(); 
 		Hash.insert(pair<string, int>(temp[3], atoi(temp[2].c_str())));
@@ -2145,13 +1710,12 @@ options:\
 		while ( getline(HashList, line))
 		{
 			vector<string> temp = Split(line, '\t');
-			Hash.insert(pair<string, int>(temp[3], atoi(temp[2].c_str())));
+			Hash.insert(pair<string, int>(temp[0], atoi(temp[1].c_str())));
 			//cout << "added pair " << temp[3] << "\t" << temp[2] << endl;
 		}
 		HashList.close(); 
-		cout << "done with HashList" << endl;
 	}
-	else if (temp.size() ==2)
+	 else if (temp.size() == 2)
         {
                 HashSize = temp[0].length();
                 Hash.insert(pair<string, int>(temp[0], atoi(temp[1].c_str())));
@@ -2162,9 +1726,12 @@ options:\
                         Hash.insert(pair<string, int>(temp[0], atoi(temp[1].c_str())));
                         //cout << "added pair " << temp[3] << "\t" << temp[2] << endl;
                 }
-                HashList.close();
-                cout << "done with HashList" << endl;
-        }
+         }
+	else
+	{
+		cout << "error in hash file fomrat" << endl;
+		return 1; 
+	}
 	//map<string, int>::iterator it;
 	//for ( it = Hash.begin(); it != Hash.end(); it++ )
 	//{
@@ -2272,7 +1839,6 @@ options:\
 			if (read.first and read.alignments.size() == 2 )
 			{
 				cout << "atempting colaps" << endl;
-				cout << read.name << endl;
 				vector<SamRead> R; 
 				for(int j =0; j< read.alignments.size(); j++)
 				{
@@ -2280,7 +1846,6 @@ options:\
 					//if (reads[read.alignments[j]].chr == read.chr)
 					{
 						R.push_back(reads[read.alignments[j]]);
-						cout << reads[read.alignments[j]].name << endl;
 					}
 				}
 				if (R.size() == 2 & R[0].chr == R[1].chr & R[0].mapQual > 0 & R[1].mapQual > 0)
@@ -2291,15 +1856,10 @@ options:\
 			else if(read.first and read.alignments.size() >2)
 			{
 				BEDNotHandled << "too many alignments" << endl;
-				BEDNotHandled << read.chr << "\t" << read.pos << "\t" << read.pos+read.seq.size() << "\t" << read.name << "\t" << read.cigar << endl;
-				cout << "too many alignments" << endl;
-				cout << read.chr << "\t" << read.pos << "\t" << read.pos+read.seq.size() << "\t" << read.name << "\t" << read.cigar << endl;
 				for (int j = 0; j< read.alignments.size(); j++)
 				{
-					SamRead mate = reads[read.alignments[j]]; 
-					cout << j << "\t" << mate.chr << "\t" << mate.pos << "\t" << mate.pos+mate.seq.size() << "\t" << mate.name << "\t" << mate.cigar << endl;
-					 BEDNotHandled << mate.chr << "\t" << mate.pos << "\t" << mate.pos+mate.seq.size() << "\t" << mate.name << "\t" << mate.cigar << endl;
-					mate.writetofile(BEDNotHandled);
+					 BEDNotHandled << reads[j].chr << "\t" << reads[j].pos << "\t" << reads[j].pos+reads[j].seq.size() << "\t" << reads[j].name << "\t" << reads[j].cigar << endl;
+					reads[j].writetofile(BEDNotHandled);
 				}
 				BEDNotHandled << endl << endl;
 			}
@@ -2309,7 +1869,7 @@ options:\
 			//else if (read.combined == false )
 			if (read.mapQual > 0)
 			{
-				read.parseMutations(argv); 
+				read.parseMutations(); 
 				//BEDNotHandled << read.chr << "\t" << read.pos << "\t" << read.pos+read.seq.length() << "\t" << read.name << endl;
 			}
 		}
