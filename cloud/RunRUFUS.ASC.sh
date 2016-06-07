@@ -50,6 +50,8 @@ else
 	/usr/bin/time -v bash $RunJelly $Parent1Generator $K $(echo $Threads -2 | bc)
 fi 
 
+aws s3  --region us-east-1 cp $Parent1Generator.Jelly.chr s3://marthlab.rufus/ASC.out/$Out/ &
+
 /usr/bin/time -v bash $RunJelly $Parent2Generator $K $(echo $Threads -2 | bc)
 if [ "$( tail -n 2 $Parent2Generator.Jelly.chr | head -1)" == "*" ]
 then
@@ -61,7 +63,7 @@ else
        /usr/bin/time -v bash $RunJelly $Parent2Generator $K $(echo $Threads -2 | bc)
 fi
 
-
+aws s3  --region us-east-1 cp $Parent2Generator.Jelly.chr s3://marthlab.rufus/ASC.out/$Out/ &
 
 
 /usr/bin/time -v bash $RunJelly $SiblingGenerator $K $(echo $Threads -2 | bc)
@@ -74,7 +76,7 @@ else
 	rm  $SiblingGenerator.Jelly.chr
        /usr/bin/time -v bash $RunJelly $SiblingGenerator $K $(echo $Threads -2 | bc)
 fi
-
+aws s3  --region us-east-1 cp $SiblingGenerator.Jelly.chr s3://marthlab.rufus/ASC.out/$Out/ &
 
 
 /usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc)
@@ -88,6 +90,7 @@ else
         /usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc)
 fi
 
+aws s3  --region us-east-1 cp $ProbandGenerator.Jelly.chr s3://marthlab.rufus/ASC.out/$Out/ &
 
 perl -ni -e 's/ /\t/;print' $ProbandGenerator.Jhash.histo
 perl -ni -e 's/ /\t/;print' $Parent1Generator.Jhash.histo
@@ -112,6 +115,8 @@ else
 	echo "done with model "
 fi 
 
+for i in *model; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
+
 ParentMaxE=0
 MutantMinCov=$(head -2 $ProbandGenerator.Jhash.histo.7.7.model | tail -1 )
 SiblingMinCov=$(head -2 $SiblingGenerator.Jhash.histo.7.7.model | tail -1 )
@@ -132,7 +137,6 @@ if [ -e $ProbandGenerator.k$K_c$MutantMinCov.HashList.prefilter ]
 then 
 	echo "skipping $ProbandGenerator.HashList pull "
 else
-echo "crap"
 	/usr/bin/time -v bash $PullSampleHashes $ProbandGenerator.Jhash Family.Unique.HashList $MutantMinCov > $ProbandGenerator.k$K_c$MutantMinCov.HashList.prefilter
 fi 
 
@@ -148,7 +152,6 @@ if [ -e $ProbandGenerator.k$K_c$MutantMinCov.HashList ]
 then 
 	echo "skipping 1kg filter"
 else
-echo "crap"
 	 /usr/bin/time -v ../RUFUS/cloud/RUFUS.search.1kg -hf <(awk '{print $1 "\t" $2}' $ProbandGenerator.k$K_c$MutantMinCov.HashList.prefilter ) -o $ProbandGenerator.k$K_c$MutantMinCov.HashList  -c $RDIR/cloud/1000G.RUFUSreference.sorted.min45.tab -hs 25
 fi 
 
@@ -156,9 +159,9 @@ if [ -e $SiblingGenerator.k$K_c$SiblingMinCov.HashList ]
 then
         echo "skipping 1kg filter"
 else
-         /usr/bin/time -v  ../RUFUS/cloud/RUFUS.search.1kg -hf <(awk '{print $1 "\t" $2}' $SiblingGenerator.k$K_c$SiblingMinCov.HashList.prefilter ) -o $SiblingGenerator.k$K_c$SiblingMinCov.HashList  -c $RDIR/cloud/1000G.RUFUSreference.sorted.min45.tab -hs 25
+         /usr/bin/time -v ../RUFUS/cloud/RUFUS.search.1kg -hf <(awk '{print $1 "\t" $2}' $SiblingGenerator.k$K_c$SiblingMinCov.HashList.prefilter ) -o $SiblingGenerator.k$K_c$SiblingMinCov.HashList  -c $RDIR/cloud/1000G.RUFUSreference.sorted.min45.tab -hs 25
 fi
-
+for i in *HashList;  do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
 echo "done with RUFUS build "
 
 echo "startin RUFUS filter"
@@ -184,6 +187,8 @@ echo "crap"
 	        /usr/bin/time -v   $RUFUSfilter  $ProbandGenerator.k$K_c$MutantMinCov.HashList $ProbandGenerator.temp $ProbandGenerator $K 5 5 10 $(echo $Threads -2 | bc) &
 		wait
 	fi
+	aws s3  --region us-east-1 cp $ProbandGenerator.filter.chr s3://marthlab.rufus/ASC.out/$Out/ &
+	aws s3  --region us-east-1 cp $ProbandGenerator.Mutations.fastq s3://marthlab.rufus/ASC.out/$Out/ &
 fi 
 
 if [ -e $ProbandGenerator.V2.overlap.hashcount.fastq.bam.vcf ]
@@ -216,6 +221,8 @@ else
         	/usr/bin/time -v   $RUFUSfilter  $SiblingGenerator.k$K_c$SiblingMinCov.HashList $SiblingGenerator.temp $SiblingGenerator $K 5 5 10 $(echo $Threads -2 | bc) &
         	wait
 	fi
+	aws s3  --region us-east-1 cp $SiblingGenerator.filter.chr s3://marthlab.rufus/ASC.out/$Out/ &
+	aws s3  --region us-east-1 cp $SiblingGenerator.Mutations.fastq s3://marthlab.rufus/ASC.out/$Out/ &
 
 fi
 
@@ -229,10 +236,7 @@ else
 fi
 
 for i in *vcf*; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done 
-for i in *Mutations.fastq ; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
-for i in *HashList;  do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
 for i in *bam; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
-for i in *chr; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
 for i in *generator.V2.overlap.asembly.hash.fastq.*; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
 
 echo "done with everything "
