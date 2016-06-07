@@ -54,5 +54,5 @@ $gkno bwa-se -ps human  -q ./$NameStub.overlap.hashcount.fastq -id ./$NameStub.o
 
 mkfifo check 
 $samtools view ./$NameStub.overlap.hashcount.fastq.bam > check &
- $RUFUSinterpret -s check -r $humanRef -hf $HashList -o  ./$NameStub.overlap.hashcount.fastq.bam -m 100000000
+ $RUFUSinterpret -s check -r $humanRef -hf $HashList -o  ./$NameStub.overlap.hashcount.fastq.bam -m 100000000 -c $NameStub.overlap.asembly.hash.fastq.p1 -c $NameStub.overlap.asembly.hash.fastq.p2 -c $NameStub.overlap.asembly.hash.fastq.p3
 
