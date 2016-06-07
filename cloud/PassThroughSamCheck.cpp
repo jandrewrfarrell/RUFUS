@@ -10,6 +10,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <string.h>
 #include <vector>
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,26 +44,118 @@ int main (int argc, char *argv[])
 	}
 
 	
-	string line;
-	map  <string, unsigned long> Chrs;
-
-
 	string L1;
+	string current = "notachr";
+	//string chr = "";
+	
+
 	while (getline(SamIn, L1))
 	{
-		vector <string> temp;
-		temp = Split(L1, '\t');
-		Chrs[temp[2]]++;
-		cout << temp[0] << endl << temp[9] << endl << "+" << endl << temp[10] << endl;
-	}
-	SamIn.close();
+		//string name = "";
+		int i = 0; 
+		
+		const char* L1_array = L1.c_str(); 		
+		int start =i;
+		const char* tmpName = L1_array + i ; 	
+		while (L1_array[i] != '\t')
+		{
+			//name+=L1_array[i]; 
+			++i;
+		}
+		int lenName = i-start; 
+		++i;
+		//string flag = "";
+		while (L1_array[i] != '\t')
+                {
+                        ++i;
+                }
+		++i;
+		//string chr = "";
+		start = i; 
+		const char* tmpChr = L1_array + i ;
+		while (L1_array[i] != '\t')
+                {
+                	//chr+=L1_array[i];
+		        ++i;
+                }
+		int lenChr = i-start; 
+		++i;
+		//string pos = "";
+		while (L1_array[i] != '\t')
+                {
+                        ++i;
+                }
+                ++i;
+		//string something = "";
+                while (L1_array[i] != '\t')
+                {
+                        ++i;
+                }
+		++i;
+		//string cigar = "";
+                while (L1_array[i] != '\t')
+                {
+                        ++i;
+                }
+		++i;
+		//string something2 = "";
+                while (L1_array[i] != '\t')
+                {
+                        ++i;
+                }
+		++i;
+		//string something3=  ""; 
+                while (L1_array[i] != '\t')
+                {
+                        ++i;
+                }
+		++i;
+                //string something4=  "";
+                while (L1_array[i] != '\t')
+                {
+                        ++i;
+                }
+		++i;
+		//string seq = "";
+		start = i; 
+		const char* tmpSeq=L1_array + i ;
+                while (L1_array[i] != '\t')
+                {
+		//	seq += L1_array[i];
+                        ++i;
+                }
+		int lenSeq = i-start; 
+		++i;
+                //string qual = "";
+		start = i;
+		const char* tmpQual = L1_array + i ;
+                while (L1_array[i] != '\t')
+                {
+                 //       qual += L1_array[i];
+                        ++i;
+                }
+		int lenQual = i - start; 
+		
 
-	typedef std::map<std::string, unsigned long>::iterator it_type;
-	for(it_type iterator = Chrs.begin(); iterator != Chrs.end(); iterator++) 
-	{
-	    ChrOut << iterator->first << "\t" << iterator->second << endl;
+		
+		if (strncmp( tmpChr,  current.c_str(), lenChr) != 0 or lenChr != current.size() )
+		{
+			ChrOut << current  << endl;
+			
+			current = string(tmpChr, lenChr); 
+		}
+		//cout << "@" << name << endl << seq << endl << "+" << endl << qual << endl;
+		cout.write("@", 1);
+		cout.write(tmpName, lenName);
+		cout << endl; 
+		cout.write(tmpSeq, lenSeq);
+		cout << endl << "+" << endl; 
+		cout.write(tmpQual, lenQual); 
+		cout << endl;  
 	}
-	ChrOut.close(); 	
-	
+       ChrOut << current << endl;
+	ChrOut << "booya" << endl;	
+	SamIn.close();
+return 0; 
 }
 	
