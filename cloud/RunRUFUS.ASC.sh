@@ -87,7 +87,6 @@ else
 	rm $ProbandGenerator.Jelly.chr
         /usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc)
 fi
-exit
 
 
 perl -ni -e 's/ /\t/;print' $ProbandGenerator.Jhash.histo
@@ -216,7 +215,6 @@ else
         	/usr/bin/time -v   $RUFUSfilter  $SiblingGenerator.k$K_c$SiblingMinCov.HashList $SiblingGenerator.temp $SiblingGenerator $K 5 5 10 $(echo $Threads -2 | bc) &
         	wait
 	fi
-	exit
 
 fi
 
