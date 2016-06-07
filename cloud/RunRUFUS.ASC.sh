@@ -182,6 +182,7 @@ echo "crap"
 	        mkfifo $ProbandGenerator.temp
 	        /usr/bin/time -v  bash $ProbandGenerator | /home/ubuntu/work/RUFUS/cloud/PassThroughSamCheck $ProbandGenerator.filter.chr >  $ProbandGenerator.temp &
 	        /usr/bin/time -v   $RUFUSfilter  $ProbandGenerator.k$K_c$MutantMinCov.HashList $ProbandGenerator.temp $ProbandGenerator $K 5 5 10 $(echo $Threads -2 | bc) &
+		wait
 	fi
 fi 
 
