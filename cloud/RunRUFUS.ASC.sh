@@ -228,12 +228,12 @@ else
 
 fi
 
-for i in *vcf*; do aws s3 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done 
-for i in *Mutations.fastq ; do aws s3 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
-for i in *HashList;  do aws s3 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
-for i in *bam; do aws s3 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
-for i in *chr; do aws s3 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
-for i in *generator.V2.overlap.asembly.hash.fastq.*; do aws s3 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
+for i in *vcf*; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done 
+for i in *Mutations.fastq ; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
+for i in *HashList;  do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
+for i in *bam; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
+for i in *chr; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
+for i in *generator.V2.overlap.asembly.hash.fastq.*; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
 
 echo "done with everything "
 
