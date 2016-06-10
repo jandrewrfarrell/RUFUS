@@ -5,6 +5,7 @@
  * now accepts nfastqd as input
  * 7 = hash based searching method for matches
  */
+ 
 #include <algorithm>
 #include <iostream>
 #include <fstream>
