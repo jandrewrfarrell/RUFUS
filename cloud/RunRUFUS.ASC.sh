@@ -197,6 +197,9 @@ then
 else
 	echo "startin RUFUS overlap"
 	/usr/bin/time -v bash $RUFUSOverlap $ProbandGenerator.Mutations.fastq 5 $ProbandGenerator $ProbandGenerator.k$MutantMinCov.HashList $Threads $ProbandGenerator.Jhash $SiblingGenerator.Jhash $Parent1Generator.Jhash $Parent2Generator.Jhash 
+	for i in *vcf*; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
+	for i in *bam; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
+	for i in *generator.V2.overlap.asembly.hash.fastq.*; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done	
 fi
 
 echo "starting RUFUS filter"
