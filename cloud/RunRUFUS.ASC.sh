@@ -33,8 +33,6 @@ PullSampleHashes=$RDIR/cloud/CheckJellyHashList.sh
 RUFUS1kgFilter=$RDIR/bin/RUFUS.1kg.filter
 RunJelly=$RDIR/cloud/RunJellyForRUFUS
 
-export AWS_ACCESS_KEY_ID=AKIAJYJOYRQMBBN34OWQ
-export AWS_SECRET_ACCESS_KEY=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
 
 aws s3 --region us-east-1 cp s3://marthlab.rufus/ASC.scripts/$Parent1Generator ./
 aws s3 --region us-east-1 cp s3://marthlab.rufus/ASC.scripts/$Parent2Generator ./
