@@ -209,6 +209,8 @@ then
 else
 	echo "startin RUFUS overlap"
 	/usr/bin/time -v bash $RUFUSOverlap $ProbandGenerator.Mutations.fastq 5 $ProbandGenerator $ProbandGenerator.k$MutantMinCov.HashList $Threads $ProbandGenerator.Jhash $SiblingGenerator.Jhash $Parent1Generator.Jhash $Parent2Generator.Jhash 
+	export AWS_ACCESS_KEY_ID=AKIAJYJOYRQMBBN34OWQ
+	export AWS_SECRET_ACCESS_KEY=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
 	for i in *vcf*; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
 	for i in *bam; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
 	for i in *generator.V2.overlap.asembly.hash.fastq.*; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done	
