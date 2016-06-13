@@ -49,8 +49,8 @@ else
 	rm $Parent1Generator.Jelly.chr
 	/usr/bin/time -v bash $RunJelly $Parent1Generator $K $(echo $Threads -2 | bc)
 fi 
-export AWS_ACCESS_KEY_ID=AKIAJYJOYRQMBBN34OWQ
-export AWS_SECRET_ACCESS_KEY=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
+export AWS_ACCESS_KEY_ID=AKIAJNOA6L7BX2HDSBZA
+export AWS_SECRET_ACCESS_KEY=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
 aws s3  --region us-east-1 cp $Parent1Generator.Jelly.chr s3://marthlab.rufus/ASC.out/$Out/ &
 
 /usr/bin/time -v bash $RunJelly $Parent2Generator $K $(echo $Threads -2 | bc)
@@ -63,8 +63,8 @@ else
 	rm $Parent2Generator.Jelly.chr
        /usr/bin/time -v bash $RunJelly $Parent2Generator $K $(echo $Threads -2 | bc)
 fi
-export AWS_ACCESS_KEY_ID=AKIAJYJOYRQMBBN34OWQ
-export AWS_SECRET_ACCESS_KEY=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
+export AWS_ACCESS_KEY_ID=AKIAJNOA6L7BX2HDSBZA
+export AWS_SECRET_ACCESS_KEY=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
 aws s3  --region us-east-1 cp $Parent2Generator.Jelly.chr s3://marthlab.rufus/ASC.out/$Out/ &
 
 
@@ -78,8 +78,8 @@ else
 	rm  $SiblingGenerator.Jelly.chr
        /usr/bin/time -v bash $RunJelly $SiblingGenerator $K $(echo $Threads -2 | bc)
 fi
-export AWS_ACCESS_KEY_ID=AKIAJYJOYRQMBBN34OWQ
-export AWS_SECRET_ACCESS_KEY=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
+export AWS_ACCESS_KEY_ID=AKIAJNOA6L7BX2HDSBZA
+export AWS_SECRET_ACCESS_KEY=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
 aws s3  --region us-east-1 cp $SiblingGenerator.Jelly.chr s3://marthlab.rufus/ASC.out/$Out/ &
 
 
@@ -93,8 +93,8 @@ else
 	rm $ProbandGenerator.Jelly.chr
         /usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc)
 fi
-export AWS_ACCESS_KEY_ID=AKIAJYJOYRQMBBN34OWQ
-export AWS_SECRET_ACCESS_KEY=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
+export AWS_ACCESS_KEY_ID=AKIAJNOA6L7BX2HDSBZA
+export AWS_SECRET_ACCESS_KEY=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
 aws s3  --region us-east-1 cp $ProbandGenerator.Jelly.chr s3://marthlab.rufus/ASC.out/$Out/ &
 
 perl -ni -e 's/ /\t/;print' $ProbandGenerator.Jhash.histo
@@ -119,8 +119,8 @@ else
 	/usr/bin/time -v $RUFUSmodel $SiblingGenerator.Jhash.histo $K 150 $Threads
 	echo "done with model "
 fi 
-export AWS_ACCESS_KEY_ID=AKIAJYJOYRQMBBN34OWQ
-export AWS_SECRET_ACCESS_KEY=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
+export AWS_ACCESS_KEY_ID=AKIAJNOA6L7BX2HDSBZA
+export AWS_SECRET_ACCESS_KEY=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
 for i in *model; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
 
 ParentMaxE=0
@@ -167,8 +167,8 @@ then
 else
          /usr/bin/time -v ../RUFUS/cloud/RUFUS.search.1kg -hf <(awk '{print $1 "\t" $2}' $SiblingGenerator.k$K_c$SiblingMinCov.HashList.prefilter ) -o $SiblingGenerator.k$K_c$SiblingMinCov.HashList  -c $RDIR/cloud/1000G.RUFUSreference.sorted.min45.tab -hs 25
 fi
-export AWS_ACCESS_KEY_ID=AKIAJYJOYRQMBBN34OWQ
-export AWS_SECRET_ACCESS_KEY=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
+export AWS_ACCESS_KEY_ID=AKIAJNOA6L7BX2HDSBZA
+export AWS_SECRET_ACCESS_KEY=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
 for i in *HashList;  do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
 echo "done with RUFUS build "
 
@@ -195,8 +195,8 @@ echo "crap"
 	        /usr/bin/time -v   $RUFUSfilter  $ProbandGenerator.k$K_c$MutantMinCov.HashList $ProbandGenerator.temp $ProbandGenerator $K 5 5 10 $(echo $Threads -2 | bc) &
 		wait
 	fi
-	export AWS_ACCESS_KEY_ID=AKIAJYJOYRQMBBN34OWQ
-	export AWS_SECRET_ACCESS_KEY=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
+	export AWS_ACCESS_KEY_ID=AKIAJNOA6L7BX2HDSBZA
+	export AWS_SECRET_ACCESS_KEY=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
 	aws s3  --region us-east-1 cp $ProbandGenerator.filter.chr s3://marthlab.rufus/ASC.out/$Out/ &
 	aws s3  --region us-east-1 cp $ProbandGenerator.Mutations.fastq s3://marthlab.rufus/ASC.out/$Out/ &
 fi 
@@ -207,8 +207,8 @@ then
 else
 	echo "startin RUFUS overlap"
 	/usr/bin/time -v bash $RUFUSOverlap $ProbandGenerator.Mutations.fastq 5 $ProbandGenerator $ProbandGenerator.k$MutantMinCov.HashList $Threads $ProbandGenerator.Jhash $SiblingGenerator.Jhash $Parent1Generator.Jhash $Parent2Generator.Jhash 
-	export AWS_ACCESS_KEY_ID=AKIAJYJOYRQMBBN34OWQ
-	export AWS_SECRET_ACCESS_KEY=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
+	export AWS_ACCESS_KEY_ID=AKIAJNOA6L7BX2HDSBZA
+	export AWS_SECRET_ACCESS_KEY=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
 	for i in *vcf*; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
 	for i in *bam; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
 	for i in *generator.V2.overlap.asembly.hash.fastq.*; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done	
@@ -236,8 +236,8 @@ else
         	/usr/bin/time -v   $RUFUSfilter  $SiblingGenerator.k$K_c$SiblingMinCov.HashList $SiblingGenerator.temp $SiblingGenerator $K 5 5 10 $(echo $Threads -2 | bc) &
         	wait
 	fi
-	export AWS_ACCESS_KEY_ID=AKIAJYJOYRQMBBN34OWQ
-	export AWS_SECRET_ACCESS_KEY=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
+	export AWS_ACCESS_KEY_ID=AKIAJNOA6L7BX2HDSBZA
+	export AWS_SECRET_ACCESS_KEY=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
 	aws s3  --region us-east-1 cp $SiblingGenerator.filter.chr s3://marthlab.rufus/ASC.out/$Out/ &
 	aws s3  --region us-east-1 cp $SiblingGenerator.Mutations.fastq s3://marthlab.rufus/ASC.out/$Out/ &
 
@@ -251,8 +251,8 @@ else
 	/usr/bin/time -v bash $RUFUSOverlap $SiblingGenerator.Mutations.fastq 5 $SiblingGenerator $SiblingGenerator.k$SiblingMinCov.HashList $Threads $SiblingGenerator.Jhash $ProbandGenerator.Jhash $Parent1Generator.Jhash $Parent2Generator.Jhash
 
 fi
-export AWS_ACCESS_KEY_ID=AKIAJYJOYRQMBBN34OWQ
-export AWS_SECRET_ACCESS_KEY=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
+export AWS_ACCESS_KEY_ID=AKIAJNOA6L7BX2HDSBZA
+export AWS_SECRET_ACCESS_KEY=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
 for i in *vcf*; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done 
 for i in *bam; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
 for i in *generator.V2.overlap.asembly.hash.fastq.*; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
