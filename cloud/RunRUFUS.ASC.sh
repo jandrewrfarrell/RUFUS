@@ -36,8 +36,8 @@ RUFUS1kgFilter=$RDIR/bin/RUFUS.1kg.filter
 RunJelly=$RDIR/cloud/RunJellyForRUFUS
 
 
-export AWS_ACCESS_KEY_ID=$Key
-export AWS_SECRET_ACCESS_KEY=$PKey
+#export AWS_ACCESS_KEY_ID=$Key
+#export AWS_SECRET_ACCESS_KEY=$PKey
 
 aws s3 --region us-east-1 cp s3://marthlab.rufus/ASC.scripts/$Parent1Generator ./
 aws s3 --region us-east-1 cp s3://marthlab.rufus/ASC.scripts/$Parent2Generator ./
