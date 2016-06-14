@@ -56,7 +56,7 @@ else
 fi 
 export AWS_ACCESS_KEY_ID=$Key
 export AWS_SECRET_ACCESS_KEY=$PKey
-aws s3  --region us-east-1 cp $Parent1Generator.Jelly.chr s3://marthlab.rufus/ASC.out/$Out/ --profile upload &
+aws s3  --region us-east-1 cp $Parent1Generator.Jelly.chr s3://marthlab.rufus/ASC.out/$Out/  &
 
 /usr/bin/time -v bash $RunJelly $Parent2Generator $K $(echo $Threads -2 | bc)
 if [ "$( tail -n 2 $Parent2Generator.Jelly.chr | head -1)" == "*" ]
@@ -70,7 +70,7 @@ else
 fi
 export AWS_ACCESS_KEY_ID=$Key
 export AWS_SECRET_ACCESS_KEY=$PKey
-aws s3  --region us-east-1 cp $Parent2Generator.Jelly.chr s3://marthlab.rufus/ASC.out/$Out/ --profile upload &
+aws s3  --region us-east-1 cp $Parent2Generator.Jelly.chr s3://marthlab.rufus/ASC.out/$Out/  &
 
 
 /usr/bin/time -v bash $RunJelly $SiblingGenerator $K $(echo $Threads -2 | bc)
@@ -85,7 +85,7 @@ else
 fi
 export AWS_ACCESS_KEY_ID=$Key
 export AWS_SECRET_ACCESS_KEY=$PKey
-aws s3  --region us-east-1 cp $SiblingGenerator.Jelly.chr s3://marthlab.rufus/ASC.out/$Out/ --profile upload &
+aws s3  --region us-east-1 cp $SiblingGenerator.Jelly.chr s3://marthlab.rufus/ASC.out/$Out/ &
 
 
 /usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc)
@@ -100,7 +100,7 @@ else
 fi
 export AWS_ACCESS_KEY_ID=$Key
 export AWS_SECRET_ACCESS_KEY=$PKey
-aws s3  --region us-east-1 cp $ProbandGenerator.Jelly.chr s3://marthlab.rufus/ASC.out/$Out/ --profile upload &
+aws s3  --region us-east-1 cp $ProbandGenerator.Jelly.chr s3://marthlab.rufus/ASC.out/$Out/  &
 
 perl -ni -e 's/ /\t/;print' $ProbandGenerator.Jhash.histo
 perl -ni -e 's/ /\t/;print' $Parent1Generator.Jhash.histo
@@ -126,7 +126,7 @@ else
 fi 
 export AWS_ACCESS_KEY_ID=$Key
 export AWS_SECRET_ACCESS_KEY=$PKey
-for i in *model; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ --profile upload ; done
+for i in *model; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/  ; done
 
 ParentMaxE=0
 MutantMinCov=$(head -2 $ProbandGenerator.Jhash.histo.7.7.model | tail -1 )
@@ -174,7 +174,7 @@ else
 fi
 export AWS_ACCESS_KEY_ID=$Key
 export AWS_SECRET_ACCESS_KEY=$PKey
-for i in *HashList;  do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ --profile upload ; done
+for i in *HashList;  do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
 echo "done with RUFUS build "
 
 echo "startin RUFUS filter"
@@ -202,8 +202,8 @@ echo "crap"
 	fi
 	export AWS_ACCESS_KEY_ID=$Key
 	export AWS_SECRET_ACCESS_KEY=$PKey
-	aws s3  --region us-east-1 cp $ProbandGenerator.filter.chr s3://marthlab.rufus/ASC.out/$Out/ --profile upload &
-	aws s3  --region us-east-1 cp $ProbandGenerator.Mutations.fastq s3://marthlab.rufus/ASC.out/$Out/ --profile upload &
+	aws s3  --region us-east-1 cp $ProbandGenerator.filter.chr s3://marthlab.rufus/ASC.out/$Out/  &
+	aws s3  --region us-east-1 cp $ProbandGenerator.Mutations.fastq s3://marthlab.rufus/ASC.out/$Out/  &
 fi 
 
 if [ -e $ProbandGenerator.V2.overlap.hashcount.fastq.bam.vcf ]
@@ -214,9 +214,9 @@ else
 	/usr/bin/time -v bash $RUFUSOverlap $ProbandGenerator.Mutations.fastq 5 $ProbandGenerator $ProbandGenerator.k$MutantMinCov.HashList $Threads $ProbandGenerator.Jhash $SiblingGenerator.Jhash $Parent1Generator.Jhash $Parent2Generator.Jhash 
 	export AWS_ACCESS_KEY_ID=$Key
 	export AWS_SECRET_ACCESS_KEY=$PKey
-	for i in *vcf*; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ --profile upload ; done
-	for i in *bam; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ --profile upload ; done
-	for i in *generator.V2.overlap.asembly.hash.fastq.*; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ --profile upload ; done	
+	for i in *vcf*; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/  ; done
+	for i in *bam; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/  ; done
+	for i in *generator.V2.overlap.asembly.hash.fastq.*; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/  ; done	
 fi
 
 echo "starting RUFUS filter"
@@ -243,8 +243,8 @@ else
 	fi
 	export AWS_ACCESS_KEY_ID=$Key
 	export AWS_SECRET_ACCESS_KEY=$PKey
-	aws s3  --region us-east-1 cp $SiblingGenerator.filter.chr s3://marthlab.rufus/ASC.out/$Out/ --profile upload &
-	aws s3  --region us-east-1 cp $SiblingGenerator.Mutations.fastq s3://marthlab.rufus/ASC.out/$Out/ --profile upload &
+	aws s3  --region us-east-1 cp $SiblingGenerator.filter.chr s3://marthlab.rufus/ASC.out/$Out/  &
+	aws s3  --region us-east-1 cp $SiblingGenerator.Mutations.fastq s3://marthlab.rufus/ASC.out/$Out/  &
 
 fi
 
@@ -258,9 +258,9 @@ else
 fi
 export AWS_ACCESS_KEY_ID=$Key
 export AWS_SECRET_ACCESS_KEY=$PKey
-for i in *vcf*; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ --profile upload ; done 
-for i in *bam; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ --profile upload ; done
-for i in *generator.V2.overlap.asembly.hash.fastq.*; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ --profile upload ; done
+for i in *vcf*; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/  ; done 
+for i in *bam; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/  ; done
+for i in *generator.V2.overlap.asembly.hash.fastq.*; do aws s3  --region us-east-1 cp $i s3://marthlab.rufus/ASC.out/$Out/ ; done
 
 echo "done with everything "
 
