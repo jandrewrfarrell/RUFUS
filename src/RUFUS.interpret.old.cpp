@@ -1711,7 +1711,7 @@ options:\
 		{
 			vector<string> temp = Split(line, '\t');
 			Hash.insert(pair<string, int>(temp[0], atoi(temp[1].c_str())));
-			//cout << "added pair " << temp[3] << "\t" << temp[2] << endl;
+			cout << "added pair " << temp[3] << "\t" << temp[2] << endl;
 		}
 		HashList.close(); 
 	}
