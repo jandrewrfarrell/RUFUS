@@ -19,7 +19,7 @@ then
         exit
 fi
 
-RDIR=/home/ubuntu/work/RUFUS
+RDIR=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/RUFUS
 RUFUSmodel=$RDIR/bin/ModelDist
 RUFUSbuild=$RDIR/bin/RUFUS.Build
 RUFUSfilter=$RDIR/bin/RUFUS.Filter
@@ -62,12 +62,20 @@ fi
 
 
 echo "done with RUFUS build "
-echo "startin RUFUS filter"
-rm  $MutantGenerator.temp
-mkfifo $MutantGenerator.temp
-/usr/bin/time -v  bash $MutantGenerator >  $MutantGenerator.temp &
-/usr/bin/time -v   $RUFUSfilter  $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList $MutantGenerator.temp $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".filtered.fq $K 0 5 10 $Threads >> $Out.Run.out   &
-wait
+if [ -e  "$Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".filtered.fq.Mutations.fastq" ]
+then 
+	echo "Skipping Filter"
+else 
+
+	echo "startin RUFUS filter"
+	rm  $MutantGenerator.temp
+	mkfifo $MutantGenerator.temp
+	echo $RDIR/cloud/PassThroughSamCheck $MutantGenerator.filter.chr  
+	/usr/bin/time -v  bash $MutantGenerator  >  $MutantGenerator.temp &
+	/usr/bin/time -v   $RUFUSfilter  $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList $MutantGenerator.temp $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".filtered.fq $K 0 5 10 $Threads >> $Out.Run.out   &
+	wait
+fi 
+
 
 echo "startin RUFUS overlap"
 /usr/bin/time -v bash $RUFUSOverlap $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".filtered.fq.Mutations.fastq 5 $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov" $Out".k$K"_m"$ParentMaxE"_c"$MutantMinCov".HashList $Threads
