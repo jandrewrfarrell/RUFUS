@@ -765,7 +765,7 @@ void SamRead::parseMutations( char *argv[])
 		reff = ""; 
 		alt = "";
 		varType = ""; 
-		if ((cigarString.c_str()[i] == 'X' or cigarString.c_str()[i] == 'I' or cigarString.c_str()[i] == 'D' or cigarString.c_str()[i] == 'T'  or cigarString.c_str()[i] == 'S' /*or cigarString.c_str()[i] == 'H'*/) and RefSeq.c_str()[i] != 'N')
+		if ((cigarString.c_str()[i] == 'X' or cigarString.c_str()[i] == 'I' or cigarString.c_str()[i] == 'D' or cigarString.c_str()[i] == 'T'/*  or cigarString.c_str()[i] == 'S' *or cigarString.c_str()[i] == 'H'*/) and RefSeq.c_str()[i] != 'N')
 		{
 			int size = -1; 
 			int startPos = i; 
@@ -779,7 +779,7 @@ void SamRead::parseMutations( char *argv[])
 			for(int j = 0; j< cigarString.size() - i; j++)
 			{
 				//if(cigarString.c_str()[i+j] == cigarString.c_str()[i])
-				if(cigarString.c_str()[i+j] == 'X' or cigarString.c_str()[i+j] == 'D' or cigarString.c_str()[i+j] == 'I' or cigarString.c_str()[i+j] == 'T' or cigarString.c_str()[i+j] == 'S' /*or cigarString.c_str()[i+j] == 'H'*/)
+				if(cigarString.c_str()[i+j] == 'X' or cigarString.c_str()[i+j] == 'D' or cigarString.c_str()[i+j] == 'I' or cigarString.c_str()[i+j] == 'T' /*or cigarString.c_str()[i+j] == 'S' or cigarString.c_str()[i+j] == 'H'*/)
 				{
 					size = j; 
 					if (qual.c_str()[i+j] > '!')
