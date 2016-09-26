@@ -301,6 +301,17 @@ int main (int argc, char *argv[])
 			Mutations.insert(pair<unsigned long, int > (revb, 0));
                 	//break;
 		}
+		if (temp.size() == 1)
+                {
+		temp = Split(L1, ' ');
+                unsigned long b = HashToLong(temp[0]);
+                unsigned long revb = HashToLong(RevComp(temp[0]));
+                //int c = atoi(temp[1].c_str()); 
+                //cout << temp[0] << "\t" << temp[1] << endl << b << "\t" << LongToHash(b, 18) <<  endl<<endl;
+                Mutations.insert(pair<unsigned long, int > (b, 0));
+                Mutations.insert(pair<unsigned long, int > (revb, 0));
+                //break;
+                }
 	}
 	MutHashFile.close();
 	

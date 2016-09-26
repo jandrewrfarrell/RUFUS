@@ -44,7 +44,7 @@ aws s3 --region us-east-1 cp s3://marthlab.rufus/ASC.scripts/$Parent2Generator .
 aws s3 --region us-east-1 cp s3://marthlab.rufus/ASC.scripts/$SiblingGenerator ./
 aws s3 --region us-east-1 cp s3://marthlab.rufus/ASC.scripts/$ProbandGenerator ./
 
-/usr/bin/time -v bash $RunJelly $Parent1Generator $K $(echo $Threads -2 | bc)
+/usr/bin/time -v bash $RunJelly $Parent1Generator $K $(echo $Threads -2 | bc) 2
 if [ "$( tail -n 2 $Parent1Generator.Jelly.chr | head -1)" == "*" ]
 then 
 	echo "Jelly on $Parent1Generator successfull"
@@ -52,13 +52,13 @@ else
 	echo "ReRunning jelly on $Parent1Generator"
 	rm $Parent1Generator.Jhash
 	rm $Parent1Generator.Jelly.chr
-	/usr/bin/time -v bash $RunJelly $Parent1Generator $K $(echo $Threads -2 | bc)
+	/usr/bin/time -v bash $RunJelly $Parent1Generator $K $(echo $Threads -2 | bc) 2
 fi 
 export AWS_ACCESS_KEY_ID=$Key
 export AWS_SECRET_ACCESS_KEY=$PKey
 aws s3  --region us-east-1 cp $Parent1Generator.Jelly.chr s3://marthlab.rufus/ASC.out/$Out/  &
 
-/usr/bin/time -v bash $RunJelly $Parent2Generator $K $(echo $Threads -2 | bc)
+/usr/bin/time -v bash $RunJelly $Parent2Generator $K $(echo $Threads -2 | bc) 2
 if [ "$( tail -n 2 $Parent2Generator.Jelly.chr | head -1)" == "*" ]
 then
         echo "Jelly on $Parent2Generator successfull"
@@ -66,14 +66,14 @@ else
         echo "ReRunning jelly on $Parent2Generator"
         rm $Parent2Generator.Jhash
 	rm $Parent2Generator.Jelly.chr
-       /usr/bin/time -v bash $RunJelly $Parent2Generator $K $(echo $Threads -2 | bc)
+       /usr/bin/time -v bash $RunJelly $Parent2Generator $K $(echo $Threads -2 | bc) 2
 fi
 export AWS_ACCESS_KEY_ID=$Key
 export AWS_SECRET_ACCESS_KEY=$PKey
 aws s3  --region us-east-1 cp $Parent2Generator.Jelly.chr s3://marthlab.rufus/ASC.out/$Out/  &
 
 
-/usr/bin/time -v bash $RunJelly $SiblingGenerator $K $(echo $Threads -2 | bc)
+/usr/bin/time -v bash $RunJelly $SiblingGenerator $K $(echo $Threads -2 | bc) 2
 if [ "$( tail -n 2 $SiblingGenerator.Jelly.chr | head -1)" == "*" ]
 then
         echo "Jelly on $SiblingGenerator successfull"
@@ -81,14 +81,14 @@ else
         echo "ReRunning jelly on $SiblingGenerator"
         rm $SiblingGenerator.Jhash
 	rm  $SiblingGenerator.Jelly.chr
-       /usr/bin/time -v bash $RunJelly $SiblingGenerator $K $(echo $Threads -2 | bc)
+       /usr/bin/time -v bash $RunJelly $SiblingGenerator $K $(echo $Threads -2 | bc) 2
 fi
 export AWS_ACCESS_KEY_ID=$Key
 export AWS_SECRET_ACCESS_KEY=$PKey
 aws s3  --region us-east-1 cp $SiblingGenerator.Jelly.chr s3://marthlab.rufus/ASC.out/$Out/ &
 
 
-/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc)
+/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc) 2
 if [ "$( tail -n 2 $ProbandGenerator.Jelly.chr | head -1)" == "*" ]
 then
         echo "Jelly on $ProbandGenerator successfull"
@@ -96,7 +96,7 @@ else
         echo "ReRunning jelly on $ProbandGenerator"
         rm $ProbandGenerator.Jhash
 	rm $ProbandGenerator.Jelly.chr
-        /usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc)
+        /usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc) 2
 fi
 export AWS_ACCESS_KEY_ID=$Key
 export AWS_SECRET_ACCESS_KEY=$PKey

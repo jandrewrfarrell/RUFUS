@@ -5,8 +5,8 @@ pref=$(basename $0 .sh)
 DIR=../bin
 JF="$DIR/jellyfish"
 [ -n "$VALGRIND" ] && JF="valgrind $JF"
-SRCDIR=/home/ubuntu/work/RUFUS/cloud/jellyfish-MODIFIED-merge
-BUILDDIR=/home/ubuntu/work/RUFUS/cloud/jellyfish-MODIFIED-merge
+SRCDIR=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/RUFUS/cloud/jellyfish-MODIFIED-merge
+BUILDDIR=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/RUFUS/cloud/jellyfish-MODIFIED-merge
 
 check () {
     cut -d\  -f 2 $1 | xargs md5sum | sort -k2,2 | diff -w $DIFFFLAGS $1 -

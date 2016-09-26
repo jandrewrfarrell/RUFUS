@@ -39,7 +39,7 @@ int main (int argc, char *argv[])
 	{}
 	else
 	{	
-		cout << "ERROR, Output file could not be opened -" << argv[3] << endl;
+		cout << "ERROR, Output file could not be opened -" << argv[1] << endl;
 		return 0;
 	}
 

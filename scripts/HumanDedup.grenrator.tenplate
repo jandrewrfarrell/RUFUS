@@ -1,5 +1,5 @@
 #!/bin/bash
-RDIR=/home/ubuntu/work/RUFUS
+RDIR=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/RUFUS
 BAMTOOLS=$RDIR/src/externals/gkno_launcher/tools/bamtools/bin/bamtools
 
 $BAMTOOLS filter -in $1 -isDuplicate false | $BAMTOOLS convert -format fastq 

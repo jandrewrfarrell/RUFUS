@@ -344,7 +344,6 @@ string RevComp (string Sequence)
 {
 	string NewString = "";
 	//cout << "Start - " << Sequence << "\n";
-	//cout << Sequence.length() << endl; 
 	for(int i = Sequence.length()-1; i>=0; i+= -1)
 	{
 		char C = Sequence.c_str()[i];
@@ -360,10 +359,8 @@ string RevComp (string Sequence)
 		else if (C == 'N')
 			 NewString += 'N';
 		else
-		{
-			cout << "ERROR IN RevComp - " << C << " " ;
-			NewString += C; 
-		}
+			cout << "ERROR IN RevComp - " << C << endl;
+
 
 	}
 	//cout << "end\n";
@@ -439,44 +436,7 @@ class SamRead
 	void write();
 	void writeVertical();
 	void writetofile(ofstream &out);
-	void flipRead(); 
 };
-
-void SamRead::flipRead()
-{
-	cout <<"FLIPPING reads not on the same strand";
-	write(); 
-	string FlipSeq = ""  ;
-	string FlipQual = ""   ; 
-	string FlipRefSeq = "";
-	string FlipCigarString = ""; 
-	string FlipStrand = "";
-	vector<int> FlipPos;
-	vector<string> FlipChrPos; 
-	for (int i = seq.size() -1;  i >=0; i--)
-	{
-	//	FlipSeq += seq.c_str()[i]; 
-		FlipQual += qual.c_str()[i];
-	//	FlipRefSeq += RefSeq.c_str()[i];
-		FlipCigarString += cigarString.c_str()[i];
-		FlipStrand += '-'; 
-		FlipPos.push_back(Positions[i]);
-		FlipChrPos.push_back(ChrPositions[i]);
-	}
-	FlipSeq = RevComp(seq); 
-	FlipRefSeq = RevComp(RefSeq);
-
-	seq = FlipSeq; 
-	qual = FlipQual; 
-	RefSeq = FlipRefSeq;
-	cigarString = FlipCigarString; 
-	strand = FlipStrand; 
-	Positions = FlipPos; 
-	ChrPositions = FlipChrPos; 
-	
-	write(); 
-	
-}
 
 void SamRead::processMultiAlignment()
 {
@@ -765,7 +725,7 @@ void SamRead::parseMutations( char *argv[])
 		reff = ""; 
 		alt = "";
 		varType = ""; 
-		if ((cigarString.c_str()[i] == 'X' or cigarString.c_str()[i] == 'I' or cigarString.c_str()[i] == 'D' or cigarString.c_str()[i] == 'T'  or cigarString.c_str()[i] == 'S' /*or cigarString.c_str()[i] == 'H'*/) and RefSeq.c_str()[i] != 'N')
+		if ((cigarString.c_str()[i] == 'X' or cigarString.c_str()[i] == 'I' or cigarString.c_str()[i] == 'D' or cigarString.c_str()[i] == 'T'  or cigarString.c_str()[i] == 'S' or cigarString.c_str()[i] == 'H') and RefSeq.c_str()[i] != 'N')
 		{
 			int size = -1; 
 			int startPos = i; 
@@ -779,7 +739,7 @@ void SamRead::parseMutations( char *argv[])
 			for(int j = 0; j< cigarString.size() - i; j++)
 			{
 				//if(cigarString.c_str()[i+j] == cigarString.c_str()[i])
-				if(cigarString.c_str()[i+j] == 'X' or cigarString.c_str()[i+j] == 'D' or cigarString.c_str()[i+j] == 'I' or cigarString.c_str()[i+j] == 'T' or cigarString.c_str()[i+j] == 'S' /*or cigarString.c_str()[i+j] == 'H'*/)
+				if(cigarString.c_str()[i+j] == 'X' or cigarString.c_str()[i+j] == 'D' or cigarString.c_str()[i+j] == 'I' or cigarString.c_str()[i+j] == 'T' or cigarString.c_str()[i+j] == 'S' or cigarString.c_str()[i+j] == 'H')
 				{
 					size = j; 
 					if (qual.c_str()[i+j] > '!')
@@ -923,7 +883,7 @@ void SamRead::parseMutations( char *argv[])
 				else
 				   	cout << "GOOD COVERAGE" << endl;
 				cout << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << HashCountsOG.size() << "\t" << "." << "\t" << StructCall << "CVT=" << CompressedVarType << ":HD=";	
-				VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << HashCountsOG.size() << "\t" << "." << "\t"  << StructCall <<":RN=" << name << ":MQ=" << mapQual << ":cigar = " << cigar << ":" << ":CVT=" << CompressedVarType << ":HD="; 
+				VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << HashCountsOG.size() << "\t" << "." << "\t"  << StructCall << "CVT=" << CompressedVarType << ":HD="; 
 				for (int j = 0; j < HashCounts.size(); j++)
 				{	VCFOutFile << HashCounts[j] << "_"; }
 				if (HashCountsOG.size()>0)
@@ -1453,11 +1413,6 @@ SamRead BetterWay(vector<SamRead> reads)
 	}
 	int Acount = 0; 
 	int Bcount = 0;
-	 if (B == 1 and GetReadOrientation(reads[A].flag) != GetReadOrientation(reads[B].flag))
-	{
-		cout <<"FLIPPING reads not on the same strand"; 
-		reads[B].flipRead(); 
-	}
 	while (Acount < reads[A].cigarString.size() and Bcount < reads[B].cigarString.size())
 	{
 		vector<int> currentPos;
@@ -1665,7 +1620,7 @@ SamRead BetterWay(vector<SamRead> reads)
 				{
 					if (LastAlignedQ == '!' or reads[A].qual.c_str()[i] == '!' )
 					{
-						cout << "well fuck this shit A" << endl;
+						cout << "well fuck this shit" << endl;
 						return reads[A]; 
 					}
 					//if(reads[A].ChrPositions[i] == LastAlignedChr and abs(reads[A].Positions[i] -LastAlignedPos ) < MaxVarentSize ) //must be on the same chromosome
@@ -1718,7 +1673,7 @@ SamRead BetterWay(vector<SamRead> reads)
 				{
 					 if (LastAlignedQ == '!'  or reads[A].qual.c_str()[i] == '!')
 					{
-						cout << "well fuck this shit B" << endl;
+						cout << "well fuck this shit" << endl;
 						return reads[A];
 					}
 					cout << "this could be one A, last = " << LastAlignedPos << " Current = " << reads[A].Positions[i] << " chr = " << LastAlignedChr << " and " << reads[A].ChrPositions[i] << endl;
@@ -1779,7 +1734,7 @@ SamRead BetterWay(vector<SamRead> reads)
 				{
 					 if (LastAlignedQ == '!'  or reads[A].qual.c_str()[i] == '!')
 					{
-						cout << "well fuck this shit C" << endl;
+						cout << "well fuck this shit" << endl;
 
 						return reads[A];
 					}
@@ -1811,7 +1766,7 @@ SamRead BetterWay(vector<SamRead> reads)
 					 if (LastAlignedQ == '!'  or reads[B].qual.c_str()[i] == '!')
 					{
 						
-						cout << "well fuck this shit D" << endl;
+						cout << "well fuck this shit" << endl;
 
 						return reads[A];
 					}
@@ -1870,7 +1825,7 @@ SamRead BetterWay(vector<SamRead> reads)
 				{
 					 if (LastAlignedQ == '!' or reads[B].qual.c_str()[i] == '!' )
 					{
-						cout << "well fuck this shit E" << endl;
+						cout << "well fuck this shit" << endl;
 
 						return reads[A];
 					}
@@ -1928,7 +1883,7 @@ SamRead BetterWay(vector<SamRead> reads)
 				{
 					 if (LastAlignedQ == '!' or reads[B].qual.c_str()[i] == '!')
 					{
-						cout << "well fuck this shit F" << endl;
+						cout << "well fuck this shit" << endl;
 						return reads[A];
 					}
 					Translocations << "too big " << abs(reads[A].Positions[i] -LastAlignedPos ) << endl;
@@ -2050,44 +2005,29 @@ SamRead BetterWay(vector<SamRead> reads)
 		//this needs to be the invertion stuff 
 		if( reads[A].chr == reads[B].chr )//and abs(reads[A].Positions[i] -LastAlignedPos ) <= MaxVarentSize )
 		{
-			Translocations << "INVERSION "  << endl;
-			reads[A].writetofile(Translocations);
-			reads[B].writetofile(Translocations);
-			Translocations << endl << endl;
-			string Acig = "";
-			string Bcig = "";	
-			for (int i = 0; i < reads[A].seq.size(); i++)
-			{
-				char Ab = reads[A].cigarString.c_str()[i]; 
-				char Bb = reads[B].cigarString.c_str()[i]; 		
-				if ((reads[A].cigarString.c_str()[i] == 'M' or reads[A].cigarString.c_str()[i] == 'X') and (reads[B].cigarString.c_str()[i] == 'S' or reads[B].cigarString.c_str()[i] == 'H'))
-					Bb = 'U';
-				if ((reads[B].cigarString.c_str()[i] == 'M' or reads[B].cigarString.c_str()[i] == 'X') and (reads[A].cigarString.c_str()[i] == 'S' or reads[A].cigarString.c_str()[i] == 'H'))
-                              		Ab = 'U'; 
-				Acig += Ab; 
-				Bcig += Bb; 
-				   	
-			}
-			reads[A].cigarString = Acig; 
-			reads[B].cigarString = Bcig; 
-			cout << "invertion adjust string"; 
-			reads[A].write(); 
-			reads[B].write(); 	
-		}
-		else if ((reads[A].chr == "hs37d5" and reads[B].chr != "hs37d5" ) or  (reads[A].chr != "hs37d5" and reads[B].chr == "hs37d5" ))
-		{
-			Translocations << "mobil elemnt " << endl;
-			reads[A].writetofile(Translocations);
-			reads[B].writetofile(Translocations);
-			Translocations << endl << endl;
+				Translocations << "INVERSION "  << endl;
+				reads[A].writetofile(Translocations);
+				reads[B].writetofile(Translocations);
+				Translocations << endl << endl;
+
 		}
 		else
 		{
-			Translocations << "we got a translocation and invertion" << endl;
-			reads[A].writetofile(Translocations);
-			reads[B].writetofile(Translocations);
-			Translocations << endl << endl;
-			
+			if ((reads[A].chr == "hs37d5" and reads[B].chr != "hs37d5" ) or  (reads[A].chr != "hs37d5" and reads[B].chr == "hs37d5" ))
+			{
+				Translocations << "mobil elemnt " << endl;
+				reads[A].writetofile(Translocations);
+				reads[B].writetofile(Translocations);
+				Translocations << endl << endl;
+			}
+			else
+			{
+				Translocations << "we got a translocation and invertion" << endl;
+				reads[A].writetofile(Translocations);
+				reads[B].writetofile(Translocations);
+				Translocations << endl << endl;
+
+			}
 		}
 
 			
@@ -2104,7 +2044,6 @@ SamRead BetterWay(vector<SamRead> reads)
 		Invertions << reads[A].chr << "\t" << reads[A].pos << "\t" << reads[B].pos << "\t" << reads[B].pos- reads[A].pos << endl;
 
 	}
-	reads[A].write(); 
 	return reads[A];
 }
 int main (int argc, char *argv[])
@@ -2137,7 +2076,6 @@ options:\
 			(Sorry it has to be a num, no 1kb, must be 1000\n\
   -c  arg		Path to sorted.tab file for the parent sample\n\
   -s  arg 		Path to sorted.tab file for the subject sample\n\
-  -mQ arg		Minimum map quality to consider varients in\n\
 ";
 	
 	string MutHashFilePath = "" ;
@@ -2146,8 +2084,7 @@ options:\
 	string HashListFile = "" ; 	
 	string samFile = "stdin"; 
 	string outStub= "";
-	int MinMapQual = 0; 
-	for(int i = 1; i< argc; i++)
+	 for(int i = 1; i< argc; i++)
 	{
 		cout << i << " = " << argv[i] << endl; 
 	}
@@ -2202,12 +2139,6 @@ options:\
 			MutHashFilePath = argv[i+1];
 			i+=1;
 		}
-		else if (p == "-mQ")
-                {
-                        cout << "Min Mapping Qualtiy = " << argv[i+1] << endl;
-                        MinMapQual = atoi(argv[i+1]);
-                        i+=1;
-                }
 		else
 		{
 			cout << "ERROR: unkown command line paramater -" <<  argv[i] << "-"<< endl;
@@ -2437,9 +2368,6 @@ options:\
 				}
 			}
 		}
-		for (int j = 0; j<reads[i].alignments.size(); j++)
-			reads[reads[i].alignments[j]].alignments = reads[i].alignments; 
-
 	}
 
 	for (int i = 0; i < reads.size(); i++)
@@ -2492,7 +2420,7 @@ options:\
 			//if (read.first && read.alignments.size() ==1 )
 			// 	read.parseMutations();
 			//else if (read.combined == false )
-			if (read.mapQual > MinMapQual and read.alignments.size() <=2)
+			if (read.mapQual > 0)
 			{
 				read.parseMutations(argv); 
 				//BEDNotHandled << read.chr << "\t" << read.pos << "\t" << read.pos+read.seq.length() << "\t" << read.name << endl;

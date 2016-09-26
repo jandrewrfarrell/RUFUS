@@ -1,4 +1,4 @@
-prefix=/home/ubuntu/work/RUFUS/cloud/jellyfish-MODIFIED-merge/bin
+prefix=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/RUFUS/cloud/jellyfish-MODIFIED-merge/bin/jellyfish
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include

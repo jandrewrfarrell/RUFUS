@@ -21,7 +21,7 @@
 #include <unordered_map>
 #include <map>
 using namespace std;
-bool FullOut = false;
+bool FullOut = true;
 ///Call is BitHashCompare Parent Mutant firstpassfile hashsize
 
 /////////////////////////
@@ -740,7 +740,7 @@ int main (int argc, char *argv[])
 	string L6;
 	unsigned long LongHash;
 	int Rejects = 0;
-	
+	int MinReadLength = 90; 
 	//read in fastq
 	string Fastqd = argv[1];
 	size_t found = Fastqd.find(".fastqd");
@@ -773,7 +773,7 @@ int main (int argc, char *argv[])
 				
                         	if (Multiple == true){L2 = TrimLowCoverageEnds(L2, L4, depths, LCcutoff);}
 
-                                if (L2.size() > 60)
+                                if (L2.size() > MinReadLength)
                                 {
                                         lines++;
                                         sequenes.push_back(L2);
@@ -781,6 +781,8 @@ int main (int argc, char *argv[])
                                         depth.push_back(depths);
                                         ReadSize = L2.size();
                                 }
+				else
+				{Rejects++;}
                 	}	
 			else
 			{
@@ -813,7 +815,7 @@ int main (int argc, char *argv[])
 				
 			//L2 = AdjustBases(L2, L4);
 			L2 = TrimNends(L2, L4);
-			 if ((double)L2.size()/(double)ReadSize > .6)
+			 if ((double)L2.size()/(double)ReadSize > .6 and L2.size() > MinReadLength)
                         {
                                 ReadSize = L2.size();
                                 lines++;

@@ -369,22 +369,30 @@ int main (int argc, char *argv[])
 	{
 		vector<string>  temp;
 		temp = Split(L1, '\t');
-		cout << "size = " << temp.size(); 
+		//cout << "size = " << temp.size() << endl; 
 		if (temp.size() == 2)
 		{
 			unsigned long b = HashToLong(temp[0].c_str());
 			Mutations.insert(pair<unsigned long, unsigned int> (b, atoi(temp[1].c_str())));
 			HashSize = temp[0].length();
-			cout << "2 " << b << " = " << temp[0].c_str() << " - " << temp[1].c_str();	
+		//	cout << "2 " << b << " = " << temp[0].c_str() << " - " << temp[1].c_str();	
 		}
 		else if(temp.size() ==4)
 		{
-			cout << "here" << endl; 	
+			//cout << "here" << endl; 	
 			unsigned long b = HashToLong(temp[3].c_str());
                         Mutations.insert(pair<unsigned long, unsigned int> (b, atoi(temp[2].c_str())));
                         HashSize = temp[3].length();
-			cout << "4 " << b << " = " << temp[3].c_str() << " - " << temp[2].c_str(); 
-		} 
+		//	cout << "4 " << b << " = " << temp[3].c_str() << " - " << temp[2].c_str(); 
+		}
+		else if (temp.size() == 1)
+                {
+			temp = Split(L1, ' ');
+                        unsigned long b = HashToLong(temp[0].c_str());
+                        Mutations.insert(pair<unsigned long, unsigned int> (b, atoi(temp[1].c_str())));
+                        HashSize = temp[0].length();
+                 //       cout << "1 " << b << " = " << temp[0].c_str() << " - " << temp[1].c_str() << endl;
+                }
 	}
 	MutHashFile.close();
 	//cout << "Hash size = " << HashSize << endl;
