@@ -37,7 +37,7 @@ RunRUFUS.Trio takes 6 arguments, the command line should look like this
 ```
 bash RunRUFUS.Trio.sh Father.generator Mother.generator Child.generator 25 40 Child.generator.outstub
 ```
-where 25 is the kmer size to be used and 40 is the number of threads to use 
+where 25 is the kmer size to be used and 40 is the number of threads to use.  You can chage those to what ever you want. 
 
 RUFUS works on generator files.  You will need to make a generator for each one of your input bam files.  A generator is essentially a bash script that dumps sam formatted reads to the terminal.  This lets us take in numerous data formats and lets you filter your input to remove duplicate reads ect.  An example of the generator file we usually use is below, this will output only the primary alignments and ignore all duplicate reads.
 
