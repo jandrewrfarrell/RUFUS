@@ -61,3 +61,16 @@ else
 fi
 
 cd ../
+
+cd cloud
+rm -rf jellyfish-MODIFIED-merge
+tar -xvf jellyfish-2.2.5.tar.gz
+mv jellyfish-2.2.5 jellyfish-MODIFIED-merge
+cp merge_files.cc jellyfish-MODIFIED-merge/jellyfish/merge_files.cc 
+cd jellyfish-MODIFIED-merge/
+./configure --prefix=$(pwd)
+make 
+make install
+cd ../
+cd ../
+
