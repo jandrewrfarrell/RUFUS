@@ -509,13 +509,20 @@ int main (int argc, char *argv[])
 	getline(HistoFile, line); // burn the 0 0 line
 	temp = Split(line, '\t');
 	cout << "first line = " << temp[0] << " - " << temp[1] << endl;
-	while (atoi(temp[1].c_str()) == 0 or atoi(temp[0].c_str())==0)
-	{
-		cout << "getting another " << endl;
-		getline(HistoFile, line);
-		temp = Split(line, '\t');
-		cout << "got " << temp[0] << " - " << temp[1] << endl;
-	}	
+	int count = 0;
+        while (atoi(temp[1].c_str()) == 0 or atoi(temp[0].c_str())==0)
+        {
+                cout << "getting another " << endl;
+                getline(HistoFile, line);
+                temp = Split(line, '\t');
+                cout << "got " << temp[0] << " - " << temp[1] << endl;
+                count++;
+                if (count > 10)
+                {
+                         cout << "ERROR there are no kmers in this file" << endl;
+                        return 1;
+                }
+        }	
 	cout << "going with " << temp[0] << " - " << temp[1] << endl;
 	value = atol(temp[1].c_str());
 	histo.push_back(value);
