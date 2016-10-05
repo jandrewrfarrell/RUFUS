@@ -922,8 +922,8 @@ void SamRead::parseMutations( char *argv[])
 				}
 				else
 				   	cout << "GOOD COVERAGE" << endl;
-				cout << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << HashCountsOG.size() << "\t" << "." << "\t" << StructCall << "CVT=" << CompressedVarType << ":HD=";	
-				VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << HashCountsOG.size() << "\t" << "." << "\t"  << StructCall <<":RN=" << name << ":MQ=" << mapQual << ":cigar = " << cigar << ":" << ":CVT=" << CompressedVarType << ":HD="; 
+				cout << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << HashCountsOG.size() << "\t" << "." << "\t" << StructCall << "CVT=" << CompressedVarType << ";HD=";	
+				VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << HashCountsOG.size() << "\t" << "." << "\t"  << StructCall <<";RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";" << ";CVT=" << CompressedVarType << ";HD="; 
 				for (int j = 0; j < HashCounts.size(); j++)
 				{	VCFOutFile << HashCounts[j] << "_"; }
 				if (HashCountsOG.size()>0)
@@ -935,7 +935,7 @@ void SamRead::parseMutations( char *argv[])
 				{
 					 VCFOutFile << ";AO=" << "-1";
 				} 
-				VCFOutFile <<  ":VT=" <<  varType << "\t" << "GT:AK" << "\t" << "0/1:"<< "7" << endl; 
+				VCFOutFile <<  ";VT=" <<  varType << "\t" << "GT;AK" << "\t" << "0/1;"<< "7" << endl; 
 				BEDOutFile << chr << "\t" << pos+i << "\t" <<  pos+i+size << "\t" << chr << ":" << pos+i << ":" << (int)(reff.length() - alt.length()) << ":" << HashCountsOG.size() << endl;
 				i+=size;
 			} 
@@ -2383,8 +2383,14 @@ options:\
 	//write VCF header
 	VCFOutFile << "##fileformat=VCFv4.1" << endl;
 	VCFOutFile << "##fileDate=" << time(0) << endl;
+	VCFOutFile << "##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">" << endl;
+	VCFOutFile << "##FORMAT=<ID=AK,Number=1,Type=Integer,Description=\"Alternte Kmer Count\">" << endl;
 	VCFOutFile << "##INFO=<ID=AO,Number=A,Type=Integer,Description=\"Alternate allele observations, with partial observations recorded fractionally\">"<<endl;
 	VCFOutFile << "##INFO=<ID=HD,Number=A,Type=String,Description=\"Hash counts for each k-mer overlapping the vareint, -1 indicates no info\">"<< endl;
+	VCFOutFile << "##INFO=<ID=RN,Number=1,Tinype=String,Description=\"Name of contig that produced the call\">"<< endl;
+	VCFOutFile << "##INFO=<ID=MQ,Number=1,Tinype=Integer,Description=\"Mapping quality of the contig that created the call\">"<< endl;
+	VCFOutFile << "##INFO=<ID=cigar,Number=1,Tinype=String,Description=\"Cigar string for the contig that created the call\">"<< endl;
+	VCFOutFile << "##INFO=<ID=CVT,Number=1,Tinype=String,Description=\"Compressed Varient Type\">"<< endl;
 	VCFOutFile << "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t";
 	VCFOutFile << outStub << endl;
 
