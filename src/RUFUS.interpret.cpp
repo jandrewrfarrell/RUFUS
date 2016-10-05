@@ -923,19 +923,19 @@ void SamRead::parseMutations( char *argv[])
 				else
 				   	cout << "GOOD COVERAGE" << endl;
 				cout << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << HashCountsOG.size() << "\t" << "." << "\t" << StructCall << "CVT=" << CompressedVarType << ";HD=";	
-				VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << HashCountsOG.size() << "\t" << "." << "\t"  << StructCall <<";RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";" << ";CVT=" << CompressedVarType << ";HD="; 
+				VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << HashCountsOG.size() << "\t" << "." << "\t"  << StructCall <<":RN=" << name << ":MQ=" << mapQual << ":cigar=" << cigar << ":" << ":CVT=" << CompressedVarType << ":HD="; 
 				for (int j = 0; j < HashCounts.size(); j++)
 				{	VCFOutFile << HashCounts[j] << "_"; }
 				if (HashCountsOG.size()>0)
 				{
 					std::sort (HashCountsOG.begin(), HashCountsOG.end());
-					VCFOutFile << ";AO=" << HashCountsOG[HashCountsOG.size()/2];
+					VCFOutFile << ":AO=" << HashCountsOG[HashCountsOG.size()/2];
 				}
 				else
 				{
-					 VCFOutFile << ";AO=" << "-1";
+					 VCFOutFile << ":AO=" << "-1";
 				} 
-				VCFOutFile <<  ";VT=" <<  varType << "\t" << "GT;AK" << "\t" << "0/1;"<< "7" << endl; 
+				VCFOutFile <<  ":VT=" <<  varType << "\t" << "GT:AK" << "\t" << "0/1:"<< "7" << endl; 
 				BEDOutFile << chr << "\t" << pos+i << "\t" <<  pos+i+size << "\t" << chr << ":" << pos+i << ":" << (int)(reff.length() - alt.length()) << ":" << HashCountsOG.size() << endl;
 				i+=size;
 			} 
