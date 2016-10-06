@@ -632,7 +632,7 @@ void SamRead::parseMutations( char *argv[])
 	
 	cout << "Parsing Mutations " << endl;
 	write(); 
-	string StructCall = "ST"; 	
+	string StructCall = ""; 	
 	vector<bool> PeakMap; 
 	int max = -1; 
 	int maxSpot = -1;
@@ -923,7 +923,7 @@ void SamRead::parseMutations( char *argv[])
 				else
 				   	cout << "GOOD COVERAGE" << endl;
 				cout << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << HashCountsOG.size() << "\t" << "." << "\t" << StructCall << "CVT=" << CompressedVarType << ";HD=";	
-				VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << HashCountsOG.size() << "\t" << "." << "\t"  << StructCall <<";RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";" << ";CVT=" << CompressedVarType << ";HD="; 
+				VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << HashCountsOG.size() << "\t" << "." << "\t"  << StructCall <<"RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";" << "CVT=" << CompressedVarType << ";HD="; 
 				for (int j = 0; j < HashCounts.size(); j++)
 				{	VCFOutFile << HashCounts[j] << "_"; }
 				if (HashCountsOG.size()>0)
@@ -2385,6 +2385,8 @@ options:\
 	VCFOutFile << "##fileDate=" << time(0) << endl;
 	VCFOutFile << "##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">" << endl;
 	VCFOutFile << "##FORMAT=<ID=AK,Number=1,Type=Integer,Description=\"Alternte Kmer Count\">" << endl;
+	VCFOutFile << "##INFO=<ID=SVTYPE,Number=A,Type=String,Description=\"Type of SV detected\">" << endl;
+	VCFOutFile << "##INFO=<ID=SVLENGTH,Number=A,Type=Integer,Description=\"Length of SV detected\">" << endl; 
 	VCFOutFile << "##INFO=<ID=AO,Number=A,Type=Integer,Description=\"Alternate allele observations, with partial observations recorded fractionally\">"<<endl;
 	VCFOutFile << "##INFO=<ID=HD,Number=A,Type=String,Description=\"Hash counts for each k-mer overlapping the vareint, -1 indicates no info\">"<< endl;
 	VCFOutFile << "##INFO=<ID=RN,Number=1,Tinype=String,Description=\"Name of contig that produced the call\">"<< endl;
