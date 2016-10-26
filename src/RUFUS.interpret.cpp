@@ -430,7 +430,9 @@ class SamRead
 	vector<string> ChrPositions; 
 	bool first; // = true;  
 	bool combined; // = false; 
+	vector<bool> PeakMap; 
 
+	void createPeakMap(); 
 	void parse(string read);
 	void getRefSeq(); 
 	void processCigar();
@@ -451,6 +453,7 @@ void SamRead::flipRead()
 	string FlipRefSeq = "";
 	string FlipCigarString = ""; 
 	string FlipStrand = "";
+	vector<bool> FlipPeakMap ; 
 	vector<int> FlipPos;
 	vector<string> FlipChrPos; 
 	for (int i = seq.size() -1;  i >=0; i--)
@@ -462,6 +465,7 @@ void SamRead::flipRead()
 		FlipStrand += '-'; 
 		FlipPos.push_back(Positions[i]);
 		FlipChrPos.push_back(ChrPositions[i]);
+		FlipPeakMap.push_back(PeakMap[i]);
 	}
 	FlipSeq = RevComp(seq); 
 	FlipRefSeq = RevComp(RefSeq);
@@ -473,7 +477,7 @@ void SamRead::flipRead()
 	strand = FlipStrand; 
 	Positions = FlipPos; 
 	ChrPositions = FlipChrPos; 
-	
+	PeakMap=FlipPeakMap; 
 	write(); 
 	
 }
@@ -627,42 +631,76 @@ string compressVar(string line, int start, string& StructCall)
 	
 	return CV;
 }
+void SamRead::createPeakMap()
+{
+	vector<bool> tempPeakMap;
+	int i =0; 
+	int max = -1; 
+	int maxSpot = -1; 
+	while (i<qual.size())
+        {
+                int j;
+                for ( j = i+1; j < qual.size()-1; j++)
+                {
+                        if(qual.c_str()[j+1] < qual.c_str()[j])
+                        {
+                                max =  qual.c_str()[j];
+                                while (qual.c_str()[j+1] < qual.c_str()[j] && j < qual.size()-1)
+                                {
+                                        j++;
+                                }
+                                break;
+                        }
+                }
+                int k;
+                for ( k = i; k <=j; k++)
+                {
+                        if (qual.c_str()[k] == max)
+                               tempPeakMap.push_back(1);
+                        else
+                                tempPeakMap.push_back(0);
+                }
+                i = i +k;
+        }	
+	PeakMap = tempPeakMap; 
+}
 void SamRead::parseMutations( char *argv[])
 {
 	
 	cout << "Parsing Mutations " << endl;
 	write(); 
-	string StructCall = ""; 	
-	vector<bool> PeakMap; 
-	int max = -1; 
-	int maxSpot = -1;
-	int i =0;
-	while (i<qual.size())
-	{
-		int j;
-		for ( j = i+1; j < qual.size()-1; j++)
-		{
-			if(qual.c_str()[j+1] < qual.c_str()[j])
-			{
-				max =  qual.c_str()[j];
-				while (qual.c_str()[j+1] < qual.c_str()[j] && j < qual.size()-1)
-				{
-					j++;
-				}
-				break; 	
-			}		
-		}
-		int k; 
-		for ( k = i; k <=j; k++)
-		{
-			if (qual.c_str()[k] == max)
-				PeakMap.push_back(1);
-			else	
-				PeakMap.push_back(0);
-		}
-		i = i +k; 
-	}	
-	
+	string StructCall = ""; 
+	createPeakMap();	
+//	vector<bool> PeakMap; 
+//	int max = -1; 
+//	int maxSpot = -1;
+//	int i =0;
+//	while (i<qual.size())
+//	{
+//		int j;
+//		for ( j = i+1; j < qual.size()-1; j++)
+//		{
+//			if(qual.c_str()[j+1] < qual.c_str()[j])
+//			{
+//				max =  qual.c_str()[j];
+//				while (qual.c_str()[j+1] < qual.c_str()[j] && j < qual.size()-1)
+//				{
+//					j++;
+//				}
+//				break; 	
+//			}		
+//		}
+//		int k; 
+//		for ( k = i; k <=j; k++)
+//		{
+//			if (qual.c_str()[k] == max)
+//				PeakMap.push_back(1);
+//			else	
+//				PeakMap.push_back(0);
+//		}
+//		i = i +k; 
+//	}	
+//	
 	//cout << "testhing hash search" << endl;
 	vector <string> hashes;
 	vector <bool> varHash; 
@@ -923,7 +961,7 @@ void SamRead::parseMutations( char *argv[])
 				else
 				   	cout << "GOOD COVERAGE" << endl;
 				cout << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << HashCountsOG.size() << "\t" << "." << "\t" << StructCall << "CVT=" << CompressedVarType << ";HD=";	
-				VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << HashCountsOG.size() << "\t" << "." << "\t"  << StructCall <<"RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";" << "CVT=" << CompressedVarType << ";HD="; 
+				VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << HashCountsOG.size() << "\t" << "." << "\t"  << StructCall <<"RN=" << "boom" /*name*/ << ";MQ=" << mapQual << ";cigar=" << cigar << ";" << "CVT=" << CompressedVarType << ";HD="; 
 				for (int j = 0; j < HashCounts.size(); j++)
 				{	VCFOutFile << HashCounts[j] << "_"; }
 				if (HashCountsOG.size()>0)
@@ -1616,6 +1654,10 @@ SamRead BetterWay(vector<SamRead> reads)
 		for (int j = 0; j<AlignmentPos.size(); j++)
 		{reads[i].ChrPositions.push_back(AlignmentChr[j][i]);}
 		
+	}
+	for (int i =0; i< reads.size(); i++)
+        {
+		reads[i].createPeakMap(); 
 	}
 
 	cout << "Post adjustment" << endl;
@@ -2389,10 +2431,10 @@ options:\
 	VCFOutFile << "##FORMAT=<ID=DP,Number=1,Type=Integer,Description=\"Genotype\">" << endl;
 	VCFOutFile << "##FORMAT=<ID=RO,Number=1,Type=Integer,Description=\"Genotype\">" << endl;
 	VCFOutFile << "##FORMAT=<ID=AO,Number=1,Type=Integer,Description=\"Genotype\">" << endl;
-	VCFOutFile << "##INFO=<ID=SVTYPE,Number=A,Type=String,Description=\"Type of SV detected\">" << endl;
-	VCFOutFile << "##INFO=<ID=SVLENGTH,Number=A,Type=Integer,Description=\"Length of SV detected\">" << endl; 
-	VCFOutFile << "##INFO=<ID=AO,Number=A,Type=Integer,Description=\"Alternate allele observations, with partial observations recorded fractionally\">"<<endl;
-	VCFOutFile << "##INFO=<ID=HD,Number=A,Type=String,Description=\"Hash counts for each k-mer overlapping the vareint, -1 indicates no info\">"<< endl;
+	VCFOutFile << "##INFO=<ID=SVTYPE,Number=1,Type=String,Description=\"Type of SV detected\">" << endl;
+	VCFOutFile << "##INFO=<ID=SVLENGTH,Number=1,Type=Integer,Description=\"Length of SV detected\">" << endl; 
+	VCFOutFile << "##INFO=<ID=AO,Number=1,Type=Integer,Description=\"Alternate allele observations, with partial observations recorded fractionally\">"<<endl;
+	VCFOutFile << "##INFO=<ID=HD,Number=.,Type=String,Description=\"Hash counts for each k-mer overlapping the vareint, -1 indicates no info\">"<< endl;
 	VCFOutFile << "##INFO=<ID=RN,Number=1,Tinype=String,Description=\"Name of contig that produced the call\">"<< endl;
 	VCFOutFile << "##INFO=<ID=MQ,Number=1,Tinype=Integer,Description=\"Mapping quality of the contig that created the call\">"<< endl;
 	VCFOutFile << "##INFO=<ID=cigar,Number=1,Tinype=String,Description=\"Cigar string for the contig that created the call\">"<< endl;
@@ -2435,8 +2477,10 @@ options:\
 		if (reads[i].alignments.size() == 0)
 		{
 			reads[i].alignments.push_back(i);
+			int count = 0; 
 			for (int j = i+1; j < reads.size(); j++)
 			{
+				count++; 
 				if (strcmp(reads[i].name.c_str(), reads[j].name.c_str()) == 0)
 				{
 					cout << "found mate " << reads[j].name << endl;
@@ -2448,6 +2492,8 @@ options:\
 				//	else
 				//		cout << "skip that shit" << endl; 
 				}
+				if (count > 10000)
+					break; 
 			}
 		}
 		for (int j = 0; j<reads[i].alignments.size(); j++)

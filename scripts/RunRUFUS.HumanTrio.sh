@@ -1,3 +1,5 @@
+echo "use RunRUFUS.Trio.sh instead"
+exit
 date
 Parent1=$1
 Parent2=$2

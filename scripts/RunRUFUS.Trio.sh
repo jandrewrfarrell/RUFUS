@@ -21,11 +21,11 @@ then
         exit
 fi
 
-RDIR=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/RUFUS/
+RDIR=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/RUFUS
 RUFUSmodel=$RDIR/bin/ModelDist
 RUFUSbuild=$RDIR/bin/RUFUS.Build
 RUFUSfilter=$RDIR/bin/RUFUS.Filter
-RUFUSOverlap=$RDIR/scripts/OverlapBashMultiThread.sh
+RUFUSOverlap=$RDIR/scripts/OverlapBashMultiThread.trio.sh
 DeDupDump=$RDIR/scripts/HumanDedup.grenrator.tenplate
 PullSampleHashes=$RDIR/cloud/CheckJellyHashList.sh
 RUFUS1kgFilter=$RDIR/bin/RUFUS.1kg.filter
