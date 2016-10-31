@@ -57,6 +57,7 @@ else
         cd gkno_launcher
         ./gkno add-resource human
         ./gkno bwa-index -r ./resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys.fa -x ./resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys
+	./tools/samtools/samtools faidx ./resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys.fa
         cd ..
 fi
 
