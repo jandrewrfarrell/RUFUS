@@ -27,10 +27,17 @@ RUFUS1kgFilter=$RDIR/bin/RUFUS.1kg.filter
 RunJelly=$RDIR/scripts/RunJellyForRUFUS
 
 
+if [ -e $ProbandGenerator.Jhash.sorted.min2.tab ]
+then 
+	echo "skipping jelly "
+else 
 
+	mkfifo $ProbandGenerator.temp
+	/usr/bin/time -v  bash $ProbandGenerator | $RDIR/cloud/PassThroughSamCheck $ProbandGenerator.filter.chr >  $ProbandGenerator.temp &
+	/usr/bin/time -v bash $RunJelly $ProbandGenerator.temp $K $(echo $Threads -2 | bc) 2 
+	rm $ProbandGenerator.temp
+fi
 
-/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc) 2 &
-wait
 
 perl -ni -e 's/ /\t/;print' $ProbandGenerator.Jhash.histo
 if [ -e "$ProbandGenerator.Jhash.histo.7.7.model" ]
