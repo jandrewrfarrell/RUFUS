@@ -48,6 +48,7 @@ ofstream BEDBigStuff;
 ofstream BEDNotHandled;
 ofstream Invertions; 
 ofstream Translocations; 
+ofstream Translocationsbed; 
 ofstream Unaligned; 
 map <string, int> Hash; 
 /////////////////////////
@@ -501,6 +502,10 @@ void SamRead::write()
 	cout << "   Cigar  = " << cigarString << endl; 
 	cout << "   RefSeq = " << RefSeq << endl;
 	cout << "   strand = " << strand << endl;
+	cout << "  PeakMap = "; 
+	for (int i =0; i < PeakMap.size(); i++)
+		{cout << PeakMap[i]; }
+	cout << endl;
 	cout << "   RefPositions: ";
 	for (int i =0; i < Positions.size(); i++)
 		cout << Positions[i] << " \t"; 
@@ -513,6 +518,7 @@ void SamRead::write()
 }
 void SamRead::writetofile(ofstream &out)
 {
+
 	out << name << endl;
 	out << "   flag = " << flag << endl;
 	out << "   mapQual = " << mapQual << endl; 
@@ -524,6 +530,13 @@ void SamRead::writetofile(ofstream &out)
 	out << "   Qual   = " << qual << endl;
 	out << "   Cigar  = " << cigarString << endl;
 	out << "   RefSeq = " << RefSeq << endl;
+	out << "   PeakMap= "; 
+	for (int i =0; i < PeakMap.size(); i++)
+	{
+		out <<  PeakMap[i] ;
+	}
+	out << endl; 
+	out << "   PMSize = " << PeakMap.size() << endl;
 }
 
 void SamRead::writeVertical()
@@ -637,40 +650,96 @@ void SamRead::createPeakMap()
 	int i =0; 
 	int max = -1; 
 	int maxSpot = -1; 
-	while (i<qual.size())
-        {
-                int j;
-                for ( j = i+1; j < qual.size()-1; j++)
-                {
-                        if(qual.c_str()[j+1] < qual.c_str()[j])
-                        {
-                                max =  qual.c_str()[j];
-                                while (qual.c_str()[j+1] < qual.c_str()[j] && j < qual.size()-1)
-                                {
-                                        j++;
-                                }
-                                break;
-                        }
-                }
-                int k;
-                for ( k = i; k <=j; k++)
-                {
-                        if (qual.c_str()[k] == max)
-                               tempPeakMap.push_back(1);
-                        else
-                                tempPeakMap.push_back(0);
-                }
-                i = i +k;
-        }	
+	for (int i =0; i< qual.size(); i++)
+	{
+		if (qual[i] <='!')
+		{
+			cout << "!"; 
+			tempPeakMap.push_back(0);
+		}
+		else
+		{
+			cout <<endl << qual[i];
+			int j = i; 
+			max = qual[j]; 
+			while ( j < qual.size() and qual[j] > '!' )
+			{
+				cout << qual[j] << "-" << j ; 
+				if (max < qual[j])
+				{max = qual[j];}
+				j++;
+				cout << "max = " << (char) max << endl;
+			}
+			cout << endl;
+			j = j-1;
+			for ( int k = i; k < qual.size() and k <= j ; k++)
+			{
+				cout << qual[k]; 
+				if (qual[k]==max and cigarString[k] != 'H')
+					tempPeakMap.push_back(1);
+				else
+					tempPeakMap.push_back(0);
+			}
+			cout << endl; 
+			//not sure why I need this, figure it out 
+			//tempPeakMap.push_back(0);
+			i = j;
+		}
+	}
+
+
+	PeakMap.clear();	
 	PeakMap = tempPeakMap; 
 }
+/*void SamRead::createPeakMap()
+{
+//	cout << "crateing PeakMap" << endl;
+	vector<bool> tempPeakMap;
+	int i =0; 
+	int max = -1; 
+	int maxSpot = -1; 
+	while (i<qual.size())
+	{
+		int j;
+		for ( j = i+1; j < qual.size()-1; j++)
+		{
+			if(qual.c_str()[j+1] < qual.c_str()[j])
+			{
+				max =  qual.c_str()[j];
+				while (qual.c_str()[j+1] < qual.c_str()[j] && j < qual.size()-1)
+				{
+					j++;
+				}
+				break;
+			}
+		}
+		int k;
+		for ( k = i; k <=j; k++)
+		{
+			if (qual.c_str()[k] == max)
+			       tempPeakMap.push_back(1);
+			else
+				tempPeakMap.push_back(0);
+		}
+		i = i +k;
+	}
+	for (int i = tempPeakMap.size()-1; i < qual.size(); i++)
+	{
+		tempPeakMap.push_back(0); 
+	}
+	PeakMap.clear();	
+	PeakMap = tempPeakMap; 
+//	for (int i =0; i< PeakMap.size(); i++)
+//		cout << i << "-" << PeakMap[i] << endl;
+
+}*/
 void SamRead::parseMutations( char *argv[])
 {
 	
 	cout << "Parsing Mutations " << endl;
+	createPeakMap();
 	write(); 
 	string StructCall = ""; 
-	createPeakMap();	
 //	vector<bool> PeakMap; 
 //	int max = -1; 
 //	int maxSpot = -1;
@@ -1385,7 +1454,7 @@ void SamRead::getRefSeq()
 	for (int i =0; i<NewQual.size(); i++)
 	{       
 	 	if (NewQual.c_str()[i] == ' ')
-			qual += lastQ;
+			qual += '!'; //lastQ;
 		else 
 		{
 			qual+=NewQual.c_str()[i];
@@ -1455,7 +1524,52 @@ void SamRead::parse(string read)
 	seq = NewSeq; 
 	processCigar(); 
 }
+int findBreak(SamRead& read)
+{
+        char Afirst = read.cigarString.c_str()[0];
 
+
+        cout << "Afirst = " << Afirst  << endl;
+        cout << "starting A check " << endl;
+        if (Afirst == 'H' or Afirst == 'S')
+        {
+                cout << "forward" << endl;
+                for (int i =0; i < read.seq.size(); i++)
+                {
+                        if  (read.cigarString.c_str()[i] == 'H' or read.cigarString.c_str()[i] == 'S')
+                        {
+                                //keep going
+                                 cout << i <<  " == " << read.cigarString.c_str()[i] << ' ' << read.seq.c_str()[i]<< endl;
+                        }
+                        else
+                        {
+                                cout << i <<  " == " << read.cigarString.c_str()[i]  << ' ' << read.seq.c_str()[i] << endl;
+                                cout << "fond break at " << i << endl;
+                                return i;
+                        }
+                }
+        }
+        else
+        {
+                cout << "reverse" << endl;
+                for (int i = read.seq.size()-1; i >= 0; i += -1)
+                {
+                        if  (read.cigarString.c_str()[i] == 'H' or read.cigarString.c_str()[i] == 'S')
+                        {
+                                cout << i <<  " == " << read.cigarString.c_str()[i]  << ' ' << read.seq.c_str()[i] << endl;
+                                //keep going
+                        }
+                        else
+                        {
+                                cout << i <<  " == " << read.cigarString.c_str()[i]  << ' ' << read.seq.c_str()[i] << endl;
+                                cout << "fond break at " << i << endl;
+                                return i;
+                       }
+                }
+        }
+
+
+}
 SamRead BetterWay(vector<SamRead> reads)
 {
 	
@@ -1655,14 +1769,6 @@ SamRead BetterWay(vector<SamRead> reads)
 		{reads[i].ChrPositions.push_back(AlignmentChr[j][i]);}
 		
 	}
-	for (int i =0; i< reads.size(); i++)
-        {
-		reads[i].createPeakMap(); 
-	}
-
-	cout << "Post adjustment" << endl;
-	reads[A].write(); 
-	reads[B].write(); 
 
 	bool deletion = true;
 	string NewCigar = "";
@@ -1695,8 +1801,48 @@ SamRead BetterWay(vector<SamRead> reads)
 		if (notfound)
 			base++;
 	}
-	
+	//corect qualites so everyone has the same ones, H will produce no quality 
+	cout << "checking quals" << endl;
+	string bestQual = reads[0].qual; 
+	for (int i =0; i<reads.size(); i++)
+	{	
+		bool h = false; 
+		cout << "read " << reads[i].name << endl;
+		for (int j = 0; j < reads[i].RefSeq.size(); j ++)
+		{
+			if (reads[i].RefSeq.c_str()[j] == 'H')
+			{
+				h = true;
+			}
+		}
+		if (h)
+		{
+			cout << "contains H" << reads[i].RefSeq << endl;
+		}
+		else
+		{
+			cout << "does not contain H " << reads[i].RefSeq << endl;
+			bestQual = reads[i].qual; 
+		}
+		 
+		
+						
+	}
+	for (int i =0; i<reads.size(); i++)
+	{
+		reads[i].qual = bestQual; 
+	}
+		
+	for (int i =0; i< reads.size(); i++)
+	{
+		reads[i].createPeakMap();
+	}
 
+	cout << "Post adjustment" << endl;
+	reads[A].write();
+	reads[B].write();
+	//for (int i =0; i< reads[A].PeakMap.size(); i++)
+	 //     cout << i << "-" << reads[A].PeakMap[i] << "-" << reads[B].PeakMap[i] << endl;
 	cout << "************INTO**********" << endl;
 	if (B == 1 and GetReadOrientation(reads[A].flag) == GetReadOrientation(reads[B].flag)) //if they are on the same strand, and there are only two split reads  
 	{
@@ -1731,28 +1877,83 @@ SamRead BetterWay(vector<SamRead> reads)
 						//if( reads[A].ChrPositions[i] == LastAlignedChr and abs(reads[A].Positions[i] -LastAlignedPos ) >= MaxVarentSize )
 						if( reads[A].chr == reads[B].chr and abs(reads[A].Positions[i] -LastAlignedPos ) >= MaxVarentSize )
 						{
-							Translocations << "too big " << abs(reads[A].Positions[i] -LastAlignedPos ) << endl;
-							reads[A].writetofile(Translocations);
-							reads[B].writetofile(Translocations);
-							Translocations << endl << endl;	
-							
+							int Abreak = findBreak(reads[A]);
+                                                        int Bbreak = findBreak(reads[B]);
+                                                        cout << " if( "<<reads[A].PeakMap[Abreak]<<" == 1 or "<<reads[A].PeakMap[Abreak-1]<<" == 1 or " << reads[B].PeakMap[Bbreak]<<" == 1 or "<<reads[B].PeakMap[Bbreak -1]<<" == 1)";
+                                                        if( /*1==1 or*/ (reads[A].PeakMap[Abreak] == 1 or reads[A].PeakMap[Abreak-1] == 1) and ( reads[B].PeakMap[Bbreak] == 1 or reads[B].PeakMap[Bbreak -1] == 1) and Abreak > 0 and Bbreak > 0)
+                                                        {
+                                                                cout <<  "INVERSION written to file"  << endl;
+                                                                Translocations << "Too Big, Same strand and chr "<< abs(reads[A].Positions[i] -LastAlignedPos ) << endl;
+                                                                reads[A].writetofile(Translocations);
+                                                                reads[B].writetofile(Translocations);
+                                                                Translocations << endl << endl;
+                                                		Translocationsbed << reads[A].chr << "\t" << reads[A].Positions[Abreak]-200 << "\t" <<  reads[A].Positions[Abreak]+200 << endl <<  reads[B].chr << "\t" << reads[B].Positions[Bbreak]-200 << "\t" <<  reads[B].Positions[Bbreak]+200 << endl; 
+						       }
+                                                        else
+                                                        {
+                                                                cout <<  "INVERSION skipped"  << endl;
+                                                        }
+						//	if( /*1==1 or*/ reads[A].PeakMap[i] == 1 or reads[A].PeakMap[i-1] == 1 or reads[B].PeakMap[i] == 1 or reads[B].PeakMap[i -1] == 1)
+						//	{
+						//		Translocations << "TOO BIG " << abs(reads[A].Positions[i] -LastAlignedPos ) << endl;
+						//		reads[A].writetofile(Translocations);
+						//		reads[B].writetofile(Translocations);
+						//		Translocations << endl << endl;	
+						//	}
 						}
 						else
 						{
 							if ((reads[A].chr == "hs37d5" and reads[B].chr != "hs37d5" ) or  (reads[A].chr != "hs37d5" and reads[B].chr == "hs37d5" ))
 							{
-								Translocations << "mobil elemnt " << endl;
-								reads[A].writetofile(Translocations); 
-								reads[B].writetofile(Translocations); 
-								Translocations << endl << endl;
+								int Abreak = findBreak(reads[A]);
+                                                        	int Bbreak = findBreak(reads[B]);
+                                                        	cout << " if( "<<reads[A].PeakMap[Abreak]<<" == 1 or "<<reads[A].PeakMap[Abreak-1]<<" == 1 or " << reads[B].PeakMap[Bbreak]<<" == 1 or "<<reads[B].PeakMap[Bbreak -1]<<" == 1)";
+                                                        	if( /*1==1 or*/ (reads[A].PeakMap[Abreak] == 1 or reads[A].PeakMap[Abreak-1] == 1) and ( reads[B].PeakMap[Bbreak] == 1 or reads[B].PeakMap[Bbreak -1] == 1) and Abreak > 0 and Bbreak > 0 )
+                                                        	{
+                                                        	        cout <<  "INVERSION written to file"  << endl;
+                                                        	        Translocations << "Possible mob event "<< abs(reads[A].Positions[i] -LastAlignedPos ) << endl;
+                                                        	        reads[A].writetofile(Translocations);
+                                                        	        reads[B].writetofile(Translocations);
+                                                        	        Translocations << endl << endl;
+                                                        		Translocationsbed << reads[A].chr << "\t" << reads[A].Positions[Abreak]-200 << "\t" <<  reads[A].Positions[Abreak]+200 << endl <<  reads[B].chr << "\t" << reads[B].Positions[Bbreak]-200 << "\t" <<  reads[B].Positions[Bbreak]+200 << endl;
+								}
+                                                        	else
+                                                        	{
+                                                        	        cout <<  "INVERSION skipped"  << endl;
+                                                        	}
+						//		if( /*1==1 or*/ reads[A].PeakMap[i] == 1 or reads[A].PeakMap[i-1] == 1 or reads[B].PeakMap[i] == 1 or reads[B].PeakMap[i -1] == 1)
+						//		{
+						//			Translocations << "mobil elemnt " << endl;
+						//			reads[A].writetofile(Translocations); 
+						//			reads[B].writetofile(Translocations); 
+						//			Translocations << endl << endl;
+						//		}
 							}
 							else
 							{
-								Translocations << "we got a translocation" << endl;
-								reads[A].writetofile(Translocations);
-								reads[B].writetofile(Translocations);
-								Translocations << endl << endl;
-
+							int Abreak = findBreak(reads[A]);
+                                                        int Bbreak = findBreak(reads[B]);
+                                                        cout << " if( "<<reads[A].PeakMap[Abreak]<<" == 1 or "<<reads[A].PeakMap[Abreak-1]<<" == 1 or " << reads[B].PeakMap[Bbreak]<<" == 1 or "<<reads[B].PeakMap[Bbreak -1]<<" == 1)";
+                                                        if( /*1==1 or*/ (reads[A].PeakMap[Abreak] == 1 or reads[A].PeakMap[Abreak-1] == 1) and ( reads[B].PeakMap[Bbreak] == 1 or reads[B].PeakMap[Bbreak -1] == 1) and Abreak > 0 and Bbreak > 0)
+                                                        {
+                                                                cout <<  "INVERSION written to file"  << endl;
+                                                                Translocations << "Translocataion, same strand "<< abs(reads[A].Positions[i] -LastAlignedPos ) << endl;
+                                                                reads[A].writetofile(Translocations);
+                                                                reads[B].writetofile(Translocations);
+                                                                Translocations << endl << endl;
+                                				Translocationsbed << reads[A].chr << "\t" << reads[A].Positions[Abreak]-200 << "\t" <<  reads[A].Positions[Abreak]+200 << endl <<  reads[B].chr << "\t" << reads[B].Positions[Bbreak]-200 << "\t" <<  reads[B].Positions[Bbreak]+200 << endl; 
+				                       }
+                                                        else
+                                                        {
+                                                                cout <<  "INVERSION skipped"  << endl;
+                                                        }	
+							//	if( /*1==1 or*/ reads[A].PeakMap[i] == 1 or reads[A].PeakMap[i-1] == 1 or reads[B].PeakMap[i] == 1 or reads[B].PeakMap[i -1] == 1)
+							//	{
+							//		Translocations << "we got a translocation" << endl;
+							//		reads[A].writetofile(Translocations);
+							//		reads[B].writetofile(Translocations);
+							//		Translocations << endl << endl;
+							//	}
 							}	
 						}
 					}
@@ -1806,15 +2007,53 @@ SamRead BetterWay(vector<SamRead> reads)
 					{
 						if ((reads[A].chr == "hs37d5" and reads[B].chr != "hs37d5" ) or  (reads[A].chr != "hs37d5" and reads[B].chr == "hs37d5" ))
 						{
-							Translocations << "mobil elemnt " << endl;
-							reads[A].writetofile(Translocations);
-							reads[B].writetofile(Translocations);
-							Translocations << endl << endl;
+							int Abreak = findBreak(reads[A]);
+                                        		int Bbreak = findBreak(reads[B]);
+                                        		cout << " if( "<<reads[A].PeakMap[Abreak]<<" == 1 or "<<reads[A].PeakMap[Abreak-1]<<" == 1 or " << reads[B].PeakMap[Bbreak]<<" == 1 or "<<reads[B].PeakMap[Bbreak -1]<<" == 1)";
+                                        		if( /*1==1 or*/ (reads[A].PeakMap[Abreak] == 1 or reads[A].PeakMap[Abreak-1] == 1) and ( reads[B].PeakMap[Bbreak] == 1 or reads[B].PeakMap[Bbreak -1] == 1) and Abreak > 0 and Bbreak > 0)
+                                        		{
+                                        		        cout <<  "INVERSION written to file"  << endl;
+                                        		        Translocations << "Possible mob event "<< abs(reads[A].Positions[i] -LastAlignedPos ) << endl;
+                                        		        reads[A].writetofile(Translocations);
+                                        		        reads[B].writetofile(Translocations);
+                                        		        Translocations << endl << endl;
+                                        			Translocationsbed << reads[A].chr << "\t" << reads[A].Positions[Abreak]-200 << "\t" <<  reads[A].Positions[Abreak]+200 << endl <<  reads[B].chr << "\t" << reads[B].Positions[Bbreak]-200 << "\t" <<  reads[B].Positions[Bbreak]+200 << endl;
+							}
+                                        		else
+                                        		{
+                                                		cout <<  "INVERSION skipped"  << endl;
+                                        		}
+							//if( /*1==1 or*/ reads[A].PeakMap[i] == 1 or reads[A].PeakMap[i-1] == 1 or reads[B].PeakMap[i] == 1 or reads[B].PeakMap[i -1] == 1)
+							//{
+							//	Translocations << "mobil elemnt " << endl;
+							//	reads[A].writetofile(Translocations);
+							//	reads[B].writetofile(Translocations);
+							//	Translocations << endl << endl;
+							//}
 						}
-						Translocations << "we got a translocation" << endl;
-						reads[A].writetofile(Translocations);
-						reads[B].writetofile(Translocations);
-						Translocations << endl << endl;
+                                 		int Abreak = findBreak(reads[A]);
+                                        	int Bbreak = findBreak(reads[B]);
+					       	cout << " if( "<<reads[A].PeakMap[Abreak]<<" == 1 or "<<reads[A].PeakMap[Abreak-1]<<" == 1 or " << reads[B].PeakMap[Bbreak]<<" == 1 or "<<reads[B].PeakMap[Bbreak -1]<<" == 1)";
+                                        	if( /*1==1 or*/ (reads[A].PeakMap[Abreak] == 1 or reads[A].PeakMap[Abreak-1] == 1) and ( reads[B].PeakMap[Bbreak] == 1 or reads[B].PeakMap[Bbreak -1] == 1) and Abreak > 0 and Bbreak > 0)
+                                        	{
+                                        	        cout <<  "INVERSION written to file"  << endl;
+                                        	        Translocations << "Translocation, same strand "<< abs(reads[A].Positions[i] -LastAlignedPos ) << endl;
+                                        	        reads[A].writetofile(Translocations);
+                                        	        reads[B].writetofile(Translocations);
+                                        	        Translocations << endl << endl;
+                                 			Translocationsbed << reads[A].chr << "\t" << reads[A].Positions[Abreak]-200 << "\t" <<  reads[A].Positions[Abreak]+200 << endl <<  reads[B].chr << "\t" << reads[B].Positions[Bbreak]-200 << "\t" <<  reads[B].Positions[Bbreak]+200 << endl;
+					       	}
+                                        	else
+                                        	{
+                                        	        cout <<  "INVERSION skipped"  << endl;
+                                        	}
+				//		if( /*1==1 or*/ reads[A].PeakMap[i] == 1 or reads[A].PeakMap[i-1] == 1 or reads[B].PeakMap[i] == 1 or reads[B].PeakMap[i -1] == 1)
+				//		{
+				//			Translocations << "we got a translocation" << endl;
+				//			reads[A].writetofile(Translocations);
+				//			reads[B].writetofile(Translocations);
+				//			Translocations << endl << endl;
+				//		}
 					}
 	
 				}
@@ -1826,10 +2065,32 @@ SamRead BetterWay(vector<SamRead> reads)
 
 						return reads[A];
 					}
-					Translocations << "too big " << abs(reads[A].Positions[i] -LastAlignedPos ) << endl;
-					reads[A].writetofile(Translocations);
-					reads[B].writetofile(Translocations);
-					Translocations << endl << endl;
+					int Abreak = findBreak(reads[A]);
+                                        int Bbreak = findBreak(reads[B]);
+			                cout << " if( "<<reads[A].PeakMap[Abreak]<<" == 1 or "<<reads[A].PeakMap[Abreak-1]<<" == 1 or " << reads[B].PeakMap[Bbreak]<<" == 1 or "<<reads[B].PeakMap[Bbreak -1]<<" == 1)";
+                                        if( /*1==1 or*/ (reads[A].PeakMap[Abreak] == 1 or reads[A].PeakMap[Abreak-1] == 1) and ( reads[B].PeakMap[Bbreak] == 1 or reads[B].PeakMap[Bbreak -1] == 1) and Abreak > 0 and Bbreak > 0)
+                                        {
+                                                cout <<  "INVERSION written to file"  << endl;
+						if (reads[A].chr == reads[B].chr)
+                                                	Translocations << "TOO BIG 3 "<< abs(reads[A].Positions[i] -LastAlignedPos ) << endl;
+                                                else 
+							Translocations << "Translocation 3 "<< abs(reads[A].Positions[i] -LastAlignedPos ) << endl;
+						reads[A].writetofile(Translocations);
+                                                reads[B].writetofile(Translocations);
+                                                Translocations << endl << endl;
+                        			Translocationsbed << reads[A].chr << "\t" << reads[A].Positions[Abreak]-200 << "\t" <<  reads[A].Positions[Abreak]+200 << endl <<  reads[B].chr << "\t" << reads[B].Positions[Bbreak]-200 << "\t" <<  reads[B].Positions[Bbreak]+200 << endl; 
+			               }
+                                        else
+                                        {
+                                                cout <<  "INVERSION skipped"  << endl;
+                                        }
+			//		if( /*1==1 or*/ reads[A].PeakMap[i] == 1 or reads[A].PeakMap[i-1] == 1 or reads[B].PeakMap[i] == 1 or reads[B].PeakMap[i -1] == 1)
+			//		{
+			//			Translocations << "TOO BIG " << abs(reads[A].Positions[i] -LastAlignedPos ) << endl;
+			//			reads[A].writetofile(Translocations);
+			//			reads[B].writetofile(Translocations);
+			//			Translocations << endl << endl;
+			//		}
 				}
 
 				
@@ -1884,26 +2145,85 @@ SamRead BetterWay(vector<SamRead> reads)
 						// if( reads[A].ChrPositions[i] == LastAlignedChr and abs(reads[B].Positions[i] -LastAlignedPos ) >= MaxVarentSize )
 						if( reads[A].chr == reads[B].chr and abs(reads[B].Positions[i] -LastAlignedPos ) >= MaxVarentSize )
 						{
-							Translocations << "too big " << abs(reads[A].Positions[i] -LastAlignedPos ) << endl;
-							reads[A].writetofile(Translocations);
-							reads[B].writetofile(Translocations);
-							Translocations << endl << endl;
+							int Abreak = findBreak(reads[A]);
+                                        		int Bbreak = findBreak(reads[B]);
+                                        		cout << " if( "<<reads[A].PeakMap[Abreak]<<" == 1 or "<<reads[A].PeakMap[Abreak-1]<<" == 1 or " << reads[B].PeakMap[Bbreak]<<" == 1 or "<<reads[B].PeakMap[Bbreak -1]<<" == 1)";
+                                        		if( /*1==1 or*/ (reads[A].PeakMap[Abreak] == 1 or reads[A].PeakMap[Abreak-1] == 1) and ( reads[B].PeakMap[Bbreak] == 1 or reads[B].PeakMap[Bbreak -1] == 1) and Abreak > 0 and Bbreak > 0)
+                                        		{
+                                        		        cout <<  "INVERSION written to file"  << endl;
+                                        		        Translocations << "TOO BIG 2 "<< abs(reads[A].Positions[i] -LastAlignedPos ) << endl;
+                                        		        reads[A].writetofile(Translocations);
+                                        		        reads[B].writetofile(Translocations);
+                                        		        Translocations << endl << endl;
+                                        			Translocationsbed << reads[A].chr << "\t" << reads[A].Positions[Abreak]-200 << "\t" <<  reads[A].Positions[Abreak]+200 << endl <<  reads[B].chr << "\t" << reads[B].Positions[Bbreak]-200 << "\t" <<  reads[B].Positions[Bbreak]+200 << endl;
+							}
+                                        		else
+                                        		{
+                                                		cout <<  "INVERSION skipped"  << endl;
+                                        		}
+						//	if( /*1==1 or*/ reads[A].PeakMap[i] == 1 or reads[A].PeakMap[i-1] == 1 or reads[B].PeakMap[i] == 1 or reads[B].PeakMap[i -1] == 1)
+						//	{
+						//		Translocations << "TOO BIG " << abs(reads[A].Positions[i] -LastAlignedPos ) << endl;
+						//		reads[A].writetofile(Translocations);
+						//		reads[B].writetofile(Translocations);
+						//		Translocations << endl << endl;
+						//	}
 						}
 						else
 						{
 							if ((reads[A].chr == "hs37d5" and reads[B].chr != "hs37d5" ) or  (reads[A].chr != "hs37d5" and reads[B].chr == "hs37d5" ))
 							{
-								Translocations << "mobil elemnt " << endl;
-								reads[A].writetofile(Translocations);
-								reads[B].writetofile(Translocations);
-								Translocations << endl << endl;
+								int Abreak = findBreak(reads[A]);
+                                                        	int Bbreak = findBreak(reads[B]);
+                                                        	cout << " if( "<<reads[A].PeakMap[Abreak]<<" == 1 or "<<reads[A].PeakMap[Abreak-1]<<" == 1 or " << reads[B].PeakMap[Bbreak]<<" == 1 or "<<reads[B].PeakMap[Bbreak -1]<<" == 1)";
+                                                        	if( /*1==1 or*/ (reads[A].PeakMap[Abreak] == 1 or reads[A].PeakMap[Abreak-1] == 1) and ( reads[B].PeakMap[Bbreak] == 1 or reads[B].PeakMap[Bbreak -1] == 1) and Abreak > 0 and Bbreak > 0)
+                                                        	{
+                                                        	        cout <<  "INVERSION written to file"  << endl;
+                                                        	        Translocations << "Possible mob event "<< abs(reads[A].Positions[i] -LastAlignedPos ) << endl;
+                                                        	        reads[A].writetofile(Translocations);
+                                                        	        reads[B].writetofile(Translocations);
+                                                        	        Translocations << endl << endl;
+                                                        		Translocationsbed << reads[A].chr << "\t" << reads[A].Positions[Abreak]-200 << "\t" <<  reads[A].Positions[Abreak]+200 << endl <<  reads[B].chr << "\t" << reads[B].Positions[Bbreak]-200 << "\t" <<  reads[B].Positions[Bbreak]+200 << endl;
+								}
+                                                        	else
+                                                        	{
+                                                        	        cout <<  "INVERSION skipped"  << endl;
+                                                        	}
+							//	if( /*1==1 or*/ reads[A].PeakMap[i] == 1 or reads[A].PeakMap[i-1] == 1 or reads[B].PeakMap[i] == 1 or reads[B].PeakMap[i -1] == 1)
+							//	{
+							//		Translocations << "mobil elemnt " << endl;
+							//		reads[A].writetofile(Translocations);
+							//		reads[B].writetofile(Translocations);
+							//		Translocations << endl << endl;
+							//	}
 							}
 							else	
 							{
-								Translocations << "we got a translocation" << endl;
-								reads[A].writetofile(Translocations);
-								reads[B].writetofile(Translocations);
-								Translocations << endl << endl;
+								int Abreak = findBreak(reads[A]);
+                                                                int Bbreak = findBreak(reads[B]);
+                                                                cout << " if( "<<reads[A].PeakMap[Abreak]<<" == 1 or "<<reads[A].PeakMap[Abreak-1]<<" == 1 or " << reads[B].PeakMap[Bbreak]<<" == 1 or "<<reads[B].PeakMap[Bbreak -1]<<" == 1)";
+                                                                if( /*1==1 or*/ (reads[A].PeakMap[Abreak] == 1 or reads[A].PeakMap[Abreak-1] == 1) and ( reads[B].PeakMap[Bbreak] == 1 or reads[B].PeakMap[Bbreak -1] == 1) and Abreak > 0 and Bbreak > 0)
+                                                                {
+                                                                        cout <<  "INVERSION written to file"  << endl;
+                                                                        Translocations << "Translocation 2 "<< abs(reads[A].Positions[i] -LastAlignedPos ) << endl;
+                                                                        reads[A].writetofile(Translocations);
+                                                                        reads[B].writetofile(Translocations);
+                                                                        Translocations << endl << endl;
+                                					Translocationsbed << reads[A].chr << "\t" << reads[A].Positions[Abreak]-200 << "\t" <<  reads[A].Positions[Abreak]+200 << endl <<  reads[B].chr << "\t" << reads[B].Positions[Bbreak]-200 << "\t" <<  reads[B].Positions[Bbreak]+200 << endl; 
+				                               }
+                                                                else
+                                                                {
+                                                                        cout <<  "INVERSION skipped"  << endl;
+                                                                }
+
+							
+							//	if( /*1==1 or*/ reads[A].PeakMap[i] == 1 or reads[A].PeakMap[i-1] == 1 or reads[B].PeakMap[i] == 1 or reads[B].PeakMap[i -1] == 1)
+							//	{
+							//		Translocations << "we got a translocation" << endl;
+							//		reads[A].writetofile(Translocations);
+							//		reads[B].writetofile(Translocations);
+							//		Translocations << endl << endl;
+							//	}
 							}
 						}
 					}
@@ -1974,10 +2294,33 @@ SamRead BetterWay(vector<SamRead> reads)
 						cout << "well fuck this shit F" << endl;
 						return reads[A];
 					}
-					Translocations << "too big " << abs(reads[A].Positions[i] -LastAlignedPos ) << endl;
-					reads[A].writetofile(Translocations);
-					reads[B].writetofile(Translocations);
-					Translocations << endl << endl;
+				 	int Abreak = findBreak(reads[A]);
+		                        int Bbreak = findBreak(reads[B]);
+
+
+
+                       		 	cout << " if( "<<reads[A].PeakMap[Abreak]<<" == 1 or "<<reads[A].PeakMap[Abreak-1]<<" == 1 or " << reads[B].PeakMap[Bbreak]<<" == 1 or "<<reads[B].PeakMap[Bbreak -1]<<" == 1)";
+                        		if( /*1==1 or*/ (reads[A].PeakMap[Abreak] == 1 or reads[A].PeakMap[Abreak-1] == 1) and ( reads[B].PeakMap[Bbreak] == 1 or reads[B].PeakMap[Bbreak -1] == 1) and Abreak > 0 and Bbreak > 0)
+                        		{
+                                		cout <<  "INVERSION written to file"  << endl;
+                                		Translocations << "TOO BIG 1 "<< abs(reads[A].Positions[i] -LastAlignedPos ) << endl;
+                                		reads[A].writetofile(Translocations);
+                                		reads[B].writetofile(Translocations);
+                                		Translocations << endl << endl;
+         					Translocationsbed << reads[A].chr << "\t" << reads[A].Positions[Abreak]-200 << "\t" <<  reads[A].Positions[Abreak]+200 << endl <<  reads[B].chr << "\t" << reads[B].Positions[Bbreak]-200 << "\t" <<  reads[B].Positions[Bbreak]+200 << endl;
+		               		}
+                        		else
+                        		{
+                                 		cout <<  "INVERSION skipped"  << endl;
+                        		}
+
+				//	if( /*1==1 or*/ reads[A].PeakMap[i] == 1 or reads[A].PeakMap[i-1] == 1 or reads[B].PeakMap[i] == 1 or reads[B].PeakMap[i -1] == 1)
+				//       	{
+				//		Translocations << "TOO BIG " << abs(reads[A].Positions[i] -LastAlignedPos ) << endl;
+				//		reads[A].writetofile(Translocations);
+				//		reads[B].writetofile(Translocations);
+				//		Translocations << endl << endl;
+				//	}
 				}
 
 
@@ -2088,15 +2431,37 @@ SamRead BetterWay(vector<SamRead> reads)
 
 		cout <<	 "Done with " << reads[A].name << endl;
 	}
-	else
+	else //if (3==1)
 	{
 		//this needs to be the invertion stuff 
+		//need to add here looing at every base 
 		if( reads[A].chr == reads[B].chr )//and abs(reads[A].Positions[i] -LastAlignedPos ) <= MaxVarentSize )
 		{
-			Translocations << "INVERSION "  << endl;
-			reads[A].writetofile(Translocations);
-			reads[B].writetofile(Translocations);
-			Translocations << endl << endl;
+			//need to check each base and find the breakpoint 
+			cout << "found possible Inversion " << endl;
+			
+
+
+			int Abreak = findBreak(reads[A]); 
+			int Bbreak = findBreak(reads[B]);
+			
+			
+
+			cout << " if( "<<reads[A].PeakMap[Abreak]<<" == 1 or "<<reads[A].PeakMap[Abreak-1]<<" == 1 or " << reads[B].PeakMap[Bbreak]<<" == 1 or "<<reads[B].PeakMap[Bbreak -1]<<" == 1)";
+			//if( /*1==1 or*/ reads[A].PeakMap[Abreak] == 1 or reads[A].PeakMap[Abreak-1] == 1 or reads[B].PeakMap[Bbreak] == 1 or reads[B].PeakMap[Bbreak -1] == 1) and Abreak > 0 and Bbreak > 0
+			if( /*1==1 or*/ (reads[A].PeakMap[Abreak] == 1 or reads[A].PeakMap[Abreak-1] == 1) and ( reads[B].PeakMap[Bbreak] == 1 or reads[B].PeakMap[Bbreak -1] == 1) and Abreak > 0 and Bbreak > 0)
+			{	
+				cout <<  "INVERSION written to file"  << endl;
+				Translocations << "INVERSION"  << endl;
+				reads[A].writetofile(Translocations);
+				reads[B].writetofile(Translocations);
+				Translocations << endl << endl;
+				Translocationsbed << reads[A].chr << "\t" << reads[A].Positions[Abreak]-200 << "\t" <<  reads[A].Positions[Abreak]+200 << endl <<  reads[B].chr << "\t" << reads[B].Positions[Bbreak]-200 << "\t" <<  reads[B].Positions[Bbreak]+200 << endl;
+			}
+			else
+			{
+				 cout <<  "INVERSION skipped"  << endl;
+			}
 			string Acig = "";
 			string Bcig = "";	
 			for (int i = 0; i < reads[A].seq.size(); i++)
@@ -2106,7 +2471,7 @@ SamRead BetterWay(vector<SamRead> reads)
 				if ((reads[A].cigarString.c_str()[i] == 'M' or reads[A].cigarString.c_str()[i] == 'X') and (reads[B].cigarString.c_str()[i] == 'S' or reads[B].cigarString.c_str()[i] == 'H'))
 					Bb = 'U';
 				if ((reads[B].cigarString.c_str()[i] == 'M' or reads[B].cigarString.c_str()[i] == 'X') and (reads[A].cigarString.c_str()[i] == 'S' or reads[A].cigarString.c_str()[i] == 'H'))
-                              		Ab = 'U'; 
+			      		Ab = 'U'; 
 				Acig += Ab; 
 				Bcig += Bb; 
 				   	
@@ -2119,18 +2484,39 @@ SamRead BetterWay(vector<SamRead> reads)
 		}
 		else if ((reads[A].chr == "hs37d5" and reads[B].chr != "hs37d5" ) or  (reads[A].chr != "hs37d5" and reads[B].chr == "hs37d5" ))
 		{
-			Translocations << "mobil elemnt " << endl;
-			reads[A].writetofile(Translocations);
-			reads[B].writetofile(Translocations);
-			Translocations << endl << endl;
+			 int Abreak = findBreak(reads[A]);
+                        int Bbreak = findBreak(reads[B]);
+
+
+
+                        cout << " if( "<<reads[A].PeakMap[Abreak]<<" == 1 or "<<reads[A].PeakMap[Abreak-1]<<" == 1 or " << reads[B].PeakMap[Bbreak]<<" == 1 or "<<reads[B].PeakMap[Bbreak -1]<<" == 1)";
+                        //if( /*1==1 or*/ reads[A].PeakMap[Abreak] == 1 or reads[A].PeakMap[Abreak-1] == 1 or reads[B].PeakMap[Bbreak] == 1 or reads[B].PeakMap[Bbreak -1] == 1) and Abreak > 0 and Bbreak > 0
+			 if( /*1==1 or*/ (reads[A].PeakMap[Abreak] == 1 or reads[A].PeakMap[Abreak-1] == 1) and ( reads[B].PeakMap[Bbreak] == 1 or reads[B].PeakMap[Bbreak -1] == 1) and Abreak > 0 and Bbreak > 0)
+			{
+				Translocations << "mobil elemnt inverted" << endl;
+				reads[A].writetofile(Translocations);
+				reads[B].writetofile(Translocations);
+				Translocations << endl << endl;
+				Translocationsbed << reads[A].chr << "\t" << reads[A].Positions[Abreak]-200 << "\t" <<  reads[A].Positions[Abreak]+200 << endl <<  reads[B].chr << "\t" << reads[B].Positions[Bbreak]-200 << "\t" <<  reads[B].Positions[Bbreak]+200 << endl;	
+			}
 		}
 		else
 		{
-			Translocations << "we got a translocation and invertion" << endl;
-			reads[A].writetofile(Translocations);
-			reads[B].writetofile(Translocations);
-			Translocations << endl << endl;
-			
+			 int Abreak = findBreak(reads[A]);
+                        int Bbreak = findBreak(reads[B]);
+
+
+
+                        cout << " if( "<<reads[A].PeakMap[Abreak]<<" == 1 or "<<reads[A].PeakMap[Abreak-1]<<" == 1 or " << reads[B].PeakMap[Bbreak]<<" == 1 or "<<reads[B].PeakMap[Bbreak -1]<<" == 1)";
+                        //if( /*1==1 or*/ reads[A].PeakMap[Abreak] == 1 or reads[A].PeakMap[Abreak-1] == 1 or reads[B].PeakMap[Bbreak] == 1 or reads[B].PeakMap[Bbreak -1] == 1) and Abreak > 0 and Bbreak > 0
+			 if( /*1==1 or*/ (reads[A].PeakMap[Abreak] == 1 or reads[A].PeakMap[Abreak-1] == 1) and ( reads[B].PeakMap[Bbreak] == 1 or reads[B].PeakMap[Bbreak -1] == 1) and Abreak > 0 and Bbreak > 0)
+			{
+				Translocations << "we got a translocation and invertion" << endl;
+				reads[A].writetofile(Translocations);
+				reads[B].writetofile(Translocations);
+				Translocations << endl << endl;
+				Translocationsbed << reads[A].chr << "\t" << reads[A].Positions[Abreak]-200 << "\t" <<  reads[A].Positions[Abreak]+200 << endl <<  reads[B].chr << "\t" << reads[B].Positions[Bbreak]-200 << "\t" <<  reads[B].Positions[Bbreak]+200 << endl;
+			}	
 		}
 
 			
@@ -2246,11 +2632,11 @@ options:\
 			i+=1;
 		}
 		else if (p == "-mQ")
-                {
-                        cout << "Min Mapping Qualtiy = " << argv[i+1] << endl;
-                        MinMapQual = atoi(argv[i+1]);
-                        i+=1;
-                }
+		{
+			cout << "Min Mapping Qualtiy = " << argv[i+1] << endl;
+			MinMapQual = atoi(argv[i+1]);
+			i+=1;
+		}
 		else
 		{
 			cout << "ERROR: unkown command line paramater -" <<  argv[i] << "-"<< endl;
@@ -2421,6 +2807,7 @@ options:\
 	BEDNotHandled.open(boom+ ".vcf.NotHandled.bed");
 	Invertions.open(boom+".vcf.invertions.bed");
 	Translocations.open(boom+ ".vcf.Translocations");
+	Translocationsbed.open(boom+ ".vcf.Translocations.bed");
 	Unaligned.open(boom+"vcf.Unaligned");
 
 	//write VCF header
@@ -2455,11 +2842,16 @@ options:\
 	int counter = 0; 
 	while (getline(SamFile, line))
 	{
-		//cout << line << endl;
+		cout << line << endl;
 		counter ++; 
 		SamRead read; 
+		cout << "parse" << endl; 
 		read.parse(line);
+		cout << "RefSeq" << endl; 
 		read.getRefSeq();
+		cout << "peak" << endl; 
+		read.createPeakMap();
+		cout << "ummm" << endl; 
 		//if (read.mapQual > 0)
 		{
 			reads.push_back(read);
@@ -2492,12 +2884,12 @@ options:\
 				//	else
 				//		cout << "skip that shit" << endl; 
 				}
-				if (count > 10000)
+				if (count > 100000)
 					break; 
 			}
 		}
 		for (int j = 0; j<reads[i].alignments.size(); j++)
-			reads[reads[i].alignments[j]].alignments = reads[i].alignments; 
+			{reads[reads[i].alignments[j]].alignments = reads[i].alignments;} 
 
 	}
 
@@ -2564,5 +2956,6 @@ options:\
 	BEDNotHandled.close();
 	Invertions.close(); 
 	cout << "\nreally dont\n";
+	return 0; 
 }
 	

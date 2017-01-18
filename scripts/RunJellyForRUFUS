@@ -14,7 +14,7 @@ echo "$JELLYFISH"
 $JELLYFISH
 
 
-ulimit -v 30000000
+ulimit -v 60000000
 ulimit -a
 if [ -e "$GEN.Jhash.sorted.min2.tab" ]
 then
@@ -26,9 +26,9 @@ else
 	bash $GEN > $GEN.fq &
 	/usr/bin/time -v $JELLYFISH count -m $K -s 1G -t $T -o $GEN.Jhash -C $GEN.fq
 	/usr/bin/time -v $JELLYFISH dump -c -t -L 2 $GEN.Jhash > $GEN.Jhash.temp&
-	/usr/bin/time -v $SORT --parallel=$T -S 50% -T ./ $GEN.Jhash.temp > $GEN.Jhash.sorted.min2.tab &
+	/usr/bin/time -v $SORT --parallel=$T -S 10% -T ./ $GEN.Jhash.temp > $GEN.Jhash.sorted.min2.tab &
 	/usr/bin/time -v $JELLYFISH histo -f -o $GEN.Jhash.histo $GEN.Jhash & 
 	wait
-	rm $GEN.Jhash
+	#rm $GEN.Jhash
 	rm $GEN.Jhash.temp
 fi

@@ -283,13 +283,13 @@ int main (int argc, char *argv[])
 		temp = Split(L1, '\t');
 		if (temp.size() == 2)
 		{
-		unsigned long b = HashToLong(temp[0]);
-		unsigned long revb = HashToLong(RevComp(temp[0]));
-		//int c = atoi(temp[1].c_str()); 
-		//cout << temp[0] << "\t" << temp[1] << endl << b << "\t" << LongToHash(b, 18) <<  endl<<endl;
-		Mutations.insert(pair<unsigned long, int > (b, 0));
-		Mutations.insert(pair<unsigned long, int > (revb, 0));
-		//break;
+			unsigned long b = HashToLong(temp[0]);
+			unsigned long revb = HashToLong(RevComp(temp[0]));
+			//int c = atoi(temp[1].c_str()); 
+			//cout << temp[0] << "\t" << temp[1] << endl << b << "\t" << LongToHash(b, 18) <<  endl<<endl;
+			Mutations.insert(pair<unsigned long, int > (b, 0));
+			Mutations.insert(pair<unsigned long, int > (revb, 0));
+			//break;
 		}
 		else if (temp.size() == 4)
 		{
@@ -414,13 +414,15 @@ int main (int argc, char *argv[])
 					//unsigned long LongHash = HashToLong(Buffer[BuffCount+1].substr (i,HashSize));
 					if (Mutations.count(HashToLong(Buffer[BuffCount+1].substr (i,HashSize))) > 0)
 	                                {
-	                                	MutHashesFound++;
+						MutHashesFound++;
 						positions.push_back(i);
 					}
 				}
 			}
+			//cout << MutHashesFound << endl;
 			if (MutHashesFound >= HashCountThreshold and rejected < (Buffer[BuffCount+1].length()/2))
 			{
+			//cout << "yay keeping" << endl;
 				int MaxCounter = -1;
                         	for (int i = 0; i<positions.size()-1; i++)
                         	{
@@ -434,7 +436,7 @@ int main (int argc, char *argv[])
         	                        {MaxCounter = counter;}
 	                        }
 				if (MaxCounter >= HashCountThreshold )
-				{ 
+				{
 					#pragma omp critical(MutWrite)
 					{MutOutFile << Buffer[BuffCount] << ":MH" << MutHashesFound << endl << Buffer[BuffCount+1] << endl << Buffer[BuffCount+2] << endl << Buffer[BuffCount+3] << endl;}
 					found ++;
