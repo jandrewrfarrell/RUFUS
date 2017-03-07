@@ -689,7 +689,8 @@ void SamRead::createPeakMap()
 
 
 	PeakMap.clear();	
-	PeakMap = tempPeakMap; 
+	PeakMap = tempPeakMap;
+	cout << "done with peak map " << endl;  
 }
 /*void SamRead::createPeakMap()
 {
@@ -2847,13 +2848,14 @@ options:\
 		SamRead read; 
 		cout << "parse" << endl; 
 		read.parse(line);
-		cout << "RefSeq" << endl; 
-		read.getRefSeq();
-		cout << "peak" << endl; 
-		read.createPeakMap();
-		cout << "ummm" << endl; 
 		//if (read.mapQual > 0)
+		if (read.flag != 4)
 		{
+			cout << "RefSeq" << endl;
+                	read.getRefSeq();
+                	cout << "peak" << endl;
+                	read.createPeakMap();
+                	cout << "ummm" << endl;
 			reads.push_back(read);
 			if (counter%100 == 0)
 				cout << "read " << counter << " entries " << char(13); 
