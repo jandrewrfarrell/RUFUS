@@ -654,33 +654,33 @@ void SamRead::createPeakMap()
 	{
 		if (qual[i] <='!')
 		{
-			cout << "!"; 
+			//cout << "!"; 
 			tempPeakMap.push_back(0);
 		}
 		else
 		{
-			cout <<endl << qual[i];
+			//cout <<endl << qual[i];
 			int j = i; 
 			max = qual[j]; 
 			while ( j < qual.size() and qual[j] > '!' )
 			{
-				cout << qual[j] << "-" << j ; 
+			//	cout << qual[j] << "-" << j ; 
 				if (max < qual[j])
 				{max = qual[j];}
 				j++;
-				cout << "max = " << (char) max << endl;
+			//	cout << "max = " << (char) max << endl;
 			}
 			cout << endl;
 			j = j-1;
 			for ( int k = i; k < qual.size() and k <= j ; k++)
 			{
-				cout << qual[k]; 
+			//	cout << qual[k]; 
 				if (qual[k]==max and cigarString[k] != 'H')
 					tempPeakMap.push_back(1);
 				else
 					tempPeakMap.push_back(0);
 			}
-			cout << endl; 
+			//cout << endl; 
 			//not sure why I need this, figure it out 
 			//tempPeakMap.push_back(0);
 			i = j;
@@ -690,7 +690,7 @@ void SamRead::createPeakMap()
 
 	PeakMap.clear();	
 	PeakMap = tempPeakMap;
-	cout << "done with peak map " << endl;  
+	//cout << "done with peak map " << endl;  
 }
 /*void SamRead::createPeakMap()
 {
@@ -846,15 +846,15 @@ void SamRead::parseMutations( char *argv[])
 		parentCounts.push_back(counts);
 	}
 	//cout << "here" << endl;
-	for(int i =0; i < hashes.size(); i++)
-	{
-		cout << i << "\t" << hashes[i] << "\t" << varHash[i] << "\t" << PeakMap[i] << "\t" << (int) qual.c_str()[i]-33;
-		for (int j = 0; j < parentCounts.size(); j++)
-		{
-				cout << "\t" <<  parentCounts[j][i];
-		}
-		cout << endl;
-	}
+	//for(int i =0; i < hashes.size(); i++)
+	//{
+	//	cout << i << "\t" << hashes[i] << "\t" << varHash[i] << "\t" << PeakMap[i] << "\t" << (int) qual.c_str()[i]-33;
+	//	for (int j = 0; j < parentCounts.size(); j++)
+	//	{
+	//			cout << "\t" <<  parentCounts[j][i];
+	//	}
+	//	cout << endl;
+	//}
 
 	
 	//cout << "Peak map = " << PeakMap.size() << endl;
@@ -902,7 +902,7 @@ void SamRead::parseMutations( char *argv[])
 			bool LowCov = false; 
 			int low = i - 30; 
 			if (low < 0){low = 0;}
-			cout << "checking bases " << low << " to " << i+size+5 << endl;
+	//		cout << "checking bases " << low << " to " << i+size+5 << endl;
 			for(int j = low; j < i+size+5 and j < hashes.size(); j++)
 			{
 				bool AllPar0 = true; 
@@ -917,18 +917,18 @@ void SamRead::parseMutations( char *argv[])
 				}
 				if (hashes[j].size() == HashSize and varHash[j] == false)
 				{
-					 cout << "base " << j ; 
+	//				 cout << "base " << j ; 
 					 
 					for (int k = 0; k < parentCounts.size(); k++)
 					{
 						if (parentCounts[k][j] <= 5 and parentCounts[k][j] > 0)
 						{
-							cout << "\t" << parentCounts[k][j] ; 
+	//						cout << "\t" << parentCounts[k][j] ; 
 							LowCov = true;
 						}
 						 
 					}
-					cout << endl;
+	//				cout << endl;
 				}
 			}
 			if (AnyBasesOver0)  //enabling this will only report varites covered by hashes 
