@@ -26,7 +26,7 @@ PullSampleHashes=$RDIR/cloud/CheckJellyHashList.sh
 RUFUS1kgFilter=$RDIR/bin/RUFUS.1kg.filter
 RunJelly=$RDIR/scripts/RunJellyForRUFUS 
 
-: << 'END'
+
 if [ -e $ProbandGenerator.Jhash.sorted.min2.tab ]
 then 
 	echo "skipping jelly "
@@ -79,7 +79,7 @@ else
 
 fi 
 
-END
+
 if [ -e $ProbandGenerator.V2.overlap.hashcount.fastq.bam.vcf.runanyway ]
 then 
 	echo "skipping overlap"
