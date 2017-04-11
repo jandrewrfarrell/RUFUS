@@ -964,14 +964,14 @@ int main (int argc, char *argv[])
 			}
 			if (maxDep >=MinCoverage)
 			{
-				if (sequenes[i].size() !=  qual[i].size() &&  qual[i].size() != depth[i].size()){cout << "ERROR, read " << "@NODE_" << argv[6] << "_" << i << "_L=" <<sequenes[i].size() << "_D" << maxDep << " Has the wrong size, Seq = " << sequenes[i].size() << " Qual = " << qual[i].size() << " Dep = " <<  depth[i].size() << endl;}
+				if (sequenes[i].size() !=  qual[i].size() &&  qual[i].size() != depth[i].size()){cout << "ERROR, read " << "@NODE_" << argv[6] << "_" << i << "_L" <<sequenes[i].size() << "_D" << maxDep << " Has the wrong size, Seq = " << sequenes[i].size() << " Qual = " << qual[i].size() << " Dep = " <<  depth[i].size() << endl;}
 				count ++;
-				report << "@NODE_" << argv[6] << "_" << i << "_L=" <<sequenes[i].size() << "_D" << maxDep <<  endl;
+				report << "@NODE_" << argv[6] << "_" << i << "_L" <<sequenes[i].size() << "_D" << maxDep <<  endl;
 				report << sequenes[i] << endl;
 				report << "+" << endl;
 				report << qual[i] << endl;
 
-				Depreport << "@NODE_" << argv[6] << "_" << i <<  "_L=" << sequenes[i].size() << "_D" << maxDep << endl;
+				Depreport << "@NODE_" << argv[6] << "_" << i <<  "_L" << sequenes[i].size() << "_D" << maxDep << endl;
                                 Depreport << sequenes[i] << endl;
                                 Depreport << "+" << endl;
                                 Depreport << qual[i] << endl;

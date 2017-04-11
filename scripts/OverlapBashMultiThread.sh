@@ -60,3 +60,10 @@ $gkno bwa-se -ps human  -q ./$NameStub.overlap.hashcount.fastq -id ./$NameStub.o
 mkfifo check 
 $samtools view ./$NameStub.overlap.hashcount.fastq.bam | $RUFUSinterpret -r $humanRef -hf $HashList -o  ./$NameStub.overlap.hashcount.fastq.bam -m 100000000 -c $NameStub.overlap.asembly.hash.fastq.p1 -c $NameStub.overlap.asembly.hash.fastq.p2 -c $NameStub.overlap.asembly.hash.fastq.p3
 
+
+grep ^# ./$NameStub.overlap.hashcount.fastq.bam.vcf> ./$NameStub.overlap.hashcount.fastq.bam.vcf.sorted.vcf
+grep -v  ^# test.vcf  | sort -k1,1 -k2,2n >> ./$NameStub.overlap.hashcount.fastq.bam.vcf.sorted.vcf
+$RDIR/bin/gkno_launcher/tools/tabix/bgzip ./$NameStub.overlap.hashcount.fastq.bam.vcf.sorted.vcf
+$RDIR/bin/gkno_launcher/tools/tabix/tabix ./$NameStub.overlap.hashcount.fastq.bam.vcf.sorted.vcf.gz
+
+

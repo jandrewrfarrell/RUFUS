@@ -2823,13 +2823,12 @@ options:\
 	VCFOutFile << "##INFO=<ID=SVLENGTH,Number=1,Type=Integer,Description=\"Length of SV detected\">" << endl; 
 	VCFOutFile << "##INFO=<ID=AO,Number=1,Type=Integer,Description=\"Alternate allele observations, with partial observations recorded fractionally\">"<<endl;
 	VCFOutFile << "##INFO=<ID=HD,Number=.,Type=String,Description=\"Hash counts for each k-mer overlapping the vareint, -1 indicates no info\">"<< endl;
-	VCFOutFile << "##INFO=<ID=RN,Number=1,Tinype=String,Description=\"Name of contig that produced the call\">"<< endl;
-	VCFOutFile << "##INFO=<ID=MQ,Number=1,Tinype=Integer,Description=\"Mapping quality of the contig that created the call\">"<< endl;
-	VCFOutFile << "##INFO=<ID=cigar,Number=1,Tinype=String,Description=\"Cigar string for the contig that created the call\">"<< endl;
-	VCFOutFile << "##INFO=<ID=CVT,Number=1,Tinype=String,Description=\"Compressed Varient Type\">"<< endl;
+	VCFOutFile << "##INFO=<ID=RN,Number=1,Type=String,Description=\"Name of contig that produced the call\">"<< endl;
+	VCFOutFile << "##INFO=<ID=MQ,Number=1,Type=Integer,Description=\"Mapping quality of the contig that created the call\">"<< endl;
+	VCFOutFile << "##INFO=<ID=cigar,Number=1,Type=String,Description=\"Cigar string for the contig that created the call\">"<< endl;
+	VCFOutFile << "##INFO=<ID=VT,Number=1,Type=String,Description=\"Varient Type\">"<< endl;	
+	VCFOutFile << "##INFO=<ID=CVT,Number=1,Type=String,Description=\"Compressed Varient Type\">"<< endl;
 	
-	VCFOutFile << "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t";
-	VCFOutFile << outStub << endl;
 
 	int lines = 0;
 
@@ -2843,26 +2842,49 @@ options:\
 	int counter = 0; 
 	while (getline(SamFile, line))
 	{
-		cout << line << endl;
-		counter ++; 
-		SamRead read; 
-		cout << "parse" << endl; 
-		read.parse(line);
-		//if (read.mapQual > 0)
-		if (read.flag != 4)
+		if (line.c_str()[0] == '@')
 		{
-			cout << "RefSeq" << endl;
-                	read.getRefSeq();
-                	cout << "peak" << endl;
-                	read.createPeakMap();
-                	cout << "ummm" << endl;
-			reads.push_back(read);
-			if (counter%100 == 0)
-				cout << "read " << counter << " entries " << char(13); 
+			cout << " HEADER LINE = " << line << endl; 
+			  vector <string> temp = Split(line, '\t');
+			cout << temp[0] << endl;
+			if (temp[0] == "@SQ")
+			{
+				cout << temp[1] << endl;
+				vector <string> chr = Split(temp[1], ':');
+				vector <string> len = Split(temp[2], ':');
+	
+				cout << "##contig=<ID=" <<  chr[1]<<",length=" << len[1] << ">"<< endl;
+				VCFOutFile <<"##contig=<ID=" <<  chr[1]<<",length=" << len[1] << ">" << endl;
+			}
+		}
+		else
+		{
+			cout << line << endl;
+			counter ++; 
+			SamRead read; 
+			cout << "parse" << endl; 
+			read.parse(line);
+			//if (read.mapQual > 0)
+			if (read.flag != 4)
+			{
+				cout << "RefSeq" << endl;
+        	        	read.getRefSeq();
+        	        	cout << "peak" << endl;
+        	        	read.createPeakMap();
+        	        	cout << "ummm" << endl;
+				reads.push_back(read);
+				if (counter%100 == 0)
+					cout << "read " << counter << " entries " << char(13); 
+			}
 		}
 	}
 	cout << endl;
 	cout << "Read in " << reads.size() << " reads " << endl;
+
+
+	  VCFOutFile << "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t";
+        VCFOutFile << outStub << endl;
+
 	
 	cout << "procesing split reads" << endl;
 	for (int i = 0; i < reads.size(); i++) 
