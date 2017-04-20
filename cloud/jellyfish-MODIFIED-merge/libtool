@@ -75,19 +75,19 @@ build=x86_64-unknown-linux-gnu
 build_os=linux-gnu
 
 # A sed program that does not truncate output.
-SED="/bin/sed"
+SED="/usr/bin/sed"
 
 # Sed that helps us avoid accidentally triggering echo(1) options like -n.
 Xsed="$SED -e 1s/^X//"
 
 # A grep program that handles long lines.
-GREP="/bin/grep"
+GREP="/usr/bin/grep"
 
 # An ERE matcher.
-EGREP="/bin/grep -E"
+EGREP="/usr/bin/grep -E"
 
 # A literal string matcher.
-FGREP="/bin/grep -F"
+FGREP="/usr/bin/grep -F"
 
 # A BSD- or MS-compatible name lister.
 NM="/usr/bin/nm -B"
@@ -272,10 +272,10 @@ finish_eval=""
 hardcode_into_libs=yes
 
 # Compile-time system search path for libraries.
-sys_lib_search_path_spec="/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2 /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib64 /lib64 /usr/lib64 /uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2016.3.210/linux/ipp/lib/intel64 /uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2016.3.210/linux/compiler/lib/intel64 /uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2016.3.210/linux/mkl/lib/intel64 /uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2016.3.210/linux/tbb/lib/intel64/gcc4.4 /uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2016.3.210/linux/daal/lib/intel64_lin /uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2016.3.210/linux/compiler/lib/intel64_lin "
+sys_lib_search_path_spec="/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5 /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc /lib64 /usr/lib64 /scratch/ucgd/lustre/ugpuser/apps/kingspeak.peaks/vt/master_2016.12.08_29d5ac8 /uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2017.0.098/linux/ipp/lib/intel64 /uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2017.0.098/linux/compiler/lib/intel64 /uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2017.0.098/linux/mkl/lib/intel64 /uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2017.0.098/linux/tbb/lib/intel64/gcc4.4 /uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2017.0.098/linux/daal/lib/intel64_lin /uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2017.0.098/linux/tbb/lib/intel64_lin/gcc4.4 /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib "
 
 # Run-time system search path for libraries.
-sys_lib_dlsearch_path_spec="/lib /usr/lib /usr/lib64/atlas /usr/lib/cernlib/2006-g77/lib /usr/lib64/cernlib/2006-g77/lib /usr/lib/cernlib/2006/lib /usr/lib64/cernlib/2006/lib /usr/lib64/ctapi /uufs/kingspeak.peaks/sys/pkg/torque/std/lib /usr/lib64/mysql /usr/lib64/nvidia /usr/lib64/oprofile /usr/lib64/papi-4.1.3 /usr/lib64/papi-5.1.1/usr/lib /usr/pgsql-9.3/lib/ /usr/lib64/qt-3.3/lib /usr/lib/tcl8.5/tclx8.4 /usr/lib64/tcl8.5/tclx8.4 /usr/lib64/tcl8.5 /usr/lib64/xulrunner "
+sys_lib_dlsearch_path_spec="/lib /usr/lib /usr/lib64/R/lib /usr/lib64/atlas /usr/local/cuda-8.0/targets/x86_64-linux/lib /usr/lib64/dsulib /usr/lib64/dyninst /usr/lib64/iscsi /usr/lib64/mysql /usr/lib64/nvidia /usr/lib64/octave/3.8.2 /usr/lib64/oprofile /usr/pgpool-9.6/lib/ /usr/pgsql-9.6/lib/ /usr/lib64/qt-3.3/lib /usr/lib64/tcl8.5/tclx8.4 /usr/lib64/tcl8.5 /usr/lib64/xulrunner "
 
 # Whether dlopen is supported.
 dlopen_support=unknown
@@ -292,7 +292,7 @@ striplib="strip --strip-unneeded"
 
 
 # The linker used to build libraries.
-LD="/uufs/chpc.utah.edu/sys/installdir/xalt/2015-10-13/bin/ld -m elf_x86_64"
+LD="/usr/bin/ld -m elf_x86_64"
 
 # How to create reloadable object files.
 reload_flag=" -r"
@@ -10099,7 +10099,7 @@ build_old_libs=`case $build_libtool_libs in yes) echo no;; *) echo yes;; esac`
 # ### BEGIN LIBTOOL TAG CONFIG: CXX
 
 # The linker used to build libraries.
-LD="/uufs/chpc.utah.edu/sys/installdir/xalt/2015-10-13/bin/ld -m elf_x86_64"
+LD="/usr/bin/ld -m elf_x86_64"
 
 # How to create reloadable object files.
 reload_flag=" -r"
@@ -10230,17 +10230,17 @@ file_list_spec=""
 hardcode_action=immediate
 
 # The directories searched by this compiler when creating a shared library.
-compiler_lib_search_dirs="/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2 /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/../../../../lib64 /lib/../lib64 /usr/lib/../lib64 /uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2016.3.210/linux/ipp/lib/intel64 /uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2016.3.210/linux/compiler/lib/intel64 /uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2016.3.210/linux/mkl/lib/intel64 /uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2016.3.210/linux/tbb/lib/intel64/gcc4.4 /uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2016.3.210/linux/daal/lib/intel64_lin /uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2016.3.210/linux/compiler/lib/intel64_lin /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/../../.."
+compiler_lib_search_dirs="/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/bin/../lib/gcc/x86_64-unknown-linux-gnu/4.8.5 /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/bin/../lib/gcc /lib/../lib64 /usr/lib/../lib64 /scratch/ucgd/lustre/ugpuser/apps/kingspeak.peaks/vt/master_2016.12.08_29d5ac8 /uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2017.0.098/linux/ipp/lib/intel64 /uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2017.0.098/linux/compiler/lib/intel64 /uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2017.0.098/linux/mkl/lib/intel64 /uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2017.0.098/linux/tbb/lib/intel64/gcc4.4 /uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2017.0.098/linux/daal/lib/intel64_lin /uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2017.0.098/linux/tbb/lib/intel64_lin/gcc4.4 /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/bin/../lib/gcc/x86_64-unknown-linux-gnu/4.8.5/../../.."
 
 # Dependencies to place before and after the objects being linked to
 # create a shared library.
-predep_objects="/usr/lib/../lib64/crti.o /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/crtbeginS.o"
-postdep_objects="/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/crtendS.o /usr/lib/../lib64/crtn.o"
+predep_objects="/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/bin/../lib/gcc/x86_64-unknown-linux-gnu/4.8.5/crti.o /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/bin/../lib/gcc/x86_64-unknown-linux-gnu/4.8.5/crtbeginS.o"
+postdep_objects="/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/bin/../lib/gcc/x86_64-unknown-linux-gnu/4.8.5/crtendS.o /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/bin/../lib/gcc/x86_64-unknown-linux-gnu/4.8.5/crtn.o"
 predeps=""
 postdeps="-lstdc++ -lm -lgcc_s -lc -lgcc_s"
 
 # The library search path used internally by the compiler when linking
 # a shared library.
-compiler_lib_search_path="-L/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2 -L/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2016.3.210/linux/ipp/lib/intel64 -L/uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2016.3.210/linux/compiler/lib/intel64 -L/uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2016.3.210/linux/mkl/lib/intel64 -L/uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2016.3.210/linux/tbb/lib/intel64/gcc4.4 -L/uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2016.3.210/linux/daal/lib/intel64_lin -L/uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2016.3.210/linux/compiler/lib/intel64_lin -L/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/../../.."
+compiler_lib_search_path="-L/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/bin/../lib/gcc/x86_64-unknown-linux-gnu/4.8.5 -L/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/bin/../lib/gcc -L/lib/../lib64 -L/usr/lib/../lib64 -L/scratch/ucgd/lustre/ugpuser/apps/kingspeak.peaks/vt/master_2016.12.08_29d5ac8 -L/uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2017.0.098/linux/ipp/lib/intel64 -L/uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2017.0.098/linux/compiler/lib/intel64 -L/uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2017.0.098/linux/mkl/lib/intel64 -L/uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2017.0.098/linux/tbb/lib/intel64/gcc4.4 -L/uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2017.0.098/linux/daal/lib/intel64_lin -L/uufs/chpc.utah.edu/sys/installdir/intel/compilers_and_libraries_2017.0.098/linux/tbb/lib/intel64_lin/gcc4.4 -L/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/bin/../lib/gcc/x86_64-unknown-linux-gnu/4.8.5/../../.."
 
 # ### END LIBTOOL TAG CONFIG: CXX

@@ -17,7 +17,7 @@ old_library='libjellyfish-2.0.a'
 inherited_linker_flags=''
 
 # Libraries that this one depends upon.
-dependency_libs=' /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2/lib/../lib64/libstdc++.la'
+dependency_libs=' /uufs/chpc.utah.edu/common/home/u6000771/Data/gemini_install2/data/anaconda/gcc/../lib/libstdc++.la'
 
 # Names of additional weak libraries provided by this library
 weak_library_names=''
