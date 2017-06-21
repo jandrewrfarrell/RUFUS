@@ -453,21 +453,32 @@ options:\
 	while ( getline(HashList, line))
 	{
 		vector<string> temp = Split(line, '\t');
-                string hash  = temp[0];
+		string hash = "";
+		string hashcount = "";
+                if (temp.size() ==2)
+		{
+			hash  = temp[0];
+			hashcount = temp[1];
+		}
+		else 
+		{
+			hash = temp[3]; 
+			hashcount = temp[2]; 
+		}
                 string rev = RevComp(hash);
                 char *fileptr = NULL;
                 if (hash < rev)
                	{
 			int count = search(Reader1kg, hash, fileptr); 
 			if (count == 0)
-				Outfile << hash << "\t" << temp[1] << endl;
+				Outfile << hash << "\t" << hashcount << endl;
 			
 		}
                 else
                 {	
 			int count = search(Reader1kg, rev, fileptr); 
 			if (count == 0)
-				 Outfile << hash << "\t" << temp[1] << endl;
+				 Outfile << hash << "\t" << hashcount << endl;
 		}
 
                 if (munmap(fileptr, FILESIZE) == -1) {

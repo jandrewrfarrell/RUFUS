@@ -60,10 +60,10 @@ then
         echo "Skipping build"
 else
 ######use this one kingspeak##########
-#	/usr/bin/time -v $RUFUSbuild  -c /scratch/ucgd/lustre/u0991464/RUFUS.1000g.reference/1000G.RUFUSreference.sorted.min45.tab -s $ProbandGenerator.Jhash.sorted.min2.tab -o  $ProbandGenerator.k$MutantMinCov.HashList -hs $K -mS $MutantMinCov -max 300 -t $Threads -d ' ' -mC 0
+	/usr/bin/time -v $RUFUSbuild  -c /scratch/ucgd/lustre/u0991464/RUFUS.1000g.reference/1000G.RUFUSreference.sorted.min45.tab -s $ProbandGenerator.Jhash.sorted.min2.tab -o  $ProbandGenerator.k$MutantMinCov.HashList -hs $K -mS $MutantMinCov -max 300 -t $Threads -d ' ' -mC 0
 
 ######use ths one on ono puhi humu and lonepeak#######
-/usr/bin/time -v $RUFUSbuild  -c  /uufs/chpc.utah.edu/common/home/marth-d1/home/farrelac/1000gRUFUSreference/1000G.RUFUSreference.sorted.min45.tab -s $ProbandGenerator.Jhash.sorted.min2.tab -o  $ProbandGenerator.k$MutantMinCov.HashList -hs $K -mS $MutantMinCov -max 300 -t $Threads -d ' ' -mC 0
+#/usr/bin/time -v $RUFUSbuild  -c  /uufs/chpc.utah.edu/common/home/marth-d1/home/farrelac/1000gRUFUSreference/1000G.RUFUSreference.sorted.min45.tab -s $ProbandGenerator.Jhash.sorted.min2.tab -o  $ProbandGenerator.k$MutantMinCov.HashList -hs $K -mS $MutantMinCov -max 300 -t $Threads -d ' ' -mC 0
 fi
 
 echo "starting RUFUS filter"

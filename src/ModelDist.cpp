@@ -963,14 +963,15 @@ for (i = 0; i<=2; i++)
 cout << "yay 1" << endl;	
 
 	//Write out hard cutoffs to head of model file
-    	if (SC - (5*stdev) > Inflection)
+    	 ModelFile <<  3 << endl <<Inflection << endl;
+	/*if (SC - (5*stdev) > Inflection)
 	{
 		ModelFile <<  3 << endl <<(int) (SC - (5*stdev)) << endl;
 	}
 	else
 	{
 		ModelFile <<  3 << endl << (int)Inflection << endl;
-	}
+	}*/
 
 
 cout << "yay 2" << endl;

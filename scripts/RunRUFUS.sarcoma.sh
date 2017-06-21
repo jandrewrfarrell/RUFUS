@@ -63,7 +63,7 @@ if [ -e "Family.Unique.HashList" ]
 then
         echo "Skipping build"
 else
-	/usr/bin/time -v ../RUFUS/cloud/jellyfish-MODIFIED-merge/bin/jellyfish merge $Parent1Generator.Jhash  $Parent2Generator.Jhash $ProbandGenerator.Jhash >  Family.Unique.HashList
+	/usr/bin/time -v $RDIR/cloud/jellyfish-MODIFIED-merge/bin/jellyfish merge $Parent1Generator.Jhash  $Parent2Generator.Jhash $ProbandGenerator.Jhash >  Family.Unique.HashList
 fi
 
 echo "Mut cov = $MutantMinCov "
