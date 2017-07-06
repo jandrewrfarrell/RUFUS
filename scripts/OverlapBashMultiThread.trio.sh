@@ -33,7 +33,7 @@ samtools=$RDIR/bin/gkno_launcher/tools/samtools/samtools
 RUFUSinterpret=$RDIR/bin/RUFUS.interpret
 humanRef=$RDIR/bin/gkno_launcher/resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys.fa
 CheckHash=$RDIR/cloud/CheckJellyHashList.sh
-OverlapSam=$RDIR/OverlapSam
+OverlapSam=$RDIR/bin/OverlapSam
 
 
 
