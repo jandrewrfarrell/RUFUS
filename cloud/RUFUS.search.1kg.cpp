@@ -364,13 +364,13 @@ options:\
 	int  Reff1kgArgPos = -1; 
 	 for(int i = 1; i< argc; i++)
 	{
-		cout << i << " = " << argv[i] << endl; 
+	//	cout << i << " = " << argv[i] << endl; 
 	}
-	cout <<"****************************************************************************************" << endl;
+	//cout <<"****************************************************************************************" << endl;
 	for(int i = 1; i< argc; i++)
 	{
 		string p = argv[i];
-		cout << i << " = " << argv[i]<< endl;
+	//	cout << i << " = " << argv[i]<< endl;
 		if( p == "-h")
 		{
 			//print help 
@@ -389,13 +389,13 @@ options:\
 		} 
 		else if (p == "-c")
                 {
-                        cout << "Par Hash = " << argv[i+1] << endl;
+        //                cout << "Par Hash = " << argv[i+1] << endl;
                         Reff1kgArgPos = i+1;
                         i=i+1;
                 }
 		else if (p == "-hs")
                 {
-                        cout << "Hash Size= " << argv[i+1] << endl;
+          //              cout << "Hash Size= " << argv[i+1] << endl;
                         HashSize = atoi(argv[i+1]);
                         i+=1;
                 }
@@ -429,7 +429,7 @@ options:\
       	ifstream HashList;
       	HashList.open (HashListFile);
       	if ( HashList.is_open())
-      	{	 cout << "HashList Open " << HashListFile << endl;}   //cout << "##File Opend\n";
+      	{	}// cout << "HashList Open " << HashListFile << endl;}   //cout << "##File Opend\n";
       	else
       	{
       		cout << "Error, HashList could not be opened";
@@ -459,6 +459,8 @@ options:\
 		{
 			hash  = temp[0];
 			hashcount = temp[1];
+		
+			//cout << temp[0]<<endl;
 		}
 		else 
 		{
@@ -469,7 +471,8 @@ options:\
                 char *fileptr = NULL;
                 if (hash < rev)
                	{
-			int count = search(Reader1kg, hash, fileptr); 
+			int count = search(Reader1kg, hash, fileptr);
+			cout << hash << " " << count << endl; 
 			if (count == 0)
 				Outfile << hash << "\t" << hashcount << endl;
 			
@@ -477,6 +480,7 @@ options:\
                 else
                 {	
 			int count = search(Reader1kg, rev, fileptr); 
+			cout << hash << " " << count << endl;
 			if (count == 0)
 				 Outfile << hash << "\t" << hashcount << endl;
 		}

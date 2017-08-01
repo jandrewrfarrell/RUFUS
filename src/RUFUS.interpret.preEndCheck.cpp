@@ -1802,16 +1802,6 @@ SamRead BetterWay(vector<SamRead> reads)
 		if (notfound)
 			base++;
 	}
-	for (int i =0; i < base; i++)
-	{
-
-		NewCigar += reads[A].cigarString.c_str()[i];
-                                        NewSeq +=reads[A].seq.c_str()[i];
-                                        NewQual += reads[A].qual.c_str()[i];
-                                        NewRef+= reads[A].RefSeq.c_str()[i];
-                                        NewPos.push_back(reads[A].Positions[i]);
-                                        NewChr.push_back(reads[A].ChrPositions[i]);
-	}
 	//corect qualites so everyone has the same ones, H will produce no quality 
 	cout << "checking quals" << endl;
 	string bestQual = reads[0].qual; 
@@ -2412,36 +2402,25 @@ SamRead BetterWay(vector<SamRead> reads)
 				NewNewCigar+=NewCigar.c_str()[i];
 					
 		}
-		NewCigar = NewNewCigar;
-	
-		int UnalignedCount = 0;
-		for (int i =0; i<NewCigar.size(); i++)
-		{
-			if (NewCigar.c_str()[i] == 'H' || NewCigar.c_str()[i] == 'S')
-				UnalignedCount++;
-		}
-		cout << "Unaligned Baises = " << UnalignedCount << " %= " << (double)UnalignedCount/(double)NewCigar.size() << endl;
-		if (UnalignedCount < 10)
-		{
-			NewCigar = NewNewCigar; 
-			//cout << NewSeq << endl << NewQual << endl << NewCigar << endl << NewRef << endl;
-			reads[A].first = true;
-//			cout <<"redoing alignemnt number" << endl;
-			int temp = reads[A].alignments[0];
-			reads[A].alignments.clear();
-			reads[A].alignments.push_back(temp);
-//			cout << "alignemtns should be " << reads[A].alignments.size() << endl;
-	
-	       		reads[A].cigarString = NewCigar;
-			reads[A].seq = NewSeq;
-			reads[A].qual = NewQual;
-			reads[A].RefSeq = NewRef;
-			reads[A].Positions.clear();
-			reads[A].ChrPositions.clear();
-			reads[A].Positions = NewPos; 
-			reads[A].ChrPositions = NewChr; 
-			reads[A].combined = true;
-			reads[B].combined = true;
+		NewCigar = NewNewCigar; 
+		//cout << NewSeq << endl << NewQual << endl << NewCigar << endl << NewRef << endl;
+		reads[A].first = true;
+//		cout <<"redoing alignemnt number" << endl;
+		int temp = reads[A].alignments[0];
+		reads[A].alignments.clear();
+		reads[A].alignments.push_back(temp);
+//		cout << "alignemtns should be " << reads[A].alignments.size() << endl;
+
+       		reads[A].cigarString = NewCigar;
+		reads[A].seq = NewSeq;
+		reads[A].qual = NewQual;
+		reads[A].RefSeq = NewRef;
+		reads[A].Positions.clear();
+		reads[A].ChrPositions.clear();
+		reads[A].Positions = NewPos; 
+		reads[A].ChrPositions = NewChr; 
+		reads[A].combined = true;
+		reads[B].combined = true;
 		
 		//reads[A].write(); 		
 		//{
@@ -2449,11 +2428,8 @@ SamRead BetterWay(vector<SamRead> reads)
 	       	//reads[A].writeVertical();
 		//}		
 	
-		}
-		else
-		{
-			cout << "Skipping" << endl;
-		}
+
+
 		cout <<	 "Done with " << reads[A].name << endl;
 	}
 	else //if (3==1)

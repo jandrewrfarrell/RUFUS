@@ -6,7 +6,7 @@ GEN=$1
 K=$2
 T=$3
 L=$4
-T=10
+
 
 RDIR=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/RUFUS
 JELLYFISH="$RDIR/bin/jellyfish/bin/jellyfish"
