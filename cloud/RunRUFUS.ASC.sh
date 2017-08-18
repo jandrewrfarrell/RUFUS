@@ -50,6 +50,11 @@ then
 	echo "Jelly on $Parent1Generator successfull"
 else
 	echo "ReRunning jelly on $Parent1Generator"
+	cp $Parent1Generator.Jelly.chr $Parent1Generator.Jelly.firstTry.chr
+	export AWS_ACCESS_KEY_ID=$Key
+	export AWS_SECRET_ACCESS_KEY=$PKe
+	aws s3  --region us-east-1 cp $Parent1Generator.Jelly.firstTry.chr s3://marthlab.rufus/ASC.out/$Out/  &
+
 	rm $Parent1Generator.Jhash
 	rm $Parent1Generator.Jelly.chr
 	/usr/bin/time -v bash $RunJelly $Parent1Generator $K $(echo $Threads -2 | bc) 2
@@ -64,6 +69,11 @@ then
         echo "Jelly on $Parent2Generator successfull"
 else
         echo "ReRunning jelly on $Parent2Generator"
+	cp $Parent2Generator.Jelly.chr $Parent2Generator.Jelly.firstTry.chr
+	export AWS_ACCESS_KEY_ID=$Key
+	export AWS_SECRET_ACCESS_KEY=$PKe
+	aws s3  --region us-east-1 cp $Parent2Generator.Jelly.firstTry.chr s3://marthlab.rufus/ASC.out/$Out/  &
+
         rm $Parent2Generator.Jhash
 	rm $Parent2Generator.Jelly.chr
        /usr/bin/time -v bash $RunJelly $Parent2Generator $K $(echo $Threads -2 | bc) 2
@@ -79,7 +89,11 @@ then
         echo "Jelly on $SiblingGenerator successfull"
 else
         echo "ReRunning jelly on $SiblingGenerator"
-        rm $SiblingGenerator.Jhash
+	cp $SiblingGenerator.Jelly.chr $SiblingGenerator.Jelly.firstTry.chr
+        export AWS_ACCESS_KEY_ID=$Key
+	export AWS_SECRET_ACCESS_KEY=$PKe
+	aws s3  --region us-east-1 cp $SiblingGenerator.Jelly.firstTry.chr s3://marthlab.rufus/ASC.out/$Out/ &
+	rm $SiblingGenerator.Jhash
 	rm  $SiblingGenerator.Jelly.chr
        /usr/bin/time -v bash $RunJelly $SiblingGenerator $K $(echo $Threads -2 | bc) 2
 fi
@@ -94,6 +108,10 @@ then
         echo "Jelly on $ProbandGenerator successfull"
 else
         echo "ReRunning jelly on $ProbandGenerator"
+	cp $ProbandGenerator.Jelly.chr  $ProbandGenerator.Jelly.firstTry.chr
+	export AWS_ACCESS_KEY_ID=$Key
+	export AWS_SECRET_ACCESS_KEY=$PKe
+	aws s3  --region us-east-1 cp $ProbandGenerator.Jelly.firstTry.chr s3://marthlab.rufus/ASC.out/$Out/  & 
         rm $ProbandGenerator.Jhash
 	rm $ProbandGenerator.Jelly.chr
         /usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc) 2

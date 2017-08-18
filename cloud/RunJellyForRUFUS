@@ -12,8 +12,8 @@ RDIR=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/RUFUS
 JELLYFISH="$RDIR/bin/jellyfish/bin/jellyfish"
 SORT="$RDIR/scripts/sort"
 
-#ulimit -v 3000000
-ulimit -v 40000000
+ulimit -v 3000000
+#ulimit -v 40000000
 ulimit -a
 if [ -e "$GEN.Jhash" ]
 then

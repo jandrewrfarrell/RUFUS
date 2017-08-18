@@ -88,7 +88,7 @@ else
 
 fi 
 
-if [ -e $ProbandGenerator.V2.overlap.hashcount.fastq.bam.vcf.runanyway ]
+if [ -e $ProbandGenerator.V2.overlap.hashcount.fastq.bam.vcf ]
 then 
 	echo "skipping overlap"
 else

@@ -34,10 +34,7 @@ RunJelly=$RDIR/cloud/RunJellyForRUFUS.UGP
 
 
 /usr/bin/time -v bash $RunJelly $Parent1Generator $K $(echo $Threads -2 | bc) 2
-
 /usr/bin/time -v bash $RunJelly $Parent2Generator $K $(echo $Threads -2 | bc) 2
-
-
 /usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc) 2
 
 perl -ni -e 's/ /\t/;print' $ProbandGenerator.Jhash.histo
@@ -59,7 +56,7 @@ MutantMinCov=$(head -2 $ProbandGenerator.Jhash.histo.7.7.model | tail -1 )
 date
 echo "starting RUFUS build "
 let "Max= $MutantMinCov*100"
-if [ -e "Family.Unique.HashList" ]
+if [ -s "Family.Unique.HashList" ]
 then
         echo "Skipping build"
 else
@@ -67,14 +64,14 @@ else
 fi
 
 echo "Mut cov = $MutantMinCov "
-if [ -e $ProbandGenerator.k$K_c$MutantMinCov.HashList.prefilter ]
+if [ -s $ProbandGenerator.k$K_c$MutantMinCov.HashList.prefilter ]
 then 
 	echo "skipping $ProbandGenerator.HashList pull "
 else
 	/usr/bin/time -v bash $PullSampleHashes $ProbandGenerator.Jhash Family.Unique.HashList $MutantMinCov > $ProbandGenerator.k$K_c$MutantMinCov.HashList.prefilter
 fi 
 
-if [ -e $ProbandGenerator.k$K_c$MutantMinCov.HashList ]
+if [ -s $ProbandGenerator.k$K_c$MutantMinCov.HashList ]
 then 
 	echo "skipping 1kg filter"
 else
@@ -84,7 +81,7 @@ fi
 echo "done with RUFUS build "
 
 echo "startin RUFUS filter"
-if [ -e $ProbandGenerator.Mutations.fastq ]
+if [ -s $ProbandGenerator.Mutations.fastq ]
 then 
 	echo "skipping filter"
 else 
