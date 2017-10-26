@@ -37,6 +37,7 @@ else
 	/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc) 2 
 	rm $ProbandGenerator.temp
 fi
+exit
 
 
 perl -ni -e 's/ /\t/;print' $ProbandGenerator.Jhash.histo

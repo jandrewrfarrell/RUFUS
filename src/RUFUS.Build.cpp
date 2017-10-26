@@ -298,7 +298,7 @@ options:\
 		cout << "Error Minimum coverage in the subject required and must be greather than 0" << endl;
 		return 0; 
 	}
-	if (MaxCovControl <0)
+	if (MaxCovControl <-1)
 	{
 		cout << "Error Maximum Coverage in the control must be set and must be greaterthan or equal to 0" << endl;
 		return 0; 

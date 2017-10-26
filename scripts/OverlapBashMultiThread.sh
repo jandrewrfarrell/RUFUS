@@ -65,7 +65,7 @@ $samtools view ./$NameStub.overlap.hashcount.fastq.bam | $RUFUSinterpret -r $hum
 
 
 grep ^# ./$NameStub.overlap.hashcount.fastq.bam.vcf> ./$NameStub.overlap.hashcount.fastq.bam.vcf.sorted.vcf
-grep -v  ^# test.vcf  | sort -k1,1 -k2,2n >> ./$NameStub.overlap.hashcount.fastq.bam.vcf.sorted.vcf
+grep -v  ^# ./$NameStub.overlap.hashcount.fastq.bam.vcf  | sort -k1,1 -k2,2n >> ./$NameStub.overlap.hashcount.fastq.bam.vcf.sorted.vcf
 $RDIR/bin/gkno_launcher/tools/tabix/bgzip ./$NameStub.overlap.hashcount.fastq.bam.vcf.sorted.vcf
 $RDIR/bin/gkno_launcher/tools/tabix/tabix ./$NameStub.overlap.hashcount.fastq.bam.vcf.sorted.vcf.gz
 

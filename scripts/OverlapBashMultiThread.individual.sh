@@ -6,9 +6,6 @@ HashList=$4
 Threads=$5
  
 SampleJhash=$6
-Parent1Jhash=$7
-Parent2Jhash=$8
-Parent3Jhash=$9
 
 echo " you gave
 File=$File
@@ -42,12 +39,12 @@ if [ -s $NameStub.overlap.hashcount.fastq ]
 then 
 	echo "Skipping Overlap"
 else
-	if [ -s ./TempOverlap/$NameStub.sam.fastqd ]  
+	if [ -s ./TempOverlap/$NameStub.sam.fastqd ]
 	then 
 		echo "skipping sam assemble"
 	else
 		$gkno bwa-se -ps human  -q $File -id $File -s $File -o $File.bam -p ILLUMINA
-	 	$OverlapSam <($samtools view $File.bam ) .95 50 5 ./TempOverlap/$NameStub.sam $NameStub 1 $Threads
+	 	$OverlapSam <($samtools view -F 3328 $File.bam ) .95 50 5 ./TempOverlap/$NameStub.sam $NameStub 1 $Threads
 	fi
 	if [ -s ./TempOverlap/$NameStub.1.fastqd]
 	then 	
@@ -62,7 +59,7 @@ else
 		time $OverlapHash ./TempOverlap/$NameStub.1.fastqd .98 50 2 FP 15 1 ./TempOverlap/$NameStub.2 1 $Threads #>>  $File.overlap.out
 	fi
 	$ReplaceQwithDinFASTQD ./TempOverlap/$NameStub.2.fastqd > ./TempOverlap/$NameStub.3.fastqd
-	if [ -s ./TempOverlap/$NameStub.4.fastqd ]
+	if [ -s ./TempOverlap/$NameStub.4.fastqd]
 	then 
 		echo "skipping overlap 4"
 	else 
@@ -80,9 +77,6 @@ else
 	$AnnotateOverlap $HashList ./$NameStub.overlap.fastq $NameStub.overlap.asembly.hash.fastq > ./$NameStub.overlap.hashcount.fastq 
 
 	bash $CheckHash $SampleJhash $NameStub.overlap.asembly.hash.fastq 0 > $NameStub.overlap.asembly.hash.fastq.sample
-	bash $CheckHash $Parent1Jhash $NameStub.overlap.asembly.hash.fastq 0 > $NameStub.overlap.asembly.hash.fastq.p1
-	bash $CheckHash $Parent2Jhash $NameStub.overlap.asembly.hash.fastq 0 > $NameStub.overlap.asembly.hash.fastq.p2
-	bash $CheckHash $Parent3Jhash $NameStub.overlap.asembly.hash.fastq 0 > $NameStub.overlap.asembly.hash.fastq.p3
 
 
 	/bin/bedtools2/bin/fastaFromBed -bed <(  ~/bin/bedtools2/bin/bamToBed -i ./$NameStub.overlap.hashcount.fastq.bam ) -fi ~/d1/home/farrelac/RUFUS/bin/gkno_launcher/resources/homo_sapiens/current/human_reference_v37.fa > $NameStub.overlap.asembly.hash.fastq.ref.fastq		
@@ -102,20 +96,25 @@ fi
 
     ~/bin/bedtools2/bin/fastaFromBed -bed <(  ~/bin/bedtools2/bin/bamToBed -i ./$NameStub.overlap.hashcount.fastq.bam ) -fi ~/d1/home/farrelac/RUFUS/bin/gkno_launcher/resources/homo_sapiens/current/human_reference_v37.fa > $NameStub.overlap.asembly.hash.fastq.ref.fastq
 
+	if [ -s $NameStub.overlap.asembly.hash.fastq.sample ]
+	then
+		echo "skipping $NameStub.overlap.asembly.hash.fastq.sample"
+	else
+		echo "doing that stuffnik"
+		bash $CheckHash $SampleJhash $NameStub.overlap.asembly.hash.fastq 0 > $NameStub.overlap.asembly.hash.fastq.sample
+	fi
+
 	if [ -s $NameStub.overlap.asembly.hash.fastq.Ref.sample ]	
 	then 
 		echo "skipping $NameStub.overlap.asembly.hash.fastq.Ref.sample"
 	else
 		bash $CheckHash $SampleJhash  $NameStub.overlap.asembly.hash.fastq.ref.fastq 0 > $NameStub.overlap.asembly.hash.fastq.Ref.sample
-		bash $CheckHash $Parent1Jhash $NameStub.overlap.asembly.hash.fastq.ref.fastq 0 > $NameStub.overlap.asembly.hash.fastq.Ref.p1       
-		bash $CheckHash $Parent2Jhash $NameStub.overlap.asembly.hash.fastq.ref.fastq 0 > $NameStub.overlap.asembly.hash.fastq.Ref.p2
-        	bash $CheckHash $Parent3Jhash $NameStub.overlap.asembly.hash.fastq.ref.fastq 0 > $NameStub.overlap.asembly.hash.fastq.Ref.p3
 	fi 
 
 
 
 mkfifo check 
-$samtools view ./$NameStub.overlap.hashcount.fastq.bam | $RUFUSinterpret -mQ 8 -r $humanRef -hf $HashList -o  ./$NameStub.overlap.hashcount.fastq.bam -m 1000000 -c $NameStub.overlap.asembly.hash.fastq.p1 -c $NameStub.overlap.asembly.hash.fastq.p2 -cR $NameStub.overlap.asembly.hash.fastq.Ref.p1 -cR $NameStub.overlap.asembly.hash.fastq.Ref.p2 -sR $NameStub.overlap.asembly.hash.fastq.Ref.sample -s $NameStub.overlap.asembly.hash.fastq.sample 
+$samtools view ./$NameStub.overlap.hashcount.fastq.bam | $RUFUSinterpret -mQ 8 -r $humanRef -hf $HashList -o  ./$NameStub.overlap.hashcount.fastq.bam -m 1000000  -sR $NameStub.overlap.asembly.hash.fastq.Ref.sample -s $NameStub.overlap.asembly.hash.fastq.sample 
 
 grep ^# ./$NameStub.overlap.hashcount.fastq.bam.vcf> ./$NameStub.overlap.hashcount.fastq.bam.vcf.sorted.vcf
 grep -v  ^# ./$NameStub.overlap.hashcount.fastq.bam.vcf | sort -k1,1 -k2,2n >> ./$NameStub.overlap.hashcount.fastq.bam.vcf.sorted.vcf
