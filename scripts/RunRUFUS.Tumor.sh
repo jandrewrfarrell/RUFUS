@@ -32,8 +32,8 @@ RunJelly=$RDIR/scripts/RunJellyForRUFUS.fq
 
 
 
-#/usr/bin/time -v bash $RunJelly $Parent1Generator $K $(echo $Threads -2 | bc) 4 & 
-#/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc) 4 &
+/usr/bin/time -v bash $RunJelly $Parent1Generator $K $(echo $Threads -2 | bc) 4 & 
+/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc) 4 &
 wait
 
 perl -ni -e 's/ /\t/;print' $ProbandGenerator.Jhash.histo

@@ -5,6 +5,7 @@ ProbandGenerator=$3
 K=$4
 Threads=$5
 Out=$6
+RUF1kGReff=$7
 
 echo "You gave
 Parent1Generator=$1
@@ -13,11 +14,12 @@ ProbandGenerator=$3
 K=$4
 Threads=$5
 Out=$6
+RUF1kGReff=$7
 "
 
-if [ -z "$Out" ]
+if [ -z "$RUF1kGReff" ]
 then
-        echo "out file not specified"
+        echo "RUFUS 1000G reff file not specified"
         exit
 fi
 
@@ -75,7 +77,7 @@ if [ -s $ProbandGenerator.k$K_c$MutantMinCov.HashList ]
 then 
 	echo "skipping 1kg filter"
 else
-	 /usr/bin/time -v $RDIR/cloud/RUFUS.search.1kg -hf <(awk '{print $1 "\t" $2}' $ProbandGenerator.k$K_c$MutantMinCov.HashList.prefilter ) -o $ProbandGenerator.k$K_c$MutantMinCov.HashList  -c /scratch/ucgd/lustre/work/u0991464/RUFUS.1000g.reference/1000G.RUFUSreference.sorted.min45.tab -hs 25
+	 /usr/bin/time -v $RDIR/cloud/RUFUS.search.1kg -hf <(awk '{print $1 "\t" $2}' $ProbandGenerator.k$K_c$MutantMinCov.HashList.prefilter ) -o $ProbandGenerator.k$K_c$MutantMinCov.HashList  -c $RUF1kGReff -hs 25
 fi 
 
 echo "done with RUFUS build "
