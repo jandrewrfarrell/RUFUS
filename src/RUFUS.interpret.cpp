@@ -1286,8 +1286,8 @@ void SamRead::parseMutations( char *argv[])
 				} 
 				cout       << ";VT=" <<  varType << "\t" ;
 				VCFOutFile <<  ";VT=" <<  varType << "\t" ;
-				cout       << "GT:DP:RO:AO" << "\t" << Genotype << ":" << MutRefMode + MutAltMode << ":" << MutRefMode << ":" << MutAltMode;
-				VCFOutFile << "GT:DP:RO:AO" << "\t" << Genotype << ":" << MutRefMode + MutAltMode << ":" << MutRefMode << ":" << MutAltMode;
+				cout       << "GT:DP:RO:AO:LP:PC" << "\t" << Genotype << ":" << MutRefMode + MutAltMode << ":" << MutRefMode << ":" << MutAltMode;
+				VCFOutFile << "GT:DP:RO:AO:LP:PC" << "\t" << Genotype << ":" << MutRefMode + MutAltMode << ":" << MutRefMode << ":" << MutAltMode;
 				
 				int ParentMode; 
 				int lowC = CheckParentCov(ParentMode); 
@@ -3326,9 +3326,11 @@ options:\
 	VCFOutFile << "##fileDate=" << time(0) << endl;
 	VCFOutFile << "##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">" << endl;
 	VCFOutFile << "##FORMAT=<ID=AK,Number=1,Type=Integer,Description=\"Alternte Kmer Count\">" << endl;
-	VCFOutFile << "##FORMAT=<ID=DP,Number=1,Type=Integer,Description=\"Genotype\">" << endl;
-	VCFOutFile << "##FORMAT=<ID=RO,Number=1,Type=Integer,Description=\"Genotype\">" << endl;
-	VCFOutFile << "##FORMAT=<ID=AO,Number=1,Type=Integer,Description=\"Genotype\">" << endl;
+	VCFOutFile << "##FORMAT=<ID=DP,Number=1,Type=Integer,Description=\"Total Kmer depth across the variant\">" << endl;
+	VCFOutFile << "##FORMAT=<ID=RO,Number=1,Type=Integer,Description=\"Mode of reference kmer counts\">" << endl;
+	VCFOutFile << "##FORMAT=<ID=AO,Number=1,Type=Integer,Description=\"Mode of alt kmer counts\">" << endl;
+	 VCFOutFile << "##FORMAT=<ID=LP,Number=1,Type=Integer,Description=\"Number of lowcoverage parent bases\">" << endl;
+	 VCFOutFile << "##FORMAT=<ID=PC,Number=1,Type=Integer,Description=\"Mode of parents coverage\">" << endl;
 	VCFOutFile << "##INFO=<ID=SVTYPE,Number=1,Type=String,Description=\"Type of SV detected\">" << endl;
 	VCFOutFile << "##INFO=<ID=SVLENGTH,Number=1,Type=Integer,Description=\"Length of SV detected\">" << endl; 
 	VCFOutFile << "##INFO=<ID=AO,Number=1,Type=Integer,Description=\"Alternate allele observations, with partial observations recorded fractionally\">"<<endl;
