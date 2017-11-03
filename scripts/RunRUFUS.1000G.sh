@@ -29,7 +29,7 @@ RUFUS1kgFilter=$RDIR/bin/RUFUS.1kg.filter
 RunJelly=$RDIR/scripts/RunJellyForRUFUS 
 
 
-if [ -e $ProbandGenerator.Jhash.sorted.min2.tab ]
+if [ -s $ProbandGenerator.Jhash.sorted.min2.tab ]
 then 
 	echo "skipping jelly "
 else 
@@ -39,11 +39,10 @@ else
 	/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc) 2 
 	rm $ProbandGenerator.temp
 fi
-exit
 
 
 perl -ni -e 's/ /\t/;print' $ProbandGenerator.Jhash.histo
-if [ -e "$ProbandGenerator.Jhash.histo.7.7.model" ]
+if [ -e $ProbandGenerator.Jhash.histo.7.7.model ]
 then
         echo "skipping model"
 else
@@ -58,7 +57,7 @@ MutantMinCov=$(head -2 $ProbandGenerator.Jhash.histo.7.7.model | tail -1 )
 date
 echo "starting RUFUS build "
 let "Max= $MutantMinCov*100"
-if [ -e " $ProbandGenerator.k$MutantMinCov.HashList" ]
+if [ -s $ProbandGenerator.k$MutantMinCov.HashList ]
 then
         echo "Skipping build"
 else
@@ -67,13 +66,14 @@ else
 fi
 
 echo "starting RUFUS filter"
-if [ -e $ProbandGenerator.Mutations.fastq ]
+if [ -s $ProbandGenerator.Mutations.fastq ]
 then 
 	echo "skipping filter"
 else 
 	rm  $ProbandGenerator.temp
 	mkfifo $ProbandGenerator.temp
-	/usr/bin/time -v  bash $ProbandGenerator | $RDIR/cloud/PassThroughSamCheck $ProbandGenerator.filter.chr >  $ProbandGenerator.temp &
+	#/usr/bin/time -v  bash $ProbandGenerator | $RDIR/cloud/PassThroughSamCheck $ProbandGenerator.filter.chr >  $ProbandGenerator.temp &
+	/usr/bin/time -v  bash $ProbandGenerator >  $ProbandGenerator.temp &
 	/usr/bin/time -v   $RUFUSfilter   $ProbandGenerator.k$MutantMinCov.HashList $ProbandGenerator.temp $ProbandGenerator $K 5 5 10 $(echo $Threads -2 | bc) &
 	wait
 

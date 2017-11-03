@@ -97,7 +97,7 @@ else
 fi
 
 echo "done with everything "
-rm *Jhash 
-rm *.tab
+#rm *Jhash 
+#rm *.tab
 
 
