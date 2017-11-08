@@ -86,22 +86,6 @@ else
 	$AnnotateOverlap $HashList ./$NameStub.overlap.fastq $NameStub.overlap.asembly.hash.fastq > ./$NameStub.overlap.hashcount.fastq 
 fi
 
-if [ -s $NameStub.overlap.asembly.hash.fastq.p1 ]
-then 
-	echo "skipping hash lookup"
-else
-	bash $CheckHash $SampleJhash $NameStub.overlap.asembly.hash.fastq 0 > $NameStub.overlap.asembly.hash.fastq.sample
-	bash $CheckHash $Parent1Jhash $NameStub.overlap.asembly.hash.fastq 0 > $NameStub.overlap.asembly.hash.fastq.p1
-	bash $CheckHash $Parent2Jhash $NameStub.overlap.asembly.hash.fastq 0 > $NameStub.overlap.asembly.hash.fastq.p2
-	bash $CheckHash $Parent3Jhash $NameStub.overlap.asembly.hash.fastq 0 > $NameStub.overlap.asembly.hash.fastq.p3
-fi
-
-/bin/bedtools2/bin/fastaFromBed -bed <(  ~/bin/bedtools2/bin/bamToBed -i ./$NameStub.overlap.hashcount.fastq.bam ) -fi ~/d1/home/farrelac/RUFUS/bin/gkno_launcher/resources/homo_sapiens/current/human_reference_v37.fa > $NameStub.overlap.asembly.hash.fastq.ref.fastq		
-
-
-#~/bin/bedtools2/bin/fastaFromBed -bed something.bed -fi ~/d1/home/farrelac/RUFUS/bin/gkno_launcher/resources/homo_sapiens/current/human_reference_v37.fa
-
-#fi 
 
 if [ -s ./$NameStub.overlap.hashcount.fastq.bam ]
 then 
@@ -111,19 +95,36 @@ else
 	$gkno bwa-se -ps human  -q ./$NameStub.overlap.hashcount.fastq -id ./$NameStub.overlap.hashcount.fastq -s ./$NameStub.overlap.hashcount.fastq -o ./$NameStub.overlap.hashcount.fastq.bam -p ILLUMINA
 fi 
 
-~/bin/bedtools2/bin/fastaFromBed -bed <(  ~/bin/bedtools2/bin/bamToBed -i ./$NameStub.overlap.hashcount.fastq.bam ) -fi ~/d1/home/farrelac/RUFUS/bin/gkno_launcher/resources/homo_sapiens/current/human_reference_v37.fa > $NameStub.overlap.asembly.hash.fastq.ref.fastq
+
+$RDIR/bin/bedtools2/bin/fastaFromBed -bed <( $RDIR/bin/bedtools2/bin/bamToBed -i ./$NameStub.overlap.hashcount.fastq.bam) -fi $RDIR/bin/gkno_launcher/resources/homo_sapiens/current/human_reference_v37.fa -fo $NameStub.overlap.asembly.hash.fastq.ref.fastq 
+$RDIR/bin/jellyfish/bin/jellyfish count -C -m 25 -s 1G -t 20 -o ./$NameStub.overlap.hashcount.fastq.Jhash ./$NameStub.overlap.hashcount.fastq
+$RDIR/bin/jellyfish/bin/jellyfish count -C -m 25 -s 1G -t 20 -o ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash ./$NameStub.overlap.asembly.hash.fastq.ref.fastq
+$RDIR/bin/jellyfish/bin/jellyfish dump -c ./$NameStub.overlap.hashcount.fastq.Jhash > ./$NameStub.overlap.hashcount.fastq.Jhash.tab
+$RDIR/bin/jellyfish/bin/jellyfish dump -c ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash > ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash.tab
+
+if [ -s $NameStub.overlap.asembly.hash.fastq.p1 ]
+then
+        echo "skipping hash lookup"
+else
+	echo "stargin hash lookup"
+        bash $CheckHash $SampleJhash ./$NameStub.overlap.hashcount.fastq.Jhash.tab 0 > $NameStub.overlap.asembly.hash.fastq.sample
+        bash $CheckHash $Parent1Jhash ./$NameStub.overlap.hashcount.fastq.Jhash.tab 0 > $NameStub.overlap.asembly.hash.fastq.p1
+        bash $CheckHash $Parent2Jhash ./$NameStub.overlap.hashcount.fastq.Jhash.tab 0 > $NameStub.overlap.asembly.hash.fastq.p2
+	echo "done with hash lookup"
+fi
+
 
 if [ -s $NameStub.overlap.asembly.hash.fastq.Ref.sample ]	
 then 
 	echo "skipping $NameStub.overlap.asembly.hash.fastq.Ref.sample"
 else
-	bash $CheckHash $SampleJhash  $NameStub.overlap.asembly.hash.fastq.ref.fastq 0 > $NameStub.overlap.asembly.hash.fastq.Ref.sample
-	bash $CheckHash $Parent1Jhash $NameStub.overlap.asembly.hash.fastq.ref.fastq 0 > $NameStub.overlap.asembly.hash.fastq.Ref.p1       
-	bash $CheckHash $Parent2Jhash $NameStub.overlap.asembly.hash.fastq.ref.fastq 0 > $NameStub.overlap.asembly.hash.fastq.Ref.p2
-       	bash $CheckHash $Parent3Jhash $NameStub.overlap.asembly.hash.fastq.ref.fastq 0 > $NameStub.overlap.asembly.hash.fastq.Ref.p3
+	bash $CheckHash $SampleJhash  ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash.tab 0 > $NameStub.overlap.asembly.hash.fastq.Ref.sample
+	bash $CheckHash $Parent1Jhash ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash.tab 0 > $NameStub.overlap.asembly.hash.fastq.Ref.p1
+	bash $CheckHash $Parent2Jhash ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash.tab 0 > $NameStub.overlap.asembly.hash.fastq.Ref.p2
+	 
 fi 
 
-
+wait
 
 mkfifo check 
 $samtools view ./$NameStub.overlap.hashcount.fastq.bam | $RUFUSinterpret -mQ 8 -r $humanRef -hf $HashList -o  ./$NameStub.overlap.hashcount.fastq.bam -m 1000000 -c $NameStub.overlap.asembly.hash.fastq.p1 -c $NameStub.overlap.asembly.hash.fastq.p2 -cR $NameStub.overlap.asembly.hash.fastq.Ref.p1 -cR $NameStub.overlap.asembly.hash.fastq.Ref.p2 -sR $NameStub.overlap.asembly.hash.fastq.Ref.sample -s $NameStub.overlap.asembly.hash.fastq.sample 

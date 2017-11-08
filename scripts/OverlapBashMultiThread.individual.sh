@@ -31,8 +31,7 @@ RUFUSinterpret=$RDIR/bin/RUFUS.interpret
 humanRef=$RDIR/bin/gkno_launcher/resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys.fa
 CheckHash=$RDIR/cloud/CheckJellyHashList.sh
 OverlapSam=$RDIR/bin/OverlapSam
-
-
+JELLYFISH="$RDIR/bin/jellyfish/bin/jellyfish"
 
 
 if [ -s ./TempOverlap/$NameStub.sam.fastqd ]
@@ -54,7 +53,13 @@ then
 else
 	time $OverlapHash ./TempOverlap/$NameStub.1.fastqd .98 50 2 FP 15 1 ./TempOverlap/$NameStub.2 1 $Threads #>>  $File.overlap.out
 fi
-$ReplaceQwithDinFASTQD ./TempOverlap/$NameStub.2.fastqd > ./TempOverlap/$NameStub.3.fastqd
+if [ -s ./TempOverlap/$NameStub.3.fastqd ]
+then
+	echo "skippig replace"
+else
+	$ReplaceQwithDinFASTQD ./TempOverlap/$NameStub.2.fastqd > ./TempOverlap/$NameStub.3.fastqd
+fi 
+
 if [ -s ./TempOverlap/$NameStub.4.fastqd ]
 then 
 	echo "skipping overlap 4"
@@ -78,42 +83,42 @@ else
 	$AnnotateOverlap $HashList ./$NameStub.overlap.fastq $NameStub.overlap.asembly.hash.fastq > ./$NameStub.overlap.hashcount.fastq 
 fi 
 
-if [ -s $NameStub.overlap.asembly.hash.fastq.sample ] 
-then 
-	echo "skipping hash lookup"
-else
 
-	bash $CheckHash $SampleJhash $NameStub.overlap.asembly.hash.fastq 0 > $NameStub.overlap.asembly.hash.fastq.sample
-fi 
-
-/bin/bedtools2/bin/fastaFromBed -bed <(  ~/bin/bedtools2/bin/bamToBed -i ./$NameStub.overlap.hashcount.fastq.bam ) -fi ~/d1/home/farrelac/RUFUS/bin/gkno_launcher/resources/homo_sapiens/current/human_reference_v37.fa > $NameStub.overlap.asembly.hash.fastq.ref.fastq		
-
-
-
-
+#Done with Ooverlap
+#get reference sequences
 if [ -s ./$NameStub.overlap.hashcount.fastq.bam ]
-then 
-	echo "skipping contig alignment" 
+then
+        echo "skipping contig alignment" 
 else
-	
-	$gkno bwa-se -ps human  -q ./$NameStub.overlap.hashcount.fastq -id ./$NameStub.overlap.hashcount.fastq -s ./$NameStub.overlap.hashcount.fastq -o ./$NameStub.overlap.hashcount.fastq.bam -p ILLUMINA
-fi 
+
+        $gkno bwa-se -ps human  -q ./$NameStub.overlap.hashcount.fastq -id ./$NameStub.overlap.hashcount.fastq -s ./$NameStub.overlap.hashcount.fastq -o ./$NameStub.overlap.hashcount.fastq.bam -p ILLUMINA
+fi
 
 ~/bin/bedtools2/bin/fastaFromBed -bed <(  ~/bin/bedtools2/bin/bamToBed -i ./$NameStub.overlap.hashcount.fastq.bam ) -fi ~/d1/home/farrelac/RUFUS/bin/gkno_launcher/resources/homo_sapiens/current/human_reference_v37.fa > $NameStub.overlap.asembly.hash.fastq.ref.fastq
+
+
+
+
+~/bin/bedtools2/bin/fastaFromBed -bed <(  ~/bin/bedtools2/bin/bamToBed -i ./$NameStub.overlap.hashcount.fastq.bam ) -fi ~/d1/home/farrelac/RUFUS/bin/gkno_launcher/resources/homo_sapiens/current/human_reference_v37.fa > $NameStub.overlap.asembly.hash.fastq.ref.fastq		
+$RDIR/bin/jellyfish/bin/jellyfish count -C -m 25 -s 1G -t 20 -o ./$NameStub.overlap.hashcount.fastq.Jhash ./$NameStub.overlap.hashcount.fastq
+$RDIR/bin/jellyfish/bin/jellyfish count -C -m 25 -s 1G -t 20 -o ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash ./$NameStub.overlap.asembly.hash.fastq.ref.fastq
+$RDIR/bin/jellyfish/bin/jellyfish dump -c ./$NameStub.overlap.hashcount.fastq.Jhash > ./$NameStub.overlap.hashcount.fastq.Jhash.tab
+$RDIR/bin/jellyfish/bin/jellyfish dump -c ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash > ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash.tab 
+
 
 if [ -s $NameStub.overlap.asembly.hash.fastq.sample ]
 then
 	echo "skipping $NameStub.overlap.asembly.hash.fastq.sample"
 else
 	echo "doing that stuffnik"
-	bash $CheckHash $SampleJhash $NameStub.overlap.asembly.hash.fastq 0 > $NameStub.overlap.asembly.hash.fastq.sample
+	bash $CheckHash  $SampleJhash ./$NameStub.overlap.hashcount.fastq.Jhash.tab 0 > $NameStub.overlap.asembly.hash.fastq.sample
 fi
 
 if [ -s $NameStub.overlap.asembly.hash.fastq.Ref.sample ]	
 then 
 	echo "skipping $NameStub.overlap.asembly.hash.fastq.Ref.sample"
 else
-	bash $CheckHash $SampleJhash  $NameStub.overlap.asembly.hash.fastq.ref.fastq 0 > $NameStub.overlap.asembly.hash.fastq.Ref.sample
+	bash $CheckHash $SampleJhash ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash.tab 0 > $NameStub.overlap.asembly.hash.fastq.Ref.sample
 fi 
 
 
