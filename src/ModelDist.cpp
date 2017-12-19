@@ -989,7 +989,7 @@ cout << "yay 1" << endl;
                 {
                         num+= dist[k][c];
                 }
-		if (num > 0.9 and kcutoff == -1)
+		if (num/(num+ErrorDist[k] ) > 0.9 )
 		{
 			kcutoff = k-1; 
 			break;
