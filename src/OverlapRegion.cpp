@@ -353,7 +353,7 @@ int Align3 (vector<string>& sequenes, vector<string>& quals, string Ap, string A
 	return bestScore;
 }
 
-string ColapsContigs(string A, string B, int k, string Aq, string& Bq, string& Ad, string& Bd)
+string ColapsContigs(string A, string B, int k, string Aq, string& Bq, string& Ad, string& Bd, string& As, string& Bs)
 {
 	bool verbose = false;
 	if (verbose){cout << "Conbining; \n" << A << endl << B << endl;} 
@@ -455,8 +455,9 @@ string ColapsContigs(string A, string B, int k, string Aq, string& Bq, string& A
 
                 }	
 		else if (Abase =='Z' && Bbase == 'Z')
-		{Bq = newQual; Bd = newDepth;return newString;}
+		{Bq = newQual; Bd = newDepth;break ;}//return newString;}
 	}
+	Bs += As; 
 	Bq = newQual;
 	Bd = newDepth;
 	return newString;
@@ -655,6 +656,29 @@ bool validateFASTQD(string& L1, string& L2, string& L3, string& L4, string& L5, 
 	}
 	return true;
 }
+string FlipStrands(string strand)
+{
+        string NewStrand = "";
+        for (int i = 0; i < strand.size(); i++){
+                if (strand.c_str()[i]=='+')
+                        NewStrand+="-";
+                else if (strand.c_str()[i]=='-')
+                        NewStrand+="+";
+        }
+        return NewStrand;
+
+}
+void compresStrand(string S, int& F, int& R)
+{
+	for (int i = 0; i< S.size(); i++){
+		if (S.c_str()[i] =='+')
+			F++;
+		else
+			R++;
+	}
+	return; 
+
+}
 int main (int argc, char *argv[])
 {
 	cout << "USING THIS ONE" << endl;		
@@ -727,7 +751,7 @@ int main (int argc, char *argv[])
 	std::vector<string> sequenes;
 	std::vector<string> qual;
 	std::vector<string> depth;
-	
+	std::vector<string> strand; 	
 	
 
 	int lines = -1;
@@ -779,7 +803,8 @@ int main (int argc, char *argv[])
                                         sequenes.push_back(L2);
                                         qual.push_back(L4);
                                         depth.push_back(depths);
-                                        ReadSize = L2.size();
+                                    	strand.push_back(L5); 
+				        ReadSize = L2.size();
                                 }
 				else
 				{Rejects++;}
@@ -821,6 +846,7 @@ int main (int argc, char *argv[])
                                 lines++;
                                 sequenes.push_back(L2);
                                 qual.push_back(L4);
+				strand.push_back("+"); 
                                 string depths = "";
                                 unsigned char C = 1;
                                 for (int i=0; i<L2.length();i++)
@@ -856,6 +882,7 @@ int main (int argc, char *argv[])
 		string A = sequenes[i];
 		string Aqual = qual[i];
 		string Adep = depth[i];
+		string Astr = strand[i]; 
 		
 									if(FullOut){cout << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<**************************************************************>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"<< endl;}
 		Et = clock();
@@ -879,6 +906,7 @@ int main (int argc, char *argv[])
 			string revA = RevComp(A);
 			string revAqual = RevQual(Aqual);
 			string revAdep = RevQual(Adep);
+			string revAstr = FlipStrands(Astr); 
 			int revk = -1;
 			int revbestIndex = -1;
 			int revbooya =Align3(sequenes, qual, revA, revAqual, i,revk, revbestIndex, MinPercent, PerfectMatch, MinOverlap, Threads);
@@ -889,6 +917,7 @@ int main (int argc, char *argv[])
 				A = revA;
 				Aqual = revAqual;
 				Adep = revAdep;
+				Astr = revAstr; 
 				k = revk;
 				booya = revbooya;
 				bestIndex = revbestIndex;
@@ -906,8 +935,8 @@ int main (int argc, char *argv[])
 			FoundMatch++;
 			string B = sequenes[bestIndex];
                  	string Bqual = qual[bestIndex];
-			//cout << sequenes.size() << " - " << qual.size() << " - " << depth.size() << endl;
 			string Bdep = depth[bestIndex];
+			string Bstr = strand[bestIndex];
 			//cout << "here 2" << endl;
 			if(k>0)
 			{
@@ -931,11 +960,12 @@ int main (int argc, char *argv[])
 			if (i == bestIndex )
 			{ cout << "ERROR ____________________ SAME READS " << endl;}
 			if (A.size() != Adep.size() && B.size() != Bdep.size()){cout <<" ERRPR somethis the wrong size\n  A= " << A.size() << " Ad = " << Adep.size() << " B= " << B.size() << " Bd = " << Bdep.size()<<endl;}
-			string combined = ColapsContigs(A, B, k, Aqual, Bqual, Adep, Bdep) ;
+			string combined = ColapsContigs(A, B, k, Aqual, Bqual, Adep, Bdep, Astr, Bstr) ;
 			 if (combined.size() != Bdep.size()){cout << " ERRPR combined is the wrong size\n  C= " << combined.size() << " Bd = " << Bdep.size()<<endl;}
 			sequenes[bestIndex] = combined;
 			qual[bestIndex] = Bqual;
 			depth[bestIndex] = Bdep;
+			strand[bestIndex] = Bstr; 
 			sequenes[i] = "moved";
 			if(FullOut){cout << combined << endl;
 			//cout << Bqual << endl;
@@ -966,16 +996,19 @@ int main (int argc, char *argv[])
 			{
 				if (sequenes[i].size() !=  qual[i].size() &&  qual[i].size() != depth[i].size()){cout << "ERROR, read " << "@NODE_" << argv[6] << "_" << i << "_L" <<sequenes[i].size() << "_D" << maxDep << " Has the wrong size, Seq = " << sequenes[i].size() << " Qual = " << qual[i].size() << " Dep = " <<  depth[i].size() << endl;}
 				count ++;
-				report << "@NODE_" << argv[6] << "_" << i << "_L" <<sequenes[i].size() << "_D" << maxDep <<  endl;
+				int F = 0; 
+				int R = 0; 
+				compresStrand(strand[i], F, R); 
+				report << "@NODE_" << argv[6] << "_" << i << "_L" <<sequenes[i].size() << "_D" << maxDep << ":" << F << ":" << R <<":"<<  endl;
 				report << sequenes[i] << endl;
 				report << "+" << endl;
 				report << qual[i] << endl;
 
-				Depreport << "@NODE_" << argv[6] << "_" << i <<  "_L" << sequenes[i].size() << "_D" << maxDep << endl;
+				Depreport << "@NODE_" << argv[6] << "_" << i <<  "_L" << sequenes[i].size() << "_D" << maxDep << ":" << F << ":" << R <<":"  << endl;
                                 Depreport << sequenes[i] << endl;
                                 Depreport << "+" << endl;
                                 Depreport << qual[i] << endl;
-				Depreport << '+' << endl;
+				Depreport << strand[i] << endl;
 				unsigned char C = depth[i].c_str()[0];
                                 int booya = C;
                                 Depreport << booya;

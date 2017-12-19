@@ -44,7 +44,6 @@ else
         make install
         cd ..
 fi
-
 cd $RUFUS_DIR/bin/
 if [ -e ./gkno_launcher/gkno ]
 then
@@ -66,6 +65,12 @@ else
 	./tools/samtools/samtools faidx ./resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys.fa
         cd ..
 fi
+
+wget https://github.com/arq5x/bedtools2/releases/download/v2.25.0/bedtools-2.25.0.tar.gz
+tar -zxvf bedtools-2.25.0.tar.gz
+cd bedtools2
+make
+cd ../
 
 cd ../
 

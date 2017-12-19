@@ -64,13 +64,13 @@ if [ -s ./TempOverlap/$NameStub.4.fastqd ]
 then 
 	echo "skipping overlap 4"
 else 
-	time $OverlapRebion2 ./TempOverlap/$NameStub.3.fastqd .95 30 0 ./TempOverlap/$NameStub.4 $NameStub 1 $Threads #>>  $File.overlap.out
+	time $OverlapRebion2 ./TempOverlap/$NameStub.3.fastqd .98 30 0 ./TempOverlap/$NameStub.4 $NameStub 1 $Threads #>>  $File.overlap.out
 fi
 if [ -s ./TempOverlap/$NameStub.5.fastqd ]
 then 
 	echo "skipping ovelrap 5"
 else
-	time $OverlapRebion2 ./TempOverlap/$NameStub.4.fastqd .95 30 $FinalCoverage  ./TempOverlap/$NameStub.5 $NameStub 1 $Threads #>>  $File.overlap.out
+	time $OverlapRebion2 ./TempOverlap/$NameStub.4.fastqd .98 30 $FinalCoverage  ./TempOverlap/$NameStub.5 $NameStub 1 $Threads #>>  $File.overlap.out
 fi 
 
 if [ -s ./$NameStub.overlap.hashcount.fastq ]

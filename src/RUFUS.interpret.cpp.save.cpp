@@ -35,9 +35,7 @@
 using namespace std;
 
 vector <unordered_map <unsigned long int, int> > ParentHashes;
-vector <unordered_map <unsigned long int, int> > ParentHashesReference; 
 unordered_map  <unsigned long int, int> MutantHashes; 
-unordered_map  <unsigned long int, int> MutantHashesReference;
 FastaReference Reff;
 int HashSize = 25; 
 int totalDeleted; 
@@ -88,8 +86,9 @@ unsigned long HashToLong (string hash)
 		}
 		else
 		{
-			cout << "ERROR, invalid character - " << hash.c_str()[i] << endl;
+			//cout << "ERROR, invalid character - " << hash.c_str()[i] << endl;
 		}
+	
 	}
 	return HashBits.to_ulong();
 }
@@ -316,32 +315,46 @@ struct classcomp {
 ///////////////////////////
 int GetReadOrientation(int flag)
 {
-	// returns 0 = forward, 1 = reverse
-	if (flag == 0 or flag == 2048)
-		return 0;
-	else if (flag == 16 or flag == 2064)
-		return 1;
+	// returns 0 = forward, 1 = reverse	
+	bool b[16];
+        
+       	for (int j = 0;  j < 16;  ++j){
+        	b [j] =  0 != (flag & (1 << j));	
+	}
+	cout << "bits are " << b[0] << " " << b[1] << " " << b[2] << " " << b[3] << " " << b[4] << " " << b[5] << " " << b[6] << " " << b[7] << " " << b[8] << " " << b[9] << " " << b[10] << " " << b[11] << " " << b[12] << endl;
+	cout << "flag is " << flag << endl; 
+	cout << "orientation is " << b[4] << endl; 
+	return b[4];
+	/*if (flag == 0 or flag == 2048){
+		cout << "0 forward" << endl;
+		return 0;}
+	else if (flag == 16 or flag == 2064){
+		cout << "1 reverse" << endl; 
+		return 1;}
 	else
 		cout <<  "error flag not recognised " << flag << endl;
 
-	return -1;
+	return -1;*/
 }
 string getHash(string seq, int j, int HashSize)
 {
 	int bases = 0;
 	string NewHash = "";
-	if (seq.c_str()[j] == 'A' or seq.c_str()[j] == 'C' or seq.c_str()[j] == 'G' or seq.c_str()[j] == 'T') //if the first base is not in a real seqeunce, return a blank hash
+	if (j <seq.size())
 	{
-		while (bases<HashSize and j<seq.size())
+		if (seq.c_str()[j] == 'A' or seq.c_str()[j] == 'C' or seq.c_str()[j] == 'G' or seq.c_str()[j] == 'T') //if the first base is not in a real seqeunce, return a blank hash
 		{
-			if (seq.c_str()[j] == 'A' or seq.c_str()[j] == 'C' or seq.c_str()[j] == 'G' or seq.c_str()[j] == 'T')
+			while (bases<HashSize and j<seq.size())
 			{
-				NewHash+=seq.c_str()[j];
-				bases++;
+				if (seq.c_str()[j] == 'A' or seq.c_str()[j] == 'C' or seq.c_str()[j] == 'G' or seq.c_str()[j] == 'T')
+				{
+					NewHash+=seq.c_str()[j];
+					bases++;
+				}
+				j++;
 			}
-			j++;
+			cout << "grabbed hash " << NewHash << endl;
 		}
-		cout << "grabbed hash " << NewHash << endl;
 	}
 	return NewHash;
 }
@@ -420,6 +433,7 @@ class SamRead
 	public:
 	string name;
 	int flag;
+	bool FlagBits[16];
 	string chr;
 	int pos;
 	int mapQual;
@@ -431,9 +445,22 @@ class SamRead
 	string originalQual; 
 	string cigarString;
 	string strand;  
+	float StrandBias; 
+	string strands; 
+	int forward; 
+	int reverse; 
 	vector<int> alignments; 
 	vector<int> Positions; 
-	vector<string> ChrPositions; 
+	vector<string> ChrPositions;
+	
+	vector<long> MutAltCounts; 
+	vector<long> MutRefCounts; 
+	vector<long> MutHashListCounts; 
+
+	vector<vector <long>> RefAltCounts; 
+	vector<vector <long>> RefRefCounts; 
+	vector<string> AltKmers;
+	vector<string> RefKmers;	
 	bool first; // = true;  
 	bool combined; // = false; 
 	vector<bool> PeakMap; 
@@ -448,7 +475,42 @@ class SamRead
 	void writeVertical();
 	void writetofile(ofstream &out);
 	void flipRead(); 
+	void LookUpKmers();
+	void FixTandemRef();
+	int CheckParentCov(int &mode); 
 };
+int SamRead::CheckParentCov(int &mode)
+{
+	//vector<vector <long>> RefAltCounts;
+	//vector<vector <long>> RefRefCounts;
+	bool good = true;
+	int lowC = 0;  
+	vector<int> cov; 
+	for (int pi = 0; pi < RefRefCounts.size(); pi++){
+		for (int i = 0; i < RefRefCounts[pi].size(); i++){
+			if (RefKmers[i] != ""){
+				int ParRef = 0;
+				int ParAlt = 0; 
+				if (RefAltCounts[pi][i] > 0)
+					ParAlt = RefAltCounts[pi][i]; 
+				if (RefRefCounts[pi][i] > 0)
+					ParRef = RefRefCounts[pi][i]; 
+				cov.push_back(ParRef+ParAlt); 
+				if (ParRef+ParAlt > 0 && ParRef+ParAlt < 10)
+					lowC++; 
+			}
+		}
+	}	
+	if(cov.size()>1){
+	
+		sort (cov.begin(), cov.end());
+		mode = cov[cov.size()/2];
+	}
+	else
+		mode = -1; 
+
+	return lowC; 
+}
 
 void SamRead::flipRead()
 {
@@ -546,13 +608,22 @@ void SamRead::writetofile(ofstream &out)
 
 void SamRead::writeVertical()
 {
+	cout << "ParentHashes size = " <<  ParentHashes.size() << "RefAltCounts size " << RefAltCounts.size() << endl;
 	cout << name << endl;
 	cout << "   flag = " << flag << endl;
 	cout << "   chr " << chr << " - " << pos << " qual = " << mapQual <<  endl;
 	cout << "   cigar  = " << cigar << endl;
 	cout << "   Alignments = " << alignments.size() << endl; 
-	for (int i =0; i < seq.size(); i++)
-		cout << seq.c_str()[i] << "\t" << qual.c_str()[i] << "\t" << cigarString.c_str()[i] << "\t" << RefSeq.c_str()[i] << "\t" << ChrPositions[i] << "\t" << Positions[i] << endl;
+	for (int i =0; i < seq.size(); i++){
+
+		cout << seq.c_str()[i] << "\t" << qual.c_str()[i] << "\t" << cigarString.c_str()[i] << "\t" << RefSeq.c_str()[i] << "\t" << ChrPositions[i] << "\t" << Positions[i] << "\t" << MutAltCounts[i] << "\t" << MutRefCounts[i] << "\t" << MutHashListCounts[i] << "\t" ;
+		cout << "\tParents";
+		for (int pi=0; pi < RefAltCounts.size(); pi++){
+			cout << "\t" << RefAltCounts[pi][i] << "\t" << RefRefCounts[pi][i];
+		}
+		cout << "\t" << RefKmers[i] << "\t" << AltKmers[i]; 
+		cout<< endl;
+	}
 }
 string compressVar(string line, int start, string& StructCall)
 {      
@@ -581,7 +652,7 @@ string compressVar(string line, int start, string& StructCall)
 				convertEND << end; 
 
 				
-				if (current == 'T')
+				if (current == 'Y')
 				{
 					cout << "YAAAY STRUCT" << endl; 
 					StructCall = "SVTYPE=DUP;END="; 
@@ -622,7 +693,7 @@ string compressVar(string line, int start, string& StructCall)
 		convertEND << end;
 
 
-		if (current == 'T')
+		if (current == 'Y')
 		{
 			cout << "YAAAY STRUCT" << endl;
 			StructCall = "SVTYPE=DUP:TANDEM;END=";
@@ -784,52 +855,25 @@ void SamRead::createPeakMap()
 void SamRead::parseMutations( char *argv[])
 {
 	
-	cout << "Parsing Mutations " << endl;
+	cout << "In Parsing Mutations " << endl;
 	createPeakMap();
 	write(); 
 	string StructCall = ""; 
-//	vector<bool> PeakMap; 
-//	int max = -1; 
-//	int maxSpot = -1;
-//	int i =0;
-//	while (i<qual.size())
-//	{
-//		int j;
-//		for ( j = i+1; j < qual.size()-1; j++)
-//		{
-//			if(qual.c_str()[j+1] < qual.c_str()[j])
-//			{
-//				max =  qual.c_str()[j];
-//				while (qual.c_str()[j+1] < qual.c_str()[j] && j < qual.size()-1)
-//				{
-//					j++;
-//				}
-//				break; 	
-//			}		
-//		}
-//		int k; 
-//		for ( k = i; k <=j; k++)
-//		{
-//			if (qual.c_str()[k] == max)
-//				PeakMap.push_back(1);
-//			else	
-//				PeakMap.push_back(0);
-//		}
-//		i = i +k; 
-//	}	
-//	
-	//cout << "testhing hash search" << endl;
+
+
+	/////////////////Building up varHash and hash lists ///////////// 
+	cout << "Building up varHash" << endl; 
 	vector <string> hashes;
-	vector <string> hashesRef; 
+	vector <string> hashesRef;
 	vector <bool> varHash; 
 	for (int i = 0; i <  seq.size() - HashSize; i++)
 	{
 		string newHash = "";
 		string newHashRef = "";
-		//cout << "checking ref " << RefSeq << endl;
 		newHash += seq.c_str()[i];
 		newHashRef += RefSeq.c_str()[i]; 
-		int count = 0; 
+		int count = 0;
+		////can i replace this with get hash ?  
 		if ((cigarString.c_str()[i] != 'D' and cigarString.c_str()[i] != 'R' and cigarString.c_str()[i] != 'H'))
 		{
 			for (int j = 1; j<seq.size() - i and count < HashSize-1 ; j++)
@@ -840,22 +884,21 @@ void SamRead::parseMutations( char *argv[])
 					newHash += seq.c_str()[i+j]; 
 					newHashRef += RefSeq.c_str()[i+j];
 					count++;
-		//			cout << cigarString.c_str()[i+j] << " - " << i+j<< endl;
-		//			cout << newHash << endl; 
 				}
-	//			else
-		//		cout << "yay cigar was not ok - "   << cigarString.c_str()[i+j]<< endl;
 			}
 		}
 		hashes.push_back(newHash);
-		hashesRef.push_back(newHashRef);
-		//cout << newHash << endl; 
+		  hashesRef.push_back(newHashRef);
 		if (Hash.count(newHash) > 0 or Hash.count(RevComp(newHash)) > 0)
 			varHash.push_back(true); 
 		else
 			varHash.push_back(false); 
 	}
-	//cout << "made hash list to check " << endl; 
+	///////////////////////////////////////////////////
+	
+
+	///////////////////building up parent hash counts //////////////////
+	cout << "Bulding Par hash counts" << endl; 
 	vector <vector<int>> parentCounts;
 	vector <vector<int>> parentCountsReference;
 	//vector <long int> ParentHash;
@@ -867,9 +910,8 @@ void SamRead::parseMutations( char *argv[])
 		{
 			string hash =  hashes[i];
 			string hashRef = hashesRef[i]; 
-			//cout << "Hash = " << hash << endl;
 			bool checkHash = true; 
-			for (int j = 0; j < 25; j++)
+			for (int j = 0; j < HashSize; j++)
 			{
 				if (!(hash[j] == 'A' or hash[j] == 'C' or hash[j] == 'G' or hash[j] == 'T'))
 				{
@@ -879,34 +921,19 @@ void SamRead::parseMutations( char *argv[])
 			}
 			if (checkHash)
 			{
-				//cout << "passed" << endl;
 				unsigned long int LongHash = HashToLong(hash);
-				//cout << "herhe " << LongHash << endl;
 				if (ParentHashes[pi].count(LongHash) >0)
-				{
-					//cout << "exists" << endl;
 					counts.push_back(ParentHashes[pi][LongHash]);
-				}
 				else
-				{
-					//cout << "dosnt exist" << endl;
 					counts.push_back(0);
-				}
 				 unsigned long int LongHashRef = HashToLong(hashRef);
-				if (ParentHashesReference[pi].count(LongHashRef) >0)
-				{
-					//cout << "exists" << endl;
-					countsRef.push_back(ParentHashesReference[pi][LongHashRef]);
-				}
+				if (ParentHashes[pi].count(LongHashRef) >0)
+					countsRef.push_back(ParentHashes[pi][LongHashRef]);
 				else
-				{
-					//cout << "dosnt exist" << endl;
 					countsRef.push_back(0);
-				}
 			}
 			else 
 			{
-				//cout << "didnt pass" << endl;
 				counts.push_back(-1);
 				countsRef.push_back(-1);
 			} 
@@ -914,16 +941,22 @@ void SamRead::parseMutations( char *argv[])
 		parentCounts.push_back(counts);
 		parentCountsReference.push_back(countsRef);
 	}
-	//////////bulid Mut counts//////
+	 //////////////////////////////////////////////////////////////////
+	/////////////////////bulid Mut counts/////////////////////////////
+	cout << "bulding mut counts" << endl; 
 	vector <int> mutCounts;
 	vector <int> mutCountsRef;
+	cout << hashes.size() << endl;
+	cout << hashesRef.size() << endl; 
 	for(int i = 0; i< hashes.size(); i++)
 	{
+		cout << i<< endl;
 		string hash =  hashes[i];
+		cout << "   hash = " << hash << endl; 	
 		string hashRef = hashesRef[i];
-		//cout << "Hash = " << hash << endl;
+		cout << "RefHash = " << hashRef << endl; 
 		bool checkHash = true;
-		for (int j = 0; j < 25; j++)
+		for (int j = 0; j < HashSize; j++)
 		{
 			if (!(hash[j] == 'A' or hash[j] == 'C' or hash[j] == 'G' or hash[j] == 'T'))
 			{
@@ -931,44 +964,31 @@ void SamRead::parseMutations( char *argv[])
 				break;
 			}
 		}
+		cout << "check hash = " << checkHash << endl; 
 		if (checkHash)
 		{
-			//cout << "passed" << endl;
 			unsigned long int LongHash = HashToLong(hash);
-			//cout << "herhe " << LongHash << endl;
 			if (MutantHashes.count(LongHash) >0)
-			{
-				//cout << "exists" << endl;
-				mutCounts.push_back(MutantHashes[LongHash]);
-			}
+			{	mutCounts.push_back(MutantHashes[LongHash]);}
 			else
-			{
-				//cout << "dosnt exist" << endl;
-				mutCounts.push_back(0);
-			}
-			 unsigned long int LongHashRef = HashToLong(hashRef);
-			if (MutantHashesReference.count(LongHashRef) >0)
-			{
-				//cout << "exists" << endl;
-				mutCountsRef.push_back(MutantHashesReference[LongHashRef]);
-			}
+			{	mutCounts.push_back(0);}
+			
+			unsigned long int LongHashRef = HashToLong(hashRef);
+			if (MutantHashes.count(LongHashRef) >0)
+			{	mutCountsRef.push_back(MutantHashes[LongHashRef]);}
 			else
-			{
-				//cout << "dosnt exist" << endl;
-				mutCountsRef.push_back(0);
-			}
+			{	mutCountsRef.push_back(0);}
 		}
 		else
 		{
-			//cout << "didnt pass" << endl;
 			mutCounts.push_back(-1);
 			mutCountsRef.push_back(-1);
 		}
 	}
-	//////////////////////////
+	/////////////////////////////////////////////////////////////////////
 
-	/////write out vertical table////	
-	cout << "here" << endl;
+	////////////////////write out vertical table/////////////////////////	
+	cout << "writing hashes out vert" << endl;
 	for(int i =0; i < hashes.size(); i++)
 	{
 		cout << i << "\t" << hashes[i] << "\t" << varHash[i] << "\t" << PeakMap[i] << "\t" << (int) qual.c_str()[i]-33;
@@ -985,14 +1005,11 @@ void SamRead::parseMutations( char *argv[])
 		cout << endl;
 		
 	}
-	//////////////////////////////////
+	////////////////////////////////////////////////////////////////
 	
-	for (int i = 0; i < qual.size(); i++)
-	{
-		int qualcount =  qual.c_str()[i] - 33; 
-	//	cout <<  qual.c_str()[i] << " - " << qualcount << " - " << PeakMap[i] << seq.c_str()[i]<< endl;
-	}
 
+
+	/////////////////something////////////////////////////////////
 	string reff = "";
 	string alt = "";
 	string varType = "";
@@ -1001,21 +1018,22 @@ void SamRead::parseMutations( char *argv[])
 		reff = ""; 
 		alt = "";
 		varType = ""; 
-		if ((cigarString.c_str()[i] == 'X' or cigarString.c_str()[i] == 'I' or cigarString.c_str()[i] == 'D' or cigarString.c_str()[i] == 'T'/*  or cigarString.c_str()[i] == 'S' *or cigarString.c_str()[i] == 'H'*/) and RefSeq.c_str()[i] != 'N')
+		if ((cigarString.c_str()[i] == 'X' or cigarString.c_str()[i] == 'I' or cigarString.c_str()[i] == 'D' or cigarString.c_str()[i] == 'Y'/*  or cigarString.c_str()[i] == 'S' *or cigarString.c_str()[i] == 'H'*/) and RefSeq.c_str()[i] != 'N')
 		{
+			cout << "found a " << cigarString.c_str()[i] << endl;
 			int size = -1; 
 			int startPos = i; 
 			bool  AnyBasesOver0  = false; 
 			string Denovo = "inherited"; 
-			//varType += cigarString.c_str()[i]; 
+			
 			if (qual.c_str()[i] > '!')
 				AnyBasesOver0 = true;
 			if (PeakMap[i] == 1)
 				Denovo = "DeNovo";
+			
 			for(int j = 0; j< cigarString.size() - i; j++)
 			{
-				//if(cigarString.c_str()[i+j] == cigarString.c_str()[i])
-				if(cigarString.c_str()[i+j] == 'X' or cigarString.c_str()[i+j] == 'D' or cigarString.c_str()[i+j] == 'I' or cigarString.c_str()[i+j] == 'T' /*or cigarString.c_str()[i+j] == 'S' or cigarString.c_str()[i+j] == 'H'*/)
+				if(cigarString.c_str()[i+j] == 'X' or cigarString.c_str()[i+j] == 'D' or cigarString.c_str()[i+j] == 'I' or cigarString.c_str()[i+j] == 'Y' /*or cigarString.c_str()[i+j] == 'S' or cigarString.c_str()[i+j] == 'H'*/)
 				{
 					size = j; 
 					if (qual.c_str()[i+j] > '!')
@@ -1027,10 +1045,14 @@ void SamRead::parseMutations( char *argv[])
 				else //if (qual.c_str()[i+j] == '!')
 					break; 
 			}
+			cout << "size =" << size<< endl;
+			
+			/////////////////////Parent Low Coverage Check ////////////////// 
 			bool LowCov = false; 
-			int low = i - 30; 
+			int lowCount = 0; 
+			int low = i - HashSize - 5; 
 			if (low < 0){low = 0;}
-	//		cout << "checking bases " << low << " to " << i+size+5 << endl;
+			cout << "checking bases " << low << " to " << i+size+5 << endl;
 			for(int j = low; j < i+size+5 and j < hashes.size(); j++)
 			{
 				bool AllPar0 = true; 
@@ -1045,28 +1067,22 @@ void SamRead::parseMutations( char *argv[])
 				}
 				if (hashes[j].size() == HashSize and varHash[j] == false)
 				{
-	//				 cout << "base " << j ; 
-					 
 					for (int k = 0; k < parentCounts.size(); k++)
 					{
 						if (parentCounts[k][j] <= 5 and parentCounts[k][j] > 0)
 						{
-	//						cout << "\t" << parentCounts[k][j] ; 
 							LowCov = true;
+							lowCount++; 
 						}
 						 
 					}
-	//				cout << endl;
 				}
 			}
+			////////////////////////////////////////////////////////////////
 			if (AnyBasesOver0)  //enabling this will only report varites covered by hashes 
 			{
-				if ( cigarString.c_str()[i] == 'I' or cigarString.c_str()[i] == 'D' or cigarString.c_str()[i] == 'T' /*or cigarString.c_str()[i] == 'S' or cigarString.c_str()[i] == 'H'*/)
+				if ( cigarString.c_str()[i] == 'I' or cigarString.c_str()[i] == 'D' or cigarString.c_str()[i] == 'Y' /*or cigarString.c_str()[i] == 'S' or cigarString.c_str()[i] == 'H'*/)
 				{
-					//reff+=RefSeq.c_str()[i-1];
-					//alt+=seq.c_str()[i-1];
-					//startPos = i-1;
-						
 					for (int k = 1; i-k >= 0; k++)
 					{
 						if (ChrPositions[i-k] == "nope")
@@ -1080,12 +1096,8 @@ void SamRead::parseMutations( char *argv[])
 						}
 					}  
 				}
-				//if ( cigarString.c_str()[i] == 'I' )
-				//	varType += "INS";
-				//if (cigarString.c_str()[i] == 'D')
-				//	varType += "DEL";  	
-				//if (cigarString.c_str()[i] == 'X')
-				//	varType += "SNP"; 
+				
+				/////////build the alleles and var type/////////
 				for(int j = 0; j<= size; j++)
 				{
 					if (RefSeq.c_str()[i+j] == 'A' or RefSeq.c_str()[i+j] == 'C' or RefSeq.c_str()[i+j] == 'G' or RefSeq.c_str()[i+j] == 'T')
@@ -1094,152 +1106,128 @@ void SamRead::parseMutations( char *argv[])
 						alt+=seq.c_str()[i+j]; 
 					varType += cigarString.c_str()[i+j]; 
 				}
-	
+				cout << "here 5" << endl; 
 				//***********Build up hash depth nehborhod********************
-				//cout << seq << endl;
-				//for (int j = 0; j <i; j++)
-				//{	cout << " ";}
-				//cout << alt << endl;
-					
-			
 				int lower = i-HashSize; 
 				if (lower < 0){lower =0;}
-				int upper = i+alt.length()+reff.length()+1; 
+				int upper = i+alt.length()+reff.length();//-1;
+				cout << i<<" + "<< alt.length() << " + " << reff.length() << endl;
+				if (upper > MutRefCounts.size()){
+					cout << "this is going to break " << upper << " > " << MutRefCounts.size() << endl; 
+					upper = MutRefCounts.size(); 
+				}
+				//above I have a problem, alt +ref shouldnt be longer than the read but it appeanrelty is somethigms, figure this out
+				
+				
+				
+				//////////////chekcing allele frequencies ///////////	
 				vector <int> HashCounts; 
 				vector <int> HashCountsOG; 
-				vector <int> MutRefCounts;
-				vector <int> MutAltCounts; 
-				vector<vector <int>> ParRefCounts; 
+				vector <int> varMutRefCounts;
+				vector <int> varMutAltCounts; 
+				vector<vector <int>> varParRefCounts;
+				vector<vector <int>> varParAltCounts;  
 				vector <int> temp; 
 				for(int pi = 0; pi<ParentHashes.size(); pi++){
-					ParRefCounts.push_back(temp); 
+					varParRefCounts.push_back(temp);
+					varParAltCounts.push_back(temp); 
 				}
-
+				string nonspecific = "nonspecific";
+				vector <float> freqs;  
 				for (int j = lower; j<upper; j++)
 				{
-				//	for (int k = 0; k<j; k++)
-				//	{       cout << " ";}
-					string hash = getHash(seq, j, HashSize);
-					string Revhash = RevComp(hash);
-					
-					string Refhash = getHash(RefSeq, j, HashSize);
-					string RefRevhash = RevComp(Refhash);
-				//	this bit is used for the hash map in the info field 
-					if (hash != "") 
-					{
-						if (Hash.count(hash) > 0)
-						{
-							HashCounts.push_back(Hash[hash]);
-							HashCountsOG.push_back(Hash[hash]);
+					if(MutRefCounts[j]>0)
+						varMutRefCounts.push_back(MutRefCounts[j]);
+					if (MutAltCounts[j]>0)
+						varMutAltCounts.push_back(MutAltCounts[j]);
+					if (MutRefCounts[j]>0 and MutAltCounts[j]>0){
+						cout << "Ref = " << MutRefCounts[j] << " Mut = " << MutAltCounts[j] << " sum = " << MutRefCounts[j] +  MutAltCounts[j] ;
+						if (MutRefCounts[j] +  MutAltCounts[j] <= 59 and MutRefCounts[j] +  MutAltCounts[j] >= 18){
+							nonspecific = "DeNovo";
+							cout << "  yay DeNovo"; 
+							freqs.push_back(( MutRefCounts[j] +  MutAltCounts[j])/MutAltCounts[j]); 
 						}
-						else if (Hash.count(Revhash) > 0)
-						{
-							HashCounts.push_back(Hash[Revhash]);
-							HashCountsOG.push_back(Hash[Revhash]);
-						}
-						else
-						{
-							HashCounts.push_back(-1); 
-						}
+						else if (MutRefCounts[j] +  MutAltCounts[j] < 18)
+							cout <<"   boo too low"; 
+						cout << endl;
+					}
+					for (int pi=0; pi < varParRefCounts.size(); pi++){
+						if (RefRefCounts[pi][j] >0)
+							varParRefCounts[pi].push_back(RefRefCounts[pi][j]); 
+						if (RefAltCounts[pi][j] >0)
+							varParAltCounts[pi].push_back(RefAltCounts[pi][j]);
+
 					}
 
-					if (MutantHashes.count(HashToLong(hash)) > 0 and hash != "" )
-                                        {
-                                                MutAltCounts.push_back(MutantHashes[HashToLong(hash)]);
-                                                cout << "MAadded " << MutantHashes[HashToLong(hash)] << endl;
-                                        }
-                                        else if (MutantHashes.count(HashToLong(Revhash)) > 0 and hash != "" )
-                                        {
-                                                MutAltCounts.push_back(MutantHashes[HashToLong(Revhash)]);
-                                                cout << "MAadded " << MutantHashes[HashToLong(Revhash)] << endl;
-                                        }
-                                        else
-                                        {
-                                        }	
-
-
-					if (MutantHashesReference.count(HashToLong(Refhash)) > 0 && MutantHashesReference[HashToLong(Refhash)] > 0)
-                                        {
-                                                MutRefCounts.push_back(MutantHashesReference[HashToLong(Refhash)]);
-                                        	cout << "MRFadded " << MutantHashesReference[HashToLong(Refhash)] << endl; 
-					}
-                                        else if (MutantHashesReference.count(HashToLong(RefRevhash)) > 0 && MutantHashesReference[HashToLong(RefRevhash)] > 0)
-                                        {
-                                                MutRefCounts.push_back(MutantHashesReference[HashToLong(RefRevhash)]);
-						cout << "MRRadded " << MutantHashesReference[HashToLong(RefRevhash)] << endl;
-                                        }
-                                        else
-                                        {
-                                        }
-					for(int pi = 0; pi<ParentHashes.size(); pi++){	
-						if (ParentHashesReference[pi].count(HashToLong(Refhash)) > 0 && ParentHashesReference[pi][HashToLong(Refhash)] > 0)
-                                        	{
-                                        	        ParRefCounts[pi].push_back(ParentHashesReference[pi][HashToLong(Refhash)]);
-                                        	}
-                                        	else if (ParentHashesReference[pi].count(HashToLong(RefRevhash)) > 0 && ParentHashesReference[pi][HashToLong(RefRevhash)] > 0)
-                                        	{
-                                        	        ParRefCounts[pi].push_back(ParentHashesReference[pi][HashToLong(RefRevhash)]);
-                                        	}
-                                        	else
-                                        	{
-                                        	}	
-					}
+					if (Hash.count(AltKmers[j]) > 0 and Hash[AltKmers[j]] > 0)
+ 						HashCountsOG.push_back(Hash[AltKmers[j]]);
+					else if (Hash.count(RevComp(AltKmers[j])) > 0 and Hash[RevComp(AltKmers[j])])
+						HashCountsOG.push_back(Hash[RevComp(AltKmers[j])]);
+					if (Hash[AltKmers[j]] > 0)
+						HashCounts.push_back(Hash[AltKmers[j]]);
+					else
+						HashCounts.push_back(-1); 
 				}
+				float freq = 0; 
+				if (freqs.size() > 0){
+					for (int i =0; i<freqs.size(); i++){
+						freq+=freqs[i]; 
+					}
+					freq = freq/freqs.size(); 
+				}
+				//////////////////////////////////////////////
 
 				cout << "<><><><><>MutRef<><><><><><>" << endl ;
-                                for (int s =0; s<MutRefCounts.size(); s++){
-                                        cout << MutRefCounts[s] << " " ;
+                                for (int s =0; s<varMutRefCounts.size(); s++){
+                                        cout << varMutRefCounts[s] << " " ;
                                 }
                                 cout << endl << "<><><><><>MutAlt<><><><><><>" << endl;
-                                for (int s =0; s<MutAltCounts.size(); s++){
-                                        cout << MutAltCounts[s] << " " ;
+                                for (int s =0; s<varMutAltCounts.size(); s++){
+                                        cout << varMutAltCounts[s] << " " ;
                                 }
 				cout << endl;
 
-				sort (MutRefCounts.begin(), MutRefCounts.end());
-				sort (MutAltCounts.begin(), MutAltCounts.end());
+				sort (varMutRefCounts.begin(), varMutRefCounts.end());
+				sort (varMutAltCounts.begin(), varMutAltCounts.end());
+				
 				cout << "<><><><><>MutRefSorted<><><><><><>" << endl ;
-				for (int s =0; s<MutRefCounts.size(); s++){
-					cout << MutRefCounts[s] << " " ; 
+				for (int s =0; s<varMutRefCounts.size(); s++){
+					cout << varMutRefCounts[s] << " " ; 
 				}
 				cout << endl << "<><><><><>MutAltSorted<><><><><><>" << endl; 
-				for (int s =0; s<MutAltCounts.size(); s++){
-                                        cout << MutAltCounts[s] << " " ;
+				for (int s =0; s<varMutAltCounts.size(); s++){
+                                        cout << varMutAltCounts[s] << " " ;
                                 }
 				cout << endl; 
-				for(int pi = 0; pi<ParentHashes.size(); pi++){
-					 sort (ParRefCounts[pi].begin(), ParRefCounts[pi].end());
+				
+				for(int pi = 0; pi<varParRefCounts.size(); pi++){
+					 sort (varParRefCounts[pi].begin(), varParRefCounts[pi].end());
 					cout << "<><><><><>Ref" << pi << "<><><><><<><>" << endl;
-					for (int s =0; s<ParRefCounts[pi].size(); s++){
-						cout << ParRefCounts[pi][s] << " " ;
+					for (int s =0; s<varParRefCounts[pi].size(); s++){
+						cout << varParRefCounts[pi][s] << " " ;
 					}
 					cout << endl;
 				}
+				///////////////////////////////////////////////
 				int MutRefMode; 
-				if (MutRefCounts.size() >2)
-					MutRefMode = MutRefCounts[(MutRefCounts.size()-2)/2];
+				if (varMutRefCounts.size() >1)
+					MutRefMode = varMutRefCounts[(varMutRefCounts.size())/2];
 				else
 					MutRefMode = -1;
 					 
 				int MutAltMode; 
-				if (MutAltCounts.size() >2)
-					MutAltMode= MutAltCounts[(MutAltCounts.size()-2)/2];
+				if (varMutAltCounts.size() >2)
+					MutAltMode= varMutAltCounts[(varMutAltCounts.size()-2)/2];
 				else
 					MutAltMode=-1;
-
-
+				
 				vector <int> ParModes; 
-				for(int pi = 0; pi<ParentHashes.size(); pi++){
-					if (ParRefCounts.size() >2)
-					ParModes.push_back(ParRefCounts[pi][((ParRefCounts[pi].size()-2)/2)]); 
+				for(int pi = 0; pi<varParRefCounts.size(); pi++){
+					if (varParRefCounts[pi].size() >1)
+						ParModes.push_back(varParRefCounts[pi][((varParRefCounts[pi].size())/2)]); 
 					else
-					ParModes.push_back( -1);
+						ParModes.push_back( -1);
 				}
-				//cout << "Modes\t" << MutRefMode <<"\t" << MutAltMode; 
-				//for(int pi = 0; pi<ParentHashes.size(); pi++){
-				//	 cout << "\t" << ParModes[pi];
-				//	 }
-				//cout << endl;
 				
 				//***********check that the alese are only baess**************
 				bool good = true; 
@@ -1254,6 +1242,7 @@ void SamRead::parseMutations( char *argv[])
 					write();
 				}
 				 //***********check that the alese are only baess done**************
+				
 				//*****************Shitty Genotyper*********************
 				cout << "AF = " << (double) MutAltMode / ((double) MutRefMode + (double) MutAltMode) << endl;	
 				string Genotype; 
@@ -1264,42 +1253,80 @@ void SamRead::parseMutations( char *argv[])
 				else 
 					Genotype = "0/1";
 				//******************************************************
-				//write();
+				
+				
 				string CompressedVarType = compressVar(varType, Positions[startPos], StructCall); 
 					
 				cout <<  chr << "\t" << pos+i << "\t" << CompressedVarType /*"."*/ << "\t" << reff << "\t" << alt << "\t" << HashCountsOG.size() << "\t" << varType << "\t" << "." << "\t" << "." << "\t" << "." << endl;
 			
+
+				////////////////check that parents have enough coverage////////////////////
 				for(int pi = 0; pi<ParentHashes.size(); pi++){
-                                        if (ParRefCounts[pi].size() > 1)
+                                        if (varParRefCounts[pi].size() > 1)
                                         {
-                                                if (ParRefCounts[pi][(ParRefCounts[pi].size())/2] < 10) {
+                                                if (varParRefCounts[pi][(varParRefCounts[pi].size())/2] < 10) {
                                                         Denovo = "ParLowCov";
                                                 }
-                                                cout << "Par" << pi << " = " << ParRefCounts[pi][(ParRefCounts[pi].size()-2)/2] << endl;
+                                                cout << "Par" << pi << " = " << varParRefCounts[pi][(varParRefCounts[pi].size())/2] << endl;
                                         }
                                 }	
 			
 				if (LowCov)
+				//if (lowCount >=3)
 				{
 					cout << "LOW COVERAGE" << endl;
-					Denovo = "LowCov"; 
+					Denovo = "LowCov";
+					stringstream ss;
+					ss << lowCount;
+					Denovo += ss.str(); 
 				}
 				else
 				   	cout << "GOOD COVERAGE" << endl;
-				string ParMinCovOut = "";
-				
-				
-				
-				
+				 
+				 
+				 
+				 
+				 
+				 cout << "startpos = " << startPos << " chrsize = " << ChrPositions.size() << endl; 	
+				 cout << ChrPositions[startPos] << "\t" << endl;
+				 cout << Positions[startPos] << "\t"  << endl;
+				 cout << CompressedVarType <<"-"  << endl;
+				 cout << Denovo /*"."*/  << "\t"  << endl;
+				 cout << reff << "\t"  << endl;
+				 cout << alt << "\t"  << endl;
+				 cout << HashCountsOG.size() << "\t"  << endl;
+				 cout << "." << "\t"  << endl;
+				 cout << StructCall  << endl;
+				 cout <<"RN=" << name  << endl;
+				 cout << ";MQ=" << mapQual  << endl;
+				 cout << ";cigar=" << cigar  << endl;
+				 cout << ";" << "CVT=" << CompressedVarType << ";HD=" << endl;
+
+				if (StrandBias >= 0){
+
+					if (StrandBias >0.9 or StrandBias < 0.1)
+						Denovo = "StrandBias"; 
+				}
+			//	if (nonspecific == "nonspecific" )
+			//		Denovo = "nonspecific"; 
+			//	if (freq < 0.2)
+			//		Denovo+="-LowFreq"; 
+			//	if (freq > 8.0)
+			//		Denovo+="-HighFreq";
+
+
+			////////////////////////Writing var out to file/////////////////////////
 				cout       << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << HashCountsOG.size() << "\t" << "." << "\t" << StructCall <<"RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";" << "CVT=" << CompressedVarType << ";HD="; 
 					
 				VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << HashCountsOG.size() << "\t" << "." << "\t" << StructCall <<"RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";" << "CVT=" << CompressedVarType << ";HD="; 
+			
+
 				for (int j = 0; j < HashCounts.size(); j++)
 				{	
 					cout       << HashCounts[j] << "_";
 					VCFOutFile << HashCounts[j] << "_"; 
 				}
-				if (HashCountsOG.size()>0)
+				if (HashCountsOG.size()>1)
 				{
 					std::sort (HashCountsOG.begin(), HashCountsOG.end());
 					cout       << ";AO=" << HashCountsOG[HashCountsOG.size()/2];
@@ -1312,10 +1339,17 @@ void SamRead::parseMutations( char *argv[])
 				} 
 				cout       << ";VT=" <<  varType << "\t" ;
 				VCFOutFile <<  ";VT=" <<  varType << "\t" ;
-				cout       << "GT:DP:RO:AO" << "\t" << Genotype << ":" << MutRefMode + MutAltMode << ":" << MutRefMode << ":" << MutAltMode << endl;
-				VCFOutFile << "GT:DP:RO:AO" << "\t" << Genotype << ":" << MutRefMode + MutAltMode << ":" << MutRefMode << ":" << MutAltMode << endl;
-				 				
-//VCFOutFile <<  ";VT=" <<  varType << "\t" << "GT:AK" << "\t" << "0/1:"<< "7" << endl; 
+				cout       << "GT:DP:RO:AO:LP:PC:SB" << "\t" << Genotype << ":" << MutRefMode + MutAltMode << ":" << MutRefMode << ":" << MutAltMode ;
+				VCFOutFile << "GT:DP:RO:AO:LP:PC:SB" << "\t" << Genotype << ":" << MutRefMode + MutAltMode << ":" << MutRefMode << ":" << MutAltMode ; 
+				int ParentMode; 
+				int lowC = CheckParentCov(ParentMode); 
+				      cout << ":" << lowC << ":" << ParentMode << ":" << StrandBias;; 
+				VCFOutFile << ":" << lowC << ":" << ParentMode << ":" << StrandBias;;
+				
+				cout << endl; 
+				VCFOutFile << endl;
+				
+					
 				BEDOutFile << chr << "\t" << pos+i << "\t" <<  pos+i+size << "\t" << chr << ":" << pos+i << ":" << (int)(reff.length() - alt.length()) << ":" << HashCountsOG.size() << endl;
 				i+=size;
 				
@@ -1327,272 +1361,8 @@ void SamRead::parseMutations( char *argv[])
                                 cout << endl;
 			} 
 		}
-		/*else if (cigarString.c_str()[i] == 'D'  and RefSeq.c_str()[i] != 'N')
-		{
-			cout << "DELETION" << endl;
-			//write(); 
-		      	int size = -1;
-			bool AnyBasesOver0 = false; 
-			for(int j = 0; j< cigarString.size() - i; j++)
-			{
-				if(cigarString.c_str()[i+j] == 'D' or cigarString.c_str()[i+j] == 'X' or cigarString.c_str()[i+j] == 'I' )//or cigarString.c_str()[i+j] == 'S' or cigarString.c_str()[i+j] == 'H')
-				{
-					size = j;
-					 if (RefSeq.c_str()[i+j] == 'A' or RefSeq.c_str()[i+j] == 'C' or RefSeq.c_str()[i+j] == 'G' or RefSeq.c_str()[i+j] == 'T')
-						reff+=RefSeq.c_str()[i+j];
-					if (seq.c_str()[i+j] == 'A' or seq.c_str()[i+j] == 'C' or seq.c_str()[i+j] == 'G' or seq.c_str()[i+j] == 'T')
-						alt+=seq.c_str()[i+j];	
-					
-					if (qual.c_str()[i+j] > '!')
-						AnyBasesOver0 = true; 
-				}
-				else
-					break;
-			}
-			cout << "Raw reff = " << reff << endl << "raw alt  = " << alt << endl;
-			if (AnyBasesOver0 and size < MaxVarentSize)
-			{
-				cout << "size = " << size<< endl;
-				reff = RefSeq.c_str()[i-1] + reff;
-				alt = seq.c_str()[i-1] + alt;
-
-				cout << "reff = " << reff << endl << "alt  = " << alt << endl;	
-				//for(int j = 0; j<= size; j++)
-				//{
-				//	reff+=RefSeq.c_str()[i+j];
-				//}
-
-				 //***********Build up hash depth nehborhod********************
-				//cout << seq << endl;
-				//for (int j = 0; j <i; j++)
-				//{       cout << " ";}
-				//cout << alt << endl;
-	
-	
-				int lower = i-HashSize;
-				if (lower < 0){lower =0;}
-				int upper = i+2;
-				vector <int> HashCounts;
-				vector <int> HashCountsOG;
-				for (int j = lower; j<upper; j++)
-			       	{
-       				 //	for (int k = 0; k<j; k++)
-       				 //	{       cout << " ";}
-       				 	string hash = getHash(seq, j, HashSize);
-       				 	string Revhash = RevComp(hash);
-				//	cout << hash << "\t";
-					if (Hash.count(hash) > 0)
-					{
-						HashCounts.push_back(Hash[hash]);
-						HashCountsOG.push_back(Hash[hash]);
-				//		cout << Hash[hash] << endl;
-					}
-					else if (Hash.count(Revhash) > 0)
-					{
-						HashCounts.push_back(Hash[Revhash]);
-						HashCountsOG.push_back(Hash[Revhash]);
-				//		cout << Hash[Revhash] << endl;
-					}
-					else
-					{
-						HashCounts.push_back(-1);
-				//		cout << -1 << endl;
-					}
-				}
-
-
-				//***********check that the alese are only baess**************
-				bool good = true;
-				for (int j = 0; j<reff.size(); j++)
-				{       if (reff.c_str()[j] != 'A' or reff.c_str()[j] != 'C' or reff.c_str()[j] != 'G' or reff.c_str()[j] != 'T'){good = false;}}
-				for (int j = 0; j<alt.size(); j++)
-       			 	{	if (alt.c_str()[j] != 'A' or alt.c_str()[j] != 'C' or alt.c_str()[j] != 'G' or alt.c_str()[j] != 'T'){good = false;}}
-       			 	if (good = false)
-       			 	{
-       				 	cout <<"ERROR in DELETION detect"<< endl;
-       				 	cout <<endl<< chr << "\t" << pos+i << "\t" << reff << "\t" << alt << endl;
-       				 	write();
-       			 	}	
-       			  	//***********check that the alese are only baess done**************
-				//write(); 
-				cout <<chr << "\t" << pos+i-1 << "\t" << "." << "\t" << reff << "\t" << alt << "\t" << HashCountsOG.size() << "\t" << "DEL" << "\t" << "." << "\t" << "." << "\t" << "." << endl;
-				//  "#CHROM 	      POS	       ID	      REF	    ALT	     QUAL	   FILTER	     INFO	  FORMAT	Sample";
-				
-				VCFOutFile << ChrPositions[i] << "\t" << Positions[i-1] << "\t" << "." << "\t" << reff << "\t" << alt << "\t" << HashCountsOG.size() << "\t" << "DEL" << "\t" "HD=";;  
-				for (int j = 0; j < HashCounts.size(); j++)
-				{       VCFOutFile << HashCounts[j] << "_"; }	
-				if (HashCountsOG.size()>0)
-				{
-					std::sort (HashCountsOG.begin(), HashCountsOG.end());
-					VCFOutFile << ";AO=" << HashCountsOG[HashCountsOG.size()/2];
-				}
-				else
-				{
-					 VCFOutFile << ";AO=" << "-1";
-				}
-				VCFOutFile << "\t" << "." << "\t" << "."<< endl;
-
-				BEDOutFile << ChrPositions[i] << "\t" << Positions[i-1] << "\t" <<  pos+i+size << endl;
-       				i+=size;
-			}
-			else
-				cout << "nobase :):" << endl; 
-		}*/
-		/*else if ((cigarString.c_str()[i] == 'I' )  and RefSeq.c_str()[i] != 'N')
-		{
-			cout << "Working on insertion" << endl;
-			bool AnyBasesOver0 = false;	
-			int size = -1;
-			for(int j = 0; j< cigarString.size() - i; j++)
-			{
-			       	if(cigarString.c_str()[i+j] == 'X' or cigarString.c_str()[i+j] == 'D' or cigarString.c_str()[i+j] == 'I' or cigarString.c_str()[i+j] == 'S' or cigarString.c_str()[i+j] == 'H')
-				{
-					size = j;
-					if (qual.c_str()[i+j] > '!')
-						AnyBasesOver0 = true;
-				}
-				else
-					break;
-			}
-			if (AnyBasesOver0 and size < MaxVarentSize)
-			{
-				reff += RefSeq.c_str()[i-1];
-				alt += 	seq.c_str()[i-1];
-		
-       				for(int j = 0; j<= size; j++)
-				{
-					if (seq.c_str()[i+j] == 'A' or seq.c_str()[i+j] == 'G' or seq.c_str()[i+j] == 'C' or seq.c_str()[i+j] == 'T')
-	       			 		alt+=seq.c_str()[i+j];
-					//else
-					//	alt+=RefSeq.c_str()[i+j];
-	       		 	}
-				for(int j = 0; j<= size; j++)
-				{
-					if (RefSeq.c_str()[i+j] == 'A' or RefSeq.c_str()[i+j] == 'G' or RefSeq.c_str()[i+j] == 'C' or RefSeq.c_str()[i+j] == 'T')
-						reff+=seq.c_str()[i+j];
-				}
-				  //***********Build up hash depth nehborhod********************
-				//cout << seq << endl;
-				//for (int j = 0; j <i; j++)
-				//{       cout << " ";}
-				//cout << alt << endl;
-	
-	
-				int lower = i-HashSize;
-				if (lower < 0){lower =0;}
-				int upper = i+size+2;
-				vector <int> HashCounts;
-				vector <int> HashCountsOG;
-				for (int j = lower; j<upper; j++)
-				{
-				//	for (int k = 0; k<j; k++)
-				//	{       cout << " ";}
-					string hash = getHash(seq, j, HashSize);
-					string Revhash = RevComp(hash);
-				//	cout << hash << "\t";
-					if (Hash.count(hash) > 0)
-					{
-						HashCounts.push_back(Hash[hash]);
-						HashCountsOG.push_back(Hash[hash]);
-			//			cout << Hash[hash] << endl;
-			       	 	}
-					else if (Hash.count(Revhash) > 0)
-					{
-						HashCounts.push_back(Hash[Revhash]);
-						HashCountsOG.push_back(Hash[Revhash]);
-			  //      		cout << Hash[Revhash] << endl;
-					}
-					else
-					{
-						HashCounts.push_back(-1);
-			    //    		cout << -1 << endl;
-					}
-				}
-				//***********check that the alese are only baess**************
-				bool good = true;
-				for (int j = 0; j<reff.size(); j++)
-				{       if (reff.c_str()[j] != 'A' or reff.c_str()[j] != 'C' or reff.c_str()[j] != 'G' or reff.c_str()[j] != 'T'){good = false;}}
-				for (int j = 0; j<alt.size(); j++)
-				{	if (alt.c_str()[j] != 'A' or alt.c_str()[j] != 'C' or alt.c_str()[j] != 'G' or alt.c_str()[j] != 'T'){good = false;}}
-				if (good = false)
-				{
-					cout <<"ERROR in INSERTION detect"<< endl;
-					cout <<endl<< chr << "\t" << pos+i << "\t" << reff << "\t" << alt << endl;
-					write();
-				}
-				//***********check that the alese are only baess done**************
-	
-	
- 				//write(); 
-				//cout <<  chr << "\t" << pos+i-1 << "\t" << "." << "\t" << reff << "\t" << alt << "\t" << "100" << "\t" << "INS" << "\t" << "." << "\t" << "." << "\t" << "." << endl;
-				//	    "#CHROM	      POS	       ID		REF	       ALT	       QUAL	      FILTER		 INFO	       FORMAT	     Sample";
-	
-				VCFOutFile << ChrPositions[i] << "\t" << Positions[i-1] << "\t" << "." << "\t" << reff << "\t" << alt << "\t" << HashCountsOG.size() << "\t" << "INS" << "\t" "HD="; 
-				for (int j = 0; j < HashCounts.size(); j++)
-				{       VCFOutFile << HashCounts[j] << "_"; }
-				if (HashCountsOG.size()>0)
-				{
-					std::sort (HashCountsOG.begin(), HashCountsOG.end());
-					VCFOutFile << ";AO=" << HashCountsOG[HashCountsOG.size()/2];
-				}
-				else
-				{
-					 VCFOutFile << ";AO=" << "-1";
-				}
-				VCFOutFile << "\t" << "." << "\t" << "."<< endl;
-				BEDOutFile << ChrPositions[i] << "\t" << Positions[i-1] << "\t" <<  Positions[i]+size << endl;
-       			 	i+=size;	
-			}			
-		}
-		/*else if (cigarString.c_str()[i] == 'S'  and RefSeq.c_str()[i] != 'N')
-		{
-			bool AnyBasesOver0 = false;
-			int size = -1;
-			for(int j = 0; j< cigarString.size() - i; j++)
-			{
-				if(cigarString.c_str()[i+j] == 'S' or cigarString.c_str()[i+j] == 'I' )
-				{
-					size = j;
-					if (qual.c_str()[i+j] > '!')
-						AnyBasesOver0 = true;
-				}
-				else
-					break;
-			}
-			if (AnyBasesOver0)
-			{
-				reff += RefSeq.c_str()[i-1];
-				alt +=  seq.c_str()[i-1];
-
-				for(int j = 0; j<= size; j++)
-				{
-					alt+=seq.c_str()[i+j];
-				}
-				//***********check that the alese are only baess**************
-				bool good = true;
-				for (int j = 0; j<reff.size(); j++)
-				{       if (reff.c_str()[j] != 'A' or reff.c_str()[j] != 'C' or reff.c_str()[j] != 'G' or reff.c_str()[j] != 'T'){good = false;}}
-				for (int j = 0; j<alt.size(); j++)
-				{	if (alt.c_str()[j] != 'A' or alt.c_str()[j] != 'C' or alt.c_str()[j] != 'G' or alt.c_str()[j] != 'T'){good = false;}}
-				if (good = false)
-				{
-					cout <<"ERROR in INSERTION detect"<< endl;
-					cout <<endl<< chr << "\t" << pos+i << "\t" << reff << "\t" << alt << endl;
-					write();
-				}
-				//***********check that the alese are only baess done**************
-
-
-				//write();
-				//cout <<  chr << "\t" << pos+i-1 << "\t" << "." << "\t" << reff << "\t" << alt << "\t" << "100" << "\t" << "INS" << "\t" << "." << "\t" << "." << "\t" << "." << endl;
-				//	  "#CHROM	   POS	       ID	      REF	    ALT	     QUAL	   FILTER	     INFO	  FORMAT	Sample";
-
-				VCFOutFile << chr << "\t" << pos+i-1 << "\t" << "." << "\t" << reff << "\t" << alt << "\t" << "100" << "\t" << "INS-SofClipped" << "\t" << "." << "\t" << "." << "\t" << "." << endl;
-				BEDOutFile << chr << "\t" << pos+i-1 << "\t" <<  pos+i+size << endl;
-				i+=size;
-			}
-		}*/
 	}
+		cout << "Out parsingMutations" << endl;
 }
 void SamRead::processCigar()
 {
@@ -1611,7 +1381,30 @@ void SamRead::processCigar()
 	}
 	
 }
-
+void SamRead::FixTandemRef()
+{
+	cout << "FOUND TANDEM" << endl;
+	write();
+	writeVertical();  
+	string lastChr = "nope"; 
+	int lastPos = -1; 
+	string NewRef = ""; 
+	for (int i = 0; i<seq.size(); i++){
+		cout << i << " " << seq[i] << " " <<  cigarString[i] << " " << RefSeq[i] << endl;
+		if (cigarString[i]=='Y'){
+			NewRef+= toupper(Reff.getSubSequence(lastChr, lastPos+1, 1).c_str()[0]); 
+			lastPos++; 
+		}
+		else{
+			NewRef+=RefSeq[i]; 
+			lastChr = ChrPositions[i]; 
+			lastPos = Positions[i];
+		}
+	}
+	RefSeq = NewRef; 
+	cout << "done tandtem fix" << endl;
+	write();
+}
 void SamRead::getRefSeq()
 {
 	originalSeq = seq; 
@@ -1775,11 +1568,183 @@ void SamRead::getRefSeq()
 	}
 	Positions = NewPositions;
 	ChrPositions = NewChromosome;
+	//************************Lookup Kmer counts ***************************//
+	LookUpKmers();
+	vector <long> blank;
+	/*
+	for (int pi = 0; pi < ParentHashes.size(); pi++){
+		RefAltCounts.push_back(blank); 
+		RefRefCounts.push_back(blank);
+	}
+ 	for (int j = 0; j<seq.size(); j++)
+        {
+		//hash table already has revcomp counted in it
+        	string hash = getHash(seq, j, HashSize);
+                string Refhash = getHash(RefSeq, j, HashSize);
+
+		if (hash != ""){
+
+			if (hash == Refhash){
+				MutAltCounts.push_back(0); 
+				for (int pi = 0; pi < ParentHashes.size(); pi++){
+					RefAltCounts[pi].push_back(0);
+				}
+			}
+			else{
+				if (MutantHashes.count(HashToLong(hash)) > 0 ){
+                         		MutAltCounts.push_back(MutantHashes[HashToLong(hash)]);
+                         	}
+				else
+					MutAltCounts.push_back(-1); 
+			
+				for (int pi = 0; pi < ParentHashes.size(); pi++){
+					if (ParentHashes[pi].count(HashToLong(hash)) > 0){
+						RefAltCounts[pi].push_back(ParentHashes[pi][HashToLong(hash)]);
+					}
+					else
+						RefAltCounts[pi].push_back(-1); 
+				}
+			}
+		}
+		else{
+			MutAltCounts.push_back(-3);
+			for (int pi = 0; pi < ParentHashes.size(); pi++){
+				RefAltCounts[pi].push_back(-3);
+			}
+		}
+
+		if(Refhash != ""){
+			if (MutantHashes.count(HashToLong(Refhash)) > 0 )
+                        {
+                                MutRefCounts.push_back(MutantHashes[HashToLong(Refhash)]);
+                        }
+                        else
+                                MutRefCounts.push_back(-1);
+
+			for (int pi = 0; pi < ParentHashes.size(); pi++){
+                        	if (ParentHashes[pi].count(HashToLong(Refhash)) > 0){
+                                                RefRefCounts[pi].push_back(ParentHashes[pi][HashToLong(Refhash)]);
+                                }
+                                else
+                                        RefRefCounts[pi].push_back(-1);
+                        }
+		
+		} 
+		else{
+
+			MutRefCounts.push_back(-3);
+			for (int pi = 0; pi < ParentHashes.size(); pi++){
+				RefRefCounts[pi].push_back(-3);
+			}
+		}
+
+	}
+	*/
+			
+
+	//**********************************************************************//
+	
+	cout << "After getRefSeq";
+	writeVertical(); 
+}
+
+void SamRead::LookUpKmers() 
+{
+	cout << "SeqSize = " << seq.size() << " RefSize = " << RefSeq.size() << endl;
+	vector <long> blank;
+        RefAltCounts.clear();
+	RefRefCounts.clear();
+	MutHashListCounts.clear();
+	MutAltCounts.clear();
+	MutRefCounts.clear();
+	RefKmers.clear();
+	AltKmers.clear();
+	for (int pi = 0; pi < ParentHashes.size(); pi++){
+                RefAltCounts.push_back(blank);
+                RefRefCounts.push_back(blank);
+        }
+        for (int j = 0; j<seq.size(); j++)
+        {
+                //hash table already has revcomp counted in it
+                string hash = getHash(seq, j, HashSize);
+                string Refhash = getHash(RefSeq, j, HashSize);
+		RefKmers.push_back(Refhash); 
+		AltKmers.push_back(hash);
+                if (hash != ""){
+
+                        if (hash == Refhash){
+                                MutAltCounts.push_back(0);
+                                for (int pi = 0; pi < ParentHashes.size(); pi++){
+                                        RefAltCounts[pi].push_back(0);
+                                }
+                        }
+                        else{
+                                if (MutantHashes.count(HashToLong(hash)) > 0 ){
+                                        MutAltCounts.push_back(MutantHashes[HashToLong(hash)]);
+                               	} 
+                                else
+                                        MutAltCounts.push_back(-1);
+				
+                                for (int pi = 0; pi < ParentHashes.size(); pi++){
+                                        if (ParentHashes[pi].count(HashToLong(hash)) > 0){
+                                                RefAltCounts[pi].push_back(ParentHashes[pi][HashToLong(hash)]);
+                                        }
+                                        else
+                                                RefAltCounts[pi].push_back(-1);
+                                }
+                        }
+
+			if (Hash.count(hash) > 0){
+                                        MutHashListCounts.push_back(Hash[hash]);
+                                }
+                                else
+                                        MutHashListCounts.push_back(-1);
+
+
+                }
+                else{
+                        MutAltCounts.push_back(-3);
+                        MutHashListCounts.push_back(-3); 
+			for (int pi = 0; pi < ParentHashes.size(); pi++){
+                                RefAltCounts[pi].push_back(-3);
+                        }
+                }
+
+                if(Refhash != ""){
+                        if (MutantHashes.count(HashToLong(Refhash)) > 0 )
+                        {
+                                MutRefCounts.push_back(MutantHashes[HashToLong(Refhash)]);
+                        }
+                        else
+                                MutRefCounts.push_back(-1);
+
+                        for (int pi = 0; pi < ParentHashes.size(); pi++){
+                                if (ParentHashes[pi].count(HashToLong(Refhash)) > 0){
+                                                RefRefCounts[pi].push_back(ParentHashes[pi][HashToLong(Refhash)]);
+                                }
+                                else
+                                        RefRefCounts[pi].push_back(-1);
+                        }
+
+                }
+                else{
+
+                        MutRefCounts.push_back(-3);
+                        for (int pi = 0; pi < ParentHashes.size(); pi++){
+                                RefRefCounts[pi].push_back(-3);
+                        }
+                }
+
+        }
+	cout << "donezo" << endl;
 }
 void SamRead::parse(string read)
 {
+	cout << "parsing " << read << endl;
 	vector <string> temp = Split(read, '\t');
+	cout << "boom" << endl;
 	name = temp[0];
+	cout << "name " << name; 
 	flag = atoi(temp[1].c_str());
 	chr = temp[2];
 	pos = atoi(temp[3].c_str());
@@ -1804,9 +1769,56 @@ void SamRead::parse(string read)
 	string NewSeq = ""; 
 	for (int i = 0; i < seq.size(); i++)
 		NewSeq+=toupper(seq.c_str()[i]);
-	
+
 	seq = NewSeq; 
 	processCigar(); 
+	cout << "working on strand bias" << endl; 
+	cout << temp[0] << endl; 
+	vector <string> temp2 = Split(name, ':');
+	if (temp2.size() >= 2){
+		cout << "break it down " << endl;
+		strands = temp2[1];
+		cout << "strands = " << strands << endl;
+		forward = 0;
+		reverse = 0; 
+		forward = atoi(temp2[1].c_str()); 
+		reverse = atoi(temp2[2].c_str()); 
+		//for (int i = 0; i < strands.size(); i++){
+		//	if (strands.c_str()[i] == '+')
+		//		forward++;
+		//	else if (strands.c_str()[i] == '-')
+		//		reverse++;
+		//	else
+		//		cout << "WTF strand = " << strands.c_str()[i] << endl; 
+		//}
+		cout << "forward = " << forward << endl; 
+		cout << "reverse = " << reverse << endl; 
+		StrandBias = ((float)forward)/((float)forward+(float)reverse); 
+		cout << "strand bias = " << StrandBias << endl; 
+	}
+	else{
+		cout << "no strand data " << temp2.size() << endl; 
+		strands = ""; 
+		StrandBias = -1; 
+		forward = -1; 
+		reverse = -1;
+	}
+	cout << "getting flag bits " << endl;
+	for (int j = 0;  j < 16;  ++j){
+		FlagBits [j] =  0 != (flag & (1 << j));
+	}
+	cout << "Read Pared = " << FlagBits[0] << endl;
+	cout << "read mapped in proper pair = " << FlagBits[1] << endl; 
+	cout << "read unmapped = " << FlagBits[2] << endl; 
+	cout << "mate unmapped = " << FlagBits[3] << endl; 
+	cout << "read reverse strand = " << FlagBits[4] << endl; 
+	cout << "mate referse strand = " << FlagBits[5] << endl; 
+	cout << "first in pair =" << FlagBits[6] << endl; 
+	cout << "second in pair =" << FlagBits[7] << endl; 
+	cout << "not primary alignment =" << FlagBits[8] << endl; 
+	cout << "read fails platform or vendor quality checks =" << FlagBits[9] << endl; 
+	cout << "read is PCR or optical duplicate =" << FlagBits[10] << endl; 
+	cout << "supplementary alignment =" << FlagBits[11] << endl; 
 }
 int findBreak(SamRead& read)
 {
@@ -1856,7 +1868,7 @@ int findBreak(SamRead& read)
 }
 SamRead BetterWay(vector<SamRead> reads)
 {
-	
+	cout << "In BetterWay" << endl;
 	int A = 0; 
 	int B = 1;
 	//cout << "B = " << B << endl;
@@ -2269,7 +2281,7 @@ SamRead BetterWay(vector<SamRead> reads)
 						int j = 0; 
 						for( j = i; j<reads[A].seq.size() and reads[A].Positions[j] < LastAlignedPos ; j++)
 						{
-							NewCigar += 'T'; //'I';
+							NewCigar += 'Y'; //'I';
 							NewSeq += reads[A].seq.c_str()[j];
 							NewQual += reads[A].qual.c_str()[j];
 							NewRef+= '-';
@@ -2287,7 +2299,7 @@ SamRead BetterWay(vector<SamRead> reads)
 						//cout << "j= " << reads[A].Positions[k]+1 << " < " <<  LastAlignedPos << " - " << endl;
 						for( j = reads[A].Positions[k]+1; j < LastAlignedPos; j++)
 						{
-							NewCigar += 'T'; //'I';
+							NewCigar += 'Y'; //'I';
 							NewSeq += toupper(Reff.getSubSequence(reads[A].chr, j, 1).c_str()[0]);
 							NewQual += '!';
 							NewRef+= '-';
@@ -2542,7 +2554,7 @@ SamRead BetterWay(vector<SamRead> reads)
 						int j = 0; 
 						for(j = i; j < reads[B].seq.size() and reads[B].Positions[j] <= LastAlignedPos; j++)
 						{
-							NewCigar += 'T';
+							NewCigar += 'Y';
 							NewSeq += reads[B].seq.c_str()[j];
 							NewQual += reads[B].qual.c_str()[j];
 							NewRef+= '-';
@@ -2560,7 +2572,7 @@ SamRead BetterWay(vector<SamRead> reads)
 						//cout << "j= " << reads[B].Positions[k]+1 << " < " <<  LastAlignedPos << " - " << endl;
 						for( j = reads[B].Positions[k]+1; j < LastAlignedPos; j++) 
 						{
-							NewCigar += 'T';
+							NewCigar += 'Y';
 							NewSeq += toupper(Reff.getSubSequence(reads[B].chr, j, 1).c_str()[0]);
 							NewQual += '!';
 							NewRef+= '-';
@@ -2841,8 +2853,16 @@ SamRead BetterWay(vector<SamRead> reads)
 		Invertions << reads[A].chr << "\t" << reads[A].pos << "\t" << reads[B].pos << "\t" << reads[B].pos- reads[A].pos << endl;
 
 	}
-	reads[A].write(); 
+
+	//**********************Adding K-mer lookup stuff here *********************************
+	
+	//**************************************************************************************
+	//reads[A].FixTandemRef(); 
+	reads[A].LookUpKmers();
+	cout << "ReAdjustedKmers" <<endl;
+	reads[A].writeVertical(); 
 	return reads[A];
+	cout << "Out Of BetterWay " << endl;
 }
 int main (int argc, char *argv[])
 {
@@ -2870,6 +2890,7 @@ options:\
   -sam  arg		Path to input SAM file, omit for stdin\n\
   -r  arg		Path to reference file \n\
   -hf arg		Path to HashFile from RUFUS.build\n\
+  -hS arg		Hash Size\n\
   -o  arg		Output stub\n\
   -m  arg		Maximum varient size: default 1Mb\n\
 			(Sorry it has to be a num, no 1kb, must be 1000\n\
@@ -2925,7 +2946,12 @@ options:\
 		{
 			HashListFile =  argv[i+1];
 			i++;
-		} 
+		}
+		else if (p == "-hs")
+                {
+                        HashSize =  atoi(argv[i+1]);
+                        i++;
+                }
 		else if (p == "-m")
 		{
 			MaxVarentSize =  atoi(argv[i+1]);
@@ -3018,11 +3044,10 @@ options:\
 		{
 			vector <string> temp = Split(line, ' ');
 			unsigned long hash = HashToLong(temp[0]);
-			hl[hash] = atoi(temp[1].c_str());
+			ParentHashes[i][hash] = atoi(temp[1].c_str());
 			hash = HashToLong(RevComp(temp[0]));
-			hl[hash] = atoi(temp[1].c_str());
+			ParentHashes[i][hash] = atoi(temp[1].c_str());
 		}
-		ParentHashesReference.push_back(hl);
 		reader.close();
 	}
 	cout << "check parent thing" << endl; 
@@ -3052,9 +3077,9 @@ options:\
 
 		vector <string> temp = Split(line, ' ');
 		unsigned long hash = HashToLong(temp[0]);
-		MutantHashesReference[hash] = atoi(temp[1].c_str());
+		MutantHashes[hash] = atoi(temp[1].c_str());
 		hash = HashToLong(RevComp(temp[0]));
-		MutantHashesReference[hash] = atoi(temp[1].c_str());
+		MutantHashes[hash] = atoi(temp[1].c_str());
 	}
 	reader.close();			
 	
@@ -3084,8 +3109,18 @@ options:\
 	line = "";
 	getline(HashList, line);
 	cout << "line = " << line << endl; 
-	vector<string> temp = Split(line, '\t');
+	char seperator = '\t';
+	vector<string> temp = Split(line, seperator);
+	if (temp.size() ==1){
+		cout << "separator is not tab" << endl; 
+		seperator = ' '; 
+		 temp = Split(line, seperator);
+	}
+	else
+		cout << "separator is tab" << endl;
+
 	cout << "split = " << temp[0] << " and " << temp[1] << endl;
+	HashSize = temp[0].size(); 
 	if (temp.size() ==4)
 	{ 
 		HashSize = temp[3].length(); 
@@ -3093,8 +3128,9 @@ options:\
 	
 		while ( getline(HashList, line))
 		{
-			vector<string> temp = Split(line, '\t');
+			vector<string> temp = Split(line, seperator);
 			Hash.insert(pair<string, int>(temp[3], atoi(temp[2].c_str())));
+			Hash.insert(pair<string, int>(RevComp(temp[3]), atoi(temp[2].c_str()))); 
 			//cout << "added pair " << temp[3] << "\t" << temp[2] << endl;
 		}
 		HashList.close(); 
@@ -3104,31 +3140,32 @@ options:\
 	{
 		HashSize = temp[0].length();
 		Hash.insert(pair<string, int>(temp[0], atoi(temp[1].c_str())));
-
+		Hash.insert(pair<string, int>(RevComp(temp[0]), atoi(temp[1].c_str())));
 		while ( getline(HashList, line))
 		{
-			vector<string> temp = Split(line, '\t');
+			vector<string> temp = Split(line, seperator);
 			Hash.insert(pair<string, int>(temp[0], atoi(temp[1].c_str())));
 			//cout << "added pair " << temp[3] << "\t" << temp[2] << endl;
 		}
 		HashList.close();
 		cout << "done with HashList" << endl;
 	}
-	else if (temp.size() ==1)
+	/*else if (temp.size() ==1)
 	{
 		vector<string> temp = Split(line, ' ');
 		HashSize = temp[0].length();
 		Hash.insert(pair<string, int>(temp[0], atoi(temp[1].c_str())));
-
+		Hash.insert(pair<string, int>(RevComp(temp[0]), atoi(temp[1].c_str())));
 		while ( getline(HashList, line))
 		{
 			vector<string> temp = Split(line, ' ');
 			Hash.insert(pair<string, int>(temp[0], atoi(temp[1].c_str())));
+			Hash.insert(pair<string, int>(RevComp(temp[0]), atoi(temp[1].c_str())));
 			//cout << "added pair " << temp[3] << "\t" << temp[2] << endl;
 		}
 		HashList.close();
 		cout << "done with HashList" << endl;
-	}
+	}*/
 	//map<string, int>::iterator it;
 	//for ( it = Hash.begin(); it != Hash.end(); it++ )
 	//{
@@ -3169,11 +3206,15 @@ options:\
 	VCFOutFile << "##fileDate=" << time(0) << endl;
 	VCFOutFile << "##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">" << endl;
 	VCFOutFile << "##FORMAT=<ID=AK,Number=1,Type=Integer,Description=\"Alternte Kmer Count\">" << endl;
-	VCFOutFile << "##FORMAT=<ID=DP,Number=1,Type=Integer,Description=\"Genotype\">" << endl;
-	VCFOutFile << "##FORMAT=<ID=RO,Number=1,Type=Integer,Description=\"Genotype\">" << endl;
-	VCFOutFile << "##FORMAT=<ID=AO,Number=1,Type=Integer,Description=\"Genotype\">" << endl;
+	VCFOutFile << "##FORMAT=<ID=DP,Number=1,Type=Integer,Description=\"Total Kmer depth across the variant\">" << endl;
+	VCFOutFile << "##FORMAT=<ID=RO,Number=1,Type=Integer,Description=\"Mode of reference kmer counts\">" << endl;
+	VCFOutFile << "##FORMAT=<ID=AO,Number=1,Type=Integer,Description=\"Mode of alt kmer counts\">" << endl;
+	VCFOutFile << "##FORMAT=<ID=LP,Number=1,Type=Integer,Description=\"Number of lowcoverage parent bases\">" << endl;
+	VCFOutFile << "##FORMAT=<ID=PC,Number=1,Type=Integer,Description=\"Mode of parents coverage\">" << endl;
+	VCFOutFile << "##FORMAT=<ID=SB,Number=1,Type=Float,Description=\"StrandBias\">" << endl;
 	VCFOutFile << "##INFO=<ID=SVTYPE,Number=1,Type=String,Description=\"Type of SV detected\">" << endl;
-	VCFOutFile << "##INFO=<ID=SVLENGTH,Number=1,Type=Integer,Description=\"Length of SV detected\">" << endl; 
+	VCFOutFile << "##INFO=<ID=SVLEN,Number=1,Type=Integer,Description=\"Length of SV detected\">" << endl; 
+	VCFOutFile << "##INFO=<ID=END,Number=1,Type=Integer,Description=\"END of SV detected\">" << endl; 
 	VCFOutFile << "##INFO=<ID=AO,Number=1,Type=Integer,Description=\"Alternate allele observations, with partial observations recorded fractionally\">"<<endl;
 	VCFOutFile << "##INFO=<ID=HD,Number=.,Type=String,Description=\"Hash counts for each k-mer overlapping the vareint, -1 indicates no info\">"<< endl;
 	VCFOutFile << "##INFO=<ID=RN,Number=1,Type=String,Description=\"Name of contig that produced the call\">"<< endl;
@@ -3181,7 +3222,8 @@ options:\
 	VCFOutFile << "##INFO=<ID=cigar,Number=1,Type=String,Description=\"Cigar string for the contig that created the call\">"<< endl;
 	VCFOutFile << "##INFO=<ID=VT,Number=1,Type=String,Description=\"Varient Type\">"<< endl;	
 	VCFOutFile << "##INFO=<ID=CVT,Number=1,Type=String,Description=\"Compressed Varient Type\">"<< endl;
-	
+	VCFOutFile << "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t";
+	VCFOutFile << outStub << endl;
 
 	int lines = 0;
 
@@ -3215,10 +3257,10 @@ options:\
 			cout << line << endl;
 			counter ++; 
 			SamRead read; 
-			cout << "parse" << endl; 
+			cout << "parse " << endl; 
 			read.parse(line);
 			//if (read.mapQual > 0)
-			if (read.flag != 4)
+			if (read.FlagBits[2] != 1)//read.flag != 4)
 			{
 				cout << "RefSeq" << endl;
 				read.getRefSeq();
@@ -3229,14 +3271,15 @@ options:\
 				if (counter%100 == 0)
 					cout << "read " << counter << " entries " << char(13); 
 			}
+			//else do I want to track unaliged alignments? 
 		}
 	}
 	cout << endl;
 	cout << "Read in " << reads.size() << " reads " << endl;
 
 
-	  VCFOutFile << "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t";
-	VCFOutFile << outStub << endl;
+	//  VCFOutFile << "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t";
+	//VCFOutFile << outStub << endl;
 
 	
 	cout << "procesing split reads" << endl;
@@ -3253,13 +3296,10 @@ options:\
 				if (strcmp(reads[i].name.c_str(), reads[j].name.c_str()) == 0)
 				{
 					cout << "found mate " << reads[j].name << endl;
-				//	if (reads[i].chr == reads[j].chr)
-					{
-						reads[i].alignments.push_back(j); 
-						reads[j].first = false;
-					}
-				//	else
-				//		cout << "skip that shit" << endl; 
+					
+					reads[i].alignments.push_back(j); 
+					reads[j].first = false;
+					
 				}
 				if (count > 100000)
 					break; 

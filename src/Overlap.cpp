@@ -293,10 +293,11 @@ int  PrepairSearchList(string A, int Ai, unordered_map<unsigned long, vector<int
 	NumberIndex = sanity;
 	#pragma omp critical
 	{array[Ai] = indexes;}
-	return 1;
+	//return 1;
 									if(FullOut){cout << "       " << indexes.size() << " locations passed filter" << endl;}
 
 
+	return 1; 
 }
 int Align3 (vector<string>& sequenes, string Ap, string Aq, int Ai, int& overlap, int& BestIndex, float minPercent, bool& PerfectMatch, int MinOverlap, vector<int>& indexes, int Threads, int NumReads)
 {
@@ -464,7 +465,7 @@ int Align3 (vector<string>& sequenes, string Ap, string Aq, int Ai, int& overlap
 	return bestScore;	
 }
 
-string ColapsContigs(string A, string B, int k, string Aq, string& Bq, string Ad, string& Bd)
+string ColapsContigs(string A, string B, int k, string Aq, string& Bq, string Ad, string& Bd, string As, string& Bs)
 {
 	bool verbose = false;
 	if (verbose){cout << "Combining; \n" << A << endl << B << endl;} 
@@ -580,8 +581,9 @@ string ColapsContigs(string A, string B, int k, string Aq, string& Bq, string Ad
 
 		}
 		else if (Abase =='Z' && Bbase == 'Z')
-		{Bq = newQual; Bd = newDepth;return newString;}
+		{Bq = newQual; Bd = newDepth;break;}//return newString;}
 	}
+	Bs += As; 
 	Bq = newQual;
 	Bd = newDepth;
 	return newString;
@@ -729,6 +731,18 @@ bool replace(std::string& str, const std::string& from, const std::string& to) {
     str.replace(start_pos, from.size(), to);
     return true;
 }
+string FlipStrands(string strand)
+{
+        string NewStrand = "";
+        for (int i = 0; i < strand.size(); i++){
+                if (strand.c_str()[i]=='+')
+                        NewStrand+="-";
+                else if (strand.c_str()[i]=='-')
+                        NewStrand+="+";
+        }
+        return NewStrand;
+
+}
 int main (int argc, char *argv[])
 {
 	cout << "Testing Trim \n";
@@ -839,7 +853,7 @@ int main (int argc, char *argv[])
 	vector<string> sequenes;// = new vector<string>;
 	vector<string> qual;//= new vector<string>;
 	vector<string> depth;// = new vector<string>;
-		
+	vector<string> strand; 	
 	std::unordered_map<unsigned long, vector<int>> Hashes;
 	
 
@@ -894,6 +908,7 @@ int main (int argc, char *argv[])
 				sequenes.push_back(L2);
 				qual.push_back(L4);
 				depth.push_back(depths);
+				strand.push_back(L5); 
 				ReadSize = L2.size();
 			}
 			else
@@ -974,6 +989,7 @@ int main (int argc, char *argv[])
 					goodlines++;
 					sequenes.push_back(L2);
 					qual.push_back(L4);
+					strand.push_back("+");
 					unsigned char C = 1;
 					for (int i=0; i<=ReadSize;i++)
 					{depths += C;}
@@ -1060,10 +1076,11 @@ int main (int argc, char *argv[])
 								if (FullOut){cout << "Done Bulding List"<< endl;}
 		for (int i = b; i<max; i++)
 		{
-			string A, Aqual, Adep;
+			string A, Aqual, Adep, Astr;
 			A = sequenes[i];
 			Aqual = qual[i];
 			Adep = depth[i];
+			Astr = strand[i]; 
 			int k;
 			bool PerfectMatch = false;
 			int bestIndex = -1;
@@ -1090,6 +1107,7 @@ int main (int argc, char *argv[])
 				string revA = RevComp(A);
 				string revAqual = RevQual(Aqual);
 				string revAdep = RevQual(Adep);
+				string revAstr = FlipStrands(Astr); 
 				int revk = -1;
 				int revbestIndex = -1;
 								if(FullOut){cout << "Checking Reverse\n";}
@@ -1101,6 +1119,7 @@ int main (int argc, char *argv[])
 					A = revA;
 					Aqual = revAqual;
 					Adep = revAdep;
+					Astr = revAstr; 
 					k = revk;
 					booya = revbooya;
 					bestIndex = revbestIndex;
@@ -1115,20 +1134,22 @@ int main (int argc, char *argv[])
 			}
 			else	
 			{
-				string B, Bqual, Bdep;
+				string B, Bqual, Bdep, Bstr;
 				B = sequenes[bestIndex];
 				Bqual = qual[bestIndex];
 				Bdep = depth[bestIndex];
+				Bstr = strand[bestIndex];
 				FoundMatch++;
 				
 												if(FullOut){if(k>0){cout << "found match at "<< k  << endl; for( int z = 0; z<k; z++)cout << "+";cout << A << endl << B  << endl;for (int z = 0; z < Bdep.size();z++){int bam = Bdep.c_str()[z];cout << bam;}cout << endl;}else {cout << "found match at "<< k  << endl;cout << A << endl;for( int z = 0; z<abs(k); z++)cout << "-";cout << B  << endl;for( int z = 0; z<abs(k); z++)cout << "-";for (int z = 0; z < Bdep.size();z++){int bam = Bdep.c_str()[z];cout << bam;}cout << endl;}}
 				
-				string combined = ColapsContigs(A, B, k, Aqual, Bqual, Adep, Bdep);
+				string combined = ColapsContigs(A, B, k, Aqual, Bqual, Adep, Bdep, Astr, Bstr);
 				
 							if (Bqual.size() != combined.size()){cout << "ERRRORRR ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^" << endl;}	
 				qual[bestIndex] = Bqual;
 				depth[bestIndex] = Bdep;
 				sequenes[bestIndex] = combined;
+				strand[bestIndex] = Bstr; 
 				sequenes[i] = "moved";
 			
 				//cout << "staring lookup" << endl;
@@ -1212,7 +1233,7 @@ int main (int argc, char *argv[])
 				Depreport << sequenes[i] << endl;
 				Depreport << "+" << endl;
 				Depreport << qual[i] << endl;
-				Depreport << '+' << endl;
+				Depreport << strand[i] << endl;
 				unsigned char C = depth[i].c_str()[0];
 				int booya = C;
 				Depreport << booya;

@@ -355,10 +355,10 @@ int Align3 (vector<string>& sequenes, vector<string>& quals, string Ap, string A
 	return bestScore;
 }
 
-string ColapsContigs(string A, string B, int k, string Aq, string& Bq, string& Ad, string& Bd)
+string ColapsContigs(string A, string B, int k, string Aq, string& Bq, string& Ad, string& Bd, string& As, string& Bs)
 {
 	bool verbose = false;
-	if (verbose){cout << "Conbining; \n" << A << endl << B << endl;} 
+	if (verbose){cout << "Combinding; \n" << A << endl << B << endl;} 
 
 	int Asize = A.length();
 	int Bsize = B.length();
@@ -457,10 +457,11 @@ string ColapsContigs(string A, string B, int k, string Aq, string& Bq, string& A
 
                 }	
 		else if (Abase =='Z' && Bbase == 'Z')
-		{Bq = newQual; Bd = newDepth;return newString;}
+		{Bq = newQual; Bd = newDepth;break;} //return newString;}
 	}
 	Bq = newQual;
 	Bd = newDepth;
+	Bs += As; 
 	return newString;
 
 	
@@ -657,9 +658,43 @@ bool validateFASTQD(string& L1, string& L2, string& L3, string& L4, string& L5, 
 	}
 	return true;
 }
+bool IsBitSet(int num, int bit)
+{
+            return 1 == ( (num >> bit) & 1);
+}
+int GetReadOrientation(int flag)
+{
+        // returns 0 = forward, 1 = reverse     
+        bool is_set = IsBitSet(flag, 4);
+
+        cout << "flag is " << flag << endl;
+        cout << "orientation is " << is_set << endl;
+        return is_set;
+        /*if (flag == 0 or flag == 2048){
+                cout << "0 forward" << endl;
+                return 0;}
+        else if (flag == 16 or flag == 2064){
+                cout << "1 reverse" << endl; 
+                return 1;}
+        else
+                cout <<  "error flag not recognised " << flag << endl;
+
+        return -1;*/
+}
+string FlipStrands(string strand)
+{
+	string NewStrand = ""; 
+	for (int i = 0; i < strand.size(); i++){
+		if (strand.c_str()[i]=='+')
+			NewStrand+="-";
+		else if (strand.c_str()[i]=='-')
+			NewStrand+="+"; 
+	}
+	return NewStrand; 
+
+}
 int main (int argc, char *argv[])
 {
-	cout << "USING THIS ONE" << endl;		
 	float MinPercent ;
 	int MinOverlap ;
 	int MinCoverage ;			
@@ -729,11 +764,12 @@ int main (int argc, char *argv[])
 	std::vector<string> sequenes;
 	std::vector<string> qual;
 	std::vector<string> depth;
-	
+	std::vector<string> strand; 	
 	
  	std::vector<string> Unsequenes;
         std::vector<string> Unqual;
         std::vector<string> Undepth;
+	std::vector<string>  Unstrand; 
 	int lines = -1;
 
 	string L1;
@@ -785,15 +821,21 @@ int main (int argc, char *argv[])
 			string L4 = temp[10];
                         string L2 = temp[9];
                         //cout << "9 = " << L2 << endl <<  "10 = " << L4 << endl; 
-                        L2 = TrimNends(L2, L4);
-                        if ((double)L2.size()/(double)ReadSize > .6)
+                        //L2 = AdjustBases(L2, L4); 
+			L2 = TrimNends(L2, L4);
+                        
+			if ((double)L2.size()/(double)ReadSize > .6)
                         {
                         //      cout << L1 << endl;
                                 ReadSize = L2.size();
                                 lines++;
                                 Unsequenes.push_back(L2);
                                 Unqual.push_back(L4);
-                                string depths = "";
+                                if (b[4] ==0)
+					Unstrand.push_back("+"); 
+				else if (b[4] == 1)
+					Unstrand.push_back("-");
+				string depths = "";
                                 unsigned char C = 1;
                                 for (int i=0; i<L2.length();i++)
                                 {depths += C;}
@@ -810,6 +852,7 @@ int main (int argc, char *argv[])
 			string L4 = temp[10]; 
 			string L2 = temp[9];
 			//cout << "9 = " << L2 << endl <<  "10 = " << L4 << endl; 
+			//L2 = AdjustBases(L2, L4);
 			L2 = TrimNends(L2, L4);
 			if ((double)L2.size()/(double)ReadSize > .6)
                        	{
@@ -819,7 +862,13 @@ int main (int argc, char *argv[])
                                	sequenes.push_back(L2);
                                	qual.push_back(L4);
                                	string depths = "";
-                               	unsigned char C = 1;
+                               	if (b[4] ==0)
+                                        strand.push_back("+");
+                                else if (b[4] == 1)
+					strand.push_back("-");	
+
+				
+				unsigned char C = 1;
                                	for (int i=0; i<L2.length();i++)
                                	{depths += C;}
                                	depth.push_back(depths);
@@ -836,25 +885,19 @@ int main (int argc, char *argv[])
 	cout << endl;
 	int NumReads = sequenes.size();
 	cout << "\nDone reading in \n     Read in a total of " << NumReads+Rejects << " and rejected "<<Rejects << endl; 
-	//for(std::vector<string>::size_type i = 0; i < sequenes.size(); i++)
-	//	cout << sequenes[i]<< endl;
-	//cout << "done" << endl;
 	clock_t St,Et;
 	float Dt;
 	
 	struct timeval start, end;
-	 gettimeofday(&start, NULL);
+	gettimeofday(&start, NULL);
 	int FoundMatch = 0;	
 	St = clock();
-	//int breakcount = 0;
 	for(std::vector<string>::size_type i = 0; i < sequenes.size(); i++)
 	{
-                        //
-		//breakcount++;
-		//if (breakcount==20){return 0;}
 		string A = sequenes[i];
 		string Aqual = qual[i];
 		string Adep = depth[i];
+		string Astr = strand[i]; 
 		
 									if(FullOut){cout << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<**************************************************************>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"<< endl;}
 		Et = clock();
@@ -878,6 +921,7 @@ int main (int argc, char *argv[])
 			string revA = RevComp(A);
 			string revAqual = RevQual(Aqual);
 			string revAdep = RevQual(Adep);
+			string revAstr = FlipStrands(Astr); 
 			int revk = -1;
 			int revbestIndex = -1;
 			int revbooya =Align3(sequenes, qual, revA, revAqual, i,revk, revbestIndex, MinPercent, PerfectMatch, MinOverlap, Threads);
@@ -888,6 +932,7 @@ int main (int argc, char *argv[])
 				A = revA;
 				Aqual = revAqual;
 				Adep = revAdep;
+				Astr = revAstr; 
 				k = revk;
 				booya = revbooya;
 				bestIndex = revbestIndex;
@@ -895,9 +940,10 @@ int main (int argc, char *argv[])
 		}
 		else
 		{if(FullOut){cout<<"Perfect Match Found, Skipping Referse Search"<<endl;}}
+		
+		
 		if (booya < MinOverlap )
 		{if(FullOut){cout << "No good match found, skipping"<< endl;}}
-		
 		else
 		{
 			//cout << "here " << bestIndex<< endl;
@@ -907,6 +953,7 @@ int main (int argc, char *argv[])
                  	string Bqual = qual[bestIndex];
 			//cout << sequenes.size() << " - " << qual.size() << " - " << depth.size() << endl;
 			string Bdep = depth[bestIndex];
+			string Bstr = strand[bestIndex]; 
 			//cout << "here 2" << endl;
 			if(k>0)
 			{
@@ -930,11 +977,12 @@ int main (int argc, char *argv[])
 			if (i == bestIndex )
 			{ cout << "ERROR ____________________ SAME READS " << endl;}
 			if (A.size() != Adep.size() && B.size() != Bdep.size()){cout <<" ERRPR somethis the wrong size\n  A= " << A.size() << " Ad = " << Adep.size() << " B= " << B.size() << " Bd = " << Bdep.size()<<endl;}
-			string combined = ColapsContigs(A, B, k, Aqual, Bqual, Adep, Bdep) ;
+			string combined = ColapsContigs(A, B, k, Aqual, Bqual, Adep, Bdep, Astr, Bstr) ;
 			 if (combined.size() != Bdep.size()){cout << " ERRPR combined is the wrong size\n  C= " << combined.size() << " Bd = " << Bdep.size()<<endl;}
 			sequenes[bestIndex] = combined;
 			qual[bestIndex] = Bqual;
 			depth[bestIndex] = Bdep;
+			strand[bestIndex] = Bstr; 
 			sequenes[i] = "moved";
 			if(FullOut){cout << combined << endl;
 			//cout << Bqual << endl;
@@ -974,7 +1022,7 @@ int main (int argc, char *argv[])
                                 Depreport << sequenes[i] << endl;
                                 Depreport << "+" << endl;
                                 Depreport << qual[i] << endl;
-				Depreport << '+' << endl;
+				Depreport << strand[i] << endl;
 				unsigned char C = depth[i].c_str()[0];
                                 int booya = C;
                                 Depreport << booya;
@@ -1008,7 +1056,7 @@ int main (int argc, char *argv[])
                                 Depreport << Unsequenes[i] << endl;
                                 Depreport << "+" << endl;
                                 Depreport << Unqual[i] << endl;
-                                Depreport << '+' << endl;
+                                Depreport << Unstrand[i] << endl;
                                 unsigned char C = Undepth[i].c_str()[0];
                                 int booya = C;
                                 Depreport << booya;

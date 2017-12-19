@@ -961,9 +961,45 @@ for (i = 0; i<=2; i++)
 		prob[i][1] = model[i][1]/histo[i];	
 	}
 cout << "yay 1" << endl;	
+	
+	// calculate cutoff
+	int CutOff =-1;  
+	for (long KmerCount = 2; KmerCount < SC*5; KmerCount++)
+        {
+
+                //ModelFile << KmerCount << '\t' << histo[KmerCount] << '\t' << ErrorModel[KmerCount] << '\t' <<  0;
+                //ModelFile << '\t' << ModelSums[KmerCount];
+		float ModelSum = 0; 
+
+                for (long CopyNumber = 1; CopyNumber< 10; CopyNumber++)
+                {
+                        ModelSum += model[KmerCount][CopyNumber];
+                }
+        	 cout << KmerCount << " = " << ModelSum/((float)ErrorModel[KmerCount]+ModelSum)<<endl;
+		if (ModelSum/((float)ErrorModel[KmerCount]+ModelSum) > 0.9)
+			CutOff = KmerCount; 
+	}
+	// caluclate cutoff
+	int kcutoff = -1; 
+	for (long k = 1; k < dist.size(); k++)
+        {
+		float num = 0;
+                //DistFile << k << '\t' << ErrorDist[k] << '\t' << 0;
+                for (long c = 1; c<dist[1].size(); c++)
+                {
+                        num+= dist[k][c];
+                }
+		if (num > 0.9 and kcutoff == -1)
+		{
+			kcutoff = k-1; 
+			break;
+		}
+
+        	cout << "prob not error = " << num/(num+ErrorDist[k] ) << endl;
+	}	
 
 	//Write out hard cutoffs to head of model file
-    	 ModelFile <<  3 << endl <<Inflection << endl;
+    	 ModelFile <<  3 << endl <<kcutoff << endl;//Inflection << endl;
 	/*if (SC - (5*stdev) > Inflection)
 	{
 		ModelFile <<  3 << endl <<(int) (SC - (5*stdev)) << endl;
