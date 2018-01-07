@@ -16,7 +16,7 @@ http://marthlab.org/
 
 This project is still under development and its not considered stable but you are free to use and any feedback is welcome. 
 
-##Download and install
+## Download and install
 ```
 git clone https://github.com/jandrewrfarrell/RUFUS.git   
 cd RUFUS
@@ -24,7 +24,7 @@ bash Install.sh
 ```
 This should install everything you need to use RUFUS.  If you get errors during the gkno installation contact Alistair Ward at award@genetics.utah.edu
 
-##Running 
+## Running 
 
 we have created a number of scripts to run rufus for typical experiments, the most stable one at the moment is 
  
