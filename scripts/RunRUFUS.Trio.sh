@@ -82,8 +82,10 @@ then
 else 
 	rm  $ProbandGenerator.temp
 	mkfifo $ProbandGenerator.temp
-	/usr/bin/time -v  bash $ProbandGenerator | $RDIR/cloud/PassThroughSamCheck.stranded $ProbandGenerator.filter.chr >  $ProbandGenerator.temp &
-	/usr/bin/time -v   $RUFUSfilter  $ProbandGenerator.k$K_c$MutantMinCov.HashList $ProbandGenerator.temp $ProbandGenerator $K 5 5 10 $(echo $Threads -2 | bc) &
+	#/usr/bin/time -v  bash $ProbandGenerator | $RDIR/cloud/PassThroughSamCheck.stranded $ProbandGenerator.filter.chr >  $ProbandGenerator.temp &
+	#/usr/bin/time -v   $RUFUSfilter  $ProbandGenerator.k$K_c$MutantMinCov.HashList $ProbandGenerator.temp $ProbandGenerator $K 5 5 10 $(echo $Threads -2 | bc) &
+	bash $ProbandGenerator | $RDIR/cloud/PassThroughSamCheck.stranded $ProbandGenerator.filter.chr | head 
+	/usr/bin/time -v   $RUFUSfilter  $ProbandGenerator.k$K_c$MutantMinCov.HashList <(bash $ProbandGenerator | $RDIR/cloud/PassThroughSamCheck.stranded $ProbandGenerator.filter.chr) $ProbandGenerator $K 5 5 10 $(echo $Threads -2 | bc) 
 	wait
 
 fi 

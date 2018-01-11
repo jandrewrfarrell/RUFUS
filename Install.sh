@@ -45,32 +45,50 @@ else
         cd ..
 fi
 cd $RUFUS_DIR/bin/
-if [ -e ./gkno_launcher/gkno ]
-then
-        echo "know already built: skipping"
-else
-        git clone https://github.com/gkno/gkno_launcher.git
-        cd gkno_launcher/
-        ./gkno build
-        cd ..
-fi
+#if [ -e ./gkno_launcher/gkno ]
+#then
+#        echo "know already built: skipping"
+#else
+#        git clone https://github.com/gkno/gkno_launcher.git
+#        cd gkno_launcher/
+#        ./gkno build
+#        cd ..
+#fi
 
-if [ -e ./gkno_launcher/resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys.fa ]
-then
-        echo "human reference paramaters set already downloaded: skipping"
-else
-        cd gkno_launcher
-        ./gkno add-resource human
-        ./gkno bwa-index -r ./resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys.fa -x ./resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys
-	./tools/samtools/samtools faidx ./resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys.fa
-        cd ..
-fi
+#if [ -e ./gkno_launcher/resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys.fa ]
+#then
+#        echo "human reference paramaters set already downloaded: skipping"
+#else
+#        cd gkno_launcher
+#        ./gkno add-resource human
+#        ./gkno bwa-index -r ./resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys.fa -x ./resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys
+#	./tools/samtools/samtools faidx ./resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys.fa
+#        cd ..
+#fi
 
+
+#Make BWA
+git clone https://github.com/lh3/bwa.git 
+cd bwa
+make 
+cd ../
+
+#Make BedTools
 wget https://github.com/arq5x/bedtools2/releases/download/v2.25.0/bedtools-2.25.0.tar.gz
 tar -zxvf bedtools-2.25.0.tar.gz
 cd bedtools2
 make
 cd ../
+
+#Make Samtools
+wget https://github.com/samtools/samtools/releases/download/1.6/samtools-1.6.tar.bz2
+tar -xvf samtools-1.6.tar.bz2 
+cd samtools-1.6/
+./configure --prefix=$(pwd)
+make 
+make install 
+cd ../
+
 
 cd ../
 

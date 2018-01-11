@@ -35,12 +35,10 @@ OverlapRebion2=$RDIR/bin/OverlapRegion
 ReplaceQwithDinFASTQD=$RDIR/bin/ReplaceQwithDinFASTQD
 ConvertFASTqD=$RDIR/bin/ConvertFASTqD.to.FASTQ
 AnnotateOverlap=$RDIR/bin/AnnotateOverlap
-#gkno=$RDIR/bin/gkno_launcher/gkno
-bwa=$RDIR/bin/bwa/bwa
-#samtools=$RDIR/bin/gkno_launcher/tools/samtools/samtools
-samtools=$RDIR/bin/samtools-1.6/samtools
+gkno=$RDIR/bin/gkno_launcher/gkno
+samtools=$RDIR/bin/gkno_launcher/tools/samtools/samtools
 RUFUSinterpret=$RDIR/bin/RUFUS.interpret
-humanRef=$RDIR/bin/gkno_launcher/resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys
+humanRef=$RDIR/bin/gkno_launcher/resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys.fa
 CheckHash=$RDIR/cloud/CheckJellyHashList.sh
 OverlapSam=$RDIR/bin/OverlapSam
 
@@ -56,9 +54,7 @@ if [ -s ./TempOverlap/$NameStub.sam.fastqd ]
 then 
 	echo "skipping sam assemble"
 else
-	$bwa mem $humanRef $File | samtools sort -T $File -O bam - > $File.bam 
-
-	#$gkno bwa-se -ps human  -q $File -id $File -s $File -o $File.bam -p ILLUMINA
+	$gkno bwa-se -ps human  -q $File -id $File -s $File -o $File.bam -p ILLUMINA
 	$OverlapSam <( $samtools view $File.bam ) .95 50 3 ./TempOverlap/$NameStub.sam $NameStub 1 $Threads
 fi
 
@@ -103,8 +99,8 @@ if [ -s ./$NameStub.overlap.hashcount.fastq.bam ]
 then 
 	echo "skipping contig alignment" 
 else
-	$bwa mem $humanRef ./$NameStub.overlap.hashcount.fastq | samtools sort -T $File -O bam - > ./$NameStub.overlap.hashcount.fastq.bam 	
-	#$gkno bwa-se -ps human  -q ./$NameStub.overlap.hashcount.fastq -id ./$NameStub.overlap.hashcount.fastq -s ./$NameStub.overlap.hashcount.fastq -o ./$NameStub.overlap.hashcount.fastq.bam -p ILLUMINA
+	
+	$gkno bwa-se -ps human  -q ./$NameStub.overlap.hashcount.fastq -id ./$NameStub.overlap.hashcount.fastq -s ./$NameStub.overlap.hashcount.fastq -o ./$NameStub.overlap.hashcount.fastq.bam -p ILLUMINA
 fi 
 
 if [ -e $NameStub.overlap.asembly.hash.fastq.ref.fastq ]
@@ -154,9 +150,9 @@ fi
 wait
 
 mkfifo check 
-$samtools view ./$NameStub.overlap.hashcount.fastq.bam | $RUFUSinterpret -mQ 8 -r $humanRef.fa -hf $HashList -o  ./$NameStub.overlap.hashcount.fastq.bam -m 1000000 -c $NameStub.overlap.asembly.hash.fastq.p1 -c $NameStub.overlap.asembly.hash.fastq.p2 -cR $NameStub.overlap.asembly.hash.fastq.Ref.p1 -cR $NameStub.overlap.asembly.hash.fastq.Ref.p2 -sR $NameStub.overlap.asembly.hash.fastq.Ref.sample -s $NameStub.overlap.asembly.hash.fastq.sample 
+$samtools view ./$NameStub.overlap.hashcount.fastq.bam | $RUFUSinterpret -mQ 8 -r $humanRef -hf $HashList -o  ./$NameStub.overlap.hashcount.fastq.bam -m 1000000 -c $NameStub.overlap.asembly.hash.fastq.p1 -c $NameStub.overlap.asembly.hash.fastq.p2 -cR $NameStub.overlap.asembly.hash.fastq.Ref.p1 -cR $NameStub.overlap.asembly.hash.fastq.Ref.p2 -sR $NameStub.overlap.asembly.hash.fastq.Ref.sample -s $NameStub.overlap.asembly.hash.fastq.sample 
 
 grep ^# ./$NameStub.overlap.hashcount.fastq.bam.vcf> ./$NameStub.overlap.hashcount.fastq.bam.vcf.sorted.vcf
 grep -v  ^# ./$NameStub.overlap.hashcount.fastq.bam.vcf | sort -k1,1 -k2,2n >> ./$NameStub.overlap.hashcount.fastq.bam.vcf.sorted.vcf
-$RDIR/bin/tabix/bgzip -f ./$NameStub.overlap.hashcount.fastq.bam.vcf.sorted.vcf
-$RDIR/bin/tabix/tabix ./$NameStub.overlap.hashcount.fastq.bam.vcf.sorted.vcf.gz
+$RDIR/bin/gkno_launcher/tools/tabix/bgzip -f ./$NameStub.overlap.hashcount.fastq.bam.vcf.sorted.vcf
+$RDIR/bin/gkno_launcher/tools/tabix/tabix ./$NameStub.overlap.hashcount.fastq.bam.vcf.sorted.vcf.gz

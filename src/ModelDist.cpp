@@ -975,7 +975,6 @@ cout << "yay 1" << endl;
                 {
                         ModelSum += model[KmerCount][CopyNumber];
                 }
-        	 cout << KmerCount << " = " << ModelSum/((float)ErrorModel[KmerCount]+ModelSum)<<endl;
 		if (ModelSum/((float)ErrorModel[KmerCount]+ModelSum) > 0.9)
 			CutOff = KmerCount; 
 	}
@@ -989,17 +988,18 @@ cout << "yay 1" << endl;
                 {
                         num+= dist[k][c];
                 }
-		if (num/(num+ErrorDist[k] ) > 0.9 )
+		cout << "prob not error = " << num/(num+ErrorDist[k] ) << endl;
+		if (num/(num+ErrorDist[k] ) > 0.9  )
 		{
 			kcutoff = k-1; 
+			cout << "this one" << endl;
 			break;
 		}
 
-        	cout << "prob not error = " << num/(num+ErrorDist[k] ) << endl;
 	}	
 
 	//Write out hard cutoffs to head of model file
-    	 ModelFile <<  3 << endl <<kcutoff << endl;//Inflection << endl;
+    	 ModelFile <<  3 << endl << kcutoff << endl;//Inflection << endl;
 	/*if (SC - (5*stdev) > Inflection)
 	{
 		ModelFile <<  3 << endl <<(int) (SC - (5*stdev)) << endl;
