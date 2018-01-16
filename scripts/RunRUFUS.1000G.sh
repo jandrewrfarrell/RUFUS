@@ -18,7 +18,7 @@ then
         exit
 fi
 
-RDIR=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/RUFUS
+RDIR=/uufs/chpc.utah.edu/common/home/u0401321/testRUFUS/RUFUS
 RUFUSmodel=$RDIR/bin/ModelDist
 RUFUSbuild=$RDIR/bin/RUFUS.Build
 RUFUSfilter=$RDIR/bin/RUFUS.Filter

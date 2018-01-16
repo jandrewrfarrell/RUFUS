@@ -2884,7 +2884,7 @@ cout << "Modes	chr	pos	type	reff	alt	MutRef	MutAlt	Par1Ref	Par2Ref" << endl;
 RUFUS.interpret: converts RUFUS aligned contigs into a VCF \n\
 By Andrew Farrell\n\
    The Marth Lab\n\
-\n\ 
+\n\
 options:\
   -h [ --help ]	  Print help message\n\
   -sam  arg		Path to input SAM file, omit for stdin\n\
@@ -3110,7 +3110,7 @@ options:\
 	{ cout << "ModelFile is open";}
 	else
 	{
-		cout << "Error no model file given" << endl
+	  cout << "Error no model file given" << endl;
 		return -1;
 	}
 

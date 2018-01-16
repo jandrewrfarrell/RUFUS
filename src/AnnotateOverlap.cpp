@@ -1,4 +1,3 @@
-
 /*This vertion imcorporates both copy number and mutation detection in 1
  *  * it needs to be run in two sptes, first the build, then the filter
  *   * it is split up to allow distribution to a cluster */
