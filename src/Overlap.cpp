@@ -53,8 +53,8 @@ int RebuildHashTable(vector<string>& sequenes, int Ai, int SearchHash, unordered
 			size_t found = hash.find('N');
   			if (found==std::string::npos)
 			{
-  unsigned long LongHash = Util::HashToLong(hash, "Rebuild");
-  unsigned long  RevHash = Util::HashToLong(Util::RevComp(hash), "Rebuild");
+  unsigned long LongHash = Util::HashToLong(hash);
+  unsigned long  RevHash = Util::HashToLong(Util::RevComp(hash));
 				#pragma omp critical(updateHash)
 				{Hashes[LongHash].push_back(i);
 				Hashes[RevHash].push_back(i);}
@@ -75,7 +75,7 @@ int  PrepairSearchList(string A, int Ai, unordered_map<unsigned long, vector<int
 		size_t found = hash.find('N');
 		if (found==std::string::npos)
 		{
-		  unsigned long LongHash = Util::HashToLong(hash, "Align");
+		  unsigned long LongHash = Util::HashToLong(hash);
 			int max = Hashes[LongHash].size();
 			for (vector<int>::size_type i = 0; i < max; i++)
 			{
@@ -583,7 +583,7 @@ int main (int argc, char *argv[])
 	
 	cout << "Testing HashToLong \n";
 	test = "CACCACCGGCAAGCTGCCCGTGCCCTGCC";
-	unsigned long testLong = Util::HashToLong(test, "test");
+	unsigned long testLong = Util::HashToLong(test);
 	string test2 = Util::LongToHash(testLong, test.size());
 	cout << "String = " << test << ", hash = " << testLong << endl << "String2= " << test2 << endl;	
 
@@ -992,9 +992,9 @@ int main (int argc, char *argv[])
 					{
 						bool found = false;
 						int k = 0; 
-                                                for ( k = 0; k < Hashes[Util::HashToLong(hash, "update")].size(); k++)
+                                                for ( k = 0; k < Hashes[Util::HashToLong(hash)].size(); k++)
                                                 {
-						  if (Hashes[Util::HashToLong(hash, "update")][k] == bestIndex)
+						  if (Hashes[Util::HashToLong(hash)][k] == bestIndex)
 							{
 								found = true; 
 								break; 		
@@ -1005,14 +1005,14 @@ int main (int argc, char *argv[])
 						{
 							#pragma omp critical
 							{	
-							  Hashes[Util::HashToLong(hash, "update")].push_back(bestIndex);
+							  Hashes[Util::HashToLong(hash)].push_back(bestIndex);
 							//	Hashes[HashToLong(RevComp(hash), "upsate")].push_back(bestIndex);
 							}
 						}
 						found = false;
-                                                for ( k = 0; k < Hashes[Util::HashToLong(Util::RevComp(hash), "update")].size(); k++)
+                                                for ( k = 0; k < Hashes[Util::HashToLong(Util::RevComp(hash))].size(); k++)
                                                 {
-						  if (Hashes[Util::HashToLong(Util::RevComp(hash), "update")][k] == bestIndex)        
+						  if (Hashes[Util::HashToLong(Util::RevComp(hash))][k] == bestIndex)        
                                                         {
                                                                 found = true;
                                                                 break;
@@ -1024,7 +1024,7 @@ int main (int argc, char *argv[])
                                                 	#pragma omp critical
                                                 	{       
                                                 	//      Hashes[HashToLong(hash, "update")].push_back(bestIndex);
-			  Hashes[Util::HashToLong(Util::RevComp(hash), "upsate")].push_back(bestIndex);
+			  Hashes[Util::HashToLong(Util::RevComp(hash))].push_back(bestIndex);
                                                 	}
 						}
 					}
