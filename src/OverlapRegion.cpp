@@ -20,119 +20,12 @@
 #include <sys/time.h>
 #include <unordered_map>
 #include <map>
+
+#include "Util.h"
+
 using namespace std;
+
 bool FullOut = true;
-///Call is BitHashCompare Parent Mutant firstpassfile hashsize
-
-/////////////////////////
-bool fncomp (char lhs, char rhs) {return lhs<rhs;}
-
-struct classcomp {
-  bool operator() (const char& lhs, const char& rhs) const
-  {return lhs<rhs;}
-};
-///////////////////////////
-
-const vector<string> Split(const string& line, const char delim) {
-    vector<string> tokens;
-    stringstream lineStream(line);
-    string token;
-    while ( getline(lineStream, token, delim) )
-        tokens.push_back(token);
-    return tokens;
-}
-
-unsigned long HashToLong (string hash)
-{
-	
-	//cout << "booya" << hash << endl;
-	bitset<64> HashBits;
-	int bitcout = 0;
-	for(int i=0; i<hash.length();i++)
-	{
-		if (hash.c_str()[i] == 'A')
-		{
-			HashBits[bitcout] = 0;
-			bitcout++;
-			HashBits[bitcout] = 0;
-			bitcout++;
-		}
-		else  if (hash.c_str()[i] == 'C')
-                {
-                        HashBits[bitcout] = 0;
-                        bitcout++;
-                        HashBits[bitcout] = 1;
-                        bitcout++;
-                }
-		else  if (hash.c_str()[i] == 'G')
-                {
-                        HashBits[bitcout] = 1;
-                        bitcout++;
-                        HashBits[bitcout] = 0;
-                        bitcout++;
-                }
-		else  if (hash.c_str()[i] == 'T')
-                {
-                        HashBits[bitcout] = 1;
-                        bitcout++;
-                        HashBits[bitcout] = 1;
-                        bitcout++;
-                }
-		else
-		{
-			cout << "ERROR, invalid character - " << hash.c_str()[i] << endl;
-		}
-	}
-	//cout <<  HashBits.to_ulong() << "-" << endl;
-	return HashBits.to_ulong();
-}
-string LongToHash (unsigned long LongHash)
-{
-	bitset<64> HashBits;
-//	char test [33];
-//	itoa (4,test,2);
-//	cout << test << endl;
-//	cint >> test;
-}
-
-string RevComp (string Sequence)
-{
-        string NewString = "";
-        //cout << "Start - " << Sequence << "\n";
-        for(int i = Sequence.length()-1; i>=0; i+= -1)
-        {
-                char C = Sequence.c_str()[i];
-        //      cout << C << endl;
-                if (C == 'A')
-                        NewString += 'T';
-                else if (C == 'C')
-                         NewString += 'G';
-                else if (C == 'G')
-                         NewString += 'C';
-                else if (C == 'T')
-                         NewString += 'A';
-                else if (C == 'N')
-                         NewString += 'N';
-		else
-                        cout << "ERROR IN RevComp - " << C << endl;
-
-
-        }
-        //cout << "end\n";
-        return NewString;
-}
-string RevQual (string Sequence)
-{
-	string NewString = "";
-	for(int i = Sequence.length()-1; i>=0; i+= -1)
-	{
-		unsigned char C = Sequence.c_str()[i];
-		if (C != '\0')
-		{NewString += C;}
-	}
-	return NewString;
-}
-
 
 int Align3 (vector<string>& sequenes, vector<string>& quals, string Ap, string Aqp, int Ai, int& overlap, int& index, float minPercentpassed, bool& PerfectMatch, int MinOverlapPassed, int Threads)
 {
@@ -648,7 +541,7 @@ bool validateFASTQD(string& L1, string& L2, string& L3, string& L4, string& L5, 
 		cout << "error sequence and qual  problems - \n" << L2 << endl << L4 << endl;
 		return false;
 	}
-	vector<string> temp = Split(L6, ' ');
+	vector<string> temp = Util::Split(L6, ' ');
 	if (temp.size() != L2.size())
 	{
 		cout << "error counts  problems - " << L2.size() << " != " << temp.size()  << endl;
@@ -786,7 +679,7 @@ int main (int argc, char *argv[])
 			if (validateFASTQD(L1, L2, L3, L4, L5, L6))
 			{
                         	bool Multiple = false;
-                       	 	std::vector<string> temp = Split(L6, ' ');
+                       	 	std::vector<string> temp = Util::Split(L6, ' ');
                         	for (std::vector<string>::size_type i = 0; i < temp.size(); i++)
                         	{
 					int e = atoi(temp[i].c_str());
@@ -903,9 +796,9 @@ int main (int argc, char *argv[])
 	
 		if (!(PerfectMatch))
 		{
-			string revA = RevComp(A);
-			string revAqual = RevQual(Aqual);
-			string revAdep = RevQual(Adep);
+		  string revA = Util::RevComp(A);
+		  string revAqual = Util::RevQual(Aqual);
+		  string revAdep = Util::RevQual(Adep);
 			string revAstr = FlipStrands(Astr); 
 			int revk = -1;
 			int revbestIndex = -1;
