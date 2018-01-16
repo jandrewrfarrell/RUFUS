@@ -15,186 +15,12 @@
 #include <math.h>
 #include <bitset>
 #include <time.h>
-#include<sys/stat.h>
-#include<sys/types.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+
+#include "Util.h"
+
 using namespace std;
-bool FullOut = false;
-///Call is BitHashCompare Parent Mutant firstpassfile hashsize
-
-/////////////////////////
-bool fncomp (char lhs, char rhs) {return lhs<rhs;}
-
-struct classcomp {
-  bool operator() (const char& lhs, const char& rhs) const
-  {return lhs<rhs;}
-};
-///////////////////////////
-
-const vector<string> Split(const string& line, const char delim) {
-    vector<string> tokens;
-    stringstream lineStream(line);
-    string token;
-    while ( getline(lineStream, token, delim) )
-        tokens.push_back(token);
-    return tokens;
-}
-string trim (string s)
-{
-	string newS = "";
-	cout << s << endl;
-	for (int i = 0; i < s.size(); i++)
-	{
-		if ((int)s.c_str()[i]>=33)
-		{
-			newS = newS+s.c_str()[i];
-			cout << s.c_str()[i] << endl;
-		}
-	}
-	cout << newS << endl;
-return newS;
-}
-
-string LongToHash (unsigned long LongHash, int HashSize)
-{
-        string value = "";
-        bitset<64> test (LongHash);
-        for (int i = 1; i < HashSize*2; i+=2)
-        {
-                if (test[i-1] == 0)
-                {
-                        if (test[i] == 0)
-			{value = value + "A";}
-                        else
-                        {value = value + "C";}
-                }
-                else
-                {
-                        if (test[i] == 0)
-                        {value = value + "G";}
-                        else
-                        {value = value + "T";}
-                }
-        }
-        return value;
-}
-
-
-string RevComp (string Sequence)
-{
-        string NewString = "";
-        //cout << "Start - " << Sequence << "\n";
-        for(int i = Sequence.size()-1; i>=0; i+= -1)
-        {
-                char C = Sequence.c_str()[i];
-        //      cout << C << endl;
-                if (C == 'A')
-                        {NewString += 'T';}
-                else if (C == 'C')
-                       	{NewString += 'G';}
-                else if (C == 'G')
-                        {NewString += 'C';}
-                else if (C == 'T')
-                        {NewString += 'A';}
-                else if (C == 'N')
-                        {NewString += 'N';}
-		else
-                        {cout << "\nERROR IN RevComp - " << C << "\n";}
-        }
-        //cout << "end\n";
-        return NewString;
-}
-string RevQual (string Sequence)
-{
-	string NewString = "";
-	for(int i = Sequence.size()-1; i>=0; i+= -1)
-	{
-		
-		unsigned char C = Sequence.c_str()[i];
-		NewString += C;
-	}
-	return NewString;
-}
-
-unsigned long HashToLong (string hash, string calledby)
-{
-        //cout << "booya" << hash << endl;
-        bitset<64> HashBits;
-        int bitcout = 0;
-        for(int i=0; i<hash.size();i++)
-        {
-                if (hash.c_str()[i] == 'A')
-                {
-                        HashBits[bitcout] = 0;
-                        bitcout++;
-                        HashBits[bitcout] = 0;
-                        bitcout++;
-                }
-                else  if (hash.c_str()[i] == 'C')
-                {
-                        HashBits[bitcout] = 0;
-                        bitcout++;
-                        HashBits[bitcout] = 1;
-                        bitcout++;
-                }
-                else  if (hash.c_str()[i] == 'G')
-                {
-                        HashBits[bitcout] = 1;
-                        bitcout++;
-                        HashBits[bitcout] = 0;
-                        bitcout++;
-                }
-                else  if (hash.c_str()[i] == 'T')
-                {
-                        HashBits[bitcout] = 1;
-                        bitcout++;
-                        HashBits[bitcout] = 1;
-                        bitcout++;
-                }
-                else
-                {
-                        cout << "ERROR, invalid character - " << hash.c_str()[i] << ", in hash " << hash << ", called by " << calledby <<  endl;
-                }
-        }
-        //cout <<  HashBits.to_ulong() << "-" << endl;
-        return  HashBits.to_ulong();
-}
-/*	
-unsigned long HashToLong (string hash)
-{
-        //cout << "booya" << hash << endl;
-        bitset<64> HashBits;
-        //#pragma omp parellel for
-        for(int i=0; i<hash.size();i++)
-        {
-                if (hash.c_str()[i] == 'A')
-                {
-                        HashBits[i*2] = 0;
-                        HashBits[i*2+1] = 0;
-                }
-                else  if (hash.c_str()[i] == 'C')
-                {
-                        HashBits[i*2] = 0;
-                        HashBits[i*2+1] = 1;
-                }
-                else  if (hash.c_str()[i] == 'G')
-                {
-                        HashBits[i*2] = 1;
-                        HashBits[i*2+1] = 0;
-                }
-                else  if (hash.c_str()[i] == 'T')
-                {
-                        HashBits[i*2] = 1;
-                        HashBits[i*2+1] = 1;
-                }
-                else
-                {
-                        cout << "ERROR, invalid character - " << hash.c_str()[i] << " in " << hash <<  endl;
-                }
-        }
-        //cout <<  HashBits.to_ulong() << "-" << endl;
-        return HashBits.to_ulong();
-}
-*/
 
 string TrimNends(string S, string& qual)
 {
@@ -389,7 +215,7 @@ int main (int argc, char *argv[])
 			int ReadSize = L2.size();
 				
 			bool Multiple = false;
-                       	vector<string> temp = Split(L6, ' ');
+                       	vector<string> temp = Util::Split(L6, ' ');
 			 		
 			for (vector<string>::size_type i = 0; i < temp.size(); i++)
                         {unsigned char C = atoi(temp[i].c_str());depths += C;}

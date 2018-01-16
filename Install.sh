@@ -22,7 +22,7 @@ g++ src/ModelDist.cpp src/Util.cpp -o bin/ModelDist  -std=gnu++11 -fopenmp
 g++ src/Overlap.cpp src/Util.cpp -o bin/Overlap -std=gnu++11 -fopenmp -O3
 g++ src/OverlapRegion.cpp src/Util.cpp -o bin/OverlapRegion -std=gnu++11 -fopenmp -O3
 g++ src/OverlapSam.cpp src/Util.cpp -o bin/OverlapSam -std=gnu++11 -fopenmp -O3
-g++ src/ReplaceQwithDinFASTQD.cpp -o bin/ReplaceQwithDinFASTQD  -O3
+g++ src/ReplaceQwithDinFASTQD.cpp src/Util.cpp -o bin/ReplaceQwithDinFASTQD -std=gnu++11  -O3
 g++ ./src/RUFUS.Filter.cpp -o ./bin/RUFUS.Filter -std=gnu++0x -fopenmp -O3
 g++ src/RUFUS.Build.cpp -o bin/RUFUS.Build -fopenmp -O3
 g++ ./src/RUFUS.interpret.cpp ./src/include/* -o ./bin/RUFUS.interpret -std=gnu++0x -O3
