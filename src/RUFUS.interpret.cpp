@@ -3110,8 +3110,8 @@ options:\
 	{ cout << "ModelFile is open";}
 	else
 	{
-		cout << "Error no model file given" << endl
-		return -1;
+		cout << "Error no model file given, not worring abou this now" << endl
+		//return -1;
 	}
 
       	ifstream HashList;
