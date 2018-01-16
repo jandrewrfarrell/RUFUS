@@ -1,4 +1,4 @@
-//hosdie, how are you 
+//hosdie, how are you s
 /*By ANDREW FARRELL 
  * the Marth Lab BC
  * 6.3 = 6.2 + testing sectioning the file 
@@ -23,184 +23,13 @@
 #include <map>
 #include <sys/time.h>
 #include <unistd.h>
+
+#include "Util.h"
+
 using namespace std;
+
 bool FullOut = false;
-///Call is BitHashCompare Parent Mutant firstpassfile hashsize
 
-/////////////////////////
-bool fncomp (char lhs, char rhs) {return lhs<rhs;}
-
-struct classcomp {
-  bool operator() (const char& lhs, const char& rhs) const
-  {return lhs<rhs;}
-};
-///////////////////////////
-
-const vector<string> Split(const string& line, const char delim) {
-    vector<string> tokens;
-    stringstream lineStream(line);
-    string token;
-    while ( getline(lineStream, token, delim) )
-	tokens.push_back(token);
-    return tokens;
-}
-string trim (string s)
-{
-	string newS = "";
-	cout << s << endl;
-	for (int i = 0; i < s.size(); i++)
-	{
-		if ((int)s.c_str()[i]>=33)
-		{
-			newS = newS+s.c_str()[i];
-			cout << s.c_str()[i] << endl;
-		}
-	}
-	cout << newS << endl;
-return newS;
-}
-
-string LongToHash (unsigned long LongHash, int HashSize)
-{
-	string value = "";
-	bitset<64> test (LongHash);
-	for (int i = 1; i < HashSize*2; i+=2)
-	{
-		if (test[i-1] == 0)
-		{
-			if (test[i] == 0)
-			{value = value + "A";}
-			else
-			{value = value + "C";}
-		}
-		else
-		{
-			if (test[i] == 0)
-			{value = value + "G";}
-			else
-			{value = value + "T";}
-		}
-	}
-	return value;
-}
-
-
-string RevComp (string Sequence)
-{
-	string NewString = "";
-	//cout << "Start - " << Sequence << "\n";
-	for(int i = Sequence.size()-1; i>=0; i+= -1)
-	{
-		char C = Sequence.c_str()[i];
-	//      cout << C << endl;
-		if (C == 'A')
-			{NewString += 'T';}
-		else if (C == 'C')
-		       	{NewString += 'G';}
-		else if (C == 'G')
-			{NewString += 'C';}
-		else if (C == 'T')
-			{NewString += 'A';}
-		else if (C == 'N')
-			{NewString += 'N';}
-		else
-			{cout << "\nERROR IN RevComp - " << C << "\n";}
-	}
-	//cout << "end\n";
-	return NewString;
-}
-string RevQual (string Sequence)
-{
-	string NewString = "";
-	for(int i = Sequence.size()-1; i>=0; i+= -1)
-	{
-		
-		unsigned char C = Sequence.c_str()[i];
-		NewString += C;
-	}
-	return NewString;
-}
-
-unsigned long HashToLong (string hash, string calledby)
-{
-	//cout << "booya" << hash << endl;
-	bitset<64> HashBits;
-	int bitcout = 0;
-	for(int i=0; i<hash.size();i++)
-	{
-		if (hash.c_str()[i] == 'A')
-		{
-			HashBits[bitcout] = 0;
-			bitcout++;
-			HashBits[bitcout] = 0;
-			bitcout++;
-		}
-		else  if (hash.c_str()[i] == 'C')
-		{
-			HashBits[bitcout] = 0;
-			bitcout++;
-			HashBits[bitcout] = 1;
-			bitcout++;
-		}
-		else  if (hash.c_str()[i] == 'G')
-		{
-			HashBits[bitcout] = 1;
-			bitcout++;
-			HashBits[bitcout] = 0;
-			bitcout++;
-		}
-		else  if (hash.c_str()[i] == 'T')
-		{
-			HashBits[bitcout] = 1;
-			bitcout++;
-			HashBits[bitcout] = 1;
-			bitcout++;
-		}
-		else
-		{
-			cout << "ERROR, invalid character - " << hash.c_str()[i] << ", in hash " << hash << ", called by " << calledby <<  endl;
-		}
-	}
-	//cout <<  HashBits.to_ulong() << "-" << endl;
-	return  HashBits.to_ulong();
-}
-/*	
-unsigned long HashToLong (string hash)
-{
-	//cout << "booya" << hash << endl;
-	bitset<64> HashBits;
-	//#pragma omp parellel for
-	for(int i=0; i<hash.size();i++)
-	{
-		if (hash.c_str()[i] == 'A')
-		{
-			HashBits[i*2] = 0;
-			HashBits[i*2+1] = 0;
-		}
-		else  if (hash.c_str()[i] == 'C')
-		{
-			HashBits[i*2] = 0;
-			HashBits[i*2+1] = 1;
-		}
-		else  if (hash.c_str()[i] == 'G')
-		{
-			HashBits[i*2] = 1;
-			HashBits[i*2+1] = 0;
-		}
-		else  if (hash.c_str()[i] == 'T')
-		{
-			HashBits[i*2] = 1;
-			HashBits[i*2+1] = 1;
-		}
-		else
-		{
-			cout << "ERROR, invalid character - " << hash.c_str()[i] << " in " << hash <<  endl;
-		}
-	}
-	//cout <<  HashBits.to_ulong() << "-" << endl;
-	return HashBits.to_ulong();
-}
-*/
 
 int RebuildHashTable(vector<string>& sequenes, int Ai, int SearchHash, unordered_map<unsigned long, vector<int>>& Hashes, int Threads)
 {
@@ -224,8 +53,8 @@ int RebuildHashTable(vector<string>& sequenes, int Ai, int SearchHash, unordered
 			size_t found = hash.find('N');
   			if (found==std::string::npos)
 			{
-				unsigned long LongHash = HashToLong(hash, "Rebuild");
-				unsigned long  RevHash = HashToLong(RevComp(hash), "Rebuild");
+  unsigned long LongHash = Util::HashToLong(hash, "Rebuild");
+  unsigned long  RevHash = Util::HashToLong(Util::RevComp(hash), "Rebuild");
 				#pragma omp critical(updateHash)
 				{Hashes[LongHash].push_back(i);
 				Hashes[RevHash].push_back(i);}
@@ -246,7 +75,7 @@ int  PrepairSearchList(string A, int Ai, unordered_map<unsigned long, vector<int
 		size_t found = hash.find('N');
 		if (found==std::string::npos)
 		{
-			unsigned long LongHash = HashToLong(hash, "Align");
+		  unsigned long LongHash = Util::HashToLong(hash, "Align");
 			int max = Hashes[LongHash].size();
 			for (vector<int>::size_type i = 0; i < max; i++)
 			{
@@ -754,8 +583,8 @@ int main (int argc, char *argv[])
 	
 	cout << "Testing HashToLong \n";
 	test = "CACCACCGGCAAGCTGCCCGTGCCCTGCC";
-	unsigned long testLong = HashToLong(test, "test");
-	string test2 = LongToHash(testLong, test.size());
+	unsigned long testLong = Util::HashToLong(test, "test");
+	string test2 = Util::LongToHash(testLong, test.size());
 	cout << "String = " << test << ", hash = " << testLong << endl << "String2= " << test2 << endl;	
 
 //return 0;
@@ -894,7 +723,7 @@ int main (int argc, char *argv[])
 			int ReadSize = L2.size();
 				
 			bool Multiple = false;
-		       	vector<string> temp = Split(L6, ' ');
+		       	vector<string> temp = Util::Split(L6, ' ');
 			 		
 			for (vector<string>::size_type i = 0; i < temp.size(); i++)
 			{unsigned char C = atoi(temp[i].c_str());depths += C;if((int)C>1){Multiple = true;}}
@@ -1062,7 +891,7 @@ int main (int argc, char *argv[])
 		#pragma omp parallel for  num_threads(Threads) shared( Hashes, Revs) 
 		for (int i = b; i<max; i++)
 		{
-			string A = RevComp(sequenes[i]);
+			string A = Util::RevComp(sequenes[i]);
 			bool posLimit = false;
 			bool sanityLimit = false;
 			int NumPos = 0;
@@ -1104,9 +933,9 @@ int main (int argc, char *argv[])
 		
 			if (!(PerfectMatch))
 			{
-				string revA = RevComp(A);
-				string revAqual = RevQual(Aqual);
-				string revAdep = RevQual(Adep);
+				string revA = Util::RevComp(A);
+				string revAqual = Util::RevQual(Aqual);
+				string revAdep = Util::RevQual(Adep);
 				string revAstr = FlipStrands(Astr); 
 				int revk = -1;
 				int revbestIndex = -1;
@@ -1163,9 +992,9 @@ int main (int argc, char *argv[])
 					{
 						bool found = false;
 						int k = 0; 
-                                                for ( k = 0; k < Hashes[HashToLong(hash, "update")].size(); k++)
+                                                for ( k = 0; k < Hashes[Util::HashToLong(hash, "update")].size(); k++)
                                                 {
-                                                	if (Hashes[HashToLong(hash, "update")][k] == bestIndex)
+						  if (Hashes[Util::HashToLong(hash, "update")][k] == bestIndex)
 							{
 								found = true; 
 								break; 		
@@ -1176,14 +1005,14 @@ int main (int argc, char *argv[])
 						{
 							#pragma omp critical
 							{	
-								Hashes[HashToLong(hash, "update")].push_back(bestIndex);
+							  Hashes[Util::HashToLong(hash, "update")].push_back(bestIndex);
 							//	Hashes[HashToLong(RevComp(hash), "upsate")].push_back(bestIndex);
 							}
 						}
 						found = false;
-                                                for ( k = 0; k < Hashes[HashToLong(RevComp(hash), "update")].size(); k++)
+                                                for ( k = 0; k < Hashes[Util::HashToLong(Util::RevComp(hash), "update")].size(); k++)
                                                 {
-                                                        if (Hashes[HashToLong(RevComp(hash), "update")][k] == bestIndex)        
+						  if (Hashes[Util::HashToLong(Util::RevComp(hash), "update")][k] == bestIndex)        
                                                         {
                                                                 found = true;
                                                                 break;
@@ -1195,7 +1024,7 @@ int main (int argc, char *argv[])
                                                 	#pragma omp critical
                                                 	{       
                                                 	//      Hashes[HashToLong(hash, "update")].push_back(bestIndex);
-                                                		Hashes[HashToLong(RevComp(hash), "upsate")].push_back(bestIndex);
+			  Hashes[Util::HashToLong(Util::RevComp(hash), "upsate")].push_back(bestIndex);
                                                 	}
 						}
 					}
