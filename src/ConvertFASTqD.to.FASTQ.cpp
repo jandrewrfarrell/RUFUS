@@ -1,4 +1,4 @@
-/*By ANDREW FARRELL 
+xy/*By ANDREW FARRELL 
  * the Marth Lab BC
  * 6.3 = 6.2 + testing sectioning the file 
  * now accepts nfastqd as input
@@ -17,42 +17,15 @@
 #include <time.h>
 #include<sys/stat.h>
 #include<sys/types.h>
-using namespace std;
-bool FullOut = false;
-///Call is BitHashCompare Parent Mutant firstpassfile hashsize
 
-/////////////////////////
-bool fncomp (char lhs, char rhs) {return lhs<rhs;}
+#include "Util.h"
+
+using namespace std;
 
 struct classcomp {
   bool operator() (const char& lhs, const char& rhs) const
   {return lhs<rhs;}
 };
-///////////////////////////
-
-const vector<string> Split(const string& line, const char delim) {
-    vector<string> tokens;
-    stringstream lineStream(line);
-    string token;
-    while ( getline(lineStream, token, delim) )
-        tokens.push_back(token);
-    return tokens;
-}
-string trim (string s)
-{
-	string newS = "";
-	cout << s << endl;
-	for (int i = 0; i < s.size(); i++)
-	{
-		if ((int)s.c_str()[i]>=33)
-		{
-			newS = newS+s.c_str()[i];
-			cout << s.c_str()[i] << endl;
-		}
-	}
-	cout << newS << endl;
-return newS;
-}
 
 
 int main (int argc, char *argv[])

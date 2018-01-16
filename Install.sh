@@ -16,10 +16,10 @@ perl -p -i -e "s/RDIR=.*\n/RDIR=$( echo $(pwd)| perl -p -i -e "s/\//\\\\\//g")\n
 RUFUS_DIR=$(pwd)
 
 echo "bulding rufus executables"
-g++ src/AnnotateOverlap.cpp src/Util.cpp -o bin/AnnotateOverlap -std=gnu++0x -O3
-g++ src/ConvertFASTqD.to.FASTQ.cpp -o bin/ConvertFASTqD.to.FASTQ -O3
-g++ src/ModelDist.cpp -o bin/ModelDist -fopenmp 
-g++ src/Overlap.cpp -o bin/Overlap -std=gnu++0x -fopenmp -O3
+g++ src/AnnotateOverlap.cpp src/Util.cpp -o bin/AnnotateOverlap -std=gnu++11 -O3
+g++ src/ConvertFASTqD.to.FASTQ.cpp src/Util.cpp -o bin/ConvertFASTqD.to.FASTQ -std=gnu++11 -O3
+g++ src/ModelDist.cpp src/Util.cpp -o bin/ModelDist  -std=gnu++11 -fopenmp 
+g++ src/Overlap.cpp src/Util.cpp -o bin/Overlap -std=gnu++11 -fopenmp -O3
 g++ src/OverlapRegion.cpp -o bin/OverlapRegion -std=gnu++0x -fopenmp -O3
 g++ src/ReplaceQwithDinFASTQD.cpp -o bin/ReplaceQwithDinFASTQD  -O3
 g++ ./src/RUFUS.Filter.cpp -o ./bin/RUFUS.Filter -std=gnu++0x -fopenmp -O3

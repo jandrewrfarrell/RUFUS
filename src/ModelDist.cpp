@@ -14,61 +14,12 @@
 #include <bitset>
 #include <sys/resource.h>
 
+#include "Util.h"
+
 using namespace std;
- double pi = 3.14159L;
- bool Diploid = true; 
-////Call is BitHashCompare Parent Mutant firstpassfile hashsize
 
-/////////////////////////
-
-const vector<string> Split(const string& line, const char delim) {
-    vector<string> tokens;
-    stringstream lineStream(line);
-    string token;
-    while ( getline(lineStream, token, delim) )
-        tokens.push_back(token);
-    return tokens;
-}
-
-
-void process_mem_usage(double& vm_usage, double& resident_set, double& MAXvm, double& MAXrss)
-{
-   using std::ios_base;
-   using std::ifstream;
-   using std::string;
-
-   vm_usage     = 0.0;
-   resident_set = 0.0;
-
-   // 'file' stat seems to give the most reliable results
-   //
-   ifstream stat_stream("/proc/self/stat",ios_base::in);
-
-   // dummy vars for leading entries in stat that we don't care about
-   //
-   string pid, comm, state, ppid, pgrp, session, tty_nr;
-   string tpgid, flags, minflt, cminflt, majflt, cmajflt;
-   string utime, stime, cutime, cstime, priority, nice;
-   string O, itrealvalue, starttime;
-
-   // the two fields we want
-   //
-   unsigned long vsize;
-   long rss;
-
-   stat_stream >> pid >> comm >> state >> ppid >> pgrp >> session >> tty_nr
-               >> tpgid >> flags >> minflt >> cminflt >> majflt >> cmajflt
-               >> utime >> stime >> cutime >> cstime >> priority >> nice
-               >> O >> itrealvalue >> starttime >> vsize >> rss; // don't care about the rest
-
-   stat_stream.close();
-
-   long page_size_kb = sysconf(_SC_PAGE_SIZE) / 1024; // in case x86-64 is configured to use 2MB pages
-   vm_usage     = vsize / 1024.0;
-   resident_set = rss * page_size_kb;
-        if (vm_usage > MAXvm){MAXvm = vm_usage;}
-        if (resident_set > MAXrss){MAXrss = resident_set;}
-}
+double pi = 3.14159L;
+bool Diploid = true; 
 
 double norm(double x, double mu, double sigma, double skew, double p)
 {
@@ -507,14 +458,14 @@ int main (int argc, char *argv[])
 	histo.push_back(0);
 	
 	getline(HistoFile, line); // burn the 0 0 line
-	temp = Split(line, '\t');
+	temp = Util::Split(line, '\t');
 	cout << "first line = " << temp[0] << " - " << temp[1] << endl;
 	int count = 0;
         while (atoi(temp[1].c_str()) == 0 or atoi(temp[0].c_str())==0)
         {
                 cout << "getting another " << endl;
                 getline(HistoFile, line);
-                temp = Split(line, '\t');
+                temp = Util::Split(line, '\t');
                 cout << "got " << temp[0] << " - " << temp[1] << endl;
                 count++;
                 if (count > 10)
@@ -535,7 +486,7 @@ int main (int argc, char *argv[])
 	while (getline(HistoFile, line) )
 	{
 		i++;
-		temp = Split(line, '\t');
+		temp = Util::Split(line, '\t');
 		value = atol(temp[1].c_str());
 		histo.push_back(value);
 		total += value;
