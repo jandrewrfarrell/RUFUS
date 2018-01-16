@@ -1,4 +1,4 @@
-xy/*By ANDREW FARRELL 
+/*By ANDREW FARRELL 
  * the Marth Lab BC
  * 6.3 = 6.2 + testing sectioning the file 
  * now accepts nfastqd as input
@@ -21,12 +21,6 @@ xy/*By ANDREW FARRELL
 #include "Util.h"
 
 using namespace std;
-
-struct classcomp {
-  bool operator() (const char& lhs, const char& rhs) const
-  {return lhs<rhs;}
-};
-
 
 int main (int argc, char *argv[])
 {
