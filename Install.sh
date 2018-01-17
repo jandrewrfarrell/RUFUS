@@ -26,7 +26,7 @@ g++ src/ReplaceQwithDinFASTQD.cpp src/Util.cpp -o bin/ReplaceQwithDinFASTQD -std
 g++ ./src/RUFUS.Filter.cpp -o ./bin/RUFUS.Filter -std=gnu++0x -fopenmp -O3
 g++ src/RUFUS.Build.cpp -o bin/RUFUS.Build -fopenmp -O3
 g++ ./src/RUFUS.interpret.cpp ./src/include/* -o ./bin/RUFUS.interpret -std=gnu++0x -O3
-g++ ./src/RUFUS.1kg.filter.cpp -o ./bin/RUFUS.1kg.filter -std=gnu++0x -fopenmp -O3
+g++ ./src/RUFUS.1kg.filter.cpp src/Util.cpp -o ./bin/RUFUS.1kg.filter -std=gnu++11 -fopenmp -O3
 
 echo "bulding external programs"
 cd src/externals/

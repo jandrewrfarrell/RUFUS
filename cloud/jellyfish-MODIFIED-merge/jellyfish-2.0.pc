@@ -1,4 +1,4 @@
-prefix=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/RUFUS/cloud/jellyfish-MODIFIED-merge
+prefix=/uufs/chpc.utah.edu/common/home/u0401321/testRUFUS/RUFUS/cloud/jellyfish-MODIFIED-merge
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include

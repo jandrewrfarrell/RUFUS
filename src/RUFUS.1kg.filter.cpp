@@ -22,143 +22,11 @@
 #include <sys/stat.h>
 #include <errno.h>
 
+#include "Util.h"
+
 
 
 using namespace std;
-////Call is BitHashCompare Parent Mutant firstpassfile hashsize
-
-/////////////////////////
-bool fncomp (char lhs, char rhs) {return lhs<rhs;}
-
-struct classcomp {
-  bool operator() (const char& lhs, const char& rhs) const
-  {return lhs<rhs;}
-};
-///////////////////////////
-
-const vector<string> Split(const string& line, const char delim) {
-    vector<string> tokens;
-    stringstream lineStream(line);
-    string token;
-    while ( getline(lineStream, token, delim) )
-    tokens.push_back(token);
-    return tokens;
-}
-
-unsigned long HashToLong (string hash)
-{
-    //cout << "booya" << hash << endl;
-    bitset<64> HashBits;
-    //#pragma omp parellel for
-    for(int i=0; i<hash.length();i++)
-    {
-        if (hash.c_str()[i] == 'A')
-        {
-            HashBits[i*2] = 0;
-            HashBits[i*2+1] = 0;
-        }
-        else  if (hash.c_str()[i] == 'C')
-        {
-            HashBits[i*2] = 0;
-            HashBits[i*2+1] = 1;
-        }
-        else  if (hash.c_str()[i] == 'G')
-        {
-            HashBits[i*2] = 1;
-            HashBits[i*2+1] = 0;
-        }
-        else  if (hash.c_str()[i] == 'T')
-        {
-            HashBits[i*2] = 1;
-            HashBits[i*2+1] = 1;
-        }
-        else
-        {
-            //cout << "ERROR, invalid character - " << hash.c_str()[i] << endl;
-        }
-    }
-    //cout <<  HashBits.to_ulong() << "-" << endl;
-    return HashBits.to_ulong();
-}
-string LongToHash (unsigned long LongHash, int HashSize)
-{
-    string value = "";
-    bitset<64> test (LongHash);
-    for (int i = 1; i < HashSize*2; i+=2)
-    {
-        if (test[i-1] == 0)
-        {
-            if (test[i] == 0){value = value + "A";}
-            else{value = value + "C";}
-        }
-        else
-        {
-            if (test[i] == 0){value = value + "G";}
-            else{value = value + "T";}
-        }
-    }
-    return value;
-}
-string RevComp (string Sequence)
-{
-    string NewString = "";
-    for(int i = Sequence.length()-1; i>=0; i+= -1)
-    {
-        char C = Sequence.c_str()[i];
-        if (C == 'A')
-            NewString += 'T';
-        else if (C == 'C')
-             NewString += 'G';
-        else if (C == 'G')
-             NewString += 'C';
-        else if (C == 'T')
-             NewString += 'A';
-        else if (C == 'N')
-             NewString += 'N';
-        else
-            cout << "ERROR IN RevComp - " << C << endl;
-    }
-    return NewString;
-}
-void process_mem_usage(double& vm_usage, double& resident_set, double& MAXvm, double& MAXrss)
-{
-   using std::ios_base;
-   using std::ifstream;
-   using std::string;
-
-   vm_usage     = 0.0;
-   resident_set = 0.0;
-
-   // 'file' stat seems to give the most reliable results
-   //
-   ifstream stat_stream("/proc/self/stat",ios_base::in);
-
-   // dummy vars for leading entries in stat that we don't care about
-   //
-   string pid, comm, state, ppid, pgrp, session, tty_nr;
-   string tpgid, flags, minflt, cminflt, majflt, cmajflt;
-   string utime, stime, cutime, cstime, priority, nice;
-   string O, itrealvalue, starttime;
-
-   // the two fields we want
-   //
-   unsigned long vsize;
-   long rss;
-
-   stat_stream >> pid >> comm >> state >> ppid >> pgrp >> session >> tty_nr
-        >> tpgid >> flags >> minflt >> cminflt >> majflt >> cmajflt
-        >> utime >> stime >> cutime >> cstime >> priority >> nice
-        >> O >> itrealvalue >> starttime >> vsize >> rss; // don't care about the rest
-
-   stat_stream.close();
-
-   long page_size_kb = sysconf(_SC_PAGE_SIZE) / 1024; // in case x86-64 is configured to use 2MB pages
-   vm_usage     = vsize / 1024.0;
-   resident_set = rss * page_size_kb;
-    if (vm_usage > MAXvm){MAXvm = vm_usage;}
-    if (resident_set > MAXrss){MAXrss = resident_set;}
-}
-
 
 
 int main (int argc, char *argv[])
@@ -169,7 +37,7 @@ int main (int argc, char *argv[])
     double vm, rss, MAXvm, MAXrss;
     MAXvm = 0;
     MAXrss = 0;
-    process_mem_usage(vm, rss, MAXvm, MAXrss);
+    Util::process_mem_usage(vm, rss, MAXvm, MAXrss);
 
     string temp = argv[4];
     int HashSize = atoi(temp.c_str());
@@ -268,12 +136,12 @@ int main (int argc, char *argv[])
         {
             string B1 =  Mstack[bam];
             vector<string> stuff;
-            stuff = Split(B1, '\t');
+            stuff = Util::Split(B1, '\t');
             int Bcount = atoi(stuff[1].c_str());
             //unsigned char Bcount;
             //if (Bcount > 250){C = 251;}else{C = Bcount;}
             //if (Bcount > 10000){C = 0;}
-            unsigned long  MutantLongHash = HashToLong(stuff[0]);
+            unsigned long  MutantLongHash = Util::HashToLong(stuff[0]);
 	    //if (Bcount > MinMutDepth and Bcount < TooHigh )  
 	    {good.insert(pair<unsigned long, int>(MutantLongHash, Bcount));}
             
@@ -288,7 +156,7 @@ int main (int argc, char *argv[])
         {
             gettimeofday(&end, NULL);
             float Dt = end.tv_sec - start.tv_sec;
-            process_mem_usage(vm, rss, MAXvm, MAXrss);
+	    Util::process_mem_usage(vm, rss, MAXvm, MAXrss);
                 cout << "Read in " << BufferSize * lines << " lines " <<
                         "; VM: " << vm <<
                         "; RSS: " << rss <<
@@ -354,7 +222,7 @@ int main (int argc, char *argv[])
 			{
 				if (foo.length() == HashSize)
 				{
-					unsigned long ParHash = HashToLong(foo);
+  unsigned long ParHash = Util::HashToLong(foo);
                         		int Count;
                         		Count =	 good.count(ParHash);
 			//		cout << foo.length() << " - " << foo << endl;
@@ -390,11 +258,11 @@ int main (int argc, char *argv[])
     for (pos = good.begin(); pos != good.end(); ++pos)
     {
 	if (pos->second > MinMutDepth and pos->second < TooHigh)
-        {HashTable << pos->first << "\t" << "0" << "\t" << pos->second << "\t" << LongToHash(pos->first, HashSize) << endl;}
+	  {HashTable << pos->first << "\t" << "0" << "\t" << pos->second << "\t" << Util::LongToHash(pos->first, HashSize) << endl;}
     }
 
     HashTable.close();
 
-cout << "\nreally dont\n";
+cout << "\nreally done\n";
 }
 
