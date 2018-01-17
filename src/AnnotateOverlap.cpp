@@ -2,29 +2,27 @@
  *  * it needs to be run in two sptes, first the build, then the filter
  *   * it is split up to allow distribution to a cluster */
 
+#include <bitset>
+#include <fstream>
 #include <unistd.h>
 #include <ios>
-
 #include <iostream>
-#include <fstream>
+#include <math.h>
 #include <sstream>
+#include <stack>
 #include <string>
-#include <vector>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
-#include <unordered_map>
-#include <bitset>
-#include <time.h>
 #include <sys/resource.h>
-#include <stack>
+#include <time.h>
+#include <unordered_map>
+#include <vector>
 
 #include "Util.h"
 
 using namespace std;
 
 int main(int argc, char *argv[]) {
-  //cout << "Call is PreBuiltMutHash Overlap.fq HashSize" << endl;
   int HashSize;
   double vm, rss, MAXvm, MAXrss;
   MAXvm = 0;
