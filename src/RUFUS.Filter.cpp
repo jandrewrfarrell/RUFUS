@@ -20,173 +20,9 @@
 #include <sys/resource.h>
 #include <stack>
 
+#include "Util.h"
+
 using namespace std;
-int totalAdded =0;
-int totalDeleted =0;
-
-/////////////////////////
-bool fncomp (char lhs, char rhs) {return lhs<rhs;}
-
-struct classcomp {
-  bool operator() (const char& lhs, const char& rhs) const
-  {return lhs<rhs;}
-};
-///////////////////////////
-
-const vector<string> Split(const string& line, const char delim) {
-    vector<string> tokens;
-    stringstream lineStream(line);
-    string token;
-    while ( getline(lineStream, token, delim) )
-        tokens.push_back(token);
-    return tokens;
-}
-
-unsigned long HashToLong (string hash)
-{
-	bitset<64> HashBits;
-	for(int i=0; i<hash.length();i++)
-	{
-		if (hash.c_str()[i] == 'A')
-		{
-			HashBits[i*2] = 0;
-			HashBits[i*2+1] = 0;
-		}
-		else  if (hash.c_str()[i] == 'C')
-                {
-                        HashBits[i*2] = 0;
-                        HashBits[i*2+1] = 1;
-                }
-		else  if (hash.c_str()[i] == 'G')
-                {
-                        HashBits[i*2] = 1;
-                        HashBits[i*2+1] = 0;
-                }
-		else  if (hash.c_str()[i] == 'T')
-                {
-                        HashBits[i*2] = 1;
-                        HashBits[i*2+1] = 1;
-                }
-		else
-		{
-			cout << "ERROR, invalid character - " << hash.c_str()[i] << endl;
-		}
-	}
-	return HashBits.to_ulong();
-}
-
-string LongToHash (unsigned long LongHash, int HashSize)
-{
-        string value = "";
-        //cout << LongHash << endl;
-        bitset<64> test (LongHash);
-        for (int i = 1; i < HashSize*2; i+=2)
-        {
-                //cout << "i-1=" << test[i-1] << " i=" << test[i] << " - ";
-                if (test[i-1] == 0)
-                {
-                        if (test[i] == 0)
-                        {
-                                //cout << "A" << endl;
-                                value = value + "A";
-                        }
-                        else
-                        {
-                                //cout << "C" << endl;
-                                 value = value + "C";
-                        }
-                }
-                else
-                {
-                        if (test[i] == 0)
-                        {
-                                //cout << "G" << endl;
-                                 value = value + "G";
-                        }
-                        else
-                        {
-                                //cout << "T" << endl;
-                                 value = value + "T";
-                        }
-
-                }
-
-
-        }
-//      for (int i = 0; i < HashSize*2; i++)
-//      {
-//              cout << i << " - " << test[i] << endl;
-//      }
-        return value;
-//      char test [33];
-//      itoa (4,test,2);
-//      cout << test << endl;
-//      cint >> test;
-}
-string RevComp (string& Sequence)
-{
-        string NewString = "";
-        //cout << "Start - " << Sequence << "\n";
-        for(int i = Sequence.length()-1; i>=0; i+= -1)
-        {
-                char C = Sequence.c_str()[i];
-        //      cout << C << endl;
-                if (C == 'A')
-                        NewString += 'T';
-                else if (C == 'C')
-                         NewString += 'G';
-                else if (C == 'G')
-                         NewString += 'C';
-                else if (C == 'T')
-                         NewString += 'A';
-                else if (C == 'N')
-                         NewString += 'N';
-		else
-                        cout << "ERROR IN RevComp - " << C << endl;
-
-
-        }
-        //cout << "end\n";
-        return NewString;
-}
-void process_mem_usage(double& vm_usage, double& resident_set, double& MAXvm, double& MAXrss)
-{
-   using std::ios_base;
-   using std::ifstream;
-   using std::string;
-
-   vm_usage     = 0.0;
-   resident_set = 0.0;
-
-   // 'file' stat seems to give the most reliable results
-   //
-   ifstream stat_stream("/proc/self/stat",ios_base::in);
-
-   // dummy vars for leading entries in stat that we don't care about
-   //
-   string pid, comm, state, ppid, pgrp, session, tty_nr;
-   string tpgid, flags, minflt, cminflt, majflt, cmajflt;
-   string utime, stime, cutime, cstime, priority, nice;
-   string O, itrealvalue, starttime;
-
-   // the two fields we want
-   //
-   unsigned long vsize;
-   long rss;
-
-   stat_stream >> pid >> comm >> state >> ppid >> pgrp >> session >> tty_nr
-               >> tpgid >> flags >> minflt >> cminflt >> majflt >> cmajflt
-               >> utime >> stime >> cutime >> cstime >> priority >> nice
-               >> O >> itrealvalue >> starttime >> vsize >> rss; // don't care about the rest
-
-   stat_stream.close();
-
-   long page_size_kb = sysconf(_SC_PAGE_SIZE) / 1024; // in case x86-64 is configured to use 2MB pages
-   vm_usage     = vsize / 1024.0;
-   resident_set = rss * page_size_kb;
-	if (vm_usage > MAXvm){MAXvm = vm_usage;}
-	if (resident_set > MAXrss){MAXrss = resident_set;}
-}
 	
 int main (int argc, char *argv[])
 {
@@ -194,7 +30,7 @@ int main (int argc, char *argv[])
 	double vm, rss, MAXvm, MAXrss;
 	MAXvm = 0;
 	MAXrss = 0;
-	process_mem_usage(vm, rss, MAXvm, MAXrss);
+	Util::process_mem_usage(vm, rss, MAXvm, MAXrss);
    	cout << "VM: " << vm << "; RSS: " << rss << endl;	
 	
 	
@@ -280,11 +116,11 @@ int main (int argc, char *argv[])
 	{
 		//cout << L1 << endl;
 		vector<string>  temp;
-		temp = Split(L1, '\t');
+temp = Util::Split(L1, '\t');
 		if (temp.size() == 2)
 		{
-			unsigned long b = HashToLong(temp[0]);
-			unsigned long revb = HashToLong(RevComp(temp[0]));
+unsigned long b = Util::HashToLong(temp[0]);
+unsigned long revb = Util::HashToLong(Util::RevComp(temp[0]));
 			//int c = atoi(temp[1].c_str()); 
 			//cout << temp[0] << "\t" << temp[1] << endl << b << "\t" << LongToHash(b, 18) <<  endl<<endl;
 			Mutations.insert(pair<unsigned long, int > (b, 0));
@@ -293,8 +129,8 @@ int main (int argc, char *argv[])
 		}
 		else if (temp.size() == 4)
 		{
-			unsigned long b = HashToLong(temp[3]);
-                	unsigned long revb = HashToLong(RevComp(temp[3]));
+unsigned long b = Util::HashToLong(temp[3]);
+unsigned long revb = Util::HashToLong(Util::RevComp(temp[3]));
 			//int c = atoi(temp[1].c_str()); 
                 	//cout << temp[0] << "\t" << temp[1] << endl << b << "\t" << LongToHash(b, 18) <<  endl<<endl;
                 	Mutations.insert(pair<unsigned long, int > (b, 0));
@@ -303,9 +139,9 @@ int main (int argc, char *argv[])
 		}
 		if (temp.size() == 1)
                 {
-		temp = Split(L1, ' ');
-                unsigned long b = HashToLong(temp[0]);
-                unsigned long revb = HashToLong(RevComp(temp[0]));
+temp = Util::Split(L1, ' ');
+unsigned long b = Util::HashToLong(temp[0]);
+unsigned long revb = Util::HashToLong(Util::RevComp(temp[0]));
                 //int c = atoi(temp[1].c_str()); 
                 //cout << temp[0] << "\t" << temp[1] << endl << b << "\t" << LongToHash(b, 18) <<  endl<<endl;
                 Mutations.insert(pair<unsigned long, int > (b, 0));
@@ -412,7 +248,7 @@ int main (int argc, char *argv[])
                         	{
 				
 					//unsigned long LongHash = HashToLong(Buffer[BuffCount+1].substr (i,HashSize));
-					if (Mutations.count(HashToLong(Buffer[BuffCount+1].substr (i,HashSize))) > 0)
+				  if (Mutations.count(Util::HashToLong(Buffer[BuffCount+1].substr (i,HashSize))) > 0)
 	                                {
 						MutHashesFound++;
 						positions.push_back(i);

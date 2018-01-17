@@ -1,4 +1,4 @@
-S/*By ANDREW FARRELL 
+/*By ANDREW FARRELL 
  * the Marth Lab BC
  * 6.3 = 6.2 + testing sectioning the file 
  * now accepts fastqd as input
