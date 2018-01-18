@@ -150,7 +150,7 @@ int main(int argc, char* argv[]) {
   ifstream fastq;
   fastq.open(argv[1]);
 
-  if ÷(fastq.is_open()) {
+  if (fastq.is_open()) {
   } else {
     cout << "Error, ParentHashFile could not be opened";
     return 0;
