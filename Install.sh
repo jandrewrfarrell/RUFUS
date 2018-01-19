@@ -23,9 +23,9 @@ g++ src/Overlap.cpp src/Util.cpp -o bin/Overlap -std=gnu++11 -fopenmp -O3
 g++ src/OverlapRegion.cpp src/Util.cpp -o bin/OverlapRegion -std=gnu++11 -fopenmp -O3
 g++ src/OverlapSam.cpp src/Util.cpp -o bin/OverlapSam -std=gnu++11 -fopenmp -O3
 g++ src/ReplaceQwithDinFASTQD.cpp src/Util.cpp -o bin/ReplaceQwithDinFASTQD -std=gnu++11  -O3
-g++ ./src/RUFUS.Filter.cpp -o ./bin/RUFUS.Filter -std=gnu++0x -fopenmp -O3
-g++ src/RUFUS.Build.cpp -o bin/RUFUS.Build -fopenmp -O3
-g++ ./src/RUFUS.interpret.cpp ./src/include/* -o ./bin/RUFUS.interpret -std=gnu++0x -O3
+g++ ./src/RUFUS.Filter.cpp src/Util.cpp -o ./bin/RUFUS.Filter -std=gnu++11 -fopenmp -O3
+g++ src/RUFUS.Build.cpp src/Util.cpp -o bin/RUFUS.Build -std=gnu++11 -fopenmp -O3
+g++ ./src/RUFUS.interpret.cpp src/Util.cpp src/SamRead.cpp src/SamUtil.cpp  ./src/include/* -o ./bin/RUFUS.interpret -std=gnu++11 -O3  -fpermissive
 g++ ./src/RUFUS.1kg.filter.cpp src/Util.cpp -o ./bin/RUFUS.1kg.filter -std=gnu++11 -fopenmp -O3
 
 echo "bulding external programs"

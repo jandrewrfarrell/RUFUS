@@ -371,7 +371,7 @@ void correctContSubtract(vector<double>& Cont, double& Total, int inflect) {
 int main(int argc, char* argv[]) {
    cout << "Call is histoFile HS ReadLength Threads" << endl;
   ifstream HistoFile;
-  eHistoFile.open(argv[1]);
+  HistoFile.open(argv[1]);
 
   if (HistoFile.is_open()) {
     cout << "Parent File open - " << argv[1] << endl;

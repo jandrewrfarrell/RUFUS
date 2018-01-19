@@ -1,7 +1,50 @@
-#include "SamReads.h"
+#include <bitset>
+#include <cmath>
+#include <ctime>
+#include <errno.h>
+#include <fcntl.h>
+#include <fstream>
+#include <ios>
+#include <iostream>
+#include <map>
+#include <math.h>
+#include <sstream>
+#include <stack>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+#include <sys/mman.h>
+#include <sys/resource.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <time.h>
+#include <unordered_map>
+#include <unistd.h>
+#include <vector>
+
+#include "externals/fastahack/Fasta.h"
+#include "SamRead.h"
+#include "SamUtil.h"
 #include "Util.h"
 
 using namespace std;
+
+vector <unordered_map <unsigned long int, int> > ParentHashes;
+unordered_map  <unsigned long int, int> MutantHashes;
+FastaReference Reff;
+int HashSize = 25;
+int totalDeleted;
+int totalAdded;
+int MaxVarentSize = 1000;
+ofstream VCFOutFile;
+ofstream BEDOutFile;
+ofstream BEDBigStuff;
+ofstream BEDNotHandled;
+ofstream Invertions;
+ofstream Translocations;
+ofstream Translocationsbed;
+ofstream Unaligned;
+map <string, int> Hash;
 
 int SamRead::CheckParentCov(int &mode) {
   bool good = true;
@@ -75,7 +118,7 @@ void SamRead::write() {
   cout << name << endl;
   cout << "   flag = " << flag << endl;
   cout << "   mapQual = " << mapQual << endl;
-  cout << "   Strand = " << GetReadOrientation(flag) << endl;
+  cout << "   Strand = " << SamUtil::GetReadOrientation(flag) << endl;
   cout << "   Alignments = " << alignments.size() << endl;
   cout << "   chr " << chr << " - " << pos << " qual = " << mapQual <<  endl;
   cout << "   cigar  = " << cigar << endl;
@@ -109,7 +152,7 @@ void SamRead::writetofile(ofstream &out) {
   out << name << endl;
   out << "   flag = " << flag << endl;
   out << "   mapQual = " << mapQual << endl;
-  out << "   Strand = " << GetReadOrientation(flag) << endl;
+  out << "   Strand = " << SamUtil::GetReadOrientation(flag) << endl;
   out << "   Alignments = " << alignments.size() << endl;
   out << "   chr " << chr << " - " << pos << " qual = " << mapQual <<  endl;
   out << "   cigar  = " << cigar << endl;
@@ -230,7 +273,7 @@ void SamRead::parseMutations( char *argv[]) {
     hashes.push_back(newHash);
     hashesRef.push_back(newHashRef);
 
-    if (Hash.count(newHash) > 0 or Hash.count(RevComp(newHash)) > 0) {
+    if (Hash.count(newHash) > 0 or Hash.count(Util::RevComp(newHash)) > 0) {
       varHash.push_back(true); 
     } else {
       varHash.push_back(false); 
@@ -258,7 +301,7 @@ void SamRead::parseMutations( char *argv[]) {
 	  }
 	  
 	  if (checkHash) {
-	    unsigned long int LongHash = HashToLong(hash);
+	    unsigned long int LongHash = Util::HashToLong(hash);
 
 	    if (ParentHashes[pi].count(LongHash) >0) {
 	      counts.push_back(ParentHashes[pi][LongHash]);
@@ -266,7 +309,7 @@ void SamRead::parseMutations( char *argv[]) {
 	      counts.push_back(0);
 	    }
 	    
-	    unsigned long int LongHashRef = HashToLong(hashRef);
+	    unsigned long int LongHashRef = Util::HashToLong(hashRef);
 	    if (ParentHashes[pi].count(LongHashRef) >0) {
 	      countsRef.push_back(ParentHashes[pi][LongHashRef]);
 	    } else {
@@ -304,7 +347,7 @@ void SamRead::parseMutations( char *argv[]) {
     
     cout << "check hash = " << checkHash << endl; 
     if (checkHash) {
-      unsigned long int LongHash = HashToLong(hash);
+      unsigned long int LongHash = Util::HashToLong(hash);
       
       if (MutantHashes.count(LongHash) > 0) {
 	mutCounts.push_back(MutantHashes[LongHash]);
@@ -312,7 +355,7 @@ void SamRead::parseMutations( char *argv[]) {
 	mutCounts.push_back(0);
       }
       
-      unsigned long int LongHashRef = HashToLong(hashRef);
+      unsigned long int LongHashRef = Util::HashToLong(hashRef);
       if (MutantHashes.count(LongHashRef) >0) {
 	mutCountsRef.push_back(MutantHashes[LongHashRef]);
       } else {
@@ -505,9 +548,9 @@ void SamRead::parseMutations( char *argv[]) {
 	  
 	  if (Hash.count(AltKmers[j]) > 0 and Hash[AltKmers[j]] > 0) {
 	    HashCountsOG.push_back(Hash[AltKmers[j]]);
-	  } else if (Hash.count(RevComp(AltKmers[j])) > 0 and 
-		     Hash[RevComp(AltKmers[j])]) {
-	    HashCountsOG.push_back(Hash[RevComp(AltKmers[j])]);
+	  } else if (Hash.count(Util::RevComp(AltKmers[j])) > 0 and 
+		     Hash[Util::RevComp(AltKmers[j])]) {
+	    HashCountsOG.push_back(Hash[Util::RevComp(AltKmers[j])]);
 	  }
 	  if (Hash[AltKmers[j]] > 0) {
 	    HashCounts.push_back(Hash[AltKmers[j]]);
@@ -725,4 +768,321 @@ void SamRead::parseMutations( char *argv[]) {
     }
   }
   cout << "Out parsingMutations" << endl;
+}
+
+void SamRead::processCigar() {
+  string num = "";
+  for (int i = 0; i < cigar.length(); i++) {
+    if (cigar.c_str()[i] >= 48 and cigar.c_str()[i] <= 57) {
+        num = num + cigar.c_str()[i];
+    } else {
+      int number = atoi(num.c_str());
+      for(int j = 0; j < number; j++) {
+	cigarString += cigar.c_str()[i];
+      }
+      num = "";
+    }
+  }
+}
+
+void SamRead::FixTandemRef() {
+  cout << "FOUND TANDEM" << endl;
+  write();
+  writeVertical();
+  string lastChr = "nope";
+  int lastPos = -1;
+  string NewRef = "";
+  for (int i = 0; i < seq.size(); i++) {
+    cout << i << " " << seq[i] << " " <<  cigarString[i] << " " << RefSeq[i] << endl;
+    if (cigarString[i]=='Y') {
+      NewRef+= toupper(Reff.getSubSequence(lastChr, lastPos+1, 1).c_str()[0]);
+      lastPos++;
+    } else {
+      NewRef+=RefSeq[i];
+      lastChr = ChrPositions[i];
+      lastPos = Positions[i];
+    }
+  }
+  RefSeq = NewRef;
+  cout << "done tandtem fix" << endl;
+  write();
+}
+
+void SamRead::getRefSeq() {
+  originalSeq = seq;
+  originalQual = qual;
+  RefSeq = "";
+  string NewSeq = "";
+  string NewQual = "";
+  string NewCigar = "";
+  string NewStrand = "";
+  vector<int> NewPositions;
+  vector<string> NewChromosome;
+  int InsOffset = 0;
+  
+  if (Reff.sequenceNameStartingWith(chr) == "") {
+    cout << "ERROR chr " << chr << " not found\n";
+    return;
+  }
+  
+  // correct star position of the read to account for Hard and soft clipped
+  // bases as we are counting those now
+  for (int i = 0; i < cigarString.size(); i++) {
+    if (cigarString.c_str()[i] == 'H') {
+    } else {
+      pos = pos - i;
+      break;
+    }
+  }
+  for (int i = 0; i < cigarString.size(); i++) {
+    if (cigarString.c_str()[i] == 'S') {
+    } else {
+      pos = pos - i;
+      break;
+    }
+  }
+
+  int Roffset = 0;
+  int Coffset = 0;
+  for (int i = 0; i < cigarString.length(); i++) {
+    if (cigarString.c_str()[i] == 'M') {
+      RefSeq += toupper(
+			Reff.getSubSequence(chr, i + pos - 1 + Roffset, 1).c_str()[0]);
+      NewSeq += seq.c_str()[i - Coffset];
+      NewQual += qual.c_str()[i - Coffset];
+      NewPositions.push_back(pos + i - InsOffset);
+      NewChromosome.push_back(chr);
+      if (toupper(Reff.getSubSequence(chr, i + pos - 1 + Roffset, 1)
+		  .c_str()[0]) == seq.c_str()[i - Coffset]) {
+        NewCigar += 'M';
+      } else {
+	NewCigar += 'X';
+      }
+
+    } else if (cigarString.c_str()[i] == 'I') {
+      RefSeq += '-';
+      Roffset += -1;
+      NewSeq += seq.c_str()[i - Coffset];
+      NewQual += qual.c_str()[i - Coffset];
+      NewCigar += 'I';
+      InsOffset++;
+      NewPositions.push_back(pos + i - InsOffset);
+      NewChromosome.push_back(chr);
+    } else if (cigarString.c_str()[i] == 'D') {
+      NewSeq += '-';
+      NewQual += ' ';
+      Coffset++;
+      RefSeq += toupper(
+			Reff.getSubSequence(chr, i + pos - 1 + Roffset, 1).c_str()[0]);
+      NewCigar += 'D';
+      NewPositions.push_back(pos + i - InsOffset);
+      NewChromosome.push_back(chr);
+    }
+
+    else if (cigarString.c_str()[i] == 'H') {
+      RefSeq += 'H';
+      NewSeq += 'H';
+      NewQual += ' ';
+      Coffset++;
+      NewCigar += 'H';
+      NewPositions.push_back(-1);
+      NewChromosome.push_back("nope");
+    } else if (cigarString.c_str()[i] == 'S') {
+      RefSeq += '-';
+      NewSeq += seq.c_str()[i - Coffset];
+      NewQual += qual.c_str()[i - Coffset];
+      NewCigar += 'S';
+      NewPositions.push_back(pos + i -
+                             InsOffset);
+      NewChromosome.push_back(chr); 
+    } else {
+      cout << "Unexpected behavior in SamRead::getRefSeq()" << endl;
+    }
+  }
+  seq = NewSeq;
+  cigarString = NewCigar;
+  qual.clear();
+  char lastQ = ' ';
+
+  for (int i = 0; i < NewQual.size(); i++) {
+    if (NewQual.c_str()[i] == ' ') {
+      if (NewCigar.c_str()[i] == 'D')
+        qual += lastQ;  //'!';
+      else
+        qual += '!';
+    } else {
+      qual += NewQual.c_str()[i];
+      lastQ = NewQual.c_str()[i];
+    }
+  }
+  // build up the string that will indidcate if the read has to be flipped
+  for (int i = 0; i < qual.size(); i++) {
+    strand += "+";
+  }
+  Positions = NewPositions;
+  ChrPositions = NewChromosome;
+  //************************Lookup Kmer counts ***************************//
+  LookUpKmers();
+  vector<long> blank;
+  cout << "After getRefSeq";
+  writeVertical();
+}
+
+void SamRead::LookUpKmers() {
+  cout << "SeqSize = " << seq.size() << " RefSize = " << RefSeq.size() << endl;
+  vector<long> blank;
+  RefAltCounts.clear();
+  RefRefCounts.clear();
+  MutHashListCounts.clear();
+  MutAltCounts.clear();
+  MutRefCounts.clear();
+  RefKmers.clear();
+  AltKmers.clear();
+
+  for (int pi = 0; pi < ParentHashes.size(); pi++) {
+    RefAltCounts.push_back(blank);
+    RefRefCounts.push_back(blank);
+  }
+
+  for (int j = 0; j < seq.size(); j++) {
+    string hash = SamUtil::getHash(seq, j, HashSize);
+    string Refhash = SamUtil::getHash(RefSeq, j, HashSize);
+    RefKmers.push_back(Refhash);
+    AltKmers.push_back(hash);
+    if (hash != "") {
+      if (hash == Refhash) {
+        MutAltCounts.push_back(0);
+        for (int pi = 0; pi < ParentHashes.size(); pi++) {
+          RefAltCounts[pi].push_back(0);
+        }
+      } else {
+        if (MutantHashes.count(Util::HashToLong(hash)) > 0) {
+          MutAltCounts.push_back(MutantHashes[Util::HashToLong(hash)]);
+        } else {
+          MutAltCounts.push_back(-1);
+	}
+	for (int pi = 0; pi < ParentHashes.size(); pi++) {
+          if (ParentHashes[pi].count(Util::HashToLong(hash)) > 0) {
+            RefAltCounts[pi].push_back(ParentHashes[pi][Util::HashToLong(hash)]);
+          } else {
+            RefAltCounts[pi].push_back(-1);
+	  }
+        }
+      }
+
+      if (Hash.count(hash) > 0) {
+        MutHashListCounts.push_back(Hash[hash]);
+      } else {
+        MutHashListCounts.push_back(-1);
+      }
+
+    } else {
+      MutAltCounts.push_back(-3);
+      MutHashListCounts.push_back(-3);
+      for (int pi = 0; pi < ParentHashes.size(); pi++) {
+        RefAltCounts[pi].push_back(-3);
+      }
+    }
+
+    if (Refhash != "") {
+      if (MutantHashes.count(Util::HashToLong(Refhash)) > 0) {
+        MutRefCounts.push_back(MutantHashes[Util::HashToLong(Refhash)]);
+      } else { 
+        MutRefCounts.push_back(-1);
+      }
+
+      for (int pi = 0; pi < ParentHashes.size(); pi++) {
+        if (ParentHashes[pi].count(Util::HashToLong(Refhash)) > 0) {
+          RefRefCounts[pi].push_back(ParentHashes[pi][Util::HashToLong(Refhash)]);
+        } else {
+          RefRefCounts[pi].push_back(-1);
+	}
+      }
+
+    } else {
+      MutRefCounts.push_back(-3);
+
+      for (int pi = 0; pi < ParentHashes.size(); pi++) {
+        RefRefCounts[pi].push_back(-3);
+      }
+    }
+  }
+}
+
+void SamRead::parse(string read) {
+  cout << "parsing " << read << endl;
+  vector<string> temp = Util::Split(read, '\t');
+  cout << "boom" << endl;
+  name = temp[0];
+  cout << "name " << name;
+  flag = atoi(temp[1].c_str());
+  chr = temp[2];
+  pos = atoi(temp[3].c_str());
+  mapQual = atoi(temp[4].c_str());
+  cigar = temp[5];
+  seq = temp[9];
+
+  if (temp[10] == "*") {
+    cout << "correcting missing qualtiy" << endl;
+    string newQual = "";
+    for (int i = 0; i < seq.size(); i++) {
+      newQual += '5';
+    }
+    temp[10] = newQual;
+  }
+
+  qual = temp[10];
+  alignments.clear();
+  first = true;
+  combined = false;
+  string NewSeq = "";
+
+  for (int i = 0; i < seq.size(); i++) {
+    NewSeq += toupper(seq.c_str()[i]);
+  }
+
+  seq = NewSeq;
+  processCigar();
+  cout << "working on strand bias" << endl;
+  cout << temp[0] << endl;
+  vector<string> temp2 = Util::Split(name, ':');
+
+  if (temp2.size() >= 2) {
+    cout << "break it down " << endl;
+    strands = temp2[1];
+    cout << "strands = " << strands << endl;
+    forward = 0;
+    reverse = 0;
+    forward = atoi(temp2[1].c_str());
+    reverse = atoi(temp2[2].c_str());
+    cout << "forward = " << forward << endl;
+    cout << "reverse = " << reverse << endl;
+    StrandBias = ((float)forward) / ((float)forward + (float)reverse);
+    cout << "strand bias = " << StrandBias << endl;
+  } else {
+    cout << "no strand data " << temp2.size() << endl;
+    strands = "";
+    StrandBias = -1;
+    forward = -1;
+    reverse = -1;
+  }
+  cout << "getting flag bits " << endl;
+
+  for (int j = 0; j < 16; ++j) {
+    FlagBits[j] = 0 != (flag & (1 << j));
+  }
+
+  cout << "Read Pared = " << FlagBits[0] << endl;
+  cout << "read mapped in proper pair = " << FlagBits[1] << endl;
+  cout << "read unmapped = " << FlagBits[2] << endl;
+  cout << "mate unmapped = " << FlagBits[3] << endl;
+  cout << "read reverse strand = " << FlagBits[4] << endl;
+  cout << "mate referse strand = " << FlagBits[5] << endl;
+  cout << "first in pair =" << FlagBits[6] << endl;
+  cout << "second in pair =" << FlagBits[7] << endl;
+  cout << "not primary alignment =" << FlagBits[8] << endl;
+  cout << "read fails platform or vendor quality checks =" << FlagBits[9]
+       << endl;
+  cout << "read is PCR or optical duplicate =" << FlagBits[10] << endl;
+  cout << "supplementary alignment =" << FlagBits[11] << endl;
 }
