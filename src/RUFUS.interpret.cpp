@@ -273,144 +273,114 @@ string getHash(string seq, int j, int HashSize) {
   return NewHash;
 }
 
-string compressVar(string line, int start, string& StructCall)
-{      
-  cout << "compressing var" << endl; 
+string compressVar(string line, int start, string& StructCall) {
+  cout << "compressing var" << endl;
   char current = line.c_str()[0];
   int currentCount = 1;
-  string CV = ""; 
-  for (int i = 1; i< line.size(); i++)
-    {       
-      cout << current << endl;
-      if (line.c_str()[i] == current)
-	{       
-	  currentCount++;
-	}
-      else    
-	{       
-	  if (currentCount > 2)
-	    {       
-	      ostringstream convert;
-	      convert << currentCount; 
-	      CV+=convert.str();
-	      CV+=current;
-	      
-	      ostringstream convertEND; 
-	      int end = currentCount+start; 
-	      convertEND << end; 
+  string CV = "";
+  for (int i = 1; i < line.size(); i++) {
+    cout << current << endl;
+    if (line.c_str()[i] == current) {
+      currentCount++;
+    } else {
+      if (currentCount > 2) {
+        ostringstream convert;
+        convert << currentCount;
+        CV += convert.str();
+        CV += current;
 
-	      
-	      if (current == 'Y')
-		{
-		  cout << "YAAAY STRUCT" << endl; 
-		  StructCall = "SVTYPE=DUP;END="; 
-		  StructCall += convertEND.str(); 
-		  StructCall += ";SVLEN="; 
-		  StructCall += convert.str(); 
-		  StructCall += ";";
-		  cout << StructCall << endl; 
-		}
-	    }
-	  else if (currentCount ==2)
-	    {       
-	      CV+=current;
-	      CV+=current;
-	    }
-	  else if (currentCount == 1)
-	    {       
-	      CV+=current;
-	    }
-	  else    
-	    {       
-	      cout << "ERROR in compress " << current << " " << currentCount << endl;
-	    }
-	  
-	  current = line.c_str()[i];
-	  currentCount = 1;
-	}
-    }
-  if (currentCount > 2)
-    {       
-      ostringstream convert;
-      convert << currentCount;
-      CV+=convert.str();
-      CV+=current;
-      
-      ostringstream convertEND;
-      int end = currentCount+start;
-      convertEND << end;
+        ostringstream convertEND;
+        int end = currentCount + start;
+        convertEND << end;
 
+        if (current == 'Y') {
+          cout << "YAAAY STRUCT" << endl;
+          StructCall = "SVTYPE=DUP;END=";
+          StructCall += convertEND.str();
+          StructCall += ";SVLEN=";
+          StructCall += convert.str();
+          StructCall += ";";
+          cout << StructCall << endl;
+        }
+      } else if (currentCount == 2) {
+        CV += current;
+        CV += current;
+      } else if (currentCount == 1) {
+        CV += current;
+      } else {
+        cout << "ERROR in compress " << current << " " << currentCount << endl;
+      }
 
-      if (current == 'Y')
-	{
-	  cout << "YAAAY STRUCT" << endl;
-	  StructCall = "SVTYPE=DUP:TANDEM;END=";
-	  StructCall += convertEND.str();
-	  StructCall += ";SVLEN=";
-	  StructCall += convert.str();
-	  StructCall += ";";
-	  cout << StructCall << endl;
-	}
+      current = line.c_str()[i];
+      currentCount = 1;
     }
-  else if (currentCount ==2)
-    {       
-      CV+=current;
-      CV+=current;
+  }
+  if (currentCount > 2) {
+    ostringstream convert;
+    convert << currentCount;
+    CV += convert.str();
+    CV += current;
+
+    ostringstream convertEND;
+    int end = currentCount + start;
+    convertEND << end;
+
+    if (current == 'Y') {
+      cout << "YAAAY STRUCT" << endl;
+      StructCall = "SVTYPE=DUP:TANDEM;END=";
+      StructCall += convertEND.str();
+      StructCall += ";SVLEN=";
+      StructCall += convert.str();
+      StructCall += ";";
+      cout << StructCall << endl;
     }
-  else if (currentCount == 1)
-    {       
-      CV+=current;
-    }
-  else
-    {
-      cout << "ERROR in compress " << current << " " << currentCount << endl;
-    }
+  } else if (currentCount == 2) {
+    CV += current;
+    CV += current;
+  } else if (currentCount == 1) {
+    CV += current;
+  } else {
+    cout << "ERROR in compress " << current << " " << currentCount << endl;
+  }
   return CV;
 }
 
-int findBreak(SamRead& read)
-{
+int findBreak(SamRead& read) {
   char Afirst = read.cigarString.c_str()[0];
 
-
-  cout << "Afirst = " << Afirst  << endl;
+  cout << "Afirst = " << Afirst << endl;
   cout << "starting A check " << endl;
-  if (Afirst == 'H' or Afirst == 'S')
-    {
-      cout << "forward" << endl;
-      for (int i =0; i < read.seq.size(); i++)
-	{
-	  if  (read.cigarString.c_str()[i] == 'H' or read.cigarString.c_str()[i] == 'S')
-	    {
-	      //keep going
-	      cout << i <<  " == " << read.cigarString.c_str()[i] << ' ' << read.seq.c_str()[i]<< endl;
-	    }
-	  else
-	    {
-	      cout << i <<  " == " << read.cigarString.c_str()[i]  << ' ' << read.seq.c_str()[i] << endl;
-	      cout << "fond break at " << i << endl;
-	      return i;
-	    }
-	}
+  if (Afirst == 'H' or Afirst == 'S') {
+    cout << "forward" << endl;
+    for (int i = 0; i < read.seq.size(); i++) {
+      if (read.cigarString.c_str()[i] == 'H' or
+          read.cigarString.c_str()[i] == 'S') {
+        // keep going
+        cout << i << " == " << read.cigarString.c_str()[i] << ' '
+             << read.seq.c_str()[i] << endl;
+      } else {
+        cout << i << " == " << read.cigarString.c_str()[i] << ' '
+             << read.seq.c_str()[i] << endl;
+        cout << "fond break at " << i << endl;
+        return i;
+      }
     }
-  else
-    {
-      cout << "reverse" << endl;
-      for (int i = read.seq.size()-1; i >= 0; i += -1)
-	{
-	  if  (read.cigarString.c_str()[i] == 'H' or read.cigarString.c_str()[i] == 'S')
-	    {
-	      cout << i <<  " == " << read.cigarString.c_str()[i]  << ' ' << read.seq.c_str()[i] << endl;
-	      //keep going
-	    }
-	  else
-	    {
-	      cout << i <<  " == " << read.cigarString.c_str()[i]  << ' ' << read.seq.c_str()[i] << endl;
-	      cout << "fond break at " << i << endl;
-	      return i;
-	    }
-	}
+  } else {
+    cout << "reverse" << endl;
+    for (int i = read.seq.size() - 1; i >= 0; i += -1) {
+      if (read.cigarString.c_str()[i] == 'H' or
+          read.cigarString.c_str()[i] == 'S') {
+        cout << i << " == " << read.cigarString.c_str()[i] << ' '
+             << read.seq.c_str()[i] << endl;
+        // keep going
+      } else {
+        cout << i << " == " << read.cigarString.c_str()[i] << ' '
+             << read.seq.c_str()[i] << endl;
+        cout << "fond break at " << i << endl;
+        return i;
+      }
     }
+  }
 }
 
 SamRead BetterWay(vector<SamRead> reads) {
