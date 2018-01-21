@@ -29,7 +29,7 @@ using namespace std;
 class SamUtil{
  public:
   static int GetReadOrientation(int);
-  static int getHash(string, int, int);
+  static string getHash(string, int, int);
   static string compressVar(string, int, string&);
   
  private:

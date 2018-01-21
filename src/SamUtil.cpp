@@ -41,7 +41,7 @@ int SamUtil::GetReadOrientation(int flag) {
   return b[4];
 }
 
-int SamUTil::getHash(string seq, int , int HashSize) {
+string SamUtil::getHash(string seq, int j , int HashSize) {
   int bases = 0;
   string NewHash = "";
   if (j <seq.size()) {

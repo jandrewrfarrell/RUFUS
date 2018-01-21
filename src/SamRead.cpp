@@ -29,22 +29,16 @@
 
 using namespace std;
 
-vector <unordered_map <unsigned long int, int> > ParentHashes;
-unordered_map  <unsigned long int, int> MutantHashes;
-FastaReference Reff;
-int HashSize = 25;
-int totalDeleted;
-int totalAdded;
-int MaxVarentSize = 1000;
-ofstream VCFOutFile;
-ofstream BEDOutFile;
-ofstream BEDBigStuff;
-ofstream BEDNotHandled;
-ofstream Invertions;
-ofstream Translocations;
-ofstream Translocationsbed;
-ofstream Unaligned;
-map <string, int> Hash;
+extern vector <unordered_map <unsigned long int, int> > ParentHashes;
+extern unordered_map  <unsigned long int, int> MutantHashes;
+extern FastaReference Reff;
+extern int HashSize = 25;
+extern int MaxVarentSize = 1000;
+extern ofstream VCFOutFile;
+extern  ofstream BEDOutFile;
+extern ofstream BEDBigStuff;
+extern ofstream BEDNotHandled;
+extern map <string, int> Hash;
 
 int SamRead::CheckParentCov(int &mode) {
   bool good = true;
@@ -658,7 +652,7 @@ void SamRead::parseMutations( char *argv[]) {
 	  Genotype = "0/1";
 	}
 	
-	string CompressedVarType = compressVar(varType, Positions[startPos], StructCall); 
+	string CompressedVarType = SamUtil::compressVar(varType, Positions[startPos], StructCall); 
 	cout <<  chr << "\t" << pos+i << "\t" << CompressedVarType /*"."*/ 
 	     << "\t" << reff << "\t" << alt << "\t" << HashCountsOG.size() 
 	     << "\t" << varType << "\t" << "." << "\t" << "." << "\t" << "." 
