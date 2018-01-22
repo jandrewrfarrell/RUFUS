@@ -1,6 +1,9 @@
 /*By ANDREW FARRELL
  * OverlapSam.cpp
- * TODO: describe funciton of file
+ * -------------------------------------------------- 
+ * Assembles k-mers containing variation into contigs
+ * that represent the variant sequence
+ * --------------------------------------------------
  */
 
 #include <bitset>
@@ -10,7 +13,7 @@
 #include <math.h>
 #include <sstream>
 #include <stdio.h>
-#include <stdlib.h>
+#include <stdlib.7h>
 #include <string>
 #include <sys/stat.h>
 #include <sys/types.h>

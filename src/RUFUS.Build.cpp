@@ -1,6 +1,10 @@
-/*By ANDREW FARRELL
+/* By ANDREW FARRELL
  * RUFUS.1kg.filter.cpp
- * TODO: describe funciton of file
+ * ---------------------------------------------------
+ * Builds intersections between k-mer frequency tables
+ * to identify k-mers that correspond to a mutation or
+ * copy number variation
+ * ---------------------------------------------------
  */
 
 #include <bitset>

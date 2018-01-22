@@ -1,6 +1,9 @@
 /*By ANDREW FARRELL
  * OverlapRegion.cpp
- * TODO: describe funciton of file
+ * --------------------------------------------------
+ * Assembles k-mers containing variation into contigs
+ * that represent the variant sequence
+ * --------------------------------------------------  
  */
 
 #include <bitset>

@@ -1,6 +1,10 @@
 /*By ANDREW FARRELL
  * ModelDist.cpp
- * TODO: describe funciton of file
+ * ----------------------------------------------------------
+ * Takes raw k-mer frequency histogram produced by Jellyfish,
+ * and fits models of the underlying copy number distribition 
+ * to the raw k-mer histogram for each sample
+ * ----------------------------------------------------------
  */
 
 #include <bitset>
