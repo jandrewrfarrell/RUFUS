@@ -552,7 +552,6 @@ SamRead BetterWay(vector<SamRead> reads) {
     AlignmentChr.push_back(currentChr);
   }
 
-  // write
   for (int i = 0; i < reads.size(); i++) {
     reads[i].Positions.clear();
     reads[i].ChrPositions.clear();
@@ -631,9 +630,7 @@ SamRead BetterWay(vector<SamRead> reads) {
   cout << "Post adjustment" << endl;
   reads[A].write();
   reads[B].write();
-  // for (int i =0; i< reads[A].PeakMap.size(); i++)
-  //     cout << i << "-" << reads[A].PeakMap[i] << "-" << reads[B].PeakMap[i]
-  //     << endl;
+
   cout << "************INTO**********" << endl;
   if (B == 1 and GetReadOrientation(reads[A].flag) ==
       GetReadOrientation(reads[B].flag))  // if they are on the
@@ -644,12 +641,9 @@ SamRead BetterWay(vector<SamRead> reads) {
 	    if (reads[A].Positions[i] - LastAlignedPos > 1)  // indicates a deletion
 	      {
 		if (LastAlignedQ == '!' or reads[A].qual.c_str()[i] == '!') {
-		  cout << "well fuck this shit A" << endl;
+		  cout << "Unexpected behavior in RUFUS.interpret.cpp A" << endl;
 		  return reads[A];
 		}
-		// if(reads[A].ChrPositions[i] == LastAlignedChr and
-		// abs(reads[A].Positions[i] -LastAlignedPos ) < MaxVarentSize ) //must
-		// be on the same chromosome
 		if (reads[A].chr == reads[B].chr and
 		    abs(reads[A].Positions[i] - LastAlignedPos) <
 		    MaxVarentSize)  // must be on the same chromosome
@@ -701,16 +695,6 @@ SamRead BetterWay(vector<SamRead> reads) {
 		    } else {
 		      cout << "INVERSION skipped" << endl;
 		    }
-		    //if( /*1==1 or*/ reads[A].PeakMap[i] == 1 or
-		    //reads[A].PeakMap[i-1] == 1 or reads[B].PeakMap[i] == 1 or
-		    //reads[B].PeakMap[i -1] == 1)
-		    //{
-		    //Translocations << "TOO BIG " <<
-		    //abs(reads[A].Positions[i] -LastAlignedPos ) << endl;
-		    //reads[A].writetofile(Translocations);
-		    //reads[B].writetofile(Translocations);
-		    //Translocations << endl << endl;
-		    //}
 		  } else {
 		    if ((reads[A].chr == "hs37d5" and reads[B].chr != "hs37d5") or
 			(reads[A].chr != "hs37d5" and reads[B].chr == "hs37d5")) {
@@ -741,16 +725,6 @@ SamRead BetterWay(vector<SamRead> reads) {
 		      } else {
 			cout << "INVERSION skipped" << endl;
 		      }
-		      //if( /*1==1 or*/ reads[A].PeakMap[i] == 1 or
-		      //reads[A].PeakMap[i-1] == 1 or reads[B].PeakMap[i] == 1 or
-		      //reads[B].PeakMap[i -1] == 1)
-		      //{
-		      //Translocations << "mobil elemnt " <<
-		      //endl;
-		      //reads[A].writetofile(Translocations);
-		      //reads[B].writetofile(Translocations);
-		      //Translocations << endl << endl;
-		      //}
 		    } else {
 		      int Abreak = findBreak(reads[A]);
 		      int Bbreak = findBreak(reads[B]);
@@ -779,15 +753,6 @@ SamRead BetterWay(vector<SamRead> reads) {
 		      } else {
 			cout << "INVERSION skipped" << endl;
 		      }
-		      //if( /*1==1 or*/ reads[A].PeakMap[i] == 1 or
-		      //reads[A].PeakMap[i-1] == 1 or reads[B].PeakMap[i] == 1 or
-		      //reads[B].PeakMap[i -1] == 1)
-		      //{
-		      //Translocations << "we got a translocation" <<
-		      //endl; reads[A].writetofile(Translocations);
-		      //reads[B].writetofile(Translocations);
-		      //Translocations << endl << endl;
-		      //}
 		    }
 		  }
 		}
@@ -797,15 +762,13 @@ SamRead BetterWay(vector<SamRead> reads) {
 	      // tandem duplication
 	      {
 		if (LastAlignedQ == '!' or reads[A].qual.c_str()[i] == '!') {
-		  cout << "well fuck this shit B" << endl;
+		  cout << "Unexpected behavior in RUFUS.interpret.cpp B" << endl;
 		  return reads[A];
 		}
 		cout << "this could be one A, last = " << LastAlignedPos
 		     << " Current = " << reads[A].Positions[i]
 		     << " chr = " << LastAlignedChr << " and "
 		     << reads[A].ChrPositions[i] << endl;
-		//if (reads[A].ChrPositions[i] == LastAlignedChr
-		//)
 		if (reads[A].chr == reads[B].chr) {
 		  cout << "This is an insertion A at base " << i << endl;
 		  BEDBigStuff << reads[A].chr << "\t" << reads[A].Positions[i] << "\t"
@@ -829,8 +792,6 @@ SamRead BetterWay(vector<SamRead> reads) {
 		  for (k = reads[A].Positions.size() - 1; k >= 0; k += -1) {
 		    if (reads[A].Positions[k] + 1 > 1) break;
 		  }
-		  // cout << "j= " << reads[A].Positions[k]+1 << " < " <<
-		  // LastAlignedPos << " - " << endl;
 		  for (j = reads[A].Positions[k] + 1; j < LastAlignedPos; j++) {
 		    NewCigar += 'Y';  //'I';
               NewSeq +=
@@ -840,8 +801,6 @@ SamRead BetterWay(vector<SamRead> reads) {
               NewPos.push_back(j);
               NewChr.push_back(reads[A].chr);
 		  }
-		  cout << "yaya finished" << endl;
-
 		} else {
 		  if ((reads[A].chr == "hs37d5" and reads[B].chr != "hs37d5") or
 		      (reads[A].chr != "hs37d5" and reads[B].chr == "hs37d5")) {
@@ -871,15 +830,6 @@ SamRead BetterWay(vector<SamRead> reads) {
 		    } else {
 		      cout << "INVERSION skipped" << endl;
 		    }
-		    // if( /*1==1 or*/ reads[A].PeakMap[i] == 1 or
-		    // reads[A].PeakMap[i-1] == 1 or reads[B].PeakMap[i] == 1 or
-		    // reads[B].PeakMap[i -1] == 1)
-		    //{
-		    //Translocations << "mobil elemnt " << endl;
-		    //reads[A].writetofile(Translocations);
-		    //reads[B].writetofile(Translocations);
-		    //Translocations << endl << endl;
-		    //}
 		  }
 		  int Abreak = findBreak(reads[A]);
 		  int Bbreak = findBreak(reads[B]);
@@ -907,22 +857,13 @@ SamRead BetterWay(vector<SamRead> reads) {
 		  } else {
 		    cout << "INVERSION skipped" << endl;
 		  }
-		  //if( /*1==1 or*/ reads[A].PeakMap[i] == 1 or
-		  //reads[A].PeakMap[i-1] == 1 or reads[B].PeakMap[i] == 1 or
-		  //reads[B].PeakMap[i -1] == 1)
-		  //{
-		  //Translocations << "we got a translocation" <<
-		  //endl; reads[A].writetofile(Translocations);
-		  //reads[B].writetofile(Translocations);
-		  //Translocations << endl << endl;
-		  //}
 		}
 
 	      } else if (reads[A].Positions[i] - LastAlignedPos < 0 and
 			 abs(reads[A].Positions[i] - LastAlignedPos) >=
 			 MaxVarentSize) {
 	      if (LastAlignedQ == '!' or reads[A].qual.c_str()[i] == '!') {
-		cout << "well fuck this shit C" << endl;
+		cout << "Unexpected behavior in RUFUS.interpret.cpp C" << endl;
 
 		return reads[A];
 	      }
@@ -957,16 +898,6 @@ SamRead BetterWay(vector<SamRead> reads) {
 	      } else {
 		cout << "INVERSION skipped" << endl;
 	      }
-	      //if( /*1==1 or*/ reads[A].PeakMap[i] == 1 or
-	      //reads[A].PeakMap[i-1] == 1 or reads[B].PeakMap[i] == 1 or
-	      //reads[B].PeakMap[i -1] == 1)
-	      //{
-	      //Translocations << "TOO BIG " <<
-	      //abs(reads[A].Positions[i] -LastAlignedPos ) << endl;
-	      //reads[A].writetofile(Translocations);
-	      //reads[B].writetofile(Translocations);
-	      //Translocations << endl << endl;
-	      //}
 	    }
 
 	    if (i < reads[A].cigarString.size()) {
@@ -979,20 +910,14 @@ SamRead BetterWay(vector<SamRead> reads) {
 	      LastAlignedQ = reads[A].qual.c_str()[i];
 	      LastAlignedPos = reads[A].Positions[i];
 	      LastAlignedChr = reads[A].ChrPositions[i];
-	      // cout << "A " << reads[A].seq.c_str()[i] << " " <<
-	      // reads[A].cigarString.c_str()[i] << " " << reads[A].RefSeq.c_str()[i]
-	      // <<" " << reads[A].ChrPositions[i] << " " << reads[A].Positions[i] <<
-	      // NewSeq << endl;
 	    }
 	  } else if (reads[B].Positions[i] > -1) {
 	  if (reads[B].Positions[i] - LastAlignedPos > 1) {
 	    if (LastAlignedQ == '!' or reads[B].qual.c_str()[i] == '!') {
-	      cout << "well fuck this shit D" << endl;
+	      cout << "Unexpected behavior in RUFUS.interpret.cpp D" << endl;
 
 	      return reads[A];
 	    }
-	    // if(reads[B].ChrPositions[i] == LastAlignedChr  and
-	    // abs(reads[B].Positions[i] - LastAlignedPos ) < MaxVarentSize )
 	    if (reads[B].chr == reads[A].chr and
 		abs(reads[B].Positions[i] - LastAlignedPos) < MaxVarentSize) {
 	      cout << "striahgtup deletion, size = "
@@ -1002,9 +927,6 @@ SamRead BetterWay(vector<SamRead> reads) {
 	      BEDBigStuff << reads[B].chr << "\t" << LastAlignedPos << "\t"
 			  << reads[B].Positions[i] << "\t"
 			  << "Deletion" << endl;
-	      //cout << "Inserting reff sequence from " <<
-	      //LastAlignedPos+1 << " to " << reads[B].Positions[i] << " = " <<
-	      //reads[B].Positions[i]-LastAlignedPos << endl;
 	      for (int j = LastAlignedPos; j < reads[B].Positions[i] - 1; j++) {
 		// cout << j << " - " << j - LastAlignedPos<< endl;
 		NewCigar += 'D';
@@ -1014,19 +936,8 @@ SamRead BetterWay(vector<SamRead> reads) {
 		toupper(Reff.getSubSequence(reads[B].chr, j, 1).c_str()[0]);
               NewPos.push_back(j);
               NewChr.push_back(reads[B].ChrPositions[i]);
-
-              //char tmp =
-              //toupper(Reff.getSubSequence(reads[B].chr, j, 1).c_str()[0]);
-              //      cout << "R " <<
-              //'-' << " " << 'D' << " " << tmp << " " << reads[B].chr << " " <<
-              //j << " " << NewSeq << endl;
-              //cout << "R " <<
-              //'-' << " " << 'D' << " " << tmp << " " << reads[B].chr << " " <<
-              //j << " " << NewRef << endl << endl;
 	      }
 	    } else {
-	      // if( reads[A].ChrPositions[i] == LastAlignedChr and
-	      // abs(reads[B].Positions[i] -LastAlignedPos ) >= MaxVarentSize )
 	      if (reads[A].chr == reads[B].chr and
 		  abs(reads[B].Positions[i] - LastAlignedPos) >= MaxVarentSize) {
 		int Abreak = findBreak(reads[A]);
@@ -1055,16 +966,6 @@ SamRead BetterWay(vector<SamRead> reads) {
 		} else {
 		  cout << "INVERSION skipped" << endl;
 		}
-		//if( /*1==1 or*/ reads[A].PeakMap[i] == 1 or
-		//reads[A].PeakMap[i-1] == 1 or reads[B].PeakMap[i] == 1 or
-		//reads[B].PeakMap[i -1] == 1)
-		//{
-		//Translocations << "TOO BIG " <<
-		//abs(reads[A].Positions[i] -LastAlignedPos ) << endl;
-		//reads[A].writetofile(Translocations);
-		//reads[B].writetofile(Translocations);
-		//Translocations << endl << endl;
-		//}
 	      } else {
 		if ((reads[A].chr == "hs37d5" and reads[B].chr != "hs37d5") or
 		    (reads[A].chr != "hs37d5" and reads[B].chr == "hs37d5")) {
@@ -1095,15 +996,6 @@ SamRead BetterWay(vector<SamRead> reads) {
 		  } else {
 		    cout << "INVERSION skipped" << endl;
 		  }
-		  //if( /*1==1 or*/ reads[A].PeakMap[i] == 1 or
-		  //reads[A].PeakMap[i-1] == 1 or reads[B].PeakMap[i] == 1 or
-		  //reads[B].PeakMap[i -1] == 1)
-		  //{
-		  //Translocations << "mobil elemnt " << endl;
-		  //reads[A].writetofile(Translocations);
-		  //reads[B].writetofile(Translocations);
-		  //Translocations << endl << endl;
-		  //}
 		} else {
 		  int Abreak = findBreak(reads[A]);
 		  int Bbreak = findBreak(reads[B]);
@@ -1132,16 +1024,6 @@ SamRead BetterWay(vector<SamRead> reads) {
 		  } else {
 		    cout << "INVERSION skipped" << endl;
 		  }
-
-		  //if( /*1==1 or*/ reads[A].PeakMap[i] == 1 or
-		  //reads[A].PeakMap[i-1] == 1 or reads[B].PeakMap[i] == 1 or
-		  //reads[B].PeakMap[i -1] == 1)
-		  //{
-		  //Translocations << "we got a translocation" <<
-		  //endl; reads[A].writetofile(Translocations);
-		  //reads[B].writetofile(Translocations);
-		  //Translocations << endl << endl;
-		  //}
 		}
 	      }
 	    }
@@ -1152,20 +1034,15 @@ SamRead BetterWay(vector<SamRead> reads) {
 	    // tandem duplication
 	    {
 	      if (LastAlignedQ == '!' or reads[B].qual.c_str()[i] == '!') {
-		cout << "well fuck this shit E" << endl;
+		cout << "Unexpected behavior in RUFUS.interpret.cpp E" << endl;
 
 		return reads[A];
 	      }
-	      // cout << "this could be one B, last = " << LastAlignedPos << "
-	      // Current = " << reads[B].Positions[i] << " chr = " << LastAlignedChr
-	      // << " and " << reads[B].ChrPositions[i] << endl;
-	      // if (reads[B].ChrPositions[i] == LastAlignedChr
 	      if (reads[B].chr == reads[A].chr) {
 		cout << "This is an insertion B at base " << i << endl;
 
 		BEDBigStuff << reads[B].chr << "\t" << reads[B].Positions[i] << "\t"
 			    << LastAlignedPos << "\tTandemDup" << endl;
-		//cout << "tadem dup" << endl;
 		int j = 0;
 		for (j = i; j < reads[B].seq.size() and
 		       reads[B].Positions[j] <= LastAlignedPos;
@@ -1200,9 +1077,7 @@ SamRead BetterWay(vector<SamRead> reads) {
 		cout << "we got a translocation" << endl;
 		if ((reads[A].chr == "hs37d5" and reads[B].chr != "hs37d5") or
 		    (reads[A].chr != "hs37d5" and reads[B].chr == "hs37d5")) {
-		  cout << "mobil elemnt " << endl;
-		  // reads[A].write();
-		  // reads[B].write();
+		  cout << "mobil element " << endl;
 		}
 	      }
 
@@ -1210,7 +1085,7 @@ SamRead BetterWay(vector<SamRead> reads) {
 		       abs(reads[B].Positions[i] - LastAlignedPos) >=
                        MaxVarentSize) {
 	    if (LastAlignedQ == '!' or reads[B].qual.c_str()[i] == '!') {
-	      cout << "well fuck this shit F" << endl;
+	      cout << "Unexpected behavior in RUFUS.interpret.cpp F" << endl;
 	      return reads[A];
 	    }
 	    int Abreak = findBreak(reads[A]);
@@ -1240,17 +1115,6 @@ SamRead BetterWay(vector<SamRead> reads) {
 	    } else {
 	      cout << "INVERSION skipped" << endl;
 	    }
-
-	    //if( /*1==1 or*/ reads[A].PeakMap[i] == 1 or
-	    //reads[A].PeakMap[i-1] == 1 or reads[B].PeakMap[i] == 1 or
-	    //reads[B].PeakMap[i -1] == 1)
-	    //       {
-	    //Translocations << "TOO BIG " << abs(reads[A].Positions[i]
-	    //-LastAlignedPos ) << endl;
-	    //reads[A].writetofile(Translocations);
-	    //reads[B].writetofile(Translocations);
-	    //Translocations << endl << endl;
-	    //}
 	  }
 
 	  if (i < reads[B].cigarString.size()) {
@@ -1328,16 +1192,10 @@ SamRead BetterWay(vector<SamRead> reads) {
 	   << " %= " << (double)UnalignedCount / (double)NewCigar.size() << endl;
       if (UnalignedCount < 10) {
 	NewCigar = NewNewCigar;
-	// cout << NewSeq << endl << NewQual << endl << NewCigar << endl << NewRef
-	// << endl;
 	reads[A].first = true;
-	//cout <<"redoing alignemnt number" << endl;
 	int temp = reads[A].alignments[0];
 	reads[A].alignments.clear();
 	reads[A].alignments.push_back(temp);
-	//cout << "alignemtns should be " <<
-	//reads[A].alignments.size() << endl;
-
 	reads[A].cigarString = NewCigar;
 	reads[A].seq = NewSeq;
 	reads[A].qual = NewQual;
@@ -1348,45 +1206,31 @@ SamRead BetterWay(vector<SamRead> reads) {
 	reads[A].ChrPositions = NewChr;
 	reads[A].combined = true;
 	reads[B].combined = true;
-
-	// reads[A].write();
-	//{
-	// reads[A].write();
-	// reads[A].writeVertical();
-	//}
-
       } else {
 	cout << "Skipping" << endl;
       }
       cout << "Done with " << reads[A].name << endl;
-    } else  // if (3==1)
-    {
-      // this needs to be the invertion stuff
-      // need to add here looing at every base
-      if (reads[A].chr == reads[B].chr)  // and abs(reads[A].Positions[i]
-	// -LastAlignedPos ) <= MaxVarentSize )
-	{
-	  // need to check each base and find the breakpoint
-	  cout << "found possible Inversion " << endl;
-
-	  int Abreak = findBreak(reads[A]);
-	  int Bbreak = findBreak(reads[B]);
-
-	  cout << " if( " << reads[A].PeakMap[Abreak] << " == 1 or "
-	       << reads[A].PeakMap[Abreak - 1] << " == 1 or "
-	       << reads[B].PeakMap[Bbreak] << " == 1 or "
-	       << reads[B].PeakMap[Bbreak - 1] << " == 1)";
-	  // if( /*1==1 or*/ reads[A].PeakMap[Abreak] == 1 or
-	  // reads[A].PeakMap[Abreak-1] == 1 or reads[B].PeakMap[Bbreak] == 1 or
-	  // reads[B].PeakMap[Bbreak -1] == 1) and Abreak > 0 and Bbreak > 0
-	  if (/*1==1 or*/ (reads[A].PeakMap[Abreak] == 1 or
-			   reads[A].PeakMap[Abreak - 1] == 1) and
-	      (reads[B].PeakMap[Bbreak] == 1 or
-	       reads[B].PeakMap[Bbreak - 1] == 1) and
-	      Abreak > 0 and Bbreak > 0) {
-	    cout << "INVERSION written to file" << endl;
-	    Translocations << "INVERSION" << endl;
-	    reads[A].writetofile(Translocations);
+     } else {
+    
+    if (reads[A].chr == reads[B].chr) {
+      // need to check each base and find the breakpoint
+      cout << "found possible Inversion " << endl;
+      
+      int Abreak = findBreak(reads[A]);
+      int Bbreak = findBreak(reads[B]);
+      
+      cout << " if( " << reads[A].PeakMap[Abreak] << " == 1 or "
+	   << reads[A].PeakMap[Abreak - 1] << " == 1 or "
+	   << reads[B].PeakMap[Bbreak] << " == 1 or "
+	   << reads[B].PeakMap[Bbreak - 1] << " == 1)";
+      if (/*1==1 or*/ (reads[A].PeakMap[Abreak] == 1 or
+		       reads[A].PeakMap[Abreak - 1] == 1) and
+	  (reads[B].PeakMap[Bbreak] == 1 or
+	   reads[B].PeakMap[Bbreak - 1] == 1) and
+	  Abreak > 0 and Bbreak > 0) {
+	cout << "INVERSION written to file" << endl;
+	Translocations << "INVERSION" << endl;
+	reads[A].writetofile(Translocations);
 	    reads[B].writetofile(Translocations);
 	    Translocations << endl << endl;
 	    Translocationsbed << reads[A].chr << "\t"
@@ -1395,111 +1239,98 @@ SamRead BetterWay(vector<SamRead> reads) {
 			      << reads[B].chr << "\t"
 			      << reads[B].Positions[Bbreak] - 200 << "\t"
 			      << reads[B].Positions[Bbreak] + 200 << endl;
-	  } else {
-	    cout << "INVERSION skipped" << endl;
-	  }
-	  string Acig = "";
-	  string Bcig = "";
-	  for (int i = 0; i < reads[A].seq.size(); i++) {
-	    char Ab = reads[A].cigarString.c_str()[i];
-	    char Bb = reads[B].cigarString.c_str()[i];
-	    if ((reads[A].cigarString.c_str()[i] == 'M' or
-		 reads[A].cigarString.c_str()[i] == 'X') and
-		(reads[B].cigarString.c_str()[i] == 'S' or
-		 reads[B].cigarString.c_str()[i] == 'H'))
-	      Bb = 'U';
-	    if ((reads[B].cigarString.c_str()[i] == 'M' or
-		 reads[B].cigarString.c_str()[i] == 'X') and
-		(reads[A].cigarString.c_str()[i] == 'S' or
-		 reads[A].cigarString.c_str()[i] == 'H'))
-	      Ab = 'U';
-	    Acig += Ab;
-	    Bcig += Bb;
-	  }
-	  reads[A].cigarString = Acig;
-	  reads[B].cigarString = Bcig;
-	  cout << "invertion adjust string";
-	  reads[A].write();
-	  reads[B].write();
-	} else if ((reads[A].chr == "hs37d5" and reads[B].chr != "hs37d5") or
-		   (reads[A].chr != "hs37d5" and reads[B].chr == "hs37d5")) {
-	int Abreak = findBreak(reads[A]);
-	int Bbreak = findBreak(reads[B]);
-
-	cout << " if( " << reads[A].PeakMap[Abreak] << " == 1 or "
-	     << reads[A].PeakMap[Abreak - 1] << " == 1 or "
-	     << reads[B].PeakMap[Bbreak] << " == 1 or "
-	     << reads[B].PeakMap[Bbreak - 1] << " == 1)";
-	// if( /*1==1 or*/ reads[A].PeakMap[Abreak] == 1 or
-	// reads[A].PeakMap[Abreak-1] == 1 or reads[B].PeakMap[Bbreak] == 1 or
-	// reads[B].PeakMap[Bbreak -1] == 1) and Abreak > 0 and Bbreak > 0
-	if (/*1==1 or*/ (reads[A].PeakMap[Abreak] == 1 or
-			 reads[A].PeakMap[Abreak - 1] == 1) and
-	    (reads[B].PeakMap[Bbreak] == 1 or
-	     reads[B].PeakMap[Bbreak - 1] == 1) and
-	    Abreak > 0 and Bbreak > 0) {
-	  Translocations << "mobil elemnt inverted" << endl;
-	  reads[A].writetofile(Translocations);
-	  reads[B].writetofile(Translocations);
-	  Translocations << endl << endl;
-	  Translocationsbed << reads[A].chr << "\t"
-			    << reads[A].Positions[Abreak] - 200 << "\t"
-			    << reads[A].Positions[Abreak] + 200 << endl
-			    << reads[B].chr << "\t"
-			    << reads[B].Positions[Bbreak] - 200 << "\t"
-			    << reads[B].Positions[Bbreak] + 200 << endl;
-	}
       } else {
-	int Abreak = findBreak(reads[A]);
-	int Bbreak = findBreak(reads[B]);
-
-	cout << " if( " << reads[A].PeakMap[Abreak] << " == 1 or "
-	     << reads[A].PeakMap[Abreak - 1] << " == 1 or "
-	     << reads[B].PeakMap[Bbreak] << " == 1 or "
-	     << reads[B].PeakMap[Bbreak - 1] << " == 1)";
-	// if( /*1==1 or*/ reads[A].PeakMap[Abreak] == 1 or
-	// reads[A].PeakMap[Abreak-1] == 1 or reads[B].PeakMap[Bbreak] == 1 or
-	// reads[B].PeakMap[Bbreak -1] == 1) and Abreak > 0 and Bbreak > 0
-	if (/*1==1 or*/ (reads[A].PeakMap[Abreak] == 1 or
-			 reads[A].PeakMap[Abreak - 1] == 1) and
+	cout << "INVERSION skipped" << endl;
+      }
+      string Acig = "";
+      string Bcig = "";
+      for (int i = 0; i < reads[A].seq.size(); i++) {
+	char Ab = reads[A].cigarString.c_str()[i];
+	char Bb = reads[B].cigarString.c_str()[i];
+	if ((reads[A].cigarString.c_str()[i] == 'M' or
+	     reads[A].cigarString.c_str()[i] == 'X') and
+	    (reads[B].cigarString.c_str()[i] == 'S' or
+	     reads[B].cigarString.c_str()[i] == 'H'))
+	  Bb = 'U';
+	if ((reads[B].cigarString.c_str()[i] == 'M' or
+	     reads[B].cigarString.c_str()[i] == 'X') and
+	    (reads[A].cigarString.c_str()[i] == 'S' or
+	     reads[A].cigarString.c_str()[i] == 'H'))
+	  Ab = 'U';
+	Acig += Ab;
+	Bcig += Bb;
+      }
+      reads[A].cigarString = Acig;
+      reads[B].cigarString = Bcig;
+      cout << "invertion adjust string";
+      reads[A].write();
+      reads[B].write();
+    } else if ((reads[A].chr == "hs37d5" and reads[B].chr != "hs37d5") or
+	       (reads[A].chr != "hs37d5" and reads[B].chr == "hs37d5")) {
+      int Abreak = findBreak(reads[A]);
+      int Bbreak = findBreak(reads[B]);
+      
+      cout << " if( " << reads[A].PeakMap[Abreak] << " == 1 or "
+	   << reads[A].PeakMap[Abreak - 1] << " == 1 or "
+	   << reads[B].PeakMap[Bbreak] << " == 1 or "
+	   << reads[B].PeakMap[Bbreak - 1] << " == 1)";
+      if (/*1==1 or*/ (reads[A].PeakMap[Abreak] == 1 or
+		       reads[A].PeakMap[Abreak - 1] == 1) and
 	    (reads[B].PeakMap[Bbreak] == 1 or
 	     reads[B].PeakMap[Bbreak - 1] == 1) and
-	    Abreak > 0 and Bbreak > 0) {
-	  Translocations << "we got a translocation and invertion" << endl;
-	  reads[A].writetofile(Translocations);
-	  reads[B].writetofile(Translocations);
-	  Translocations << endl << endl;
-	  Translocationsbed << reads[A].chr << "\t"
-			    << reads[A].Positions[Abreak] - 200 << "\t"
-			    << reads[A].Positions[Abreak] + 200 << endl
-			    << reads[B].chr << "\t"
-			    << reads[B].Positions[Bbreak] - 200 << "\t"
-			    << reads[B].Positions[Bbreak] + 200 << endl;
-	}
+	  Abreak > 0 and Bbreak > 0) {
+	Translocations << "mobil elemnt inverted" << endl;
+	reads[A].writetofile(Translocations);
+	reads[B].writetofile(Translocations);
+	Translocations << endl << endl;
+	Translocationsbed << reads[A].chr << "\t"
+			  << reads[A].Positions[Abreak] - 200 << "\t"
+			  << reads[A].Positions[Abreak] + 200 << endl
+			  << reads[B].chr << "\t"
+			  << reads[B].Positions[Bbreak] - 200 << "\t"
+			  << reads[B].Positions[Bbreak] + 200 << endl;
       }
-
-      cout << "*********SKIPPING************\ndifference strands" << endl;
-      BEDNotHandled << "Different strands" << endl;
-      BEDNotHandled << reads[A].chr << "\t" << reads[A].pos << "\t"
-		    << reads[A].pos + reads[A].seq.size() << "\t" << reads[A].name
-		    << "\t" << reads[A].cigar << endl;
-      reads[A].writetofile(BEDNotHandled);
-      BEDNotHandled << reads[B].chr << "\t" << reads[B].pos << "\t"
-		    << reads[B].pos + reads[B].seq.size() << "\t" << reads[B].name
-		    << "\t" << reads[B].cigar << endl;
-      reads[B].writetofile(BEDNotHandled);
-
-      BEDNotHandled << endl << endl;
-
-      Invertions << reads[A].chr << "\t" << reads[A].pos << "\t" << reads[B].pos
-		 << "\t" << reads[B].pos - reads[A].pos << endl;
+    } else {
+      int Abreak = findBreak(reads[A]);
+      int Bbreak = findBreak(reads[B]);
+      
+      cout << " if( " << reads[A].PeakMap[Abreak] << " == 1 or "
+	   << reads[A].PeakMap[Abreak - 1] << " == 1 or "
+	   << reads[B].PeakMap[Bbreak] << " == 1 or "
+	   << reads[B].PeakMap[Bbreak - 1] << " == 1)";
+      if (/*1==1 or*/ (reads[A].PeakMap[Abreak] == 1 or
+		       reads[A].PeakMap[Abreak - 1] == 1) and
+	  (reads[B].PeakMap[Bbreak] == 1 or
+	   reads[B].PeakMap[Bbreak - 1] == 1) and
+	  Abreak > 0 and Bbreak > 0) {
+	Translocations << "we got a translocation and invertion" << endl;
+	reads[A].writetofile(Translocations);
+	reads[B].writetofile(Translocations);
+	Translocations << endl << endl;
+	Translocationsbed << reads[A].chr << "\t"
+			  << reads[A].Positions[Abreak] - 200 << "\t"
+			  << reads[A].Positions[Abreak] + 200 << endl
+			  << reads[B].chr << "\t"
+			  << reads[B].Positions[Bbreak] - 200 << "\t"
+			  << reads[B].Positions[Bbreak] + 200 << endl;
+      }
     }
-
-  //**********************Adding K-mer lookup stuff here
-  //*********************************
-
-  //**************************************************************************************
-  // reads[A].FixTandemRef();
+    
+    cout << "*********SKIPPING************\ndifference strands" << endl;
+    BEDNotHandled << "Different strands" << endl;
+    BEDNotHandled << reads[A].chr << "\t" << reads[A].pos << "\t"
+		  << reads[A].pos + reads[A].seq.size() << "\t" << reads[A].name
+		  << "\t" << reads[A].cigar << endl;
+    reads[A].writetofile(BEDNotHandled);
+    BEDNotHandled << reads[B].chr << "\t" << reads[B].pos << "\t"
+		  << reads[B].pos + reads[B].seq.size() << "\t" << reads[B].name
+		  << "\t" << reads[B].cigar << endl;
+    reads[B].writetofile(BEDNotHandled);
+    BEDNotHandled << endl << endl;
+    Invertions << reads[A].chr << "\t" << reads[A].pos << "\t" << reads[B].pos
+		 << "\t" << reads[B].pos - reads[A].pos << endl;
+  }
+  
   reads[A].LookUpKmers();
   cout << "ReAdjustedKmers" << endl;
   reads[A].writeVertical();
