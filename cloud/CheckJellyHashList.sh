@@ -1,6 +1,6 @@
 #!/bin/sh
 
-RDIR=/uufs/chpc.utah.edu/common/home/u0401321/testRUFUS/RUFUS
+RDIR=/scratch/ucgd/lustre/u0991464/Projects/EIEE.testRefactor/RUFUS
 Jhash=$1
 HashList=$2
 MinCov=$3

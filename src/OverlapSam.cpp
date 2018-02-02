@@ -13,7 +13,7 @@
 #include <math.h>
 #include <sstream>
 #include <stdio.h>
-#include <stdlib.7h>
+#include <stdlib.h>
 #include <string>
 #include <sys/stat.h>
 #include <sys/types.h>
