@@ -8,7 +8,7 @@ T=$3
 L=$4
 
 
-RDIR=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/RUFUS
+RDIR=/scratch/ucgd/lustre/u0991464/Projects/EIEE.testRefactor/RUFUS
 JELLYFISH="$RDIR/bin/jellyfish/bin/jellyfish"
 SORT="$RDIR/scripts/sort"
 
