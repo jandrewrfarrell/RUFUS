@@ -41,24 +41,11 @@ while ($l1 = <Fastq>)
 for (my $i = 0; $i < 40; $i ++)
 {
 	print "$i; ";
-        for (my $j = 0; $j < $scores[$i]; $j++)
+        for (my $j = 0; $j < $scores[$i]; $j+=100)
 	{
 		print "+"; 
 	}
 	print "; $scores[$i] \n";
-}
-print "~~~~~~~~~\n";
-for (my $i = 30; $i < 10000; $i ++)
-{
-	if ( $scores[$i] > 0)
-        {
-		print "$i; ";
-        	for (my $j = 0; $j < $scores[$i]; $j++)
-        	{
-        	        print "+";
-        	}
-        	print "; $scores[$i] \n";
-	}
 }
 #Call should be GFFfile, FastaReff, SNPFilePath
 

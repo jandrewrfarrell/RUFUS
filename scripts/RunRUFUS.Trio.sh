@@ -21,7 +21,7 @@ then
         exit
 fi
 
-RDIR=/scratch/ucgd/lustre/u0991464/Projects/EIEE.testRefactor/RUFUS
+RDIR=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/RUFUS
 RUFUSmodel=$RDIR/bin/ModelDist
 RUFUSbuild=$RDIR/bin/RUFUS.Build
 RUFUSfilter=$RDIR/bin/RUFUS.Filter
@@ -32,17 +32,16 @@ RUFUS1kgFilter=$RDIR/bin/RUFUS.1kg.filter
 RunJelly=$RDIR/cloud/RunJellyForRUFUS
 
 
-
+module load samtools
 
 /usr/bin/time -v bash $RunJelly $Parent1Generator $K $(echo $Threads -2 | bc) 2 & 
 /usr/bin/time -v bash $RunJelly $Parent2Generator $K $(echo $Threads -2 | bc) 2 &
 /usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc) 2 &
 wait
-
 perl -ni -e 's/ /\t/;print' $ProbandGenerator.Jhash.histo
 perl -ni -e 's/ /\t/;print' $Parent1Generator.Jhash.histo
 perl -ni -e 's/ /\t/;print' $Parent2Generator.Jhash.histo
-if [ -e "$ProbandGenerator.Jhash.histo.7.7.model" ]
+if [ -s "$ProbandGenerator.Jhash.histo.7.7.model" ]
 then
         echo "skipping model"
 else
@@ -53,7 +52,6 @@ fi
 
 ParentMaxE=1
 MutantMinCov=$(head -2 $ProbandGenerator.Jhash.histo.7.7.model | tail -1 )
-
 date
 echo "starting RUFUS build "
 let "Max= $MutantMinCov*100"
@@ -76,17 +74,18 @@ fi
 echo "done with RUFUS build "
 
 echo "startin RUFUS filter"
-if [ -s $ProbandGenerator.Mutations.fastq ]
+if [ -s $ProbandGenerator.Mutations.fastq ]  &&  [ $(tail -n 1 $ProbandGenerator.filter.chr ) = "booya" ] 
 then 
 	echo "skipping filter"
-else 
+else
+  	echo "filtering" 
 	rm  $ProbandGenerator.temp
 	mkfifo $ProbandGenerator.temp
 	#/usr/bin/time -v  bash $ProbandGenerator | $RDIR/cloud/PassThroughSamCheck.stranded $ProbandGenerator.filter.chr >  $ProbandGenerator.temp &
 	#/usr/bin/time -v   $RUFUSfilter  $ProbandGenerator.k$K_c$MutantMinCov.HashList $ProbandGenerator.temp $ProbandGenerator $K 5 5 10 $(echo $Threads -2 | bc) &
-	bash $ProbandGenerator | $RDIR/cloud/PassThroughSamCheck.stranded $ProbandGenerator.filter.chr | head 
+	#bash $ProbandGenerator | $RDIR/cloud/PassThroughSamCheck.stranded $ProbandGenerator.filter.chr | head 
+	
 	/usr/bin/time -v   $RUFUSfilter  $ProbandGenerator.k$K_c$MutantMinCov.HashList <(bash $ProbandGenerator | $RDIR/cloud/PassThroughSamCheck.stranded $ProbandGenerator.filter.chr) $ProbandGenerator $K 5 5 10 $(echo $Threads -2 | bc) 
-	wait
 
 fi 
 

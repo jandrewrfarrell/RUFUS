@@ -28,7 +28,7 @@ Parent3Jhash=$10
 mkdir ./TempOverlap/
 echo "Overlaping $File"
 
-RDIR=/scratch/ucgd/lustre/u0991464/Projects/EIEE.testRefactor/RUFUS
+RDIR=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/RUFUS
 
 OverlapHash=$RDIR/bin/Overlap
 OverlapRebion2=$RDIR/bin/OverlapRegion
@@ -40,10 +40,10 @@ bwa=$RDIR/bin/bwa/bwa
 #samtools=$RDIR/bin/gkno_launcher/tools/samtools/samtools
 samtools=$RDIR/bin/samtools-1.6/samtools
 RUFUSinterpret=$RDIR/bin/RUFUS.interpret
-humanRef=$RDIR/bin/gkno_launcher/resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys
+humanRef=/scratch/ucgd/lustre/u0991464/build_37_version_3/human_reference_v37_decoys
 CheckHash=$RDIR/cloud/CheckJellyHashList.sh
 OverlapSam=$RDIR/bin/OverlapSam
-
+JellyFish=$RDIR//src/externals/jellyfish-2.2.5/bin/jellyfish
 
 
 
@@ -59,14 +59,14 @@ else
 	$bwa mem $humanRef $File | samtools sort -T $File -O bam - > $File.bam 
 	$samtools index $File.bam 
 	#$gkno bwa-se -ps human  -q $File -id $File -s $File -o $File.bam -p ILLUMINA
-	$OverlapSam <( $samtools view $File.bam ) .95 50 3 ./TempOverlap/$NameStub.sam $NameStub 1 $Threads
+	$OverlapSam <( $samtools view $File.bam ) .95 75 3 ./TempOverlap/$NameStub.sam $NameStub 1 $Threads
 fi
 
 if [ -s ./TempOverlap/$NameStub.1.fastqd ]
 then 	
 	echo "skipping first overlap"
 else
-	time $OverlapHash ./TempOverlap/$NameStub.sam.fastqd .98 50 2 FP 24 1 ./TempOverlap/$NameStub.1 1 $Threads #> $File.overlap.out
+	time $OverlapHash ./TempOverlap/$NameStub.sam.fastqd .98 75 2 FP 24 1 ./TempOverlap/$NameStub.1 1 $Threads #> $File.overlap.out
 fi 
 if [ -s ./TempOverlap/$NameStub.2.fastqd ]
 then 
@@ -79,13 +79,13 @@ if [ -s ./TempOverlap/$NameStub.4.fastqd ]
 then 
 	echo "skipping overlap 4"
 else 
-	time $OverlapRebion2 ./TempOverlap/$NameStub.3.fastqd .95 30 0 ./TempOverlap/$NameStub.4 $NameStub 1 $Threads #>>  $File.overlap.out
+	time $OverlapRebion2 ./TempOverlap/$NameStub.3.fastqd .97 50  0 ./TempOverlap/$NameStub.4 $NameStub 1 $Threads #>>  $File.overlap.out
 fi
 if [ -s ./TempOverlap/$NameStub.5.fastqd ]
 then 
 	echo "skipping ovelrap 5"
 else
-	time $OverlapRebion2 ./TempOverlap/$NameStub.4.fastqd .95 30 $FinalCoverage  ./TempOverlap/$NameStub.5 $NameStub 1 $Threads #>>  $File.overlap.out
+	time $OverlapRebion2 ./TempOverlap/$NameStub.4.fastqd .97 50  $FinalCoverage  ./TempOverlap/$NameStub.5 $NameStub 1 $Threads #>>  $File.overlap.out
 fi 
 
 if [ -s ./$NameStub.overlap.hashcount.fastq ]
@@ -103,7 +103,9 @@ if [ -s ./$NameStub.overlap.hashcount.fastq.bam ]
 then 
 	echo "skipping contig alignment" 
 else
-	$bwa mem $humanRef ./$NameStub.overlap.hashcount.fastq | samtools sort -T $File -O bam - > ./$NameStub.overlap.hashcount.fastq.bam 	
+	
+	$bwa mem -Y -E 9,9 -O 4,4  -d 500 -w 500 -L 10,10     $humanRef ./$NameStub.overlap.hashcount.fastq | samtools sort -T $File -O bam - > ./$NameStub.overlap.hashcount.fastq.bam 	
+	#$bwa mem   -Y  $humanRef ./$NameStub.overlap.hashcount.fastq | samtools sort -T $File -O bam - > ./$NameStub.overlap.hashcount.fastq.bam
 	#$gkno bwa-se -ps human  -q ./$NameStub.overlap.hashcount.fastq -id ./$NameStub.overlap.hashcount.fastq -s ./$NameStub.overlap.hashcount.fastq -o ./$NameStub.overlap.hashcount.fastq.bam -p ILLUMINA
 fi 
 
@@ -118,16 +120,16 @@ if [ -e ./$NameStub.overlap.hashcount.fastq.Jhash.tab ]
 then 
 	echo "skipping var hash generationr"
 else
-	$RDIR/bin/jellyfish/bin/jellyfish count -C -m $HashSize -s 1G -t 20 -o ./$NameStub.overlap.hashcount.fastq.Jhash ./$NameStub.overlap.hashcount.fastq
-	$RDIR/bin/jellyfish/bin/jellyfish dump -c ./$NameStub.overlap.hashcount.fastq.Jhash > ./$NameStub.overlap.hashcount.fastq.Jhash.tab
+	$JellyFish count -C -m $HashSize -s 1G -t 20 -o ./$NameStub.overlap.hashcount.fastq.Jhash ./$NameStub.overlap.hashcount.fastq
+	$JellyFish dump -c ./$NameStub.overlap.hashcount.fastq.Jhash > ./$NameStub.overlap.hashcount.fastq.Jhash.tab
 fi 
 
 if [ -e ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash.tab ] 
 then 
 	echo "skipping ref hash generation"
 else
-	$RDIR/bin/jellyfish/bin/jellyfish count -C -m $HashSize -s 1G -t 20 -o ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash ./$NameStub.overlap.asembly.hash.fastq.ref.fastq
-	$RDIR/bin/jellyfish/bin/jellyfish dump -c ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash > ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash.tab
+	$JellyFish count -C -m $HashSize -s 1G -t 20 -o ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash ./$NameStub.overlap.asembly.hash.fastq.ref.fastq
+	$JellyFish dump -c ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash > ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash.tab
 fi 
 if [ -s $NameStub.overlap.asembly.hash.fastq.p1 ]
 then
@@ -154,6 +156,7 @@ fi
 wait
 
 mkfifo check 
+$samtools index ./$NameStub.overlap.hashcount.fastq.bam
 $samtools view ./$NameStub.overlap.hashcount.fastq.bam | $RUFUSinterpret -mod $NameStub.overlap.asembly.hash.fastq.sample -mQ 8 -r $humanRef.fa -hf $HashList -o  ./$NameStub.overlap.hashcount.fastq.bam -m 1000000 -c $NameStub.overlap.asembly.hash.fastq.p1 -c $NameStub.overlap.asembly.hash.fastq.p2 -cR $NameStub.overlap.asembly.hash.fastq.Ref.p1 -cR $NameStub.overlap.asembly.hash.fastq.Ref.p2 -sR $NameStub.overlap.asembly.hash.fastq.Ref.sample -s $NameStub.overlap.asembly.hash.fastq.sample 
 
 grep ^# ./$NameStub.overlap.hashcount.fastq.bam.vcf> ./$NameStub.overlap.hashcount.fastq.bam.vcf.sorted.vcf

@@ -1,7 +1,9 @@
 #!/bin/sh
 
-RDIR=/scratch/ucgd/lustre/u0991464/Projects/EIEE.testRefactor/RUFUS
+RDIR=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/RUFUS
+JellyFish=$RDIR//src/externals/jellyfish-2.2.5/bin/jellyfish
 Jhash=$1
 HashList=$2
 MinCov=$3
-$RDIR/bin/jellyfish/bin/jellyfish query -s <(cat $HashList | awk '{print ">"$1"\n"$1}') $Jhash | awk -v var=$MinCov ' $2 >= var '  
+
+$JellyFish query -s <(cat $HashList | awk '{print ">"$1"\n"$1}') $Jhash | awk -v var=$MinCov ' $2 >= var '  

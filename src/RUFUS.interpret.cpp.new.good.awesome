@@ -36,7 +36,6 @@ using namespace std;
 
 vector <unordered_map <unsigned long int, int> > ParentHashes;
 unordered_map  <unsigned long int, int> MutantHashes; 
-unordered_map <unsigned long int, int> ExcludeHashes;
 FastaReference Reff;
 int HashSize = 25; 
 int totalDeleted; 
@@ -471,7 +470,6 @@ class SamRead
 	void parse(string read);
 	void getRefSeq(); 
 	void processCigar();
-	void parseInsertions( SamRead B); 
 	void parseMutations( char *argv[] );
 	void processMultiAlignment(); 
 	void write();
@@ -481,10 +479,6 @@ class SamRead
 	void LookUpKmers();
 	void FixTandemRef();
 	int CheckParentCov(int &mode); 
-	bool StartsWithAlign(int &pos, string &insert); 
-	bool EndsWithAlign(int &pos, string &insert); 
-	bool CheckEndsAlign(); 
-	int CheckBasesAligned();
 };
 int SamRead::CheckParentCov(int &mode)
 {
@@ -1078,7 +1072,7 @@ void SamRead::parseMutations( char *argv[])
 				{
 					for (int k = 0; k < parentCounts.size(); k++)
 					{
-						if (parentCounts[k][j] <= 5 and parentCounts[k][j] > 0 and (ExcludeHashes[HashToLong(hashes[j])]<1 and ExcludeHashes[HashToLong(RevComp(hashes[j]))]<1))
+						if (parentCounts[k][j] <= 5 and parentCounts[k][j] > 0)
 						{
 							LowCov = true;
 							lowCount++; 
@@ -2881,129 +2875,8 @@ SamRead BetterWay(vector<SamRead> reads)
 	reads[A].write(); 
 	reads[A].writeVertical(); 
 	return reads[A];
-	cout << "Out Of SamReadBetterWay " << endl;
+	cout << "Out Of BetterWay " << endl;
 }
-int SamRead::CheckBasesAligned()
-{
-  int longest = 0;
-  int count = 0; 
- for ( int j = 0; j< cigarString.size(); j++)
- {
-	if (cigarString.c_str()[j] != 'H' and cigarString.c_str()[j] != 'S')
-	{count++; }
-	else
-	{
-	  if (count > longest){longest = count;}
-	  count = 0; 
-	}
-   
- }
- if (count > longest){longest = count;}
- return longest; 
-}
-bool SamRead::CheckEndsAlign()
-{
-  int StartAlign = 0;
-  int j;
-  for ( j = 10; j< cigarString.size(); j++)
-  {
-    if (cigarString.c_str()[j] != 'H' and cigarString.c_str()[j] != 'S')
-    {StartAlign++;}
-    else
-    {break;}
-  }
-  int EndAlign = 0;
-  int i;
-  for ( i = cigarString.size()-10; i>=0; i--)
-  {
-    if (cigarString.c_str()[i] != 'H' and  cigarString.c_str()[i] != 'S')
-    {EndAlign++;}
-    else
-    {break;}
-  }
-
-  if (StartAlign > 20 or EndAlign > 20)
-  {
-    return true; 
-  }
-
-return false; 
-}
-
-bool SamRead::StartsWithAlign(int &pos, string &insert)
-{
-  cout << "starst with " << endl; 
-  ///////////////////
-  int EndClip = 0; 
-  int i; 
-  for ( i = cigarString.size()-1; i>=0; i--)
-  {
-    if (cigarString.c_str()[i] == 'H' or cigarString.c_str()[i] == 'S')
-    {EndClip++;}
-    else
-    {break;}
-  }
-  //get the inserted sequence 
-  for (int s = i; s<cigarString.size(); s++)
-  {
-    insert = insert+seq[s]; 
-  }
-  /////////////////////
-  int StartAlign = 0; 
-  int j; 
-  for ( j = 0; j< cigarString.size(); j++)
-  {
-    if (cigarString.c_str()[j] != 'H' and cigarString.c_str()[j] != 'S')
-    {StartAlign++;}
-    else
-    {break;}
-  } 
-  /////////////////////
-  cout << "pos = " << j << " - " << Positions[j] << endl;
-  pos = Positions[j]; 
-  if (EndClip > 40 && StartAlign > 40)
-  {
-    if ((PeakMap[i-1] or PeakMap[i] or PeakMap[i+1]) and (PeakMap[j-1] or PeakMap[j] or PeakMap[j+1]))
-    {return true;}
-  }
-
-
-  return false; 
- }
-bool SamRead::EndsWithAlign(int &pos, string &insert)
-{
-  ////////////////////
-  int EndAlign = 0;
-  int i;
-  for ( i = cigarString.size()-1; i>=0; i--)
-  {
-    if (cigarString.c_str()[i] != 'H' and  cigarString.c_str()[i] != 'S')
-    {EndAlign++;}
-    else
-    {break;}
-  }
-  ///////////////////
-  int StartClip = 0;
-  int j;
-  for ( j = 0; j< cigarString.size(); j++)
-  {
-    if (cigarString.c_str()[j] == 'H' or cigarString.c_str()[j] == 'S')
-    {StartClip++; }
-    else
-    {break;}
-  }
-  for (int s = 0; s<j; s++)
-  {insert = insert+seq[s];}
-
-  if (EndAlign > 40 && StartClip > 40)
-  {
-    if ((PeakMap[i-1] or PeakMap[i] or PeakMap[i+1]) and (PeakMap[j-1] or PeakMap[j] or PeakMap[j+1]))
-    {return true;}
-  }
-
-
-  return false;
- }
 int main (int argc, char *argv[])
 {
 cout << "RUNNING THIS ONE" << endl; 
@@ -3041,7 +2914,6 @@ options:\
   -sR   arg		Path to the sorted.tab file fo the subject sample hashes in the reference\n\
   -mQ   arg		Minimum map quality to consider varients in\n\
   -mod 	arg		Path to the model file from RUFUS.model\n\
-  -e    arg             Path to Kmer file to exlude from LowCov check\n\
 ";
 	
 	string MutHashFilePath = "" ;
@@ -3052,7 +2924,6 @@ options:\
 	string samFile = "stdin"; 
 	string outStub= "";
 	string ModelFilePath = "";
-	string ExcludeFilePath = ""; 
 	int MinMapQual = 0; 
 	for(int i = 1; i< argc; i++)
 	{
@@ -3138,12 +3009,6 @@ options:\
 			cout << "Min Mapping Qualtiy = " << argv[i+1] << endl;
 			MinMapQual = atoi(argv[i+1]);
 			i+=1;
-		}
-		else if(p == "-e")
-		{
-		  	cout << "Exclue File Path = " << argv[i+1] << endl; 
-			ExcludeFilePath = argv[i+1]; 
-			i+=1; 
 		}
 		else
 		{
@@ -3240,16 +3105,6 @@ options:\
 	}
 	reader.close();			
 	
-	reader.open(ExcludeFilePath); 
-	while (getline(reader, line))
-	{
-		vector <string> temp = Split(line, '\t');
-		unsigned long hash = HashToLong(temp[0]);
-		ExcludeHashes[hash] =  atoi(temp[1].c_str());
-		//hash = HashToLong(RevComp(temp[0]));
-		//ExcludeHashes[hash] =  atoi(temp[1].c_str());
-	}
-	reader.close();
 	//***********************************************
 	//cout << "Call is Reference Contigs.fa OutStub HashList MaxVarientSize" << endl;
 	double vm, rss, MAXvm, MAXrss;
@@ -3443,13 +3298,7 @@ options:\
 				cout << "peak" << endl;
 				read.createPeakMap();
 				cout << "ummm" << endl;
-				int a; 
-				string b;
-				cout << "Aligned bases = " << read.CheckBasesAligned() << endl; 
-				if (read.CheckBasesAligned() > 50 or read.CheckEndsAlign())
-				{reads.push_back(read);}
-				else 
-				{cout << "SKIPPING Alignment" << endl; read.write();}
+				reads.push_back(read);
 				if (counter%100 == 0)
 					cout << "read " << counter << " entries " << char(13); 
 			}
@@ -3572,21 +3421,6 @@ options:\
 			}
 		}
 	}
-
-	//find big insertions
-	for (int i = 0; i < reads.size()-1; i++)
-	{
-	 	int pos, pos2;
-		string InsStart, InsEnd; 
-		if (reads[i].name != reads[i+1].name and reads[i].StartsWithAlign(pos, InsStart) and reads[i+1].EndsWithAlign(pos2, InsEnd) and (reads[i].mapQual > 0 or reads[i+1].mapQual > 0))
-		{
-		  cout       << reads[i].chr << "\t" << pos << "\t" << "LargeInsert" <<"-" << "DeNovo" /*"."*/  << "\t" << InsStart.c_str()[0] << "\t" << InsStart << "NNNNNNNNNNNNNNNNNNNN" << InsEnd << "\t" << "?????" << "\t" << "." << "\t" << "INS" <<"RN=" << reads[i].name << ";MQ=" << reads[i].mapQual << ";cigar=" << reads[i].cigar << ";" << "CVT=" << endl ;
-		 VCFOutFile  << reads[i].chr << "\t" << pos << "\t" << "LargeInsert" <<"-" << "DeNovo" /*"."*/  << "\t" << InsStart.c_str()[0] << "\t" << InsStart << "NNNNNNNNNNNNNNNNNNNN" << InsEnd << "\t" << "?????" << "\t" << "." << "\t" << "INS" <<"RN=" << reads[i].name << ";MQ=" << reads[i].mapQual << ";cigar=" << reads[i].cigar << ";" << "CVT=" << endl ;
-
-		  cout << "found INSERT " << endl; reads[i].write(); reads[i+1].write(); reads[i].writeVertical(); reads[i+1].writeVertical();}
-	}
-
-
 	VCFOutFile.close(); 
 	BEDOutFile.close();
 	BEDBigStuff.close();

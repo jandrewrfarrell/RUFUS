@@ -251,7 +251,7 @@ void SamRead::parseMutations( char *argv[]) {
     newHash += seq.c_str()[i];
     newHashRef += RefSeq.c_str()[i]; 
     int count = 0;
-    if ((cigarString.c_str()[i] != 'D' and cigarString.c_str()[i] != 'R'and
+    if ((cigarString.c_str()[i] != 'D' and cigarString.c_str()[i] != 'R' and
 	 cigarString.c_str()[i] != 'H')) {
 
 	  for (int j = 1; j<seq.size() - i and count < HashSize-1 ; j++) {
@@ -677,7 +677,16 @@ void SamRead::parseMutations( char *argv[]) {
 	} else {
 	  cout << "GOOD COVERAGE" << endl;
 	}
-	
+	/////temp, shoudld fix this for real, need to move tandem dup calls
+		int adjust =0; 
+		string DupSeq = ""; 
+//		for (int x = 0; x<alt.size(); x++){
+//		  if (varType.c_str()[x]=='Y'){
+//		    DupSeq = DupSeq+alt.c_str()[x]; 
+//		    adjust++;
+//		  }
+//		}
+	///////////////////////////////////////////////////////////////////
 	cout << "startpos = " << startPos << " chrsize = " << ChrPositions.size() << endl; 
 	cout << ChrPositions[startPos] << "\t" << endl;
 	cout << Positions[startPos] << "\t"  << endl;
@@ -700,15 +709,15 @@ void SamRead::parseMutations( char *argv[]) {
 	}
 	
 	////////////////////////Writing var out to file/////////////////////////
-	cout << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" 
-	     << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff 
-	     << "\t" << alt << "\t" << HashCountsOG.size() << "\t" << "." 
+	cout << ChrPositions[startPos] << "\t" <<Positions[startPos]-adjust << "\t" 
+	     << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << DupSeq 
+	     << "\t" << DupSeq<<alt << "\t" << HashCountsOG.size() << "\t" << "." 
 	     << "\t" << StructCall <<"RN=" << name << ";MQ=" << mapQual 
 	     << ";cigar=" << cigar << ";" << "CVT=" << CompressedVarType << ";HD="; 
 	      
-	      VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] 
+	      VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos]-adjust 
 			 << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  
-			 << "\t" << reff << "\t" << alt << "\t" << HashCountsOG.size() 
+			 << "\t" << reff <<DupSeq << "\t" << DupSeq << alt << "\t" << HashCountsOG.size() 
 			 << "\t" << "." << "\t" << StructCall <<"RN=" << name << ";MQ="
 			 << mapQual << ";cigar=" << cigar << ";" << "CVT=" 
 			 << CompressedVarType << ";HD="; 

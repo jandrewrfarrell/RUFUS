@@ -8,8 +8,8 @@ T=$3
 L=$4
 T=12
 
-RDIR=/scratch/ucgd/lustre/u0991464/Projects/EIEE.testRefactor/RUFUS
-JELLYFISH="$RDIR/bin/jellyfish/bin/jellyfish"
+RDIR=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/RUFUS
+JELLYFISH="$RDIR/src/externals/jellyfish-2.2.5/bin/jellyfish"
 SORT="$RDIR/scripts/sort"
 
 #ulimit -v 3000000
@@ -24,9 +24,12 @@ else
         mkfifo $GEN.Jhash.temp
         mkfifo $GEN.fq
         bash $GEN | $RDIR/cloud/PassThroughSamCheck $GEN.Jelly.chr > $GEN.fq &
-        /usr/bin/time -v $JELLYFISH count -m $K -L $L -s 100 -t $T -o $GEN.Jhash -C $GEN.fq
+        /usr/bin/time -v $JELLYFISH count --disk -m $K -L $L -s 1G -t $T -o $GEN.Jhash -C $GEN.fq
         /usr/bin/time -v $JELLYFISH histo -f -o $GEN.Jhash.histo $GEN.Jhash 
         rm $GEN.Jhash.temp
         rm $GEN.fq
 
+	wait
 fi
+wait
+exit

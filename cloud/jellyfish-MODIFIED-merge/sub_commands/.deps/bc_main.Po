@@ -6,152 +6,155 @@ sub_commands/bc_main.o: sub_commands/bc_main.cc \
  /usr/include/bits/typesizes.h /usr/include/bits/signum.h \
  /usr/include/time.h /usr/include/bits/siginfo.h \
  /usr/include/bits/sigaction.h /usr/include/bits/sigcontext.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include/stddef.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stddef.h \
  /usr/include/bits/sigstack.h /usr/include/sys/ucontext.h \
  /usr/include/bits/pthreadtypes.h /usr/include/bits/sigthread.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/iostream \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/c++config.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/os_defines.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/cpu_defines.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/ostream \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/ios \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/iosfwd \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stringfwd.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/memoryfwd.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/postypes.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/cwchar \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/iostream \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/c++config.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/os_defines.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/cpu_defines.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/ostream \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/ios \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/iosfwd \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stringfwd.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/memoryfwd.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/postypes.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/cwchar \
  /usr/include/wchar.h /usr/include/stdio.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include/stdarg.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stdarg.h \
  /usr/include/bits/wchar.h /usr/include/xlocale.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/exception \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/atomic_lockfree_defines.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/exception_ptr.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/exception_defines.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/nested_exception.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/char_traits.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_algobase.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/functexcept.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/cpp_type_traits.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/ext/type_traits.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/ext/numeric_traits.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_pair.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/move.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/concept_check.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/type_traits \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_iterator_base_types.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_iterator_base_funcs.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/debug/debug.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_iterator.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/cstdint \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include/stdint.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/exception \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/atomic_lockfree_defines.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/exception_ptr.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/exception_defines.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/nested_exception.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/char_traits.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_algobase.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/functexcept.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/cpp_type_traits.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/ext/type_traits.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/ext/numeric_traits.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_pair.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/move.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/concept_check.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/type_traits \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_iterator_base_types.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_iterator_base_funcs.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/debug/debug.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_iterator.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/ptr_traits.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/predefined_ops.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/cstdint \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stdint.h \
  /usr/include/stdint.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/localefwd.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/c++locale.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/clocale \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/localefwd.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/c++locale.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/clocale \
  /usr/include/locale.h /usr/include/bits/locale.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/cctype \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/cctype \
  /usr/include/ctype.h /usr/include/endian.h /usr/include/bits/endian.h \
  /usr/include/bits/byteswap.h /usr/include/bits/byteswap-16.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/ios_base.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/ext/atomicity.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/gthr.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/gthr-default.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/ios_base.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/ext/atomicity.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/gthr.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/gthr-default.h \
  /usr/include/pthread.h /usr/include/sched.h /usr/include/bits/sched.h \
  /usr/include/bits/time.h /usr/include/bits/timex.h \
  /usr/include/bits/setjmp.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/atomic_word.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/locale_classes.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/string \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/allocator.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/c++allocator.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/ext/new_allocator.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/new \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/ostream_insert.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/cxxabi_forced.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_function.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/backward/binders.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/range_access.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/basic_string.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/initializer_list \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/ext/string_conversions.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/cstdlib \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/atomic_word.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/locale_classes.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/string \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/allocator.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/c++allocator.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/ext/new_allocator.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/new \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/ostream_insert.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/cxxabi_forced.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_function.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/backward/binders.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/range_access.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/basic_string.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/initializer_list \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/ext/string_conversions.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/cstdlib \
  /usr/include/stdlib.h /usr/include/bits/waitflags.h \
  /usr/include/bits/waitstatus.h /usr/include/sys/types.h \
  /usr/include/sys/select.h /usr/include/bits/select.h \
  /usr/include/sys/sysmacros.h /usr/include/alloca.h \
  /usr/include/bits/stdlib-float.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/cstdio \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/cstdio \
  /usr/include/libio.h /usr/include/_G_config.h \
  /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
  /usr/include/bits/stdio.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/cerrno \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/cerrno \
  /usr/include/errno.h /usr/include/bits/errno.h \
  /usr/include/linux/errno.h /usr/include/asm/errno.h \
  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/functional_hash.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/hash_bytes.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/basic_string.tcc \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/locale_classes.tcc \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/streambuf \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/streambuf.tcc \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/basic_ios.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/locale_facets.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/cwctype \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/functional_hash.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/hash_bytes.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/basic_string.tcc \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/locale_classes.tcc \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/streambuf \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/streambuf.tcc \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/basic_ios.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/locale_facets.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/cwctype \
  /usr/include/wctype.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/ctype_base.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/streambuf_iterator.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/ctype_inline.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/locale_facets.tcc \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/basic_ios.tcc \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/ostream.tcc \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/istream \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/istream.tcc \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/fstream \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/codecvt.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/basic_file.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/c++io.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/fstream.tcc \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/vector \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_construct.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/ext/alloc_traits.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/alloc_traits.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/ptr_traits.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_uninitialized.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_vector.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_bvector.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/vector.tcc \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/chrono \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/ratio \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/limits \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/ctime \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/ctype_base.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/streambuf_iterator.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/ctype_inline.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/locale_facets.tcc \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/basic_ios.tcc \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/ostream.tcc \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/istream \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/istream.tcc \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/fstream \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/codecvt.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/basic_file.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/c++io.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/fstream.tcc \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/vector \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_construct.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/ext/alloc_traits.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/alloc_traits.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_uninitialized.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_vector.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_bvector.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/vector.tcc \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/chrono \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/ratio \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/limits \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/ctime \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/parse_numbers.h \
  include/jellyfish/err.hpp \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/iomanip \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/locale \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/locale_facets_nonio.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/time_members.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/messages_members.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/iomanip \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/locale \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/locale_facets_nonio.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/time_members.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/messages_members.h \
  /usr/include/libintl.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/locale_facets_nonio.tcc \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/sstream \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/sstream.tcc \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/stdexcept \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/cstring \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/locale_facets_nonio.tcc \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/sstream \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/sstream.tcc \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/stdexcept \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/cstring \
  /usr/include/string.h include/jellyfish/mer_overlap_sequence_parser.hpp \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/memory \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_tempbuf.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_raw_storage_iter.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/typeinfo \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/ext/concurrence.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/uses_allocator.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/functional \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/tuple \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/utility \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_relops.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/array \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/unique_ptr.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/shared_ptr.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/shared_ptr_base.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/backward/auto_ptr.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/memory \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_tempbuf.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_raw_storage_iter.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/typeinfo \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/ext/concurrence.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/uses_allocator.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/functional \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/tuple \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/utility \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_relops.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/array \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/unique_ptr.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/shared_ptr.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/shared_ptr_base.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/ext/aligned_buffer.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/backward/auto_ptr.h \
  include/jellyfish/cooperative_pool2.hpp /usr/include/assert.h \
  /usr/include/unistd.h /usr/include/bits/posix_opt.h \
  /usr/include/bits/environments.h /usr/include/bits/confname.h \
@@ -160,56 +163,85 @@ sub_commands/bc_main.o: sub_commands/bc_main.cc \
  include/jellyfish/atomic_field.hpp include/jellyfish/divisor.hpp \
  config.h include/jellyfish/locks_pthread.hpp /usr/include/sys/time.h \
  include/jellyfish/cpp_array.hpp \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/cstddef \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/cstddef \
  include/jellyfish/mer_iterator.hpp \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/iterator \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stream_iterator.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/iterator \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stream_iterator.h \
  include/jellyfish/mer_dna.hpp include/jellyfish/misc.hpp \
  /usr/include/inttypes.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/algorithm \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_algo.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/algorithmfwd.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_heap.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/random \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/cmath \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/algorithm \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_algo.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/algorithmfwd.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_heap.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/random \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/cmath \
  /usr/include/math.h /usr/include/bits/huge_val.h \
  /usr/include/bits/huge_valf.h /usr/include/bits/huge_vall.h \
  /usr/include/bits/inf.h /usr/include/bits/nan.h \
  /usr/include/bits/mathdef.h /usr/include/bits/mathcalls.h \
  /usr/include/bits/mathinline.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/random.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/opt_random.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include/x86intrin.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include/ia32intrin.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include/mmintrin.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include/xmmintrin.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include/mm_malloc.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include/emmintrin.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include/immintrin.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include/fxsrintrin.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include/adxintrin.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/random.tcc \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/numeric \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_numeric.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/random.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/opt_random.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/x86intrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/ia32intrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/mmintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/xmmintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/mm_malloc.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/emmintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/pmmintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/tmmintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/ammintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/smmintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/popcntintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/wmmintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/immintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/avxintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/avx2intrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/avx512fintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/avx512erintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/avx512pfintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/avx512cdintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/shaintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/lzcntintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/bmiintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/bmi2intrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/fmaintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/f16cintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/rtmintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/xtestintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/mm3dnow.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/prfchwintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/fma4intrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/xopintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/lwpintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/tbmintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/rdseedintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/fxsrintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/xsaveintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/xsaveoptintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/adxintrin.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/random.tcc \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/numeric \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_numeric.h \
  include/jellyfish/int128.hpp include/jellyfish/stream_manager.hpp \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/list \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_list.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/list.tcc \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/set \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_tree.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_set.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_multiset.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/list \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_list.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/list.tcc \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/set \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_tree.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_set.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_multiset.h \
  include/jellyfish/generator_manager.hpp /usr/include/sys/stat.h \
  /usr/include/bits/stat.h /usr/include/fcntl.h /usr/include/bits/fcntl.h \
  /usr/include/bits/fcntl-linux.h /usr/include/bits/uio.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/map \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_map.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_multimap.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/ext/stdio_filebuf.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/map \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_map.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_multimap.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/ext/stdio_filebuf.h \
  include/jellyfish/mer_dna_bloom_counter.hpp \
  include/jellyfish/bloom_counter2.hpp \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include-fixed/limits.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include-fixed/syslimits.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include-fixed/limits.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include-fixed/syslimits.h \
  /usr/include/limits.h /usr/include/bits/posix1_lim.h \
  /usr/include/bits/local_lim.h /usr/include/linux/limits.h \
  /usr/include/bits/posix2_lim.h /usr/include/bits/xopen_lim.h \
@@ -221,11 +253,11 @@ sub_commands/bc_main.o: sub_commands/bc_main.cc \
  include/jellyfish/thread_exec.hpp include/jellyfish/file_header.hpp \
  include/jellyfish/generic_file_header.hpp /usr/include/sys/utsname.h \
  /usr/include/bits/utsname.h include/jellyfish/json.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/deque \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_deque.h \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/deque.tcc \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/stack \
- /scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_stack.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/deque \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_deque.h \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/deque.tcc \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/stack \
+ /uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_stack.h \
  sub_commands/bc_main_cmdline.hpp
 
 /usr/include/stdc-predef.h:
@@ -258,7 +290,7 @@ sub_commands/bc_main.o: sub_commands/bc_main.cc \
 
 /usr/include/bits/sigcontext.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include/stddef.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stddef.h:
 
 /usr/include/bits/sigstack.h:
 
@@ -268,93 +300,97 @@ sub_commands/bc_main.o: sub_commands/bc_main.cc \
 
 /usr/include/bits/sigthread.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/iostream:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/iostream:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/c++config.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/c++config.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/os_defines.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/os_defines.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/cpu_defines.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/cpu_defines.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/ostream:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/ostream:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/ios:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/ios:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/iosfwd:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/iosfwd:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stringfwd.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stringfwd.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/memoryfwd.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/memoryfwd.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/postypes.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/postypes.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/cwchar:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/cwchar:
 
 /usr/include/wchar.h:
 
 /usr/include/stdio.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include/stdarg.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stdarg.h:
 
 /usr/include/bits/wchar.h:
 
 /usr/include/xlocale.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/exception:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/exception:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/atomic_lockfree_defines.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/atomic_lockfree_defines.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/exception_ptr.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/exception_ptr.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/exception_defines.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/exception_defines.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/nested_exception.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/nested_exception.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/char_traits.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/char_traits.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_algobase.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_algobase.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/functexcept.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/functexcept.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/cpp_type_traits.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/cpp_type_traits.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/ext/type_traits.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/ext/type_traits.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/ext/numeric_traits.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/ext/numeric_traits.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_pair.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_pair.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/move.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/move.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/concept_check.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/concept_check.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/type_traits:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/type_traits:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_iterator_base_types.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_iterator_base_types.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_iterator_base_funcs.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_iterator_base_funcs.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/debug/debug.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/debug/debug.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_iterator.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_iterator.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/cstdint:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/ptr_traits.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include/stdint.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/predefined_ops.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/cstdint:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/stdint.h:
 
 /usr/include/stdint.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/localefwd.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/localefwd.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/c++locale.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/c++locale.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/clocale:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/clocale:
 
 /usr/include/locale.h:
 
 /usr/include/bits/locale.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/cctype:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/cctype:
 
 /usr/include/ctype.h:
 
@@ -366,13 +402,13 @@ sub_commands/bc_main.o: sub_commands/bc_main.cc \
 
 /usr/include/bits/byteswap-16.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/ios_base.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/ios_base.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/ext/atomicity.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/ext/atomicity.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/gthr.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/gthr.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/gthr-default.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/gthr-default.h:
 
 /usr/include/pthread.h:
 
@@ -386,37 +422,37 @@ sub_commands/bc_main.o: sub_commands/bc_main.cc \
 
 /usr/include/bits/setjmp.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/atomic_word.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/atomic_word.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/locale_classes.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/locale_classes.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/string:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/string:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/allocator.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/allocator.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/c++allocator.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/c++allocator.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/ext/new_allocator.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/ext/new_allocator.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/new:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/new:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/ostream_insert.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/ostream_insert.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/cxxabi_forced.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/cxxabi_forced.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_function.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_function.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/backward/binders.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/backward/binders.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/range_access.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/range_access.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/basic_string.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/basic_string.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/initializer_list:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/initializer_list:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/ext/string_conversions.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/ext/string_conversions.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/cstdlib:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/cstdlib:
 
 /usr/include/stdlib.h:
 
@@ -436,7 +472,7 @@ sub_commands/bc_main.o: sub_commands/bc_main.cc \
 
 /usr/include/bits/stdlib-float.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/cstdio:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/cstdio:
 
 /usr/include/libio.h:
 
@@ -448,7 +484,7 @@ sub_commands/bc_main.o: sub_commands/bc_main.cc \
 
 /usr/include/bits/stdio.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/cerrno:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/cerrno:
 
 /usr/include/errno.h:
 
@@ -462,135 +498,137 @@ sub_commands/bc_main.o: sub_commands/bc_main.cc \
 
 /usr/include/asm-generic/errno-base.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/functional_hash.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/functional_hash.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/hash_bytes.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/hash_bytes.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/basic_string.tcc:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/basic_string.tcc:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/locale_classes.tcc:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/locale_classes.tcc:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/streambuf:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/streambuf:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/streambuf.tcc:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/streambuf.tcc:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/basic_ios.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/basic_ios.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/locale_facets.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/locale_facets.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/cwctype:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/cwctype:
 
 /usr/include/wctype.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/ctype_base.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/ctype_base.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/streambuf_iterator.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/streambuf_iterator.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/ctype_inline.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/ctype_inline.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/locale_facets.tcc:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/locale_facets.tcc:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/basic_ios.tcc:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/basic_ios.tcc:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/ostream.tcc:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/ostream.tcc:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/istream:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/istream:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/istream.tcc:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/istream.tcc:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/fstream:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/fstream:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/codecvt.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/codecvt.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/basic_file.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/basic_file.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/c++io.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/c++io.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/fstream.tcc:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/fstream.tcc:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/vector:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/vector:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_construct.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_construct.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/ext/alloc_traits.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/ext/alloc_traits.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/alloc_traits.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/alloc_traits.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/ptr_traits.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_uninitialized.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_uninitialized.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_vector.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_vector.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_bvector.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_bvector.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/vector.tcc:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/vector.tcc:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/chrono:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/chrono:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/ratio:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/ratio:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/limits:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/limits:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/ctime:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/ctime:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/parse_numbers.h:
 
 include/jellyfish/err.hpp:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/iomanip:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/iomanip:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/locale:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/locale:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/locale_facets_nonio.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/locale_facets_nonio.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/time_members.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/time_members.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/messages_members.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/messages_members.h:
 
 /usr/include/libintl.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/locale_facets_nonio.tcc:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/locale_facets_nonio.tcc:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/sstream:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/sstream:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/sstream.tcc:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/sstream.tcc:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/stdexcept:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/stdexcept:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/cstring:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/cstring:
 
 /usr/include/string.h:
 
 include/jellyfish/mer_overlap_sequence_parser.hpp:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/memory:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/memory:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_tempbuf.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_tempbuf.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_raw_storage_iter.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_raw_storage_iter.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/typeinfo:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/typeinfo:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/ext/concurrence.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/ext/concurrence.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/uses_allocator.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/uses_allocator.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/functional:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/functional:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/tuple:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/tuple:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/utility:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/utility:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_relops.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_relops.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/array:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/array:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/unique_ptr.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/unique_ptr.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/shared_ptr.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/shared_ptr.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/shared_ptr_base.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/shared_ptr_base.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/backward/auto_ptr.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/ext/aligned_buffer.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/backward/auto_ptr.h:
 
 include/jellyfish/cooperative_pool2.hpp:
 
@@ -622,13 +660,13 @@ include/jellyfish/locks_pthread.hpp:
 
 include/jellyfish/cpp_array.hpp:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/cstddef:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/cstddef:
 
 include/jellyfish/mer_iterator.hpp:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/iterator:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/iterator:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stream_iterator.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stream_iterator.h:
 
 include/jellyfish/mer_dna.hpp:
 
@@ -636,17 +674,17 @@ include/jellyfish/misc.hpp:
 
 /usr/include/inttypes.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/algorithm:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/algorithm:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_algo.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_algo.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/algorithmfwd.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/algorithmfwd.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_heap.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_heap.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/random:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/random:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/cmath:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/cmath:
 
 /usr/include/math.h:
 
@@ -666,51 +704,109 @@ include/jellyfish/misc.hpp:
 
 /usr/include/bits/mathinline.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/random.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/random.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/x86_64-unknown-linux-gnu/bits/opt_random.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/x86_64-unknown-linux-gnu/bits/opt_random.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include/x86intrin.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/x86intrin.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include/ia32intrin.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/ia32intrin.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include/mmintrin.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/mmintrin.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include/xmmintrin.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/xmmintrin.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include/mm_malloc.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/mm_malloc.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include/emmintrin.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/emmintrin.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include/immintrin.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/pmmintrin.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include/fxsrintrin.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/tmmintrin.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include/adxintrin.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/ammintrin.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/random.tcc:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/smmintrin.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/numeric:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/popcntintrin.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_numeric.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/wmmintrin.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/immintrin.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/avxintrin.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/avx2intrin.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/avx512fintrin.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/avx512erintrin.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/avx512pfintrin.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/avx512cdintrin.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/shaintrin.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/lzcntintrin.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/bmiintrin.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/bmi2intrin.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/fmaintrin.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/f16cintrin.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/rtmintrin.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/xtestintrin.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/mm3dnow.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/prfchwintrin.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/fma4intrin.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/xopintrin.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/lwpintrin.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/tbmintrin.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/rdseedintrin.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/fxsrintrin.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/xsaveintrin.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/xsaveoptintrin.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include/adxintrin.h:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/random.tcc:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/numeric:
+
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_numeric.h:
 
 include/jellyfish/int128.hpp:
 
 include/jellyfish/stream_manager.hpp:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/list:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/list:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_list.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_list.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/list.tcc:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/list.tcc:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/set:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/set:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_tree.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_tree.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_set.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_set.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_multiset.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_multiset.h:
 
 include/jellyfish/generator_manager.hpp:
 
@@ -726,21 +822,21 @@ include/jellyfish/generator_manager.hpp:
 
 /usr/include/bits/uio.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/map:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/map:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_map.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_map.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_multimap.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_multimap.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/ext/stdio_filebuf.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/ext/stdio_filebuf.h:
 
 include/jellyfish/mer_dna_bloom_counter.hpp:
 
 include/jellyfish/bloom_counter2.hpp:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include-fixed/limits.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include-fixed/limits.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/lib/gcc/x86_64-unknown-linux-gnu/4.8.5/include-fixed/syslimits.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/lib/gcc/x86_64-unknown-linux-gnu/4.9.2/include-fixed/syslimits.h:
 
 /usr/include/limits.h:
 
@@ -782,14 +878,14 @@ include/jellyfish/generic_file_header.hpp:
 
 include/jellyfish/json.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/deque:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/deque:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_deque.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_deque.h:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/deque.tcc:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/deque.tcc:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/stack:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/stack:
 
-/scratch/ucgd/lustre/work/u6000771/Data/gemini_install2/data/anaconda/gcc/include/c++/bits/stl_stack.h:
+/uufs/chpc.utah.edu/sys/installdir/gcc/4.9.2-c7/include/c++/4.9.2/bits/stl_stack.h:
 
 sub_commands/bc_main_cmdline.hpp:

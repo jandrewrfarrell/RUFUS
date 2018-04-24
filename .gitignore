@@ -3,3 +3,5 @@ bin/*
 src/externals/jellyfish-2.2.5/
 src/externals/gkno_launcher/
 cloud/1000G.RUFUSreference.sorted.min45.tab
+*.o
+*test*

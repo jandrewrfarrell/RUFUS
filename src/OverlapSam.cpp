@@ -575,7 +575,7 @@ int main(int argc, char* argv[]) {
 
     if (b[8] or b[11] or b[10] or temp[10].length() < 100) {
       Rejects++;
-    } else if (b[2]) {
+    } else if (b[2] and atoi(temp[4].c_str())>5) {
       string L4 = temp[10];
       string L2 = temp[9];
       L2 = TrimNends(L2, L4);
