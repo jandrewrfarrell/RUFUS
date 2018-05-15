@@ -451,6 +451,7 @@ class SamRead
 	string strands; 
 	int forward; 
 	int reverse; 
+	bool UsedForBigVar; 
 	vector<int> alignments; 
 	vector<int> Positions; 
 	vector<string> ChrPositions;
@@ -1078,11 +1079,27 @@ void SamRead::parseMutations( char *argv[])
 				{
 					for (int k = 0; k < parentCounts.size(); k++)
 					{
-						if (parentCounts[k][j] <= 5 and parentCounts[k][j] > 0 and (ExcludeHashes[HashToLong(hashes[j])]<1 and ExcludeHashes[HashToLong(RevComp(hashes[j]))]<1))
-						{
-							LowCov = true;
-							lowCount++; 
-						}
+					  	//stringstream aa; 
+					  	//aa << "~/bin/jellyfish-2.2.5/bin/jellyfish query  /scratch/ucgd/lustre/u0991464/build_37_version_3/human_reference_v37_decoys." << HashSize << ".Jhash " << hashes[j]; 
+						//cout << aa.str() << endl;
+						//string output;
+						//FILE* outputfile = popen(aa.str().c_str(), "r");
+						//char var[50]; 
+						//fgets(var, sizeof(var), outputfile); 
+						//fclose(outputfile);
+						//for (int b = 0; b < HashSize +2; b++)
+						//{cout << var[b]; }
+						//cout << endl; 
+						//cout << var[HashSize+1] << endl; 
+						//if (var[HashSize+1] == '0'){
+							//if (parentCounts[k][j] <= 5 and parentCounts[k][j] > 0 and (ExcludeHashes[HashToLong(hashes[j])]<1 and ExcludeHashes[HashToLong(RevComp(hashes[j]))]<1))
+							if (parentCounts[k][j] <= 5 and parentCounts[k][j] > 0)
+							{
+								LowCov = true;
+								lowCount++; 
+							}
+						//}else{cout << "exclude rejected " << endl;} 
+
 						 
 					}
 				}
@@ -1394,7 +1411,7 @@ void SamRead::FixTandemRef()
 {
 	cout << "FOUND TANDEM" << endl;
 	write();
-	writeVertical();  
+	//writeVertical();  
 	string lastChr = "nope"; 
 	int lastPos = -1; 
 	string NewRef = ""; 
@@ -1654,7 +1671,7 @@ void SamRead::getRefSeq()
 	//**********************************************************************//
 	
 	cout << "After getRefSeq";
-	writeVertical(); 
+	//FullOutwriteVertical(); 
 }
 
 void SamRead::LookUpKmers() 
@@ -1749,6 +1766,7 @@ void SamRead::LookUpKmers()
 }
 void SamRead::parse(string read)
 {
+  	
 	cout << "parsing " << read << endl;
 	vector <string> temp = Split(read, '\t');
 	cout << "boom" << endl;
@@ -1773,6 +1791,7 @@ void SamRead::parse(string read)
 	qual = temp[10];
 	alignments.clear(); 
 	
+	UsedForBigVar = false;UsedForBigVar = false;  
 	first = true; 
 	combined = false; 
 	string NewSeq = ""; 
@@ -2879,7 +2898,7 @@ SamRead BetterWay(vector<SamRead> reads)
 	reads[A].LookUpKmers();
 	cout << "ReAdjustedKmers" <<endl;
 	reads[A].write(); 
-	reads[A].writeVertical(); 
+	//FullOutreads[A].writeVertical(); 
 	return reads[A];
 	cout << "Out Of SamReadBetterWay " << endl;
 }
@@ -3240,7 +3259,7 @@ options:\
 	}
 	reader.close();			
 	
-	reader.open(ExcludeFilePath); 
+/*	reader.open(ExcludeFilePath); 
 	while (getline(reader, line))
 	{
 		vector <string> temp = Split(line, '\t');
@@ -3250,7 +3269,7 @@ options:\
 		//ExcludeHashes[hash] =  atoi(temp[1].c_str());
 	}
 	reader.close();
-	//***********************************************
+*/	//***********************************************
 	//cout << "Call is Reference Contigs.fa OutStub HashList MaxVarientSize" << endl;
 	double vm, rss, MAXvm, MAXrss;
 	MAXvm = 0;
@@ -3572,20 +3591,29 @@ options:\
 			}
 		}
 	}
-
-	//find big insertions
+	cout << "lets start this" << endl; 
+	//find big insertionsf
 	for (int i = 0; i < reads.size()-1; i++)
 	{
 	 	int pos, pos2;
 		string InsStart, InsEnd; 
-		if (reads[i].name != reads[i+1].name and reads[i].StartsWithAlign(pos, InsStart) and reads[i+1].EndsWithAlign(pos2, InsEnd) and (reads[i].mapQual > 0 or reads[i+1].mapQual > 0))
+		cout << "chekingBig " << endl; 
+		reads[i].write(); 
+		reads[i+1].write(); 
+
+		if (reads[i].name != reads[i+1].name and reads[i].alignments.size() == 1 and reads[i+1].alignments.size() == 1 and  reads[i].StartsWithAlign(pos, InsStart) and reads[i+1].EndsWithAlign(pos2, InsEnd) and (reads[i].mapQual > 0 or reads[i+1].mapQual > 0))
 		{
-		  cout       << reads[i].chr << "\t" << pos << "\t" << "LargeInsert" <<"-" << "DeNovo" /*"."*/  << "\t" << InsStart.c_str()[0] << "\t" << InsStart << "NNNNNNNNNNNNNNNNNNNN" << InsEnd << "\t" << "?????" << "\t" << "." << "\t" << "INS" <<"RN=" << reads[i].name << ";MQ=" << reads[i].mapQual << ";cigar=" << reads[i].cigar << ";" << "CVT=" << endl ;
-		 VCFOutFile  << reads[i].chr << "\t" << pos << "\t" << "LargeInsert" <<"-" << "DeNovo" /*"."*/  << "\t" << InsStart.c_str()[0] << "\t" << InsStart << "NNNNNNNNNNNNNNNNNNNN" << InsEnd << "\t" << "?????" << "\t" << "." << "\t" << "INS" <<"RN=" << reads[i].name << ";MQ=" << reads[i].mapQual << ";cigar=" << reads[i].cigar << ";" << "CVT=" << endl ;
+		  cout       << reads[i].chr << "\t" << pos << "\t" << "LargeInsert" <<"-" << "DeNovo" /*"."*/  << "\t" << InsStart.c_str()[0] << "\t" << InsStart << "NNNNNNNNNNNNNNNNNNNN" << InsEnd << "\t" << "10" << "\t" << "." << "\t" << "INS" <<"RN=" << reads[i].name << ";MQ=" << reads[i].mapQual << ";cigar=" << reads[i].cigar << ";" << "CVT=" << endl ;
+		 VCFOutFile  << reads[i].chr << "\t" << pos << "\t" << "LargeInsert" <<"-" << "DeNovo" /*"."*/  << "\t" << InsStart.c_str()[0] << "\t" << InsStart << "NNNNNNNNNNNNNNNNNNNN" << InsEnd << "\t" << "10" << "\t" << "." << "\t" << "INS" <<"RN=" << reads[i].name << ";MQ=" << reads[i].mapQual << ";cigar=" << reads[i].cigar << ";" << "CVT=" ;
+		  
+		 string Genotype = "0/1"; 
+		 int MutRefMode = 1; 
+		 int MutAltMode = 1; 
+		 VCFOutFile << "\tGT:DP:RO:AO:LP:PC:SB" << "\t" << Genotype << ":" << MutRefMode + MutAltMode << ":" << MutRefMode << ":" << MutAltMode << endl;
 
 		  cout << "found INSERT " << endl; reads[i].write(); reads[i+1].write(); reads[i].writeVertical(); reads[i+1].writeVertical();}
 	}
-
+	cout << "done with this" << endl; 
 
 	VCFOutFile.close(); 
 	BEDOutFile.close();
