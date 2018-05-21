@@ -30,23 +30,23 @@ RUFUS is primarily used to find mutations unique to a  proband sample, that are 
 
 Usage: 
 ```
-./runRufus.sh [-s|--subject <arg>] [-r|--ref <arg>] [-t|--threads <arg>] [-k|--kmersize <arg>] [-m|--min <arg>] 
- [-c|--controls][<controls-1>] ... [<controls-n>] [-h|--help]
+./runRufus.sh [-s|--subject <arg>] [-c|--controls][<controls-1>] ... [<controls-n>]  [-t|--threads <arg>] [-k|--kmersize <arg>] [-r|--ref <arg>] [-m|--min <arg>] 
+  [-h|--help]
  ```
 
  
  ```
--c, --controls: bam files containing the control subjects
+-s,--subject: bam file containing the subject of interest (REQUIRED)
 
--s,--subject: bam file containing the subject of interest (no default)
+-c, --controls: bam files containing the control subjects (REQUIRED)
 
--r,--ref: file path to the desired reference file (no default)
+-t,--threads: number of threads to use (REQUIRED)
 
--t,--threads: number of threads to use (no default)
+-k,--kmersize: size of Kmer to use (REQUIRED)
 
--k,--kmersize: size of Kmer to use (no default)
+-r,--ref: file path to the desired reference file to create VCF (REQUIRED)
 
--m,--min: overwrites the minimum k-mer count to call variant (Do not provide a min unless you are sure what you want)
+-m,--min: overwrites the minimum k-mer count to call variant (OPTIONAL, Do not provide a min unless you are sure what you want)
 
 -h,--help: HELP!!!!!!!!!!!!!!!
 ```
