@@ -29,11 +29,13 @@ This should install everything you need to use RUFUS.  If you get errors during 
 RUFUS can be run on a proband sample, with any number of control samples.
 
 Usage: 
+```
 ./runRufus.sh [-s|--subject <arg>] [-r|--ref <arg>] [-t|--threads <arg>] [-k|--kmersize <arg>] [-m|--min <arg>] 
+ [-c|--controls][<controls-1>] ... [<controls-n>] [-h|--help]
+ ```
+
  
-[-c|--controls][<controls-1>] ... [<controls-n>] [-h|--help]
- 
- 
+ ```
 -c, --controls: bam files containing the control subjects
 
 -s,--subject: bam file containing the subject of interest (no default)
@@ -47,6 +49,8 @@ Usage:
 -m,--min: overwrites the minimum k-mer count to call variant (Do not provide a min unless you are sure what you want)
 
 -h,--help: HELP!!!!!!!!!!!!!!!
+```
+
  
 
 
