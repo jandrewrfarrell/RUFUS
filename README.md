@@ -30,15 +30,22 @@ RUFUS can be run on a proband sample, with any number of control samples.
 
 Usage: 
 ./runRufus.sh [-s|--subject <arg>] [-r|--ref <arg>] [-t|--threads <arg>] [-k|--kmersize <arg>] [-m|--min <arg>] 
+ 
 [-c|--controls][<controls-1>] ... [<controls-n>] [-h|--help]
  
  
 -c, --controls: bam files containing the control subjects
+
 -s,--subject: bam file containing the subject of interest (no default)
+
 -r,--ref: file path to the desired reference file (no default)
+
 -t,--threads: number of threads to use (no default)
+
 -k,--kmersize: size of Kmer to use (no default)
+
 -m,--min: overwrites the minimum k-mer count to call variant (Do not provide a min unless you are sure what you want)
+
 -h,--help: HELP!!!!!!!!!!!!!!!
  
 
