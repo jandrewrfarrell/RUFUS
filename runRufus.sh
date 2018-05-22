@@ -1,8 +1,5 @@
 #!/bin/bash
 #
-# This is a rather minimal example Argbash potential
-# Example taken from http://argbash.readthedocs.io/en/stable/example.html
-#
 # ARG_OPTIONAL_SINGLE([subject],[s],[generator file containing the subject of interest])
 # ARG_OPTIONAL_SINGLE([ref],[r],[file path to the desired reference file])
 # ARG_OPTIONAL_SINGLE([threads],[t],[number of threads to use])
@@ -297,15 +294,24 @@ echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 ProbandFileName=$(basename "$_arg_subject")
 ProbandExtension="${ProbandFileName##*.}"
 
-if [[ "$ProbandExtension" != "bam" ]] || [[ ! -e "$_arg_subject" ]]
-then 
-    echo "The proband bam file" "$_arg_subject" " was not provided or does not exist; killing run with non-zero exit status"
-    kill -9 $$
-else
-    echo "you provided the proband bam file" "$_arg_subject"
-fi
+echo "proband extension is $ProbandExtension"
 
-ProbandGenerator="$ProbandFileName".generator
+if [[ "$ProbandExtension" != "bam" ]] || [[ ! -e "$_arg_subject" ]] && [[ "$ProbandExtension" != "generator" ]]
+then 
+    echo "The proband bam/generator file" "$_arg_subject" " was not provided or does not exist; killing run with non-zero exit status"
+    kill -9 $$
+elif [[ "$ProbandExtension" = "bam" ]]
+then
+    echo "you provided the proband bam file" "$_arg_subject"
+    ProbandGenerator="$ProbandFileName".generator
+    echo "samtools view -F 3328 $_arg_subject" >> "$ProbandGenerator"
+elif [[ "$ProbandExtension" = "generator" ]]
+then
+    echo "you provided the proband bam file" "$_arg_subject"
+    ProbandGenerator="$ProbandFileName"
+else 
+    echo "unknown error during generator generation, killing run with non-zero exit status"
+fi
 
 echo "samtools view -F 3328 $_arg_subject" >> "$ProbandGenerator"
 
@@ -318,17 +324,23 @@ do
     parentExtension="${parentFileName##*.}"
     echo "parent file extension name is" "$parentExtension"
     
-    if [[ "$parentExtension" != "bam" ]] || [[ ! -e "$parent" ]]
+    if [[ "$parentExtension" != "bam" ]] || [[ ! -e "$parent" ]] && [[ "$parentExtension" != "generator" ]]
     then
-	echo "The control bam file" "$parent" " was not provided, or does not exist; killing run with non-zero exit status"
+	echo "The control bam/generator file" "$parent" " was not provided, or does not exist; killing run with non-zero exit status"
 	kill -9 $$
-    else
+    elif [[ "$parentExtension" = "bam" ]]
+    then
+	    parentGenerator="$parentFileName".generator
+	    ParentGenerators+=("$parentGenerator")
+	    echo "samtools view -F 3328 $parent" >> "$parentGenerator"
+	    echo "You provided the control bam file" "$parent"
+    elif [[ "$parentExtension" = "generator" ]]
+    then
+	parentGenerator="$parentFileName"
+        ParentGenerators+=("$parentGenerator")
 	echo "You provided the control bam file" "$parent"
-    fi
 
-    parentGenerator="$parentFileName".generator
-    ParentGenerators+=("$parentGenerator")
-    echo "samtools view -F 3328 $parent" >> "$parentGenerator"
+    fi
 done
 #################################################################
 
