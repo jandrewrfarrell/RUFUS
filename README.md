@@ -22,26 +22,53 @@ git clone https://github.com/jandrewrfarrell/RUFUS.git
 cd RUFUS
 bash Install.sh
 ```
-This should install everything you need to use RUFUS.  If you get errors during the gkno installation contact Alistair Ward at award@genetics.utah.edu
+This should install everything you need to use RUFUS.  If you get errors during the installation contact me at at JAndrewRFarrell@gmail.com
 
 ## Running 
 
-we have created a number of scripts to run rufus for typical experiments, the most stable one at the moment is 
+RUFUS is primarily used to find mutations unique to a  proband sample, that are not found in the control samples
+
+Usage: 
+```
+./runRufus.sh [-s|--subject <arg>] [-c|--controls][<controls-1>] ... [<controls-n>]  [-t|--threads <arg>] [-k|--kmersize <arg>] [-r|--ref <arg>] [-m|--min <arg>] 
+  [-h|--help]
+ ```
+
  
-```
-RunRUFUS.Trio.sh
+ ```
+-s,--subject: bam file containing the subject of interest (REQUIRED)
+
+-c, --controls: bam files containing the control subjects (REQUIRED)
+
+-t,--threads: number of threads to use (REQUIRED)
+
+-k,--kmersize: size of Kmer to use (REQUIRED)
+
+-r,--ref: file path to the desired reference file to create VCF (REQUIRED)
+
+-m,--min: overwrites the minimum k-mer count to call variant (OPTIONAL, Do not provide a min unless you are sure what you want)
+
+-h,--help: HELP!!!!!!!!!!!!!!!
 ```
 
-RunRUFUS.Trio takes 6 arguments, the command line should look like this 
+ 
+
+
+The command line should look something like this:
 
 ```
-bash RunRUFUS.Trio.sh Father.generator Mother.generator Child.generator 25 40 Child.generator.outstub
-```
-where 25 is the kmer size to be used and 40 is the number of threads to use.  You can chage those to what ever you want. 
-
-RUFUS works on generator files.  You will need to make a generator for each one of your input bam files.  A generator is essentially a bash script that dumps sam formatted reads to the terminal.  It is ususally a basch script with a single line but it can be more complicated.  This lets us take in numerous data formats and lets you filter your input to remove duplicate reads ect.  An example of the generator file we usually use is below.  This is a single line file that will output only the primary alignments and ignore all duplicate reads.
+bash runRufus.sh --subject child.bam --controls Mother.bam Father.bam  --kmersize 25 --threads 40 --ref human_reference_v37_decoys.fa
 
 ```
-samtools view -F 3328 yourbamfile.bam
+
+or 
+
 ```
+bash runRufus.sh -s child.bam -c Mother.bam Father.bam -k 25 -t 40 -r human_reference_v37_decoys.fa
+```
+
+We recommend a kmer size of 25, 40 threads, and to not provide RUFUS with a static minimum cutoff value.
+
+
+
 
