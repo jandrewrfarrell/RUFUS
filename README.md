@@ -84,7 +84,7 @@ bash runRufus.sh -s Proband.bam -c Mother.bam Father.bam Sibling1.bam Sibling2.b
 
 
 
-We recommend a kmer size of 25, 40 threads, and to not provide RUFUS with the optional --min parameter
+We recommend a kmer size of 25, 40 threads, and to NOT provide RUFUS with the optional --min parameter
 
 
 
