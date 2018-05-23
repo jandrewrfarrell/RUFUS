@@ -65,6 +65,7 @@ or
 ```
 bash runRufus.sh -s Child.bam -c Mother.bam Father.bam -k 25 -t 40 -r human_reference_v37_decoys.fa
 ```
+The flags can be provided any any order.
 
 RUFUS can take any number control files (Must provide atleast one). 
 
