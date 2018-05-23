@@ -58,7 +58,6 @@ The command line should look something like this:
 
 ```
 bash runRufus.sh --subject Child.bam --controls Mother.bam Father.bam  --kmersize 25 --threads 40 --ref human_reference_v37_decoys.fa
-
 ```
 
 or 
