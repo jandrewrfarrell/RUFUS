@@ -460,6 +460,9 @@ then
     if [ -e "$ProbandGenerator.Jhash.histo.7.7.model" ]
     then
         echo "skipping model"
+	MutantMinCov=$(head -2 "$ProbandGenerator".Jhash.histo.7.7.model | tail -1 )
+        echo "mutant min coverage from generated model is $MutantMinCov"
+
     else
 	echo "staring model"
         /usr/bin/time -v "$RUFUSmodel" "$ProbandGenerator".Jhash.histo $K 150 $Threads
