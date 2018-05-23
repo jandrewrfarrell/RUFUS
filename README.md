@@ -57,17 +57,35 @@ Usage:
 The command line should look something like this:
 
 ```
-bash runRufus.sh --subject child.bam --controls Mother.bam Father.bam  --kmersize 25 --threads 40 --ref human_reference_v37_decoys.fa
+bash runRufus.sh --subject Child.bam --controls Mother.bam Father.bam  --kmersize 25 --threads 40 --ref human_reference_v37_decoys.fa
 
 ```
 
 or 
 
 ```
-bash runRufus.sh -s child.bam -c Mother.bam Father.bam -k 25 -t 40 -r human_reference_v37_decoys.fa
+bash runRufus.sh -s Child.bam -c Mother.bam Father.bam -k 25 -t 40 -r human_reference_v37_decoys.fa
 ```
 
-We recommend a kmer size of 25, 40 threads, and to not provide RUFUS with a static minimum cutoff value.
+RUFUS can take any number control files (Must provide atleast one). 
+
+Provide all of your control files after the [-c|--controls] flag
+
+For Example:
+
+```
+bash runRufus.sh -s tumorT1.bam -c tumorT0.bam -k 25 -t 40 -r human_reference_v37_decoys.fa
+```
+
+or
+
+```
+bash runRufus.sh -s Proband.bam -c Mother.bam Father.bam Sibling1.bam Sibling2.bam -k 25 -t 40 -r human_reference_v37_decoys.fa
+```
+
+
+
+We recommend a kmer size of 25, 40 threads, and to not provide RUFUS with the optional --min parameter
 
 
 
