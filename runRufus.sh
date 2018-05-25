@@ -64,73 +64,73 @@ parse_commandline ()
     do
 	_key="$1"
 	case "$_key" in
-	    -s|--subject)
+	        -s|--subject)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_arg_subject="$2"
 		shift
 		;;
-	    --subject=*)
+	        --subject=*)
 		_arg_subject="${_key##--subject=}"
 		;;
-	    -s*)
+	        -s*)
 		_arg_subject="${_key##-s}"
 		;;
-	    -r|--ref)
+	        -r|--ref)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_arg_ref="$2"
 		shift
 		;;
-	    --ref=*)
+	        --ref=*)
 		_arg_ref="${_key##--ref=}"
 		;;
-	    -r*)
+	        -r*)
 		_arg_ref="${_key##-r}"
 		;;
-	    -t|--threads)
+	        -t|--threads)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_arg_threads="$2"
 		shift
 		;;
-	    --threads=*)
+	        --threads=*)
 		_arg_threads="${_key##--threads=}"
 		;;
-	    -t*)
+	        -t*)
 		_arg_threads="${_key##-t}"
 		;;
-	    -k|--kmersize)
+	        -k|--kmersize)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_arg_kmersize="$2"
 		shift
 		;;
-	    --kmersize=*)
+	        --kmersize=*)
 		_arg_kmersize="${_key##--kmersize=}"
 		;;
-	    -k*)
+	        -k*)
 		_arg_kmersize="${_key##-k}"
 		;;
-	    -m|--min)
+	        -m|--min)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_arg_min="$2"
 		shift
 		;;
-	    --min=*)
+	        --min=*)
 		_arg_min="${_key##--min=}"
 		;;
-	    -m*)
+	        -m*)
 		_arg_min="${_key##-m}"
 		;;
-	    -h|--help)
+	        -h|--help)
 		print_help
 		exit 0
 		;;
-	    -h*)
+	        -h*)
 		print_help
 		exit 0
 		;;
-	    *)
+	        *)
 		_positionals+=("$1")
 		;;
-	    esac
+	        esac
 	shift
 	done
 }
@@ -329,9 +329,9 @@ do
     elif [[ "$parentExtension" = "bam" ]]
     then
 	    parentGenerator="$parentFileName".generator
-	    ParentGenerators+=("$parentGenerator")
-	    echo "samtools view -F 3328 $parent" >> "$parentGenerator"
-	    echo "You provided the control bam file" "$parent"
+	        ParentGenerators+=("$parentGenerator")
+		    echo "samtools view -F 3328 $parent" >> "$parentGenerator"
+		        echo "You provided the control bam file" "$parent"
     elif [[ "$parentExtension" = "generator" ]]
     then
 	parentGenerator="$parentFileName"
@@ -542,4 +542,3 @@ fi
 echo "done with everything"
 exit 0
 # ] <-- needed because of Argbash
-
