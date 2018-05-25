@@ -313,8 +313,6 @@ else
     echo "unknown error during generator generation, killing run with non-zero exit status"
 fi
 
-echo "samtools view -F 3328 $_arg_subject" >> "$ProbandGenerator"
-
 ParentGenerators=()
 
 for parent in "${Parents[@]}"
