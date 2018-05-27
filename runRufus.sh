@@ -1,4 +1,4 @@
-#!/bin/bash
+S#!/bin/bash
 #
 # ARG_OPTIONAL_SINGLE([subject],[s],[generator file containing the subject of interest])
 # ARG_OPTIONAL_SINGLE([ref],[r],[file path to the desired reference file])
