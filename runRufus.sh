@@ -350,6 +350,32 @@ Threads=$_arg_threads
 ref=$_arg_ref
 #################################################################################
 
+if [[ -z "$K" ]]
+then
+    echo "@@@@@@@@@@@__WARNING__@@@@@@@@@@@@@"
+    echo "kmer size ([-k|kmersize]) was not provided, killing run with non-zero exit status"
+    echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+    kill -9 $$
+
+fi
+
+if [[ -z "$Threads" ]]
+then
+    echo "@@@@@@@@@@@__WARNING__@@@@@@@@@@@@@"
+    echo "number of threads ([-t|--threads]) was not provided, killing run with non-zero exit status"
+    echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+    kill -9 $$
+fi
+
+if [[ -z "$ref" ]]
+then
+    echo "@@@@@@@@@@@__WARNING__@@@@@@@@@@@@@"
+    echo "reference file ([-r|--ref]) was not provided, killing run with non-zero exit status"
+    echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+    kill -9 $$
+
+fi
+
 
 ###################__PRINT_VARIABLES_USED__######################################
 echo "~~~~~~~~~~~~ printing out paramater values used in script ~~~~~~~~~~~~~~~~"
@@ -398,7 +424,7 @@ done
 
 
 ########################## set RUFUS directory path variables ##############################
-RDIR=/uufs/chpc.utah.edu/common/home/u0401321/devRUFUS/RUFUS
+RDIR=/uufs/chpc.utah.edu/common/home/u0401321/RUFUS
 RUFUSmodel=$RDIR/bin/ModelDist
 RUFUSfilter=$RDIR/bin/RUFUS.Filter
 RUFUSOverlap=$RDIR/scripts/Overlap.sh
