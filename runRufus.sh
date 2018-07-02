@@ -1,4 +1,4 @@
-#!/bin/bash
+e#!/bin/bash
 
 # This is a rather minimal example Argbash potential
 # Example taken from http://argbash.readthedocs.io/en/stable/example.html
@@ -48,6 +48,7 @@ _arg_ref=
 _arg_threads=
 _arg_kmersize=
 _arg_min=
+_arg_refhash=
 
 print_help ()
 {
@@ -57,6 +58,7 @@ print_help ()
     printf "\t%s\n" "-s,--subject: bam file containing the subject of interest (no default)"
     printf "\t%s\n" "-r,--ref: file path to the desired reference file (no default)"
     printf "\t%s\n" "-t,--threads: number of threads to use (no default)"
+    printf "\t%s\n" "-f,--refhash: File containing reference hashList (no default)"
     printf "\t%s\n" "-k,--kmersize: size of Khmer to use (no default)"
     printf "\t%s\n" "-m,--min: overwrites the minimum k-mer count to call variant (no default)"
     printf "\t%s\n" "-h,--help: HELP!!!!!!!!!!!!!!!"
@@ -101,6 +103,17 @@ parse_commandline ()
 	    -t*)
 		_arg_threads="${_key##-t}"
 		;;
+            -f|--refhash)
+                test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+                _arg_refhash="$2"
+                shift
+                ;;
+            --refhash=*)
+                _arg_refheash="${_key##--threads=}"
+                ;;
+            -f*)
+                _arg_refhash="${_key##-t}"
+                ;;
 	    -k|--kmersize)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_arg_kmersize="$2"
@@ -398,6 +411,13 @@ echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 #################################################################################
 
 
+if [ -z "$_arg_refhash" ]
+then
+    echo "Did not provide refHash"
+else
+    echo "privided refhash of: " "$_arg_refhash"
+fi
+
 #####__CHECK_IF_MIN_IS_PROVIDED__#####
 if [ -z "$_arg_min" ]
 then
@@ -566,7 +586,7 @@ then
 else
     echo "starting RUFUS overlap"
     
-    /usr/bin/time -v bash $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 5 "$ProbandGenerator" "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa"
+    /usr/bin/time -v bash $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 5 "$ProbandGenerator" "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
 fi
 ##############################################################################################
 
