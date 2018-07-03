@@ -146,7 +146,7 @@ then
 else
 	echo "starting hash lookup"
         bash $CheckHash $SampleJhash ./$NameStub.overlap.hashcount.fastq.Jhash.tab 0 > $NameStub.overlap.asembly.hash.fastq.sample
-	echo "should be one for each pareent" 	
+	#these will become the -c inputs TODO	
 	for parent in $ParentsJhash
 	do
 		echo " bash $CheckHash $parent ./$NameStub.overlap.hashcount.fastq.Jhash.tab 0 > $NameStub.overlap.asembly.hash.fastq.p1"
@@ -161,7 +161,7 @@ then
 	echo "skipping $NameStub.overlap.asembly.hash.fastq.Ref.sample"
 else
 	bash $CheckHash $SampleJhash  ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash.tab 0 > $NameStub.overlap.asembly.hash.fastq.Ref.sample
-	echo "should be one for each parent"
+	#these will be the -cR inputs TODO
 	for parent in $ParentsJhash
 	do
 		echo " bash $CheckHash $parent ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash.tab 0 > $NameStub.overlap.asembly.hash.fastq.Ref.p1"
