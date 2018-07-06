@@ -1,13 +1,14 @@
 #install script for rufus 
 echo "update script paths"
 perl -p -i -e "s/RDIR=.*\n/RDIR=$( echo $(pwd)| perl -p -i -e "s/\//\\\\\//g")\n/g" scripts/RunRUFUS.1000G.withDupRemoce.sh
-perl -p -i -e "s/RDIR=.*\n/RDIR=$( echo $(pwd)| perl -p -i -e "s/\//\\\\\//g")\n/g"  scripts/Overlap.sh
+perl -p -i -e "s/RDIR=.*\n/RDIR=$( echo $(pwd)| perl -p -i -e "s/\//\\\\\//g")\n/g"  scripts/OverlapBashMultiThread.sh
 perl -p -i -e "s/RDIR=.*\n/RDIR=$( echo $(pwd)| perl -p -i -e "s/\//\\\\\//g")\n/g"  scripts/RunJellyForRUFUS
 perl -p -i -e "s/RDIR=.*\n/RDIR=$( echo $(pwd)| perl -p -i -e "s/\//\\\\\//g")\n/g"  scripts/HumanDedup.grenrator.tenplate
 perl -p -i -e "s/RDIR=.*\n/RDIR=$( echo $(pwd)| perl -p -i -e "s/\//\\\\\//g")\n/g"  scripts/RunTumor.sh
 perl -p -i -e "s/RDIR=.*\n/RDIR=$( echo $(pwd)| perl -p -i -e "s/\//\\\\\//g")\n/g"  cloud/RunJellyForRUFUS
 perl -p -i -e "s/RDIR=.*\n/RDIR=$( echo $(pwd)| perl -p -i -e "s/\//\\\\\//g")\n/g"  cloud/CheckJellyHashList.sh
 perl -p -i -e "s/RDIR=.*\n/RDIR=$( echo $(pwd)| perl -p -i -e "s/\//\\\\\//g")\n/g"  scripts/RunRUFUS.Trio.sh
+perl -p -i -e "s/RDIR=.*\n/RDIR=$( echo $(pwd)| perl -p -i -e "s/\//\\\\\//g")\n/g"  scripts/Overlap.sh
 perl -p -i -e "s/RDIR=.*\n/RDIR=$( echo $(pwd)| perl -p -i -e "s/\//\\\\\//g")\n/g"  scripts/OverlapBashMultiThread.trio.sh
 perl -p -i -e "s/RDIR=.*\n/RDIR=$( echo $(pwd)| perl -p -i -e "s/\//\\\\\//g")\n/g"  scripts/RunRUFUS.1000G.sh 
 perl -p -i -e "s/RDIR=.*\n/RDIR=$( echo $(pwd)| perl -p -i -e "s/\//\\\\\//g")\n/g"  scripts/RunRUFUS.sarcoma.sh
@@ -34,6 +35,7 @@ g++ -g ./src/RUFUS.1kg.filter.cpp src/Util.cpp -o ./bin/RUFUS.1kg.filter -std=gn
 echo "bulding external programs"
 cd src/externals/
 
+
 if [ -e ./jellyfish-2.2.5/bin/jellyfish ]
 then
         echo "jellyfish already installed: skipping"
@@ -47,45 +49,57 @@ else
         make install
         cd ..
 fi
-cd $RUFUS_DIR/bin/
-#if [ -e ./gkno_launcher/gkno ]
-#then
-#        echo "know already built: skipping"
-#else
-#        git clone https://github.com/gkno/gkno_launcher.git
-#        cd gkno_launcher/
-#        ./gkno build
-#        cd ..
-#fi
 
-#if [ -e ./gkno_launcher/resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys.fa ]
-#then
-#        echo "human reference paramaters set already downloaded: skipping"
-#else
-#        cd gkno_launcher
-#        ./gkno add-resource human
-#        ./gkno bwa-index -r ./resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys.fa -x ./resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys
-#	./tools/samtools/samtools faidx ./resources/homo_sapiens/build_37_version_3/human_reference_v37_decoys.fa
-#        cd ..
-#fi
+cd $RUFUS_DIR/bin/
+
+#Make RufAlu
+echo "!!!!!!!!!!!!!!!!! MAKING RUFALU IN BIN DIR !!!!!!!!!!!!!!!!!!!!!!"
+
+if [ ! -d RufAlu ]; then
+    git clone https://github.com/WilliamRichards2017/RufAlu.git
+    cd RufAlu
+    mkdir -p externals/external
+    touch externals/external/CMakeLists.txt
+    cd bin
+    cmake ..
+    make
+    cd ../../
+else 
+    cd RufAlu/bin
+    cmake ..
+    make
+    cd ../../
+fi
+
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 
 
 #Make BWA
-git clone https://github.com/lh3/bwa.git 
-cd bwa
-make 
-cd ../
 
-#Make BedTools
-wget https://github.com/arq5x/bedtools2/releases/download/v2.25.0/bedtools-2.25.0.tar.gz
-tar -zxvf bedtools-2.25.0.tar.gz
+if [ ! -d bwa ]; then
+    git clone https://github.com/lh3/bwa.git 
+fi
+    cd bwa
+    make 
+    cd ../
+    
+    #Make BedTools
+if [ ! -d bedtools2 ]; then
+    wget https://github.com/arq5x/bedtools2/releases/download/v2.25.0/bedtools-2.25.0.tar.gz
+    tar -zxvf bedtools-2.25.0.tar.gz
+fi
+
 cd bedtools2
 make
 cd ../
 
 #Make Samtools
-wget https://github.com/samtools/samtools/releases/download/1.6/samtools-1.6.tar.bz2
-tar -xvf samtools-1.6.tar.bz2 
+
+if [ ! -d samtools-1.6 ]; then
+    wget https://github.com/samtools/samtools/releases/download/1.6/samtools-1.6.tar.bz2
+    tar -xvf samtools-1.6.tar.bz2
+fi
+
 cd samtools-1.6/
 ./configure --prefix=$(pwd)
 make 
