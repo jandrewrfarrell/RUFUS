@@ -32,7 +32,7 @@ echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 mkdir ./TempOverlap/
 echo "Overlaping $File"
 
-RDIR=/uufs/chpc.utah.edu/common/home/u0401321/RUFUS
+RDIR=/uufs/chpc.utah.edu/common/home/u0991464/bin/RUFUS
 
 OverlapHash=$RDIR/bin/Overlap
 OverlapRebion2=$RDIR/bin/OverlapRegion
@@ -166,8 +166,8 @@ else
 	for parent in $ParentsJhash
 	do
 	    echo "-$parent-"
-	    echo " bash $CheckHash $parent ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash.tab 0 > $NameStub.overlap.asembly.hash.fastq.Ref."$parent""
-	    bash $CheckHash $parent ./"$NameStub".overlap.asembly.hash.fastq.ref.fastq.Jhash.tab 0 > "$NameStub".overlap.asembly.hash.fastq.Ref."$parent"
+	    echo " bash $CheckHash $parent ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash.tab 0 > $NameStub.overlap.asembly.hash.fastq.Ref.$parent"
+	           bash $CheckHash $parent ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash.tab 0 > $NameStub.overlap.asembly.hash.fastq.Ref.$parent
 	done
 fi 
 
@@ -207,7 +207,7 @@ samtools index ./$NameStub.overlap.hashcount.fastq.bam
 
 ##samtools view ./$NameStub.overlap.hashcount.fastq.bam | $RUFUSinterpret -mod $NameStub.overlap.asembly.hash.fastq.sample -mQ 8 -r $humanRef -hf $HashList -o  ./$NameStub.overlap.hashcount.fastq.bam -m 1000000 -c $NameStub.overlap.asembly.hash.fastq.p1 -c $NameStub.overlap.asembly.hash.fastq.p2 -cR $NameStub.overlap.asembly.hash.fastq.Ref.p1 -cR $NameStub.overlap.asembly.hash.fastq.Ref.p2 -sR $NameStub.overlap.asembly.hash.fastq.Ref.sample -s $NameStub.overlap.asembly.hash.fastq.sample -e ./$NameStub.ref.RepRefHash 
 
-samtools view ./$NameStub.overlap.hashcount.fastq.bam | $RUFUSinterpret -mod $NameStub.overlap.asembly.hash.fastq.sample -mQ 8 -r $humanRef -hf $HashList -o  ./$NameStub.overlap.hashcount.fastq.bam -m 1000000 $(echo $parentCRString) -sR $NameStub.overlap.asembly.hash.fastq.Ref.sample -s $NameStub.overlap.asembly.hash.fastq.sample -e ./$NameStub.ref.RepRefHash 
+samtools view $NameStub.overlap.hashcount.fastq.bam | $RUFUSinterpret -mod $NameStub.overlap.asembly.hash.fastq.sample -mQ 8 -r $humanRef -hf $HashList -o  $NameStub.overlap.hashcount.fastq.bam -m 1000000 $(echo $parentCRString) -sR $NameStub.overlap.asembly.hash.fastq.Ref.sample -s $NameStub.overlap.asembly.hash.fastq.sample -e $NameStub.ref.RepRefHash 
 
 
 

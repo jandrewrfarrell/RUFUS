@@ -3498,10 +3498,18 @@ options:\
 	VCFOutFile << "##INFO=<ID=VT,Number=1,Type=String,Description=\"Varient Type\">"<< endl;	
 	VCFOutFile << "##INFO=<ID=CVT,Number=1,Type=String,Description=\"Compressed Varient Type\">"<< endl;
 	VCFOutFile << "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t";
-	VCFOutFile << outStub; 
+	
+	string samplename = outStub.substr(0, outStub.find(".generator")); 
+	VCFOutFile << samplename; 
+	//VCFOutFile << outStub; 
 	for(int i =0; i<ParentHashFilePaths.size(); i++)
 	{
-		VCFOutFile << "\tParent" << i; //argv[ParentHashFilePaths[i]]; 
+		string ParPath = argv[ParentHashFilePaths[i]]; 
+		int startpos  = ParPath.find("overlap.asembly.hash.fastq.");
+		int endpos = ParPath.find(".generator.Jhash");
+		string Par = ParPath.substr(startpos+27, endpos-(startpos+27)); 
+		VCFOutFile << "\t" << Par; 
+		//VCFOutFile << "\tParent" << i; //argv[ParentHashFilePaths[i]]; 
 	}
 	VCFOutFile<< endl;
 
