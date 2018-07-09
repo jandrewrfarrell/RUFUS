@@ -608,6 +608,7 @@ echo "$RufAlu $ProbandFileName $ProbandGenerator.V2.overlap.hashcount.fastq  $al
 $RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref  $(echo $ParentFileNames)
 #########################
 
+echo "seeing what working dir is to pass to RufAlu" $PWD
 
 echo "done with everything"
 exit 0

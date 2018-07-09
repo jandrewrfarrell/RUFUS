@@ -3119,28 +3119,29 @@ cout << "Modes	chr	pos	type	reff	alt	MutRef	MutAlt	Par1Ref	Par2Ref" << endl;
 	//************************************************
 	//my arg parser
 
-	string helptext;	
-	helptext = \
+	string helptext;       
+
+helptext = \
 "\
 RUFUS.interpret: converts RUFUS aligned contigs into a VCF \n\
 By Andrew Farrell\n\
    The Marth Lab\n\
 \n\ 
 options:\
-  -h [ --help ]	  Print help message\n\
-  -sam  arg		Path to input SAM file, omit for stdin\n\
-  -r    arg		Path to reference file \n\
-  -hf   arg		Path to HashFile from RUFUS.build\n\
-  -hS   arg		Hash Size\n\
-  -o    arg		Output stub\n\
-  -m    arg		Maximum varient size: default 1Mb\n\
-			(Sorry it has to be a num, no 1kb, must be 1000\n\
-  -c    arg		Path to sorted.tab file for the parent sample\n\
-  -s    arg 		Path to sorted.tab file for the subject sample\n\
-  -cR   arg		Path to the sorted.tab file fo the parnt sample hashes in the reference\n\
-  -sR   arg		Path to the sorted.tab file fo the subject sample hashes in the reference\n\
-  -mQ   arg		Minimum map quality to consider varients in\n\
-  -mod 	arg		Path to the model file from RUFUS.model\n\
+  -h [ --help ]  Print help message\n\
+  -sam  argPath to input SAM file, omit for stdin\n\
+  -r    argPath to reference file \n\
+  -hf   argPath to HashFile from RUFUS.build\n\
+  -hS   argHash Size\n\
+  -o    argOutput stub\n\
+  -m    argMaximum varient size: default 1Mb\n\
+(Sorry it has to be a num, no 1kb, must be 1000\n\
+  -c    argPath to sorted.tab file for the parent sample\n\
+  -s    arg Path to sorted.tab file for the subject sample\n\
+  -cR   argPath to the sorted.tab file fo the parnt sample hashes in the reference\n\
+  -sR   argPath to the sorted.tab file fo the subject sample hashes in the reference\n\
+  -mQ   argMinimum map quality to consider varients in\n\
+  -mod argPath to the model file from RUFUS.model\n\
   -e    arg             Path to Kmer file to exlude from LowCov check\n\
 ";
 	
@@ -3497,6 +3498,15 @@ options:\
 	VCFOutFile << "##INFO=<ID=cigar,Number=1,Type=String,Description=\"Cigar string for the contig that created the call\">"<< endl;
 	VCFOutFile << "##INFO=<ID=VT,Number=1,Type=String,Description=\"Varient Type\">"<< endl;	
 	VCFOutFile << "##INFO=<ID=CVT,Number=1,Type=String,Description=\"Compressed Varient Type\">"<< endl;
+	VCFOutFile << "##INFO=<ID=NR,Number=1,Type=Integer,Description=\"Number of total reads in target region\">" << std::endl;
+	VCFOutFile << "##INFO=<ID=NH,Number=1,Type=Integer,Description=\"Number of alu heads in target region\">" << std::endl;
+	VCFOutFile << "##INFO=<ID=NT,Number=1,Type=Integer,Description=\"Number of polyA tails in target region\">" << std::endl;
+	VCFOutFile << "##INFO=<ID=LT,Number=1,Type=Integer,Description=\"Longest polyA tail in target region\">" << std::endl;
+
+	VCFOutFile << "##INFO=<ID=TB,Number=1,Type=Integer,Description=\"Is tail left bound, right bound, or double bound\">" << std::endl;
+	VCFOutFile << "##ALT=<ID=INS:ME:ALU,Description=\"Insertion of ALU element\">" << std::endl;
+	VCFOutFile << "##ALT=<ID=INS:ME:L1,Description=\"Insertion of L1 element\">" << std::endl;
+
 	VCFOutFile << "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t";
 	VCFOutFile << outStub; 
 	for(int i =0; i<ParentHashFilePaths.size(); i++)
@@ -3713,14 +3723,12 @@ options:\
 			}
 		}
 	}
-	cout << "done with this" << endl; 
-
 	VCFOutFile.close(); 
 	BEDOutFile.close();
 	BEDBigStuff.close();
 	BEDNotHandled.close();
 	Invertions.close(); 
-	cout << "\nreally dont\n";
+	cout << "finishing RUFUS.Interpret for " << outStub << std::endl;
 	return 0; 
 }
 	
