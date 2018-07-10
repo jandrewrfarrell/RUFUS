@@ -1,4 +1,4 @@
-e#!/bin/bash
+#!/bin/bash
 
 # This is a rather minimal example Argbash potential
 # Example taken from http://argbash.readthedocs.io/en/stable/example.html
@@ -322,7 +322,7 @@ elif [[ "$ProbandExtension" = "bam" ]]
 then
     echo "you provided the proband bam file" "$_arg_subject"
     ProbandGenerator="$ProbandFileName".generator
-    echo "samtools view -F 3328 $_arg_subject" >> "$ProbandGenerator"
+    echo "samtools view -F 3328 $_arg_subject" > "$ProbandGenerator"
 elif [[ "$ProbandExtension" = "generator" ]]
 then
     echo "you provided the proband bam file" "$_arg_subject"
@@ -348,7 +348,7 @@ do
     then
 	    parentGenerator="$parentFileName".generator
 	        ParentGenerators+=("$parentGenerator")
-		    echo "samtools view -F 3328 $parent" >> "$parentGenerator"
+		    echo "samtools view -F 3328 $parent" > "$parentGenerator"
 		        echo "You provided the control bam file" "$parent"
     elif [[ "$parentExtension" = "generator" ]]
     then
@@ -449,7 +449,7 @@ done
 
 
 ########################## set RUFUS directory path variables ##############################
-RDIR=/uufs/chpc.utah.edu/common/home/u0401321/RUFUS
+RDIR=/uufs/chpc.utah.edu/common/home/u0991464/bin/RUFUS
 RUFUSmodel=$RDIR/bin/ModelDist
 RUFUSfilter=$RDIR/bin/RUFUS.Filter
 RUFUSOverlap=$RDIR/scripts/Overlap.sh
@@ -528,14 +528,14 @@ fi
 
 
 ###########################__RUFUS_BUILD__#################################################
-echo "starting RUFUS build"
-if [ -e out."$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList ]
-then
-        echo "Skipping build"
-else
-    /usr/bin/time -v $RDIR/cloud/jellyfish-MODIFIED-merge/bin/jellyfish merge "$ProbandGenerator".Jhash $(echo $parentsString)  >  out."$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList
-fi
-echo "done with RUFUS build "
+#echo "starting RUFUS build"
+#if [ -e out."$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList ]
+#then
+#        echo "Skipping build"
+#else
+#    /usr/bin/time -v $RDIR/cloud/jellyfish-MODIFIED-merge/bin/jellyfish merge "$ProbandGenerator".Jhash $(echo $parentsString)  >  out."$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList
+#fi
+#echo "done with RUFUS build "
 
 ##if [ ! -s out."$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList ]
 ##then
@@ -557,7 +557,12 @@ if [ -s "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList ]
 then 
     echo "skipping $ProbandGenerator.HashList pull "
 else
-    /usr/bin/time -v bash $PullSampleHashes "$ProbandGenerator".Jhash out."$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList $MutantMinCov > "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList
+    rm  "$ProbandGenerator".temp
+    mkfifo "$ProbandGenerator".temp
+     /usr/bin/time -v $RDIR/cloud/jellyfish-MODIFIED-merge/bin/jellyfish merge "$ProbandGenerator".Jhash $(echo $parentsString)  > "$ProbandGenerator".temp & 
+    /usr/bin/time -v bash $PullSampleHashes $ProbandGenerator.Jhash "$ProbandGenerator".temp $MutantMinCov > "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList
+    #/usr/bin/time -v bash $PullSampleHashes "$ProbandGenerator".Jhash out."$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList $MutantMinCov > "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList
+    wait
 fi
 
 
@@ -570,10 +575,10 @@ then
 else
     rm  "$ProbandGenerator".temp
     mkfifo "$ProbandGenerator".temp
-    #/usr/bin/time -v  bash "$ProbandGenerator" | "$RDIR"/cloud/PassThroughSamCheck.stranded "$ProbandGenerator".filter.chr >  "$ProbandGenerator".tempx &
-    #/usr/bin/time -v   "$RUFUSfilter"  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp "$ProbandGenerator" "$K" 5 5 10 "$(echo $Threads -2 | bc)" &
+    /usr/bin/time -v  bash "$ProbandGenerator" | "$RDIR"/cloud/PassThroughSamCheck.stranded "$ProbandGenerator".filter.chr >  "$ProbandGenerator".temp &
+    /usr/bin/time -v   "$RUFUSfilter"  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp "$ProbandGenerator" "$K" 5 5 10 "$(echo $Threads -2 | bc)" &
     #bash $ProbandGenerator | $RDIR/cloud/PassThroughSamCheck.stranded $ProbandGenerator.filter.chr | head 
-    /usr/bin/time -v "$RUFUSfilter" "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList <(bash $ProbandGenerator | $RDIR/cloud/PassThroughSamCheck.stranded $ProbandGenerator.filter.chr)  "$ProbandGenerator" $K 5 5 10 $(echo $Threads -2 | bc)
+    #/usr/bin/time -v "$RUFUSfilter" "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList <(bash $ProbandGenerator | $RDIR/cloud/PassThroughSamCheck.stranded $ProbandGenerator.filter.chr)  "$ProbandGenerator" $K 5 5 10 $(echo $Threads -2 | bc)
     wait
 fi
 ########################################################################################
