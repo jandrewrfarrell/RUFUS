@@ -1370,7 +1370,7 @@ void SamRead::parseMutations( char *argv[])
                         	}
 				///////////////////final filter check/////////////////////////////////////////
 				string Filter = "."; 
-				if (AlignmentSegments > 10)
+				if (AlignmentSegments > 5)
 				{
 				  	Denovo = "PoorAlignment"; 
 					stringstream ss;
