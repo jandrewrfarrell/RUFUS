@@ -3120,8 +3120,7 @@ cout << "Modes	chr	pos	type	reff	alt	MutRef	MutAlt	Par1Ref	Par2Ref" << endl;
 	//my arg parser
 
 	string helptext;       
-
-helptext = \
+	helptext = \
 "\
 RUFUS.interpret: converts RUFUS aligned contigs into a VCF \n\
 By Andrew Farrell\n\
