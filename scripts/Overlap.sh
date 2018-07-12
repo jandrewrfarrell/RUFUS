@@ -140,21 +140,27 @@ else
 	echo "$RDIR/bin/jellyfish/bin/jellyfish -c  ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash > ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash.tab"
 	$RDIR/bin/jellyfish/bin/jellyfish dump -c  ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash > ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash.tab
 fi 
-if [ -s $NameStub.overlap.asembly.hash.fastq.p1 ]
+if [ -s $NameStub.overlap.asembly.hash.fastq.sample ]
 then
-        echo "skipping hash lookup"
+        echo "skipping  $NameStub.overlap.asembly.hash.fastq.sample file already exitst"
 else
 	echo "starting hash lookup"
         bash $CheckHash $SampleJhash ./$NameStub.overlap.hashcount.fastq.Jhash.tab 0 > $NameStub.overlap.asembly.hash.fastq.sample
 	#these will become the -c inputs TODO	
-	for parent in $ParentsJhash
-	do
-		echo "-$parent-"
-	    echo " bash $CheckHash $parent ./$NameStub.overlap.hashcount.fastq.Jhash.tab 0 > "$NameStub".overlap.asembly.hash.fastq."$parent" "
-	    bash $CheckHash $parent ./$NameStub.overlap.hashcount.fastq.Jhash.tab 0 > "$NameStub".overlap.asembly.hash.fastq."$parent"
-	done
 	echo "done with hash lookup"
 fi
+for parent in $ParentsJhash
+        do
+            if [ -s $NameStub.overlap.asembly.hash.fastq.$parent ]
+            then
+                echo "skiping $NameStub.overlap.asembly.hash.fastq.$parent already exists"
+            else
+                echo "-$parent-"
+                echo " bash $CheckHash $parent ./$NameStub.overlap.hashcount.fastq.Jhash.tab 0 > "$NameStub".overlap.asembly.hash.fastq."$parent" "
+                bash $CheckHash $parent ./$NameStub.overlap.hashcount.fastq.Jhash.tab 0 > $NameStub".overlap.asembly.hash.fastq."$parent
+            fi
+done
+
 
 
 if [ -s $NameStub.overlap.asembly.hash.fastq.Ref.sample ]	
@@ -163,14 +169,19 @@ then
 else
 	bash $CheckHash $SampleJhash  ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash.tab 0 > $NameStub.overlap.asembly.hash.fastq.Ref.sample
 	#these will be the -cR inputs TODO
-	for parent in $ParentsJhash
-	do
-	    echo "-$parent-"
-	    echo " bash $CheckHash $parent ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash.tab 0 > $NameStub.overlap.asembly.hash.fastq.Ref.$parent"
-	           bash $CheckHash $parent ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash.tab 0 > $NameStub.overlap.asembly.hash.fastq.Ref.$parent
-	done
 fi 
+for parent in $ParentsJhash
+        do
+            if [ -s $NameStub.overlap.asembly.hash.fastq.Ref.$parent ]
+            then
+                echo "skipping $NameStub.overlap.asembly.hash.fastq.Ref.$parent already exitst"
+            else
 
+                echo "-$parent-"
+                echo " bash $CheckHash $parent ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash.tab 0 > $NameStub.overlap.asembly.hash.fastq.Ref.$parent"
+                   bash $CheckHash $parent ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash.tab 0 > $NameStub.overlap.asembly.hash.fastq.Ref.$parent
+           fi
+        done
 
 parentCRString=""
 c="-c"
