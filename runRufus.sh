@@ -332,15 +332,18 @@ else
 fi
 
 ParentGenerators=()
+ParentFileNames=""
+space=" "
 
 for parent in "${Parents[@]}"
 do 
     parentFileName=$(basename "$parent")
+    ParentFileNames=$ParentFileNames$space$parent
     echo "parent file name is" "$parentFileName"
     parentExtension="${parentFileName##*.}"
     echo "parent file extension name is" "$parentExtension"
 
-    if [[ "$parentExtension" != "bam" ]] || [[ ! -e "$parent" ]] && [[ "$parentExtension" != "generator" ]]
+    if [[ "$parentExtension" != "bam" ]]  && [[ "$parentExtension" != "generator" ]]
     then
 	echo "The control bam/generator file" "$parent" " was not provided, or does not exist; killing run with non-zero exit status"
 	kill -9 $$
@@ -452,12 +455,13 @@ done
 RDIR=/uufs/chpc.utah.edu/common/home/u0991464/bin/RUFUS
 RUFUSmodel=$RDIR/bin/ModelDist
 RUFUSfilter=$RDIR/bin/RUFUS.Filter
+RufAlu=$RDIR/bin/RufAlu/src/aluDetect
 RUFUSOverlap=$RDIR/scripts/Overlap.sh
 RunJelly=$RDIR/cloud/RunJellyForRUFUS
 PullSampleHashes=$RDIR/cloud/CheckJellyHashList.sh
 ############################################################################################
 
-
+pa
 ####################__GENERATE_JHASH_FILES_FROM_JELLYFISH__#####################
 for parent in "${ParentGenerators[@]}"
 do
@@ -594,6 +598,22 @@ else
     /usr/bin/time -v bash $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 5 "$ProbandGenerator" "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
 fi
 ##############################################################################################
+
+
+
+
+#TODO: fix hard coding aluLIst path
+######__RUFALU__#############
+aluList=/uufs/chpc.utah.edu/common/home/u0401321/RufAlu/aluList/primate_non-LTR_Retrotransposon.fasta
+
+echo "running RufAlu, command is" 
+
+echo "$RufAlu $ProbandFileName $ProbandGenerator.V2.overlap.hashcount.fastq  $aluList $_arg_ref  $(echo $ParentFileNames) "
+
+$RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref  $(echo $ParentFileNames)
+#########################
+
+echo "seeing what working dir is to pass to RufAlu" $PWD
 
 echo "done with everything"
 exit 0
