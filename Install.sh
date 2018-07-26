@@ -95,16 +95,27 @@ cd ../
 
 #Make Samtools
 
-if [ ! -d samtools-1.6 ]; then
-    wget https://github.com/samtools/samtools/releases/download/1.6/samtools-1.6.tar.bz2
-    tar -xvf samtools-1.6.tar.bz2
-fi
-
-cd samtools-1.6/
-./configure --prefix=$(pwd)
-make 
-make install 
+git clone https://github.com/samtools/htslib.git
+cd htslib/
+make
 cd ../
+git clone https://github.com/samtools/samtools.git
+cd samtools
+make 
+cd ../
+
+
+
+#if [ ! -d samtools-1.6 ]; then
+#    wget https://github.com/samtools/samtools/releases/download/1.6/samtools-1.6.tar.bz2
+#    tar -xvf samtools-1.6.tar.bz2
+#fi
+
+#cd samtools-1.6/
+#./configure --prefix=$(pwd)
+#make 
+#make install 
+#cd ../
 
 
 cd ../
