@@ -20,6 +20,7 @@
 # Argbash is a bash code generator used to get arguments parsing right.
 # Argbash is FREE SOFTWARE, see https://argbash.io for more info
 # Generated online by https://argbash.io/generate
+RDIR=/home/ubuntu/RUFUS
 
 die()
 {
@@ -311,7 +312,7 @@ echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 #########__CREATE_ALL_GENERATOR_FILES_AND_VARIABLES__#############
 ProbandFileName=$(basename "$_arg_subject")
 ProbandExtension="${ProbandFileName##*.}"
-
+samtools=$RDIR/bin/samtools/samtools
 echo "proband extension is $ProbandExtension"
 
 if [[ "$ProbandExtension" != "bam" ]] || [[ ! -e "$_arg_subject" ]] && [[ "$ProbandExtension" != "generator" ]]
@@ -322,7 +323,7 @@ elif [[ "$ProbandExtension" = "bam" ]]
 then
     echo "you provided the proband bam file" "$_arg_subject"
     ProbandGenerator="$ProbandFileName".generator
-    echo "samtools view -F 3328 $_arg_subject" > "$ProbandGenerator"
+    echo "$samtools view -F 3328 $_arg_subject" > "$ProbandGenerator"
 elif [[ "$ProbandExtension" = "generator" ]]
 then
     echo "you provided the proband bam file" "$_arg_subject"
@@ -351,7 +352,7 @@ do
     then
 	    parentGenerator="$parentFileName".generator
 	        ParentGenerators+=("$parentGenerator")
-		    echo "samtools view -F 3328 $parent" > "$parentGenerator"
+		    echo "$samtools view -F 3328 $parent" > "$parentGenerator"
 		        echo "You provided the control bam file" "$parent"
     elif [[ "$parentExtension" = "generator" ]]
     then
@@ -452,23 +453,23 @@ done
 
 
 ########################## set RUFUS directory path variables ##############################
-RDIR=/uufs/chpc.utah.edu/common/home/u0991464/bin/RUFUS
 RUFUSmodel=$RDIR/bin/ModelDist
 RUFUSfilter=$RDIR/bin/RUFUS.Filter
 RufAlu=$RDIR/bin/RufAlu/src/aluDetect
 RUFUSOverlap=$RDIR/scripts/Overlap.sh
 RunJelly=$RDIR/cloud/RunJellyForRUFUS
 PullSampleHashes=$RDIR/cloud/CheckJellyHashList.sh
+samtools=$RDIR/bin/samtools/samtools
 ############################################################################################
 
 pa
 ####################__GENERATE_JHASH_FILES_FROM_JELLYFISH__#####################
 for parent in "${ParentGenerators[@]}"
 do
-     /usr/bin/time -v bash $RunJelly $parent $K $(echo $Threads -2 | bc) 2 &
+     /usr/bin/time -v bash $RunJelly $parent $K $(echo $Threads -2 | bc) 2 
 done
 
-/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc) 2 & 
+/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc) 2  
 
 wait
 
