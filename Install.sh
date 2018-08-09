@@ -36,7 +36,7 @@ echo "bulding external programs"
 cd src/externals/
 
 
-if [ -e ./jellyfish-2.2.5/bin/jellyfish ]
+if [ -e $RUFUS_DIR/bin/jellyfish/bin/jellyfish ]
 then
         echo "jellyfish already installed: skipping"
 else
