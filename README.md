@@ -22,7 +22,7 @@ git clone https://github.com/jandrewrfarrell/RUFUS.git
 cd RUFUS
 bash Install.sh
 ```
-This should install everything you need to use RUFUS.  If you get errors during the installation contact me at at JAndrewRFarrell@gmail.com
+This should install everything you need to use RUFUS.  If you get errors during the installation contact me at at JAndrewRFarrell@gmail.com or submit an issue.  NOTE, to date this only works on linux machines, we have not optimized for other platforms
 
 ## Running 
 
