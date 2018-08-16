@@ -120,6 +120,21 @@ bash runRufus.sh -s Proband.bam -c Mother.bam Father.bam Sibling1.bam Sibling2.b
 
 We recommend a kmer size of 25, 40 threads, and to NOT provide RUFUS with the optional --min parameter
 
+## Providing a reference file.
+
+After RUFUS has identified reads containing mutant kmers, the reads must be aligned to a reference fasta file.  Any fasta file can be used as a reference, as long as the fasta file has been indexed for BWA.  If a fasta has been indexed by bwa, there will be reference files with the following extensions: pac, .ann, .abm, .bwt, sa.  In order to prepare a reference fasta for bwa, simply type:
+
+```
+bwa index -a bwtsw reference.fa
+samtools faidx reference.fa
+```
+
+This will produce the BWA index files, and the fasta file index respectively.  Make sure that the bwa index files and the fasta index file are in the same directory as reference.fa
+
+
+
+
+
 
 
 
