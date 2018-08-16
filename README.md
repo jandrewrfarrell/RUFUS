@@ -24,6 +24,39 @@ bash Install.sh
 ```
 This should install everything you need to use RUFUS.  If you get errors during the installation contact me at at JAndrewRFarrell@gmail.com or submit an issue.  NOTE, to date this only works on linux machines, we have not optimized for other platforms
 
+## Compiler Requirements
+
+**RUFUS requires the use of the gcc/4.9.2 compiler.**  If you are not using the gcc/4.9.2 compiler, RUFUS will not build and install properly.  Please make sure that are using the gcc/4.9.2 compiler before you proceeed.
+
+## Testing RUFUS
+
+To make sure that RUFUS was successfully built, we provide users with a test run script to run RUFUS on a small test set of data with a small test reference, and default parameters.  To test RUFUS, simply run
+```
+cd testRun
+bash runTest.sh
+```
+
+Make sure that runTest.sh is called directly from the testRun directory, or the testRun script will not be able to find the appropriate resources.
+
+All data for this run is contained in the resources dir, and nothing needs to be provided by the user to test RUFUS.
+
+At the end of a successfull test run, you should see a file named
+
+```
+testRun/Child.bam.generator.V2.overlap.hashcount.fastq.bam.vcf
+```
+
+This file should contain a single varient call.  The call should look exactly as follows: 
+
+```
+#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  ./Child.bam     Mother.bam      Father.bam
+5:177630000     12896   X-DeNovo        T       G       25      PASS    RN=NODE_Child.bam.generator.V2_0_L273_D22:10:12::MH0;MQ=60;cigar=273M;SB=0.454545;CVT=X;HD=-1_-1_-1_-1_-1_19_-1_19_19_-1_-1_-1_-1_-1_20_20_19_-1_-1_18_-1_18_-1_-1_18_-1_-1_;AO=19;VT=X GT:DP:RO:AO     0/1:39:20:19    0/0:23:23:0     0/0:23:23:0
+```
+
+If you were unable to reproduce this call, something went wront with the RUFUS install, and you should get the test run to work before proceeding further.  If you are unable to reproduce a successfull test run, please contact me at JAndrewRFarrell@gmail.scom 
+
+
+
 ## Running 
 
 RUFUS is primarily used to find mutations unique to a  proband sample, that are not found in the control samples
