@@ -11,7 +11,7 @@ SampleJhash=$8
 ParentsJhash=$9
 
 humanRefBwa=${10}
-RefHash=${11}
+refHash=${11}
 
 echo " you gave
 File=$2
@@ -31,7 +31,7 @@ echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 mkdir ./TempOverlap/
 echo "Overlaping $File"
 
-RDIR=/uufs/chpc.utah.edu/common/home/u0991464/bin/RUFUS
+RDIR=/uufs/chpc.utah.edu/common/home/u0401321/RUFUS
 
 OverlapHash=$RDIR/bin/Overlap
 OverlapRebion2=$RDIR/bin/OverlapRegion
@@ -194,7 +194,7 @@ do
     echo "$parentCRString"
 done
 
-echo "final parent String is " "$parentCRString"
+echo "final parent String is  $parentCRString"
 ##########################################################################################
 
 if [ -s ./$NameStub.ref.exclude ]
@@ -203,10 +203,6 @@ then
 else
         bash $CheckHash $RefHash ./$NameStub.overlap.hashcount.fastq.Jhash.tab 1 > ./$NameStub.ref.RepRefHash
 fi
-
-
-
-
 wait
 
 mkfifo check 

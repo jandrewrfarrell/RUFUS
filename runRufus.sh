@@ -20,7 +20,7 @@
 # Argbash is a bash code generator used to get arguments parsing right.
 # Argbash is FREE SOFTWARE, see https://argbash.io for more info
 # Generated online by https://argbash.io/generate
-RDIR=/home/ubuntu/RUFUS
+RDIR=/uufs/chpc.utah.edu/common/home/u0401321/RUFUS
 
 die()
 {
@@ -462,7 +462,6 @@ PullSampleHashes=$RDIR/cloud/CheckJellyHashList.sh
 samtools=$RDIR/bin/samtools/samtools
 ############################################################################################
 
-pa
 ####################__GENERATE_JHASH_FILES_FROM_JELLYFISH__#####################
 for parent in "${ParentGenerators[@]}"
 do
@@ -578,6 +577,9 @@ if [ -e "$ProbandGenerator".Mutations.fastq ]
 then
     echo "skipping filter"
 else
+
+    echo "Filter probandGenerator name is $ProbandGenerator"
+
     rm  "$ProbandGenerator".temp
     mkfifo "$ProbandGenerator".temp
     /usr/bin/time -v  bash "$ProbandGenerator" | "$RDIR"/cloud/PassThroughSamCheck.stranded "$ProbandGenerator".filter.chr >  "$ProbandGenerator".temp &
@@ -587,7 +589,7 @@ else
     wait
 fi
 ########################################################################################
-
+    echo "starting RUFUS overlap"
 
 ###################__RUFUS_OVERLAP__#############################################
 if [ -e "$ProbandGenerator".V2.overlap.hashcount.fastq.bam.vcf ]
@@ -595,8 +597,10 @@ then
     echo "skipping overlap"
 else
     echo "starting RUFUS overlap"
+
+    echo "Overlap probandGenerator name is $ProbandGenerator"
     
-    /usr/bin/time -v bash $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 5 "$ProbandGenerator" "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
+    /usr/bin/time -v bash $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 5 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
 fi
 ##############################################################################################
 
@@ -605,16 +609,16 @@ fi
 
 #TODO: fix hard coding aluLIst path
 ######__RUFALU__#############
-aluList=/uufs/chpc.utah.edu/common/home/u0401321/RufAlu/aluList/primate_non-LTR_Retrotransposon.fasta
+#aluList=/uufs/chpc.utah.edu/common/home/u0401321/RufAlu/aluList/primate_non-LTR_Retrotransposon.fasta
 
-echo "running RufAlu, command is" 
+#echo "running RufAlu, command is" 
 
-echo "$RufAlu $ProbandFileName $ProbandGenerator.V2.overlap.hashcount.fastq  $aluList $_arg_ref  $(echo $ParentFileNames) "
+#echo "$RufAlu $ProbandFileName $ProbandGenerator.V2.overlap.hashcount.fastq  $aluList $_arg_ref  $(echo $ParentFileNames) "
 
-$RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref  $(echo $ParentFileNames)
+#$RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref  $(echo $ParentFileNames)
 #########################
 
-echo "seeing what working dir is to pass to RufAlu" $PWD
+#echo "seeing what working dir is to pass to RufAlu" $PWD
 
 echo "done with everything"
 exit 0

@@ -1,0 +1,1 @@
+./../runRufus.sh -s /uufs/chpc.utah.edu/common/home/u0401321/RUFUS/resources/testData/Child.bam -c /uufs/chpc.utah.edu/common/home/u0401321/RUFUS/resources/testData/Mother.bam /uufs/chpc.utah.edu/common/home/u0401321/RUFUS/resources/testData/Father.bam -k 25 -t 40 -m 7 -r /uufs/chpc.utah.edu/common/home/u0401321/RUFUS/resources/references/small_test_human_reference_v37_decoys.fa
