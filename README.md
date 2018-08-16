@@ -16,6 +16,10 @@ http://marthlab.org/
 
 This project is still under development and its not considered stable but you are free to use and any feedback is welcome. 
 
+## Compiler Requirements
+
+**RUFUS requires the use of the gcc/4.9.2 compiler.**  If you are not using the gcc/4.9.2 compiler, RUFUS will not build and install properly.  Please make sure that are using the gcc/4.9.2 compiler before you proceeed.
+
 ## Download and install
 ```
 git clone https://github.com/jandrewrfarrell/RUFUS.git   
@@ -24,9 +28,6 @@ bash Install.sh
 ```
 This should install everything you need to use RUFUS.  If you get errors during the installation contact me at at JAndrewRFarrell@gmail.com or submit an issue.  NOTE, to date this only works on linux machines, we have not optimized for other platforms
 
-## Compiler Requirements
-
-**RUFUS requires the use of the gcc/4.9.2 compiler.**  If you are not using the gcc/4.9.2 compiler, RUFUS will not build and install properly.  Please make sure that are using the gcc/4.9.2 compiler before you proceeed.
 
 ## Testing RUFUS
 
