@@ -465,7 +465,7 @@ samtools=$RDIR/bin/samtools/samtools
 ####################__GENERATE_JHASH_FILES_FROM_JELLYFISH__#####################
 for parent in "${ParentGenerators[@]}"
 do
-     /usr/bin/time -v bash $RunJelly $parent $K $(echo $Threads -2 | bc) 2 
+     /usr/bin/time -v bash $RunJelly $parent $K $(echo $Threads -2 | bc) 2 &
 done
 
 /usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc) 2  
