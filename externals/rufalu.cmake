@@ -1,0 +1,23 @@
+SET_PROPERTY(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
+
+SET(RUFALU_PROJECT rufalu_project CACHE INTERNAL "Rufalu project name")
+SET(RUFALU_DIR ${CMAKE_BINARY_DIR}/externals/rufalu CACHE INTERNAL "rufalu project directory")
+SET(RUFALU_LIB)
+
+ExternalProject_Add(${RUFALU_PROJECT}
+	GIT_REPOSITORY https://github.com/WilliamRichards2017/RufAlu.git
+	GIT_TAG master
+	INSTALL_COMMAND ""
+	UPDATE_COMMAND ""
+	PREFIX ${RUFALU_DIR}
+    CMAKE_CACHE_ARGS
+        -DCMAKE_C_COMPILER:STRING=${CMAKE_C_COMPILER}
+        -DCMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
+)
+
+ExternalProject_Get_Property(${RUFALU_PROJECT} INSTALL_DIR)
+ExternalProject_Get_Property(${RUFALU_PROJECT} SOURCE_DIR)
+ExternalProject_Get_Property(${RUFALU_PROJECT} BINARY_DIR)
+
+SET(RUFALU_LIB ${SOURCE_DIR}/bin/libs/libaludetect_core.a)
+SET(RUFALU_INCLUDE ${SOURCE_DIR} CACHE INTERNAL "RUFALU Include")
