@@ -15,3 +15,4 @@ SET(CORE_LIBS CACH LIST "List of plugin libs")
 ADD_SUBDIRECTORY(externals)
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(cloud)
+
