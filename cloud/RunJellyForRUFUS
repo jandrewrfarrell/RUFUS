@@ -7,7 +7,8 @@ K=$2
 T=$3
 L=$4
 
-RDIR=/home/ubuntu/RUFUS
+RDIR=/uufs/chpc.utah.edu/common/home/u0401321/finalRUFUStest/RUFUS
+#JELLYFISH="$RDIR/bin/externals/jellyfish-2.2.5/bin/jellyfish"
 JELLYFISH="$RDIR/src/externals/jellyfish-2.2.5/bin/jellyfish"
 SORT="$RDIR/scripts/sort"
 

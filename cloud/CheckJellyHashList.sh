@@ -1,7 +1,7 @@
 #!/bin/sh
 
-RDIR=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/RUFUS
-JellyFish=$RDIR//src/externals/jellyfish-2.2.5/bin/jellyfish
+RDIR=/uufs/chpc.utah.edu/common/home/u0401321/finalRUFUStest/RUFUS
+JellyFish=$RDIR/src/externals/jellyfish-2.2.5/bin/jellyfish
 Jhash=$1
 HashList=$2
 MinCov=$3

@@ -20,7 +20,7 @@
 # Argbash is a bash code generator used to get arguments parsing right.
 # Argbash is FREE SOFTWARE, see https://argbash.io for more info
 # Generated online by https://argbash.io/generate
-RDIR=/uufs/chpc.utah.edu/common/home/u0401321/RUFUS
+RDIR=/uufs/chpc.utah.edu/common/home/u0401321/finalRUFUStest/RUFUS
 
 die()
 {
@@ -252,7 +252,7 @@ if [[ ! -e "$_arg_ref".pac ]] && [[ ! -e "$_arg_ref_cat".pac ]]
 then
     echo "Reference file not built for BWA"
     echo "this program requires the existence of the file" "$_arg_ref".pac
-    echo "Killing run with non-zero status"
+    echo "Killing run with njon-zero status"
     kill -9 $$
 fi
 
@@ -312,7 +312,7 @@ echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 #########__CREATE_ALL_GENERATOR_FILES_AND_VARIABLES__#############
 ProbandFileName=$(basename "$_arg_subject")
 ProbandExtension="${ProbandFileName##*.}"
-samtools=$RDIR/bin/samtools/samtools
+samtools=$RDIR/bin/externals/samtools/src/SAMTOOLS_PROJECT/samtools
 echo "proband extension is $ProbandExtension"
 
 if [[ "$ProbandExtension" != "bam" ]] || [[ ! -e "$_arg_subject" ]] && [[ "$ProbandExtension" != "generator" ]]
@@ -460,6 +460,7 @@ RUFUSOverlap=$RDIR/scripts/Overlap.sh
 RunJelly=$RDIR/cloud/RunJellyForRUFUS
 PullSampleHashes=$RDIR/cloud/CheckJellyHashList.sh
 samtools=$RDIR/bin/samtools/samtools
+modifiedJelly=$RDIR/cloud/jellyfish-MODIFIED-merge/bin/jellyfish
 ############################################################################################
 
 ####################__GENERATE_JHASH_FILES_FROM_JELLYFISH__#####################
@@ -563,7 +564,7 @@ then
 else
     rm  "$ProbandGenerator".temp
     mkfifo "$ProbandGenerator".temp
-     /usr/bin/time -v $RDIR/cloud/jellyfish-MODIFIED-merge/bin/jellyfish merge "$ProbandGenerator".Jhash $(echo $parentsString)  > "$ProbandGenerator".temp & 
+     /usr/bin/time -v $modifiedJelly merge "$ProbandGenerator".Jhash $(echo $parentsString)  > "$ProbandGenerator".temp & 
     /usr/bin/time -v bash $PullSampleHashes $ProbandGenerator.Jhash "$ProbandGenerator".temp $MutantMinCov > "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList
     #/usr/bin/time -v bash $PullSampleHashes "$ProbandGenerator".Jhash out."$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList $MutantMinCov > "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList
     wait
@@ -600,7 +601,7 @@ else
 
     echo "Overlap probandGenerator name is $ProbandGenerator"
     
-    /usr/bin/time -v bash $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 5 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
+    /usr/bin/time bash $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 5 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
 fi
 ##############################################################################################
 
