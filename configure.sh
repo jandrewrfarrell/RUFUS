@@ -20,7 +20,12 @@ perl -p -i -e "s/RDIR=.*\n/RDIR=$( echo $(pwd)| perl -p -i -e "s/\//\\\\\//g")\n
 #fi
 #cd samtools-1.9; ./configure --prefix=${PWD}; make; make install; cd ../;
 
+if [ ! -s "bin"]; then
+mkdir bin; cd bin; mkdir externals; cd externals
+else
 cd bin/externals
+fi
+
 if [ ! -s "jellyfish-2.2.5" ]; then
 wget https://github.com/gmarcais/Jellyfish/releases/download/v2.2.5/jellyfish-2.2.5.tar.gz
 tar -xzf jellyfish-2.2.5.tar.gz;
