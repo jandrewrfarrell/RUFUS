@@ -20,7 +20,7 @@
 # Argbash is a bash code generator used to get arguments parsing right.
 # Argbash is FREE SOFTWARE, see https://argbash.io for more info
 # Generated online by https://argbash.io/generate
-RDIR=/uufs/chpc.utah.edu/common/home/u0401321/RUFUS
+RDIR=/uufs/chpc.utah.edu/common/home/u0401321/testyRUFUS/RUFUS
 
 die()
 {
@@ -460,6 +460,7 @@ RUFUSOverlap=$RDIR/scripts/Overlap.sh
 RunJelly=$RDIR/cloud/RunJellyForRUFUS
 PullSampleHashes=$RDIR/cloud/CheckJellyHashList.sh
 samtools=$RDIR/bin/samtools/samtools
+modifiedJelly=$RDIR/bin/externals/jellyfish-MODIFIED-merge/bin/jellyfish
 ############################################################################################
 
 ####################__GENERATE_JHASH_FILES_FROM_JELLYFISH__#####################
@@ -563,7 +564,7 @@ then
 else
     rm  "$ProbandGenerator".temp
     mkfifo "$ProbandGenerator".temp
-     /usr/bin/time -v $RDIR/cloud/jellyfish-MODIFIED-merge/bin/jellyfish merge "$ProbandGenerator".Jhash $(echo $parentsString)  > "$ProbandGenerator".temp & 
+     /usr/bin/time -v $modifiedJelly merge "$ProbandGenerator".Jhash $(echo $parentsString)  > "$ProbandGenerator".temp & 
     /usr/bin/time -v bash $PullSampleHashes $ProbandGenerator.Jhash "$ProbandGenerator".temp $MutantMinCov > "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList
     #/usr/bin/time -v bash $PullSampleHashes "$ProbandGenerator".Jhash out."$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList $MutantMinCov > "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList
     wait

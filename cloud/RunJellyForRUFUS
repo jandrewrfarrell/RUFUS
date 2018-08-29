@@ -7,9 +7,9 @@ K=$2
 T=$3
 L=$4
 
-RDIR=/uufs/chpc.utah.edu/common/home/u0401321/RUFUS
+RDIR=/uufs/chpc.utah.edu/common/home/u0401321/testyRUFUS/RUFUS
 #JELLYFISH="$RDIR/bin/externals/jellyfish-2.2.5/bin/jellyfish"
-JELLYFISH="$RDIR/src/externals/jellyfish-2.2.5/bin/jellyfish"
+JELLYFISH="$RDIR/bin/externals/jellyfish-2.2.5/bin/jellyfish"
 SORT="$RDIR/scripts/sort"
 
 #ulimit -v 3000000
