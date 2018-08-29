@@ -44,7 +44,7 @@ samtools=$RDIR/bin/externals/samtools/src/SAMTOOLS_PROJECT/samtools
 RUFUSinterpret=$RDIR/bin/RUFUS.interpret
 CheckHash=$RDIR/cloud/CheckJellyHashList.sh
 OverlapSam=$RDIR/bin/OverlapSam
-JellyFish=$RDIR/bin/externals/jellyfish-2.2.5/bin/jellyfish
+JellyFish=$RDIR/src/externals/jellyfish-2.2.5/bin/jellyfish
 
 
 #if [ -s $NameStub.overlap.hashcount.fastq ]
