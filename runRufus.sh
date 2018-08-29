@@ -600,7 +600,7 @@ else
 
     echo "Overlap probandGenerator name is $ProbandGenerator"
     
-    /usr/bin/time -v bash $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 5 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
+    /usr/bin/time -v valgrind --leak-check=full -v bash $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 5 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
 fi
 ##############################################################################################
 

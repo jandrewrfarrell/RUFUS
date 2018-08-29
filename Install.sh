@@ -33,7 +33,7 @@ g++ -g ./src/RUFUS.interpret.cpp src/Util.cpp  ./src/include/* -o ./bin/RUFUS.in
 g++ -g ./src/RUFUS.1kg.filter.cpp src/Util.cpp -o ./bin/RUFUS.1kg.filter -std=gnu++11 -fopenmp -O3
 
 echo "bulding external programs"
-cd src/externals/
+cd $RUFUS_DIR/src/externals/
 
 
 if [ -e $RUFUS_DIR/bin/jellyfish/bin/jellyfish ]

@@ -43,6 +43,13 @@ target_link_libraries(AnnotateOverlap
 	${RUFUS_UTIL}
 )
 
+add_executable(OverlapSam
+	OverlapSam.cpp
+)
+target_link_libraries(OverlapSam
+	${RUFUS_UTIL}
+)
+
 add_executable(ConvertFASTqD.to.FASTQ
 	ConvertFASTqD.to.FASTQ.cpp
 )
