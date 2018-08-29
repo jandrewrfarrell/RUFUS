@@ -35,7 +35,9 @@ if [ -e $RUFUS_DIR/src/externals/jellyfish-2.2.5/bin/jellyfish ]
 then
         echo "jellyfish already installed: skipping"
 else
-    wget https://github.com/gmarcais/Jellyfish/releases/download/v2.2.5/jellyfish-2.2.5.tar.gz
+    if [ ! -f $RUFUS_DIR/src/externals/jellyfish-2.2.5.tar.gz ]; then
+	wget https://github.com/gmarcais/Jellyfish/releases/download/v2.2.5/jellyfish-2.2.5.tar.gz
+    fi
     tar -xvf jellyfish-2.2.5.tar.gz
     cd jellyfish-2.2.5
     mkdir bin
