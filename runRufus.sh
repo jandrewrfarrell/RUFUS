@@ -20,7 +20,7 @@
 # Argbash is a bash code generator used to get arguments parsing right.
 # Argbash is FREE SOFTWARE, see https://argbash.io for more info
 # Generated online by https://argbash.io/generate
-RDIR=/uufs/chpc.utah.edu/common/home/u0401321/finalRUFUStest/RUFUS
+RDIR=/uufs/chpc.utah.edu/common/home/u0401321/RUFUS
 
 die()
 {
@@ -312,7 +312,7 @@ echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 #########__CREATE_ALL_GENERATOR_FILES_AND_VARIABLES__#############
 ProbandFileName=$(basename "$_arg_subject")
 ProbandExtension="${ProbandFileName##*.}"
-samtools=$RDIR/bin/externals/samtools/src/SAMTOOLS_PROJECT/samtools
+samtools=$RDIR/bin/externals/samtools/samtools
 echo "proband extension is $ProbandExtension"
 
 if [[ "$ProbandExtension" != "bam" ]] || [[ ! -e "$_arg_subject" ]] && [[ "$ProbandExtension" != "generator" ]]
