@@ -15,14 +15,15 @@ perl -p -i -e "s/RDIR=.*\n/RDIR=$( echo $(pwd)| perl -p -i -e "s/\//\\\\\//g")\n
 
 RUFUS_DIR=$(pwd)
 
+cd $RUFUS_DIR/bin/externals
+if [ ! -d "samtools" ]; then
+wget https://github.com/samtools/samtools/releases/download/1.9/samtools-1.9.tar.bz2; 
+tar xvjf samtools-1.9.tar.bz2;
+mv samtools-1.9 samtools
+fi
+cd samtools; ./configure --prefix=${PWD}; make; make install; cd ../;
 
-#if [ ! -s "samtools-1.9.tar.bz2" ]; then
-#wget https://github.com/samtools/samtools/releases/download/1.9/samtools-1.9.tar.bz2; 
-#tar xvjf samtools-1.9.tar.bz2;
-#fi
-#cd samtools-1.9; ./configure --prefix=${PWD}; make; make install; cd ../;
-
-cd src/externals
+cd $RUFUS_DIR/src/externals
 echo "current pwd is ${PWD}"
 
 #if [ ! -d "jellyfish-2.2.5" ]; then

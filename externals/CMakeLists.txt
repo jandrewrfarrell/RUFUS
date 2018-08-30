@@ -9,8 +9,8 @@ LIST(APPEND RUFUS_DEPENDENCIES ${BWA_PROJECT})
 include(bedtools2.cmake)
 LIST(APPEND RUFUS_DEPENDENCIES ${BEDTOOLS2_PROJECT})
 
-include(htslib.cmake)
-include(samtools.cmake)
+#include(htslib.cmake)
+#include(samtools.cmake)
 
 SET(RUFUS_SOURCE_DIR ${CMAKE_BINARY_DIR}/external CACHE INTERNAL "" FORCE)
 
