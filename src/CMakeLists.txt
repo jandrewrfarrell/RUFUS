@@ -94,9 +94,6 @@ target_link_libraries(RUFUS.Filter
 
 add_executable(RUFUS.interpret
 	RUFUS.interpret.cpp
-	include/disorder.o
-        include/Fasta.o
-        include/split.o
 )
 target_link_libraries(RUFUS.interpret
 	${RUFUS_UTIL}
