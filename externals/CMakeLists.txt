@@ -8,6 +8,8 @@ include(bwa.cmake)
 LIST(APPEND RUFUS_DEPENDENCIES ${BWA_PROJECT})
 include(bedtools2.cmake)
 LIST(APPEND RUFUS_DEPENDENCIES ${BEDTOOLS2_PROJECT})
+include(fastahack.cmake)
+LIST(APPEND RUFUS_DEPENDENCIES ${FASTAHACK_PROJECT})
 
 #include(htslib.cmake)
 #include(samtools.cmake)

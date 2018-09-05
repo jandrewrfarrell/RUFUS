@@ -100,7 +100,7 @@ add_executable(RUFUS.interpret
 )
 target_link_libraries(RUFUS.interpret
 	${RUFUS_UTIL}
-	${RUFUS_FASTA}
+	${RUFUS_DEPENDENCIES}
 )
 
 add_executable(ReplaceQwithDinFASTQD
