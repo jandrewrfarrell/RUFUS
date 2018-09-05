@@ -1,7 +1,7 @@
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/)
 
 INCLUDE_DIRECTORIES(
-	#${SAMTOOLS_INCLUDE}
+	${FASTAHACK_INCLUDE}
 )
 
 set(CMAKE_BUILD_TYPE Debug) # uncomment this when you need a debug build
@@ -97,7 +97,7 @@ add_executable(RUFUS.interpret
 )
 target_link_libraries(RUFUS.interpret
 	${RUFUS_UTIL}
-	${RUFUS_DEPENDENCIES}
+	${FASTAHACK_LIB}
 )
 
 add_executable(ReplaceQwithDinFASTQD
