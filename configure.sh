@@ -50,7 +50,7 @@ fi
 
 cd $RUFUS_DIR/cloud
 
-rm -rf jellyfish-MODIFIED-merge
+rm -rf jellyfish-MODIFIED-merg*
 if [ ! -f jellyfish-2.2.5.tar.gz ]; then
 wget https://github.com/gmarcais/Jellyfish/releases/download/v2.2.5/jellyfish-2.2.5.tar.gz
 fi
