@@ -20,13 +20,68 @@ This project is still under development and its not considered stable but you ar
 
 **RUFUS requires the use of the gcc/4.9.2 compiler.**  If you are not using the gcc/4.9.2 compiler, RUFUS will not build and install properly.  Please make sure that are using the gcc/4.9.2 compiler before you proceeed.
 
-## Download and install
+## Ubuntu dependencies
+In order for RUFUS to run on a fresh Ubuntu build, all of the following packages must be installed:
+
+**General**
+```
+sudo apt-get update
+sudo apt-get install python
+sudo apt-get install cmake
+```
+
+**GCC-4.9** (c/c++ compiler)
+```
+sudo apt-get install build-essential
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+sudo apt-get install g++-4.9
+```
+
+**zlib** (file compression library)
+```
+sudo apt-get install zlib1g-dev
+sudo apt-get install bc
+```
+
+**bzlib** (bz2 file compression library)
+```
+sudo apt-get install libbz2-dev
+sudo apt-get install liblzma-dev
+```
+
+**bc** (floating point precision library)
+```
+sudo apt-get install bc
+```
+
+**Curse** (terminal control library)
+```
+sudo apt-get install libncurses5-dev
+```
+
+### Installing RUFUS
+
+ **1) Download**
 ```
 git clone https://github.com/jandrewrfarrell/RUFUS.git   
-cd RUFUS
-bash Install.sh
 ```
-This should install everything you need to use RUFUS.  If you get errors during the installation contact me at at JAndrewRFarrell@gmail.com or submit an issue.  NOTE, to date this only works on linux machines, we have not optimized for other platforms
+
+**2) Configure**
+```
+cd RUFUS
+./configure.sh
+```
+
+__Note:__ ./configure must be run from the RUFUS root directory
+
+**3) Build**
+```
+cd bin
+cmake ..
+make
+```
+
+If you get errors during the installation contact me at at JAndrewRFarrell@gmail.com or submit an issue.  NOTE, to date this only works on linux machines.
 
 
 ## Testing RUFUS
@@ -37,7 +92,7 @@ cd testRun
 bash runTest.sh
 ```
 
-Make sure that runTest.sh is called directly from the testRun directory, or the testRun script will not be able to find the appropriate resources.
+__NOTE:__ Make sure that runTest.sh is called directly from the testRun directory, or the testRun script will not be able to find the appropriate resources.
 
 All data for this run is contained in the resources dir, and nothing needs to be provided by the user to test RUFUS.
 
