@@ -59,7 +59,7 @@ sudo apt-get install bc
 sudo apt-get install libncurses5-dev
 ```
 
-### Installing RUFUS
+## Installing RUFUS
 
  **1) Download**
 ```
