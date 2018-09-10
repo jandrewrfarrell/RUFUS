@@ -20,7 +20,7 @@ This project is still under development and its not considered stable but you ar
 
 **RUFUS requires the use of the gcc/4.9.2 compiler.**  If you are not using the gcc/4.9.2 compiler, RUFUS will not build and install properly.  Please make sure that are using the gcc/4.9.2 compiler before you proceeed.  If you are loading your compiler from a module, cmake may not run the correct compiler path.  If this is the case, try replacing the
 ```
-cmake ..s
+cmake ../
 ```
 command with
 ```
