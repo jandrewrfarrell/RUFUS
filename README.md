@@ -18,7 +18,15 @@ This project is still under development and its not considered stable but you ar
 
 ## Compiler Requirements
 
-**RUFUS requires the use of the gcc/4.9.2 compiler.**  If you are not using the gcc/4.9.2 compiler, RUFUS will not build and install properly.  Please make sure that are using the gcc/4.9.2 compiler before you proceeed.
+**RUFUS requires the use of the gcc/4.9.2 compiler.**  If you are not using the gcc/4.9.2 compiler, RUFUS will not build and install properly.  Please make sure that are using the gcc/4.9.2 compiler before you proceeed.  If you are loading your compiler from a module, cmake may not run the correct compiler path.  If this is the case, try replacing the
+```
+cmake 
+```
+command with
+```
+cmake ../ -DCMAKE_C_COMPILER=$(which gcc) -DCMAKE_CXX_COMPILER=$(which g++)
+```
+to directly provide cmake with the path to your gcc compiler.
 
 ## Ubuntu dependencies
 In order for RUFUS to run on a fresh Ubuntu build, all of the following packages must be installed:
