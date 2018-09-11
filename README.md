@@ -137,7 +137,7 @@ Usage:
 
 -c, --controls: bam files containing the control subjects (REQUIRED)
 
--t,--threads: number of threads to use (REQUIRED)
+-t,--threads: number of threads to use (REQUIRED) (min 3)
 
 -k,--kmersize: size of Kmer to use (REQUIRED)
 
@@ -147,8 +147,6 @@ Usage:
 
 -h,--help: HELP!!!!!!!!!!!!!!!
 ```
-
- 
 
 
 The command line should look something like this:
@@ -162,6 +160,9 @@ or
 ```
 bash runRufus.sh -s Child.bam -c Mother.bam Father.bam -k 25 -t 40 -r human_reference_v37_decoys.fa
 ```
+
+**NOTE** runRUFUS must be provided with atleast three threads, as it assigns threads to processes as a proportion the total number of threads provided.  It does not matter if you have fewer than three cores, but you must simply provided at least three threads.
+
 The flags can be provided any any order.
 
 RUFUS can take any number control files (Must provide atleast one). 
