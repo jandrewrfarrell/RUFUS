@@ -58,11 +58,27 @@ print_help ()
     printf "\t%s\n" "-c, --controls: bam files containing the control subjects"
     printf "\t%s\n" "-s,--subject: bam file containing the subject of interest (no default)"
     printf "\t%s\n" "-r,--ref: file path to the desired reference file (no default)"
-    printf "\t%s\n" "-t,--threads: number of threads to use (no default)"
-    printf "\t%s\n" "-f,--refhash: File containing reference hashList (no default)"
-    printf "\t%s\n" "-k,--kmersize: size of Khmer to use (no default)"
+    printf "\t%s\n" "-t,--threads: number of threads to use (no default) (min 3)"
+    printf "\t%s\n" "-k,--kersize: size of k-mer to use (no default)"
     printf "\t%s\n" "-m,--min: overwrites the minimum k-mer count to call variant (no default)"
     printf "\t%s\n" "-h,--help: HELP!!!!!!!!!!!!!!!"
+}
+
+print_devhelp ()
+{
+    printf "%s\n" "The general script's help msg"
+    printf 'Usage: %s [-s|--subject <arg>] [-r|--ref <arg>] [-t|--threads <arg>] [-k|--kmersize <arg>] [-m|--min <arg>] [-h|--help] [<controls-1>] ... [<control\
+s-n>] ...\n' "$0"
+    printf "\t%s\n" "-c, --controls: bam files containing the control subjects"
+    printf "\t%s\n" "-s,--subject: bam file containing the subject of interest (no default)"
+    printf "\t%s\n" "-r,--ref: file path to the desired reference file (no default)"
+    printf "\t%s\n" "-t,--threads: number of threads to use (no default) (min 3)"
+    printf "\t%s\n" "-f,--refhash: Jhash file containing reference hashList (no default)"
+    printf "\t%s\n" "-e,--exclude: Jhash file of kmers to exclude from mutation list (no default)"
+    printf "\t%s\n" "-k,--kersize: size of k-mer to use (no default)"
+    printf "\t%s\n" "-m,--min: overwrites the minimum k-mer count to call variant (no default)"
+    printf "\t%s\n" "-h,--help: HELP!!!!!!!!!!!!!!!"
+    printf "\t%s\n" "-d,--devhelp: HELP!!! for developers"
 }
 
 parse_commandline ()
@@ -110,11 +126,23 @@ parse_commandline ()
                 shift
                 ;;
             --refhash=*)
-                _arg_refheash="${_key##--threads=}"
+                _arg_refhash="${_key##--refhash=}"
                 ;;
             -f*)
-                _arg_refhash="${_key##-t}"
+                _arg_refhash="${_key##-f}"
                 ;;
+            -e|--exclude)
+                test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+                _arg_exclude="$2"
+                shift
+                ;;
+            --exclude=*)
+                _arg_exclude="${_key##--exclude=}"
+                ;;
+            -e*)
+                _arg_exclude="${_key##-e}"
+                ;;
+
 	    -k|--kmersize)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_arg_kmersize="$2"
@@ -145,6 +173,16 @@ parse_commandline ()
 		print_help
 		exit 0
 		;;
+	    -d|--devhelp)
+                print_devhelp
+                exit 0
+                ;;
+            -d*)
+                print_devhelp
+                exit 0
+                ;;
+
+
 	    *)
 		_positionals+=("$1")
 		;;
@@ -448,6 +486,10 @@ do
   parentsString=$parentsString$space$parent$jhash
   echo "parents string equals " $parentsString
 done
+if [! -z "$_arg_exclude" ]
+then
+    parentsString=$parentsString$space$_arg_exclude
+fi
 ##################################################
 
 
