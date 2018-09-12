@@ -37,7 +37,6 @@ add_library(rufus_core STATIC
 	RUFUS.1kg.filter.cpp
 )
 
-
 add_executable(AnnotateOverlap
 	AnnotateOverlap.cpp	
 )
@@ -112,4 +111,3 @@ target_link_libraries(ReplaceQwithDinFASTQD
 
 SET(CORE_LIB rufus_core CACH STRING)
 
-TARGET_LINK_LIBRARIES(${CORE_LIB})
