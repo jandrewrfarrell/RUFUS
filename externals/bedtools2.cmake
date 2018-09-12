@@ -1,12 +1,17 @@
+
 SET_PROPERTY(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
 
 SET(BEDTOOLS2_PROJECT bedtools2_project CACHE INTERNAL "bedtools2 project name")
 SET(BEDTOOLS2_DIR ${CMAKE_BINARY_DIR}/externals/bedtools2 CACHE INTERNAL "bedtools2 project directory")
 SET(BEDTOOLS2_LIB)
 
+SET(ENV{CPLUS_INCLUDE_PATH} ${ZLIB_INCLUDE})
+message("TEST: ENV{CPLUS_INCLUDE_PATH}")
+
 ExternalProject_Add(${BEDTOOLS2_PROJECT}
-	GIT_REPOSITORY https://github.com/arq5x/bedtools2.git
+	GIT_REPOSITORY https://github.com/williamrichards2017/bedtools2.git
 	GIT_TAG master
+	DEPENDS ${ZLIB_PROJECT}
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND "make"
 	INSTALL_COMMAND ""

@@ -2,6 +2,8 @@ include(ExternalProject)
 
 SET (RUFUS_DEPENDENCIES)
 
+include(zlib.cmake)
+LIST(APPEND RUFUS_DEPENDENCIES ${ZLIB_PROJECT})
 include(rufalu.cmake)
 LIST(APPEND RUFUS_DEPENDENCIES ${RUFALU_PROJECT})
 include(bwa.cmake)
