@@ -16,8 +16,10 @@ perl -p -i -e "s/RDIR=.*\n/RDIR=$( echo $(pwd)| perl -p -i -e "s/\//\\\\\//g")\n
 RUFUS_DIR=$(pwd)
 
 cd $RUFUS_DIR/bin/externals
-if [ ! -d "samtools" ]; then
+if [ ! -e "samtools-1.9.tar.bz2" ]; then
 wget https://github.com/samtools/samtools/releases/download/1.9/samtools-1.9.tar.bz2; 
+fi
+if [ ! -d "samtools" ]; then
 tar xvjf samtools-1.9.tar.bz2;
 mv samtools-1.9 samtools
 fi
