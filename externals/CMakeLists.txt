@@ -16,7 +16,8 @@ LIST(APPEND RUFUS_DEPENDENCIES ${FASTAHACK_PROJECT})
 #include(htslib.cmake)
 #include(samtools.cmake)
 
-SET(RUFUS_SOURCE_DIR ${CMAKE_SOURCE_DIR}/externals/external CACHE INTERNAL "" FORCE)
+
+SET(RUFUS_SOURCE_DIR ${CMAKE_BINARY_DIR}/externals/external CACHE INTERNAL "" FORCE)
 
 SET(RUFUS_EXTERNAL_PROJECT_DIR ${CMAKE_BINARY_DIR}/externals/rufus_external_project CACHE INTERNAL "external project directory")
 SET(RUFUS_EXTERNAL_PROJECT rufus_external_project CACHE INTERNAL "all rufus external projects")
