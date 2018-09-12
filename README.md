@@ -36,6 +36,7 @@ In order for RUFUS to run on a fresh Ubuntu build, all of the following packages
 sudo apt-get update
 sudo apt-get install python
 sudo apt-get install cmake
+sudo apt-get install wget
 ```
 
 **GCC-4.9** (c/c++ compiler)
