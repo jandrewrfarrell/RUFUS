@@ -43,14 +43,7 @@ sudo apt-get install wget
 ```
 sudo apt-get install build-essential
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-sudo apt-get install g++-4.9
-```
-
-**zlib** (file compression library)
-```
-sudo apt-get install zlib1g-dev
-sudo apt-get install bc
-```
+sudo apt-get install g++-4.9n
 
 **bzlib** (bz2 file compression library)
 ```
