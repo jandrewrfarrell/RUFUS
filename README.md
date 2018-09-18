@@ -46,6 +46,12 @@ sudo add-apt-repository ppa:ubuntu-toolchain-r/test
 sudo apt-get install g++-4.9
 ```
 
+**zlib** (file compression library)
+```
+sudo apt-get install zlib1g-dev
+sudo
+```
+
 **bzlib** (bz2 file compression library)
 ```
 sudo apt-get install libbz2-dev
