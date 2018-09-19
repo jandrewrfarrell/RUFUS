@@ -506,12 +506,21 @@ modifiedJelly=$RDIR/cloud/jellyfish-MODIFIED-merge/bin/jellyfish
 ############################################################################################
 
 ####################__GENERATE_JHASH_FILES_FROM_JELLYFISH__#####################
+JThreads=$((Threads / 3))
+
+if (( $Jthreads < 3 ))
+then
+        $JThreads=3
+fi
+
+
 for parent in "${ParentGenerators[@]}"
 do
-     /usr/bin/time -v bash $RunJelly $parent $K $(echo $Threads -2 | bc) 2 &
+     /usr/bin/time -v bash $RunJelly $parent $K $(echo $JThreads -2 | bc) 2 &
 done
 
-/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc) 2  
+/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $JThreads -2 | bc) 2 &
+ 
 
 wait
 
