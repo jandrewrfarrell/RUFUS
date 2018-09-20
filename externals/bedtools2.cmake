@@ -5,13 +5,11 @@ SET(BEDTOOLS2_PROJECT bedtools2_project CACHE INTERNAL "bedtools2 project name")
 SET(BEDTOOLS2_DIR ${CMAKE_BINARY_DIR}/externals/bedtools2 CACHE INTERNAL "bedtools2 project directory")
 SET(BEDTOOLS2_LIB)
 
-SET(ENV{CPLUS_INCLUDE_PATH} ${ZLIB_INCLUDE})
-message("TEST: ENV{CPLUS_INCLUDE_PATH}")
+message("CMAKE_BINARY_DIR : ${CMAKE_BINARY_DIR}")
 
 ExternalProject_Add(${BEDTOOLS2_PROJECT}
 	GIT_REPOSITORY https://github.com/williamrichards2017/bedtools2.git
-	GIT_TAG master
-	DEPENDS ${ZLIB_PROJECT}
+	GIT_TAG mattOnly
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND "make"
 	INSTALL_COMMAND ""
@@ -23,6 +21,8 @@ ExternalProject_Add(${BEDTOOLS2_PROJECT}
 ExternalProject_Get_Property(${BEDTOOLS2_PROJECT} INSTALL_DIR)
 ExternalProject_Get_Property(${BEDTOOLS2_PROJECT} SOURCE_DIR)
 ExternalProject_Get_Property(${BEDTOOLS2_PROJECT} BINARY_DIR)
+
+message("BEDTOOLS_2 source dir is : ${SOURCE_DIR}")
 
 SET(BEDTOOLS2_LIB ${SOURCE_DIR}/obj/bamToBed.o CACHE INTERNAL "GSSW Lib")
 SET(BEDTOOLS2_INCLUDE ${SOURCE_DIR} CACHE INTERNAL "BEDTOOLS INCLUDE")

@@ -5,8 +5,8 @@ SET(BWA_DIR ${CMAKE_BINARY_DIR}/externals/bwa CACHE INTERNAL "bwa project direct
 SET(BWA_LIB)
 
 ExternalProject_Add( ${BWA_PROJECT}
-	GIT_REPOSITORY https://github.com/lh3/bwa.git
-	GIT_TAG master
+	GIT_REPOSITORY https://github.com/williamrichards2017/bwa.git
+	GIT_TAG mattOnly
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND "make"
 	INSTALL_COMMAND ""

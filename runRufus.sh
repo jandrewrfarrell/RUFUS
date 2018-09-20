@@ -497,7 +497,7 @@ fi
 ########################## set RUFUS directory path variables ##############################
 RUFUSmodel=$RDIR/bin/ModelDist
 RUFUSfilter=$RDIR/bin/RUFUS.Filter
-RufAlu=$RDIR/bin/RufAlu/src/aluDetect
+#RufAlu=$RDIR/bin/RufAlu/src/aluDetect
 RUFUSOverlap=$RDIR/scripts/Overlap.sh
 RunJelly=$RDIR/cloud/RunJellyForRUFUS
 PullSampleHashes=$RDIR/cloud/CheckJellyHashList.sh
