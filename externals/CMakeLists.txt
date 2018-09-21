@@ -2,19 +2,12 @@ include(ExternalProject)
 
 SET (RUFUS_DEPENDENCIES)
 
-include(zlib.cmake)
-LIST(APPEND RUFUS_DEPENDENCIES ${ZLIB_PROJECT})
-include(rufalu.cmake)
-LIST(APPEND RUFUS_DEPENDENCIES ${RUFALU_PROJECT})
 include(bwa.cmake)
 LIST(APPEND RUFUS_DEPENDENCIES ${BWA_PROJECT})
 include(bedtools2.cmake)
 LIST(APPEND RUFUS_DEPENDENCIES ${BEDTOOLS2_PROJECT})
 include(fastahack.cmake)
 LIST(APPEND RUFUS_DEPENDENCIES ${FASTAHACK_PROJECT})
-
-#include(htslib.cmake)
-#include(samtools.cmake)
 
 SET(RUFUS_SOURCE_DIR ${CMAKE_SOURCE_DIR}/externals/external CACHE INTERNAL "" FORCE)
 
