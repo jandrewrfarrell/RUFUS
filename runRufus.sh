@@ -20,7 +20,7 @@
 # Argbash is a bash code generator used to get arguments parsing right.
 # Argbash is FREE SOFTWARE, see https://argbash.io for more info
 # Generated online by https://argbash.io/generate
-RDIR=/uufs/chpc.utah.edu/common/home/u0401321/RUFUS
+RDIR=/uufs/chpc.utah.edu/common/home/u0401321/mattOnly/RUFUS
 
 die()
 {
@@ -502,7 +502,7 @@ fi
 ########################## set RUFUS directory path variables ##############################
 RUFUSmodel=$RDIR/bin/ModelDist
 RUFUSfilter=$RDIR/bin/RUFUS.Filter
-RufAlu=$RDIR/bin/RufAlu/src/aluDetect
+#RufAlu=$RDIR/bin/RufAlu/src/aluDetect
 RUFUSOverlap=$RDIR/scripts/Overlap.sh
 RunJelly=$RDIR/cloud/RunJellyForRUFUS
 PullSampleHashes=$RDIR/cloud/CheckJellyHashList.sh

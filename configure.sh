@@ -22,23 +22,44 @@ if [ ! -d "bin/externals" ]; then
 cd bin && mkdir externals
 fi
 cd $RUFUS_DIR/bin/externals
-if [ ! -e "samtools-1.9.tar.bz2" ]; then
-wget https://github.com/samtools/samtools/releases/download/1.9/samtools-1.9.tar.bz2; 
+
+if [ ! -d "htslib" ]; then
+git clone https://github.com/williamrichards2017/htslib.git
 fi
+
+cd htslib
+git checkout mattOnly
+autoheader
+autoconf
+./configure
+make 
+make install
+
+wait
+
+cd $RUFUS_DIR/bin/externals
+
 if [ ! -d "samtools" ]; then
-tar xvjf samtools-1.9.tar.bz2;
-mv samtools-1.9 samtools
+git clone https://github.com/williamrichards2017/samtools.git
 fi
-cd samtools; ./configure --prefix=${PWD}; make; make install; cd ../;
+cd samtools
+git checkout mattOnly
+autoheader          
+autoconf -Wno-syntax
+./configure --prefix=${PWD}; make; make install; cd ../;
+
+#if [ ! -e "samtools-1.9.tar.bz2" ]; then
+#wget https://github.com/samtools/samtools/releases/download/1.9/samtools-1.9.tar.bz2; 
+#fi
+#if [ ! -d "samtools" ]; then
+#tar xvjf samtools-1.9.tar.bz2;
+#mv samtools-1.9 samtools
+#fi
+#cd samtools; ./configure --prefix=${PWD}; make; make install; cd ../;
 
 cd $RUFUS_DIR/src/externals
 echo "current pwd is ${PWD}"
 
-#if [ ! -d "jellyfish-2.2.5" ]; then
-#wget https://github.com/gmarcais/Jellyfish/releases/download/v2.2.5/jellyfish-2.2.5.tar.gz
-#tar -xvf jellyfish-2.2.5.tar.gz;
-#fi
-#cd jellyfish-2.2.5; ./configure --prefix=$PWD/bin/jellyfish; make; make install; cd ../;
 
 if [ -e $RUFUS_DIR/src/externals/jellyfish-2.2.5/bin/jellyfish ]
 then
