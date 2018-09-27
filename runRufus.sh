@@ -132,21 +132,16 @@ parse_commandline ()
             -f*)
                 _arg_refhash="${_key##-f}"
                 ;;
-            -e|--exclude)
-                test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-                _arg_exclude="$2"
-                shift
-                ;;
-	    -e|--exlcude)
+	    -e|--exclude)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-		_arg_exlcude+=("$2")
+		_arg_exclude+=("$2")
 		shift
 		;;
-	    --exlcude=*)
-		_arg_exlcude+=("${_key##--exlcude=}")
+	    --exclude=*)
+		_arg_exclude+=("${_key##--exclude=}")
 		;;
 	    -e*)
-		_arg_exlcude+=("${_key##-e}")
+		_arg_exclude+=("${_key##-e}")
 		;;
 	    -k|--kmersize)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
@@ -491,11 +486,14 @@ do
   parentsString=$parentsString$space$parent$jhash
   echo "parents string equals " $parentsString
 done
-if [ ! -z "$_arg_exclude" ]
+if [ !  ${#_arg_exclude[@]} -eq 0 ]
 then
-    echo "_arg_exclude is set"
-    parentsString=$parentsString$space$_arg_exclude
-    echo "parent string with exclude is " $parentsString
+    for exclude in "${_arg_exclude[@]}"
+    do
+	echo "_arg_exclude is set"
+	parentsString=$parentsString$space$exclude
+	echo "parent string with exclude is " $parentsString
+    done
 fi
 ##################################################
 
