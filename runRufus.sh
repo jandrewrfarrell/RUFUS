@@ -391,6 +391,7 @@ else
 fi
 
 ParentGenerators=()
+ParentJhash=()
 ParentFileNames=""
 space=" "
 
@@ -402,7 +403,7 @@ do
     parentExtension="${parentFileName##*.}"
     echo "parent file extension name is" "$parentExtension"
 
-    if [[ "$parentExtension" != "bam" ]]  && [[ "$parentExtension" != "generator" ]]
+    if [[ "$parentExtension" != "bam" ]]  && [[ "$parentExtension" != "generator" ]] && [[ "$parentExtension" != "Jhash" ]]
     then
 	echo "The control bam/generator file" "$parent" " was not provided, or does not exist; killing run with non-zero exit status"
 	kill -9 $$
@@ -417,7 +418,9 @@ do
 	parentGenerator="$parentFileName"
         ParentGenerators+=("$parentGenerator")
 	echo "You provided the control bam file" "$parent"
-
+    elif [[ "$parentExtension" = "Jhash" ]]
+    then
+        parentJhash+=("$parent")
     fi
 done
 #################################################################
@@ -513,6 +516,16 @@ then
 	echo "_arg_exclude is set"
 	parentsString=$parentsString$space$exclude
 	echo "parent string with exclude is " $parentsString
+    done
+fi
+
+if [ !  ${#parentJhash[@]} -eq 0 ]
+then
+    for jhash in "${parentJhash[@]}"
+    do
+	parentsString=$parentsString$space$jhash
+	echo "found jhash in control files"
+	echo "parent string with jhash is " $parentsString
     done
 fi
 ##################################################
