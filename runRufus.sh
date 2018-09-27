@@ -546,10 +546,10 @@ modifiedJelly=$RDIR/cloud/jellyfish-MODIFIED-merge/bin/jellyfish
 ####################__GENERATE_JHASH_FILES_FROM_JELLYFISH__#####################
 JThreads=$((Threads / 3))
 
-#if [ (($Jthreads < 3)) ]
-#then
-#        $JThreads=3
-#fi
+if [ $Jthreads -lt 3 ]
+then
+        $JThreads=3
+fi
 
 
 for parent in "${ParentGenerators[@]}"
