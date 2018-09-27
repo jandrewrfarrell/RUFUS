@@ -43,6 +43,7 @@ begins_with_short_option()
 # THE DEFAULTS INITIALIZATION - POSITIONALS
 _positionals=()
 _arg_controls=()
+_arg_exclude=()
 # THE DEFAULTS INITIALIZATION - OPTIONALS
 _arg_subject=
 _arg_ref=
@@ -136,13 +137,17 @@ parse_commandline ()
                 _arg_exclude="$2"
                 shift
                 ;;
-            --exclude=*)
-                _arg_exclude="${_key##--exclude=}"
-                ;;
-            -e*)
-                _arg_exclude="${_key##-e}"
-                ;;
-
+	    -e|--exlcude)
+		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+		_arg_exlcude+=("$2")
+		shift
+		;;
+	    --exlcude=*)
+		_arg_exlcude+=("${_key##--exlcude=}")
+		;;
+	    -e*)
+		_arg_exlcude+=("${_key##-e}")
+		;;
 	    -k|--kmersize)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_arg_kmersize="$2"
@@ -486,9 +491,11 @@ do
   parentsString=$parentsString$space$parent$jhash
   echo "parents string equals " $parentsString
 done
-if [! -z "$_arg_exclude" ]
+if [ ! -z "$_arg_exclude" ]
 then
+    echo "_arg_exclude is set"
     parentsString=$parentsString$space$_arg_exclude
+    echo "parent string with exclude is " $parentsString
 fi
 ##################################################
 
@@ -508,10 +515,10 @@ modifiedJelly=$RDIR/cloud/jellyfish-MODIFIED-merge/bin/jellyfish
 ####################__GENERATE_JHASH_FILES_FROM_JELLYFISH__#####################
 JThreads=$((Threads / 3))
 
-if [ $Jthreads < 3 ]
-then
-        $JThreads=3
-fi
+#if [ (($Jthreads < 3)) ]
+#then
+#        $JThreads=3
+#fi
 
 
 for parent in "${ParentGenerators[@]}"
