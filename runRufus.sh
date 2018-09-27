@@ -225,9 +225,29 @@ safe() { "$@" || barf "cannot $*"; }                               #
                                                                    #
 ####################################################################
 
-##honestly probs dont want this, what if something stupid crashes?
-#set -e
-#####
+
+##############################__CHECK_FOR_MANDATORY_PARAMS__#################################################
+if [ -z $_arg_kmersize ]
+then 
+ echo "You must provide a minimum kmer size [--kmersize|-k] (we recommend a kmer size of 25)"
+ echo "Killing run with non-zero exit status"
+ kill -9 $$
+fi
+
+if [ -z $_arg_threads ]
+then
+    echo "You must provide a number of threads to use [--threads|-t] (we recommend 40 threads if available)"
+    echo "Killing run with non-zero exit status"
+    kill -9 $$
+fi
+
+if [ ${#_arg_exclude[@]} -eq 0 ] && [ ${#_arg_controls[@]} -eq 0 ]
+then
+    echo "You must provide RUFUS with atleast one control sample"
+    echo "Killing run with non-zero exit status"
+    kill -9 $$
+fi
+#############################################################################################################
 
 ###############__PRINTING_OUT_ARG_BASH_VALUES__##############
 #echo "Value of --subject: $_arg_subject"                    #
