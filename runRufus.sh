@@ -291,6 +291,12 @@ do
     parentFileName=$(basename "$value")
     parentExtension="${parentFileName##*.}"
     if [[ "$parentExtension" -eq "Jhash" ]]
+	if [ -z $_arg_exclude ]
+	then 
+	    echo "Jhash file detected in control sample, please pass all Jhash files to the [-e|--exclude] param"
+	    echo "Killing run with non-zero exit status"
+	    kill -9 $$
+	fi
     then
 	_arg_exclude+=($value)
     else
