@@ -283,6 +283,29 @@ unset ParentsTemp
 ##########################################################
 
 
+###########_COPY_ALL_JHASH_FILES_TO_ARG_EXCLUDE_#################
+new_parents_array=()
+for value in "${Parents[@]}"
+do
+    
+    parentFileName=$(basename "$value")
+    parentExtension="${parentFileName##*.}"
+    if [[ "$parentExtension" -eq "Jhash" ]]
+    then
+	_arg_exclude+=($value)
+    else
+	new_parents_array+=($value)
+    fi
+done
+Parents=("${new_parents_array}")
+unset new_parents_array
+
+
+echo "Parents array is: ${Parents}"
+echo "exclude array is ${_arg_exclude}"
+	
+
+
 _arg_ref_cat="${_arg_ref%.*}"
 
 echo "arg ref without fa is" "$_arg_ref_cat"
@@ -403,7 +426,7 @@ do
     parentExtension="${parentFileName##*.}"
     echo "parent file extension name is" "$parentExtension"
 
-    if [[ "$parentExtension" != "bam" ]]  && [[ "$parentExtension" != "generator" ]] && [[ "$parentExtension" != "Jhash" ]]
+    if [[ "$parentExtension" != "bam" ]]  && [[ "$parentExtension" != "generator" ]] && [[ "$parentExtension" != "Jhash" ]] && [[ ! -z $parent ]]
     then
 	echo "The control bam/generator file" "$parent" " was not provided, or does not exist; killing run with non-zero exit status"
 	kill -9 $$
@@ -544,11 +567,13 @@ modifiedJelly=$RDIR/cloud/jellyfish-MODIFIED-merge/bin/jellyfish
 ############################################################################################
 
 ####################__GENERATE_JHASH_FILES_FROM_JELLYFISH__#####################
-JThreads=$((Threads / 3))
 
-if [ $Jthreads -lt 3 ]
+
+
+JThreads=$(( Threads / 3 ))
+if [ "$JThreads" -lt 3 ]
 then
-        $JThreads=3
+    JThreads=3
 fi
 
 
