@@ -528,6 +528,7 @@ echo "MutantMinCov is $MutantMinCov"
 
 ############__BUILD_JHASH_STRING__################
 parentsString=""
+parentsExcludeString=""
 space=" "
 jhash=".Jhash"
 
@@ -536,6 +537,7 @@ for parent in "${ParentGenerators[@]}"
 do
   echo "parent is  $parent "
   parentsString=$parentsString$space$parent$jhash
+  parentsExcludeString=$parentsExcludeString$space$parent$jhash
   echo "parents string equals " $parentsString
 done
 if [ !  ${#_arg_exclude[@]} -eq 0 ]
@@ -543,8 +545,8 @@ then
     for exclude in "${_arg_exclude[@]}"
     do
 	echo "_arg_exclude is set"
-	parentsString=$parentsString$space$exclude
-	echo "parent string with exclude is " $parentsString
+	parentsExcludeString=$parentsExcludeString$space$exclude
+	echo "parent Exclude string" $parentsString
     done
 fi
 
@@ -552,9 +554,9 @@ if [ !  ${#parentJhash[@]} -eq 0 ]
 then
     for jhash in "${parentJhash[@]}"
     do
-	parentsString=$parentsString$space$jhash
+	parentsExcludeString=$parentsExcludeString$space$jhash
 	echo "found jhash in control files"
-	echo "parent string with jhash is " $parentsString
+	echo "parents exclude string is  $parentsExcludeString"
     done
 fi
 ##################################################
@@ -684,7 +686,7 @@ then
 else
     rm  "$ProbandGenerator".temp
     mkfifo "$ProbandGenerator".temp
-     /usr/bin/time -v $modifiedJelly merge "$ProbandGenerator".Jhash $(echo $parentsString)  > "$ProbandGenerator".temp & 
+     /usr/bin/time -v $modifiedJelly merge "$ProbandGenerator".Jhash $(echo $parentsExcludeString)  > "$ProbandGenerator".temp & 
     /usr/bin/time -v bash $PullSampleHashes $ProbandGenerator.Jhash "$ProbandGenerator".temp $MutantMinCov > "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList
     #/usr/bin/time -v bash $PullSampleHashes "$ProbandGenerator".Jhash out."$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList $MutantMinCov > "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList
     wait
