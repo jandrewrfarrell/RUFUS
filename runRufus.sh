@@ -42,9 +42,9 @@ begins_with_short_option()
 
 # THE DEFAULTS INITIALIZATION - POSITIONALS
 _positionals=()
-_arg_controls=()
 _arg_exclude=()
 # THE DEFAULTS INITIALIZATION - OPTIONALS
+_arg_controls=()
 _arg_subject=
 _arg_ref=
 _arg_threads=
@@ -132,17 +132,6 @@ parse_commandline ()
             -f*)
                 _arg_refhash="${_key##-f}"
                 ;;
-	    -e|--exclude)
-		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-		_arg_exclude+=("$2")
-		shift
-		;;
-	    --exclude=*)
-		_arg_exclude+=("${_key##--exclude=}")
-		;;
-	    -e*)
-		_arg_exclude+=("${_key##-e}")
-		;;
 	    -k|--kmersize)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_arg_kmersize="$2"
@@ -153,6 +142,17 @@ parse_commandline ()
 		;;
 	    -k*)
 		_arg_kmersize="${_key##-k}"
+		;;
+	    -c|--controls)
+		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+		_arg_controls+=("$2")
+		shift
+		;;
+	    --controls=*)
+		_arg_controls+=("${_key##--controls=}")
+		;;
+	    -c*)
+		_arg_controls+=("${_key##-c}")
 		;;
 	    -m|--min)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
@@ -182,7 +182,6 @@ parse_commandline ()
                 exit 0
                 ;;
 
-
 	    *)
 		_positionals+=("$1")
 		;;
@@ -192,14 +191,13 @@ parse_commandline ()
 	done
 }
 
-
 assign_positional_args ()
 {
     _positional_names=()
     _our_args=$((${#_positionals[@]} - ${#_positional_names[@]}))
     for ((ii = 0; ii < _our_args; ii++))
     do
-	_positional_names+=("_arg_controls[$((ii + 0))]")
+	_positional_names+=("_arg_exclude[$((ii + 0))]")
 	done
 
     for (( ii = 0; ii < ${#_positionals[@]}; ii++))
@@ -210,6 +208,8 @@ assign_positional_args ()
 
 parse_commandline "$@"
 assign_positional_args
+
+
 # [ <-- needed because of Argbash
 
 
@@ -247,6 +247,32 @@ then
     echo "Killing run with non-zero exit status"
     kill -9 $$
 fi
+
+
+
+
+
+#########__remove -e and --exclude from _arg_exclude array__################
+new_array=()
+for value in "${_arg_exclude[@]}"
+do
+    [[ $value != --exclude ]] && new_array+=($value)
+done
+ExcludeTemp=("${new_array[@]}")
+unset new_array
+
+new_array=()
+for value in "${ExcludeTemp[@]}"
+do 
+    [[ $value != -e ]] && new_array+=($value)
+done
+_arg_exclude=("${new_array[@]}")
+unset new_arary
+unset ExcludeTemp
+##########################################################
+
+
+
 #############################################################################################################
 
 ###############__PRINTING_OUT_ARG_BASH_VALUES__##############
@@ -262,56 +288,7 @@ fi
 #echo "Value of --minCount $_arg_min"                        #
 #############################################################
 
-
-#########__COPY_CONTROLS_TO_PARENT_ARRAY__################
-new_array=()
-for value in "${_arg_controls[@]}"
-do
-    [[ $value != --controls ]] && new_array+=($value)
-done
-ParentsTemp=("${new_array[@]}")
-unset new_array
-
-new_array=()
-for value in "${ParentsTemp[@]}"
-do 
-    [[ $value != -c ]] && new_array+=($value)
-done
-Parents=("${new_array[@]}")
-unset new_arary
-unset ParentsTemp
-##########################################################
-
-
-###########_COPY_ALL_JHASH_FILES_TO_ARG_EXCLUDE_#################
-new_parents_array=()
-for value in "${Parents[@]}"
-do
-    
-    parentFileName=$(basename "$value")
-    parentExtension="${parentFileName##*.}"
-    if [[ "$parentExtension" -eq "Jhash" ]]
-	if [ -z $_arg_exclude ]
-	then 
-	    echo "Jhash file detected in control sample, please pass all Jhash files to the [-e|--exclude] param"
-	    echo "Killing run with non-zero exit status"
-	    kill -9 $$
-	fi
-    then
-	_arg_exclude+=($value)
-    else
-	new_parents_array+=($value)
-    fi
-done
-Parents=("${new_parents_array}")
-unset new_parents_array
-
-
-echo "Parents array is: ${Parents}"
-echo "exclude array is ${_arg_exclude}"
-	
-
-
+Parents=("${_arg_controls[@]}")
 _arg_ref_cat="${_arg_ref%.*}"
 
 echo "arg ref without fa is" "$_arg_ref_cat"
@@ -432,7 +409,7 @@ do
     parentExtension="${parentFileName##*.}"
     echo "parent file extension name is" "$parentExtension"
 
-    if [[ "$parentExtension" != "bam" ]]  && [[ "$parentExtension" != "generator" ]] && [[ "$parentExtension" != "Jhash" ]] && [[ ! -z $parent ]]
+    if [[ "$parentExtension" != "bam" ]]  && [[ "$parentExtension" != "generator" ]] 
     then
 	echo "The control bam/generator file" "$parent" " was not provided, or does not exist; killing run with non-zero exit status"
 	kill -9 $$
@@ -447,9 +424,6 @@ do
 	parentGenerator="$parentFileName"
         ParentGenerators+=("$parentGenerator")
 	echo "You provided the control bam file" "$parent"
-    elif [[ "$parentExtension" = "Jhash" ]]
-    then
-        parentJhash+=("$parent")
     fi
 done
 #################################################################
@@ -537,28 +511,15 @@ for parent in "${ParentGenerators[@]}"
 do
   echo "parent is  $parent "
   parentsString=$parentsString$space$parent$jhash
-  parentsExcludeString=$parentsExcludeString$space$parent$jhash
   echo "parents string equals " $parentsString
 done
-if [ !  ${#_arg_exclude[@]} -eq 0 ]
-then
-    for exclude in "${_arg_exclude[@]}"
-    do
-	echo "_arg_exclude is set"
-	parentsExcludeString=$parentsExcludeString$space$exclude
-	echo "parent Exclude string" $parentsString
-    done
-fi
+for exclude in "${_arg_exclude[@]}"
+do
+    echo "_arg_exclude is set"
+    parentsExcludeString=$parentsExcludeString$space$exclude
+    echo "parent Exclude string" $parentsExcludeString
+done
 
-if [ !  ${#parentJhash[@]} -eq 0 ]
-then
-    for jhash in "${parentJhash[@]}"
-    do
-	parentsExcludeString=$parentsExcludeString$space$jhash
-	echo "found jhash in control files"
-	echo "parents exclude string is  $parentsExcludeString"
-    done
-fi
 ##################################################
 
 
@@ -678,7 +639,7 @@ fi
 
 
 
-
+echo "parents string + exclude string is $parentsString $parentsExcludeString" 
 #################################__HASH_LIST_FILTER__#####################################
 if [ -s "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList ]
 then 
@@ -686,7 +647,7 @@ then
 else
     rm  "$ProbandGenerator".temp
     mkfifo "$ProbandGenerator".temp
-     /usr/bin/time -v $modifiedJelly merge "$ProbandGenerator".Jhash $(echo $parentsExcludeString)  > "$ProbandGenerator".temp & 
+    /usr/bin/time -v $modifiedJelly merge "$ProbandGenerator".Jhash $(echo $parentsString) $(echo $parentsExcludeString)  > "$ProbandGenerator".temp & 
     /usr/bin/time -v bash $PullSampleHashes $ProbandGenerator.Jhash "$ProbandGenerator".temp $MutantMinCov > "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList
     #/usr/bin/time -v bash $PullSampleHashes "$ProbandGenerator".Jhash out."$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList $MutantMinCov > "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList
     wait
