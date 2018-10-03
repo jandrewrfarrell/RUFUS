@@ -153,22 +153,21 @@ Usage:
 The command line should look something like this:
 
 ```
-bash runRufus.sh --subject Child.bam --controls Mother.bam Father.bam  --kmersize 25 --threads 40 --ref human_reference_v37_decoys.fa
+bash runRufus.sh --subject Child.bam --controls Mother.bam  --controls Father.bam  --kmersize 25 --threads 40 --ref human_reference_v37_decoys.fa
 ```
 
 or 
 
 ```
-bash runRufus.sh -s Child.bam -c Mother.bam Father.bam -k 25 -t 40 -r human_reference_v37_decoys.fa
+bash runRufus.sh -s Child.bam -c Mother.bam -c Father.bam -k 25 -t 40 -r human_reference_v37_decoys.fa
 ```
-
-**NOTE** runRUFUS must be provided with atleast three threads, as it assigns threads to processes as a proportion the total number of threads provided.  It does not matter if you have fewer than three cores, but you must simply provided at least three threads.
 
 The flags can be provided any any order.
 
 RUFUS can take any number control files (Must provide atleast one). 
 
-Provide all of your control files after the [-c|--controls] flag
+Each control Bam file requires a [-c|--controls] flag infront of the control file
+
 
 For Example:
 
@@ -179,10 +178,8 @@ bash runRufus.sh -s tumorT1.bam -c tumorT0.bam -k 25 -t 40 -r human_reference_v3
 or
 
 ```
-bash runRufus.sh -s Proband.bam -c Mother.bam Father.bam Sibling1.bam Sibling2.bam -k 25 -t 40 -r human_reference_v37_decoys.fa
+bash runRufus.sh -s Proband.bam -c Mother.bam -c Father.bam -c Sibling1.bam -c Sibling2.bam -k 25 -t 40 -r human_reference_v37_decoys.fa
 ```
-
-
 
 We recommend a kmer size of 25, 40 threads, and to NOT provide RUFUS with the optional --min parameter
 
@@ -196,11 +193,3 @@ samtools faidx reference.fa
 ```
 
 This will produce the BWA index files, and the fasta file index respectively.  Make sure that the bwa index files and the fasta index file are in the same directory as reference.fa
-
-
-
-
-
-
-
-
