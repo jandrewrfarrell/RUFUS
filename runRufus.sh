@@ -56,7 +56,7 @@ print_help ()
 {
     printf "%s\n" "The general script's help msg"
     printf 'Usage: %s [-s|--subject <arg>] [-r|--ref <arg>] [-t|--threads <arg>] [-k|--kmersize <arg>] [-m|--min <arg>] [-h|--help] [<controls-1>] ... [<controls-n>] ...\n' "$0"
-    printf "\t%s\n" "-c, --controls: bam files containing the control subjects"
+    printf "\t%s\n" "-c, --controls: bam files containing the control subjects ()"
     printf "\t%s\n" "-s,--subject: bam file containing the subject of interest (no default)"
     printf "\t%s\n" "-r,--ref: file path to the desired reference file (no default)"
     printf "\t%s\n" "-t,--threads: number of threads to use (no default) (min 3)"
