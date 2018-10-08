@@ -42,8 +42,9 @@ begins_with_short_option()
 
 # THE DEFAULTS INITIALIZATION - POSITIONALS
 _positionals=()
-_arg_controls=()
+_arg_exclude=()
 # THE DEFAULTS INITIALIZATION - OPTIONALS
+_arg_controls=()
 _arg_subject=
 _arg_ref=
 _arg_threads=
@@ -55,7 +56,7 @@ print_help ()
 {
     printf "%s\n" "The general script's help msg"
     printf 'Usage: %s [-s|--subject <arg>] [-r|--ref <arg>] [-t|--threads <arg>] [-k|--kmersize <arg>] [-m|--min <arg>] [-h|--help] [<controls-1>] ... [<controls-n>] ...\n' "$0"
-    printf "\t%s\n" "-c, --controls: bam files containing the control subjects"
+    printf "\t%s\n" "-c, --controls: bam files containing the control subjects ()"
     printf "\t%s\n" "-s,--subject: bam file containing the subject of interest (no default)"
     printf "\t%s\n" "-r,--ref: file path to the desired reference file (no default)"
     printf "\t%s\n" "-t,--threads: number of threads to use (no default) (min 3)"
@@ -131,18 +132,6 @@ parse_commandline ()
             -f*)
                 _arg_refhash="${_key##-f}"
                 ;;
-            -e|--exclude)
-                test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-                _arg_exclude="$2"
-                shift
-                ;;
-            --exclude=*)
-                _arg_exclude="${_key##--exclude=}"
-                ;;
-            -e*)
-                _arg_exclude="${_key##-e}"
-                ;;
-
 	    -k|--kmersize)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_arg_kmersize="$2"
@@ -153,6 +142,17 @@ parse_commandline ()
 		;;
 	    -k*)
 		_arg_kmersize="${_key##-k}"
+		;;
+	    -c|--controls)
+		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+		_arg_controls+=("$2")
+		shift
+		;;
+	    --controls=*)
+		_arg_controls+=("${_key##--controls=}")
+		;;
+	    -c*)
+		_arg_controls+=("${_key##-c}")
 		;;
 	    -m|--min)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
@@ -182,7 +182,6 @@ parse_commandline ()
                 exit 0
                 ;;
 
-
 	    *)
 		_positionals+=("$1")
 		;;
@@ -192,14 +191,13 @@ parse_commandline ()
 	done
 }
 
-
 assign_positional_args ()
 {
     _positional_names=()
     _our_args=$((${#_positionals[@]} - ${#_positional_names[@]}))
     for ((ii = 0; ii < _our_args; ii++))
     do
-	_positional_names+=("_arg_controls[$((ii + 0))]")
+	_positional_names+=("_arg_exclude[$((ii + 0))]")
 	done
 
     for (( ii = 0; ii < ${#_positionals[@]}; ii++))
@@ -210,6 +208,8 @@ assign_positional_args ()
 
 parse_commandline "$@"
 assign_positional_args
+
+
 # [ <-- needed because of Argbash
 
 
@@ -225,9 +225,55 @@ safe() { "$@" || barf "cannot $*"; }                               #
                                                                    #
 ####################################################################
 
-##honestly probs dont want this, what if something stupid crashes?
-#set -e
-#####
+
+##############################__CHECK_FOR_MANDATORY_PARAMS__#################################################
+if [ -z $_arg_kmersize ]
+then 
+ echo "You must provide a minimum kmer size [--kmersize|-k] (we recommend a kmer size of 25)"
+ echo "Killing run with non-zero exit status"
+ kill -9 $$
+fi
+
+if [ -z $_arg_threads ]
+then
+    echo "You must provide a number of threads to use [--threads|-t] (we recommend 40 threads if available)"
+    echo "Killing run with non-zero exit status"
+    kill -9 $$
+fi
+
+if [ ${#_arg_exclude[@]} -eq 0 ] && [ ${#_arg_controls[@]} -eq 0 ]
+then
+    echo "You must provide RUFUS with atleast one control sample"
+    echo "Killing run with non-zero exit status"
+    kill -9 $$
+fi
+
+
+
+
+
+#########__remove -e and --exclude from _arg_exclude array__################
+new_array=()
+for value in "${_arg_exclude[@]}"
+do
+    [[ $value != --exclude ]] && new_array+=($value)
+done
+ExcludeTemp=("${new_array[@]}")
+unset new_array
+
+new_array=()
+for value in "${ExcludeTemp[@]}"
+do 
+    [[ $value != -e ]] && new_array+=($value)
+done
+_arg_exclude=("${new_array[@]}")
+unset new_arary
+unset ExcludeTemp
+##########################################################
+
+
+
+#############################################################################################################
 
 ###############__PRINTING_OUT_ARG_BASH_VALUES__##############
 #echo "Value of --subject: $_arg_subject"                    #
@@ -242,27 +288,7 @@ safe() { "$@" || barf "cannot $*"; }                               #
 #echo "Value of --minCount $_arg_min"                        #
 #############################################################
 
-
-#########__COPY_CONTROLS_TO_PARENT_ARRAY__################
-new_array=()
-for value in "${_arg_controls[@]}"
-do
-    [[ $value != --controls ]] && new_array+=($value)
-done
-ParentsTemp=("${new_array[@]}")
-unset new_array
-
-new_array=()
-for value in "${ParentsTemp[@]}"
-do 
-    [[ $value != -c ]] && new_array+=($value)
-done
-Parents=("${new_array[@]}")
-unset new_arary
-unset ParentsTemp
-##########################################################
-
-
+Parents=("${_arg_controls[@]}")
 _arg_ref_cat="${_arg_ref%.*}"
 
 echo "arg ref without fa is" "$_arg_ref_cat"
@@ -371,6 +397,7 @@ else
 fi
 
 ParentGenerators=()
+ParentJhash=()
 ParentFileNames=""
 space=" "
 
@@ -382,7 +409,7 @@ do
     parentExtension="${parentFileName##*.}"
     echo "parent file extension name is" "$parentExtension"
 
-    if [[ "$parentExtension" != "bam" ]]  && [[ "$parentExtension" != "generator" ]]
+    if [[ "$parentExtension" != "bam" ]]  && [[ "$parentExtension" != "generator" ]] 
     then
 	echo "The control bam/generator file" "$parent" " was not provided, or does not exist; killing run with non-zero exit status"
 	kill -9 $$
@@ -397,7 +424,6 @@ do
 	parentGenerator="$parentFileName"
         ParentGenerators+=("$parentGenerator")
 	echo "You provided the control bam file" "$parent"
-
     fi
 done
 #################################################################
@@ -476,6 +502,7 @@ echo "MutantMinCov is $MutantMinCov"
 
 ############__BUILD_JHASH_STRING__################
 parentsString=""
+parentsExcludeString=""
 space=" "
 jhash=".Jhash"
 
@@ -486,10 +513,13 @@ do
   parentsString=$parentsString$space$parent$jhash
   echo "parents string equals " $parentsString
 done
-if [! -z "$_arg_exclude" ]
-then
-    parentsString=$parentsString$space$_arg_exclude
-fi
+for exclude in "${_arg_exclude[@]}"
+do
+    echo "_arg_exclude is set"
+    parentsExcludeString=$parentsExcludeString$space$exclude
+    echo "parent Exclude string" $parentsExcludeString
+done
+
 ##################################################
 
 
@@ -497,7 +527,7 @@ fi
 ########################## set RUFUS directory path variables ##############################
 RUFUSmodel=$RDIR/bin/ModelDist
 RUFUSfilter=$RDIR/bin/RUFUS.Filter
-#RufAlu=$RDIR/bin/RufAlu/src/aluDetect
+RufAlu=$RDIR/bin/RufAlu/src/aluDetect
 RUFUSOverlap=$RDIR/scripts/Overlap.sh
 RunJelly=$RDIR/cloud/RunJellyForRUFUS
 PullSampleHashes=$RDIR/cloud/CheckJellyHashList.sh
@@ -506,11 +536,13 @@ modifiedJelly=$RDIR/cloud/jellyfish-MODIFIED-merge/bin/jellyfish
 ############################################################################################
 
 ####################__GENERATE_JHASH_FILES_FROM_JELLYFISH__#####################
-JThreads=$((Threads / 3))
 
-if (( $Jthreads < 3 ))
+
+
+JThreads=$(( Threads / 3 ))
+if [ "$JThreads" -lt 3 ]
 then
-        $JThreads=3
+    JThreads=3
 fi
 
 
@@ -607,7 +639,7 @@ fi
 
 
 
-
+echo "parents string + exclude string is $parentsString $parentsExcludeString" 
 #################################__HASH_LIST_FILTER__#####################################
 if [ -s "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList ]
 then 
@@ -615,7 +647,7 @@ then
 else
     rm  "$ProbandGenerator".temp
     mkfifo "$ProbandGenerator".temp
-     /usr/bin/time -v $modifiedJelly merge "$ProbandGenerator".Jhash $(echo $parentsString)  > "$ProbandGenerator".temp & 
+    /usr/bin/time -v $modifiedJelly merge "$ProbandGenerator".Jhash $(echo $parentsString) $(echo $parentsExcludeString)  > "$ProbandGenerator".temp & 
     /usr/bin/time -v bash $PullSampleHashes $ProbandGenerator.Jhash "$ProbandGenerator".temp $MutantMinCov > "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList
     #/usr/bin/time -v bash $PullSampleHashes "$ProbandGenerator".Jhash out."$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList $MutantMinCov > "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList
     wait
