@@ -7,7 +7,7 @@ K=$2
 T=$3
 L=$4
 
-RDIR=/uufs/chpc.utah.edu/common/home/u0401321/finalRUFUStest/RUFUS
+RDIR=/uufs/chpc.utah.edu/common/home/u0401321/mattOnly/RUFUS
 #JELLYFISH="$RDIR/bin/externals/jellyfish-2.2.5/bin/jellyfish"
 JELLYFISH="$RDIR/src/externals/jellyfish-2.2.5/bin/jellyfish"
 SORT="$RDIR/scripts/sort"
@@ -24,7 +24,7 @@ else
         mkfifo $GEN.Jhash.temp
         mkfifo $GEN.fq
         bash $GEN | $RDIR/cloud/PassThroughSamCheck $GEN.Jelly.chr > $GEN.fq &
-        /usr/bin/time -v $JELLYFISH count --disk -m $K -L $L -s 1G -t $T -o $GEN.Jhash -C $GEN.fq
+        /usr/bin/time -v $JELLYFISH count --disk -m $K -L $L -s 8G -t $T -o $GEN.Jhash -C $GEN.fq
         /usr/bin/time -v $JELLYFISH histo -f -o $GEN.Jhash.histo $GEN.Jhash 
         rm $GEN.Jhash.temp
         rm $GEN.fq
