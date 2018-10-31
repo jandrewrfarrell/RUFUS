@@ -20,7 +20,7 @@
 # Argbash is a bash code generator used to get arguments parsing right.
 # Argbash is FREE SOFTWARE, see https://argbash.io for more info
 # Generated online by https://argbash.io/generate
-RDIR=/uufs/chpc.utah.edu/common/home/u0401321/RUFUS
+RDIR=/uufs/chpc.utah.edu/common/home/u0991464/bin/testRUFUS/RUFUS
 
 die()
 {
@@ -548,13 +548,13 @@ fi
 
 for parent in "${ParentGenerators[@]}"
 do
-     /usr/bin/time -v bash $RunJelly $parent $K $(echo $JThreads -2 | bc) 2 &
+     /usr/bin/time -v bash $RunJelly $parent $K $(echo $Threads -2 | bc) 2 
 done
 
-/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $JThreads -2 | bc) 2 &
+/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc) 2 
  
 
-wait
+
 
 for parent in "${ParentGenerators[@]}"
 do
