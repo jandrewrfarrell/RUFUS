@@ -20,7 +20,7 @@
 # Argbash is a bash code generator used to get arguments parsing right.
 # Argbash is FREE SOFTWARE, see https://argbash.io for more info
 # Generated online by https://argbash.io/generate
-RDIR=/uufs/chpc.utah.edu/common/home/u0401321/RUFUS
+RDIR=/uufs/chpc.utah.edu/common/home/u0401321/gfixTest/rufus
 
 die()
 {
@@ -691,13 +691,12 @@ fi
 
 wait
 ######__RUFALU__#############
-aluList=$RDIR/resources/primate_non-LTR_Retrotransposon.fasta
+aluList=$RDIR/resources/testData/primate_non-LTR_Retrotransposon.fasta
 
 echo "running RufAlu, command is" 
 
-echo "$RufAlu $ProbandFileName $ProbandGenerator.V2.overlap.hashcount.fastq  $aluList $_arg_ref  $(echo $ParentFileNames) "
-
-$RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref  $(echo $ParentFileNames)
+##echo "$RufAlu $ProbandFileName $ProbandGenerator.V2.overlap.hashcount.fastq  $aluList $_arg_ref  $(echo $ParentFileNames) "
+valgrind $RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref  $(echo $ParentFileNames)
 #########################
 
 #echo "seeing what working dir is to pass to RufAlu" $PWD
