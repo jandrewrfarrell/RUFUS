@@ -31,7 +31,7 @@ echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 mkdir ./TempOverlap/
 echo "Overlaping $File"
 
-RDIR=/scratch/ucgd/lustre/u0991464/Projects/CEPH.1kg.cut0.5.v5/RUFUS
+RDIR=/uufs/chpc.utah.edu/common/home/u0401321/RUFUS
 
 OverlapHash=$RDIR/bin/Overlap
 OverlapRebion2=$RDIR/bin/OverlapRegion
