@@ -146,7 +146,7 @@ void do_merge(cpp_array<file_info>& files, std::ostream& out, writer_type& write
    //if (check == 1 and sum[spot] >=8 and sum[spot] < 300)
     if (sum.size() ==1)
     {
-	if (sum[0] >=5 and sum[0] < 300)
+	if (sum[0] >=1 and sum[0] < 10000)
 	{
 		cout << key <<'\t' << sum[spot] << endl;
     	}

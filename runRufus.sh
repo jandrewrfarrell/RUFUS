@@ -20,7 +20,7 @@
 # Argbash is a bash code generator used to get arguments parsing right.
 # Argbash is FREE SOFTWARE, see https://argbash.io for more info
 # Generated online by https://argbash.io/generate
-RDIR=/uufs/chpc.utah.edu/common/home/u0991464/bin/testRUFUS/RUFUS
+RDIR=/scratch/ucgd/lustre/u0991464/Projects/CEPH.1kg.cut0.5.v5/RUFUS
 
 die()
 {
@@ -528,7 +528,7 @@ done
 RUFUSmodel=$RDIR/bin/ModelDist
 RUFUSfilter=$RDIR/bin/RUFUS.Filter
 RufAlu=$RDIR/bin/RufAlu/src/aluDetect
-RUFUSOverlap=$RDIR/scripts/Overlap.sh
+RUFUSOverlap=~/bin/RUFUS/scripts/Overlap.sh
 RunJelly=$RDIR/cloud/RunJellyForRUFUS
 PullSampleHashes=$RDIR/cloud/CheckJellyHashList.sh
 samtools=$RDIR/bin/samtools/samtools
@@ -548,12 +548,11 @@ fi
 
 for parent in "${ParentGenerators[@]}"
 do
-     /usr/bin/time -v bash $RunJelly $parent $K $(echo $Threads -2 | bc) 2 
+     /usr/bin/time -v bash $RunJelly $parent $K $(echo $JThreads -2 | bc) 2 
 done
 
-/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc) 2 
+/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $JThreads -2 | bc) 2 
  
-
 
 
 for parent in "${ParentGenerators[@]}"
@@ -667,7 +666,7 @@ else
     rm  "$ProbandGenerator".temp
     mkfifo "$ProbandGenerator".temp
     /usr/bin/time -v  bash "$ProbandGenerator" | "$RDIR"/cloud/PassThroughSamCheck.stranded "$ProbandGenerator".filter.chr >  "$ProbandGenerator".temp &
-    /usr/bin/time -v   "$RUFUSfilter"  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp "$ProbandGenerator" "$K" 5 5 10 "$(echo $Threads -2 | bc)" &
+    /usr/bin/time -v   "$RUFUSfilter"  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp "$ProbandGenerator" "$K" 13 5 10 "$(echo $Threads -2 | bc)" &
     #bash $ProbandGenerator | $RDIR/cloud/PassThroughSamCheck.stranded $ProbandGenerator.filter.chr | head 
     #/usr/bin/time -v "$RUFUSfilter" "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList <(bash $ProbandGenerator | $RDIR/cloud/PassThroughSamCheck.stranded $ProbandGenerator.filter.chr)  "$ProbandGenerator" $K 5 5 10 $(echo $Threads -2 | bc)
     wait
@@ -684,7 +683,7 @@ else
 
     echo "Overlap probandGenerator name is $ProbandGenerator"
     
-    /usr/bin/time bash $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 3 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
+    /usr/bin/time bash $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 5 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
 fi
 ##############################################################################################
 

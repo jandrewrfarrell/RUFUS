@@ -166,7 +166,8 @@ int main(int argc, char *argv[]) {
     }
 
 #pragma omp parallel for shared(MutOutFile) num_threads(Threads)
-    for (int BuffCount = 0; BuffCount < pos; BuffCount += 4) {
+    for (int BuffCount = 0; BuffCount < pos; BuffCount += 4) 
+    {
       vector<int> positions;
       int rejected = 0;
       int MutHashesFound = 0;
@@ -174,9 +175,12 @@ int main(int argc, char *argv[]) {
       int streak = 0;
       int start = 0;
 
+      /////what is this loop doing, mayce checking that all bases are greater than some qual and not an N
+      //looks lke this is a pimer loop 
+      cout << Buffer[BuffCount + 0] << endl << Buffer[BuffCount + 1] << endl << Buffer[BuffCount + 2] << endl << Buffer[BuffCount + 3] << endl; 
       for (int i = 0; i < Buffer[BuffCount + 3].length() - HashSize + 1; i++) {
-        if ((int)Buffer[BuffCount + 3].c_str()[i] - 33 < MinQ or
-            (int)Buffer[BuffCount + 1].c_str()[i] == 78) {
+        cout << "char = " << Buffer[BuffCount + 3].c_str()[i] << " = " << (int)Buffer[BuffCount + 3].c_str()[i]  << " = " << ((int)Buffer[BuffCount + 3].c_str()[i] - 33) << endl; 
+	if (int(Buffer[BuffCount + 3].c_str()[i]) - 33 < MinQ or (int)Buffer[BuffCount + 1].c_str()[i] == 78) {
           streak = 0;
           start = i + 1;
           rejected++;
@@ -185,20 +189,21 @@ int main(int argc, char *argv[]) {
           if (streak >= HashSize - 1) break;
         }
       }
-
+      bool lastMatch = false; 
+      int Pass = false; 
       for (int i = start; i < Buffer[BuffCount + 1].length() - HashSize; i++) {
-        if (((int)Buffer[BuffCount + 3].c_str()[i + HashSize - 1] - 33) <
-                MinQ or
-            (int)Buffer[BuffCount + 1].c_str()[i + HashSize - 1] == 78) {
+        if (((int)Buffer[BuffCount + 3].c_str()[i + HashSize - 1] - 33) < MinQ or (int)Buffer[BuffCount + 1].c_str()[i + HashSize - 1] == 78) {
           streak = 0;
           start = i + HashSize;
+	  lastMatch =false; 
 
-          for (int j = start; j < Buffer[BuffCount + 3].length(); j++) {
-            if ((int)Buffer[BuffCount + 3].c_str()[j] - 33 < MinQ or
-                (int)Buffer[BuffCount + 1].c_str()[j] == 78) {
+          for (int j = start; j < Buffer[BuffCount + 3].length(); j++) 
+	  {
+            if ((int)Buffer[BuffCount + 3].c_str()[j] - 33 < MinQ or (int)Buffer[BuffCount + 1].c_str()[j] == 78) {
               streak = 0;
               start = j + 1;
               rejected++;
+	      lastMatch =false;
             } else {
               streak++;
               if (streak >= HashSize) break;
@@ -209,43 +214,47 @@ int main(int argc, char *argv[]) {
           i = start;
         }
 
-        if (streak >= HashSize - 1) {
-          if (Mutations.count(Util::HashToLong(
-					       Buffer[BuffCount + 1].substr(i, HashSize))) > 0) {
+        if (streak >= HashSize - 1) 
+	{
+	  cout << "       testing " << i << " - " << Buffer[BuffCount + 1].substr(i, HashSize) << endl; 
+          if (Mutations.count(Util::HashToLong(  Buffer[BuffCount + 1].substr(i, HashSize))) > 0) {
             MutHashesFound++;
-            positions.push_back(i);
+            cout << "   found " <<  i << " - " << Buffer[BuffCount + 1].substr(i, HashSize) << endl; 
+	    //if (lastMatch)
+	    //{
+		Pass = true; 
+		//#pragma omp critical(MutWrite)
+          	//{
+            	//MutOutFile << Buffer[BuffCount] << ":MH" << MutHashesFound << endl
+                //       << Buffer[BuffCount + 1] << endl
+                //       << Buffer[BuffCount + 2] << endl
+                //       << Buffer[BuffCount + 3] << endl;
+          	//	found++;
+		//	i=Buffer[BuffCount + 1].length();  
+
+	//	}
+            //}
+	    //else 
+	      // lastMatch = true; 
           }
+	  else
+		lastMatch=false; 
         }
+        else
+	      lastMatch =false;
       }
-
-      if (MutHashesFound >= HashCountThreshold and
-          rejected < (Buffer[BuffCount + 1].length() / 2)) {
-        int MaxCounter = -1;
-        for (int i = 0; i < positions.size() - 1; i++) {
-          int counter = 1;
-
-          for (int j = i + 1; j < positions.size(); j++) {
-            if (positions[j] - positions[i] <= Window) {
-              counter++;
-            }
-          }
-
-          if (counter > MaxCounter) {
-            MaxCounter = counter;
-          }
-        }
-
-        if (MaxCounter >= HashCountThreshold) {
-#pragma omp critical(MutWrite)
-          {
-            MutOutFile << Buffer[BuffCount] << ":MH" << MutHashesFound << endl
+	if (MutHashesFound >= 1)
+	{
+		#pragma omp critical(MutWrite)
+                {
+                       MutOutFile << Buffer[BuffCount] << ":MH" << MutHashesFound << endl
                        << Buffer[BuffCount + 1] << endl
                        << Buffer[BuffCount + 2] << endl
                        << Buffer[BuffCount + 3] << endl;
-          }
-          found++;
-        }
-      }
+                        found++;
+                }
+	}
+    cout <<  Buffer[BuffCount] << ":MH" << MutHashesFound << endl; 
     }
   }
   MutFile.close();

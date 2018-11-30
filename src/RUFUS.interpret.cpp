@@ -476,7 +476,7 @@ class SamRead
 	void processCigar();
 	void parseInsertions( SamRead B); 
 	void parseMutations( char *argv[] );
-	void GetModes(int pos, string alt, string reff, int &MutRefMode, int &MutAltMode, vector <int> &ParRefModes, vector <int> &ParAltModes,  vector <int> &HashCounts, vector <int> &HashCountsOG);
+	void GetModes(int pos, string alt, string reff, int &MutRefMode, int &MutAltMode, vector <int> &ParRefModes, vector <int> &ParAltModes,  vector <int> &HashCounts, vector <int> &HashCountsOG, int &PossibleVarKmer);
 	//string ShittyGenotyper(int Alt, int Ref); 	
 	int GetSupportingHashCount(int pos, string alt,  string reff);
 	void processMultiAlignment(); 
@@ -500,6 +500,7 @@ class SamRead
 	vector <string> hashes;
         vector <string> hashesRef;
         vector <bool> varHash;
+	vector <bool> candidateHash; 
 	vector <vector<int>> parentCounts;
         vector <vector<int>> parentCountsReference;
 	vector <int> mutCounts;
@@ -679,18 +680,18 @@ string ShittyGenotyper(int Alt, int Ref)
 		return "0/0";
 	else if (Alt >0 and Ref ==0)
 		return "1/1";
-        else if ((double) Alt / ((double) Ref + (double) Alt)  >.9)
+        else if ((double) Alt / ((double) Ref + (double) Alt)  >.8)
         	return "1/1";
-        else if ((double) Alt / ((double) Ref + (double) Alt)  <.1)
+        else if ((double) Alt / ((double) Ref + (double) Alt)  <.2)
                 return "0/0";
         else
                 return "0/1";
 }
-void SamRead::GetModes(int pos, string alt,  string reff, int &MutRefMode, int &MutAltMode, vector <int> &ParRefModes, vector <int> &ParAltModes,  vector <int> &HashCounts, vector <int> &HashCountsOG)
+void SamRead::GetModes(int pos, string alt,  string reff, int &MutRefMode, int &MutAltMode, vector <int> &ParRefModes, vector <int> &ParAltModes,  vector <int> &HashCounts, vector <int> &HashCountsOG, int &PossibleVarKmer)
 {
- 				int lower = pos-HashSize;
+ 				int lower = pos-HashSize+1;
         			if (lower < 0){lower =0;}
-                                int upper = pos+alt.length()+reff.length();//-1;
+                                int upper = pos+alt.length()+reff.length()-1;
                                 cout << pos<<" + "<< alt.length() << " + " << reff.length() << endl;
                                 if (upper > MutRefCounts.size()){
                                         cout << "this is going to break " << upper << " > " << MutRefCounts.size() << endl;
@@ -709,48 +710,51 @@ void SamRead::GetModes(int pos, string alt,  string reff, int &MutRefMode, int &
                                         varParAltCounts.push_back(temp);
                                 }
                                 string nonspecific = "nonspecific";
-                                vector <float> freqs;
-                                for (int j = lower; j<upper; j++)
+                                //vector <float> freqs;
+                                cout << "checking NonSpecic Kmers";
+				for (int j = lower; j<upper; j++)
                                 {
-                                        if(MutRefCounts[j]>0)
+					cout <<  AltKmers[j] << endl << RefKmers[j] <<endl;
+					if ( AltKmers[j] != RefKmers[j] and (ExcludeHashes[HashToLong(AltKmers[j])]<1 or ExcludeHashes[HashToLong(RevComp(AltKmers[j]))]<1) )
+					{
+						PossibleVarKmer++;
+						cout << "Different" << endl;
+					} 
+					else
+						cout << "SAME" << endl; 
+                                        if(MutRefCounts[j]>0 and AltKmers[j] != RefKmers[j] ) //and MutRefCounts[j]<200 and (ExcludeHashes[HashToLong(RefKmers[j])]<2 or ExcludeHashes[HashToLong(RevComp(RefKmers[j]))]<2)) //needs to be fixed, should be based on cov not cutoff of 200 
                                                 varMutRefCounts.push_back(MutRefCounts[j]);
-                                        if (MutAltCounts[j]>0)
+                                        if (MutAltCounts[j]>0 and AltKmers[j] != RefKmers[j] and MutAltCounts[j]<200 and (Hash.count(AltKmers[j]) > 0 or Hash.count(RevComp(AltKmers[j])) > 0)  and (ExcludeHashes[HashToLong(AltKmers[j])]<1 or ExcludeHashes[HashToLong(RevComp(AltKmers[j]))]<1)) //needs to be fixed, should be based on cov not cutoff of 200 
                                                 varMutAltCounts.push_back(MutAltCounts[j]);
-                                        if (MutRefCounts[j]>0 and MutAltCounts[j]>0){
-                                                cout << "Ref = " << MutRefCounts[j] << " Mut = " << MutAltCounts[j] << " sum = " << MutRefCounts[j] +  MutAltCounts[j] ;
-                                                if (MutRefCounts[j] +  MutAltCounts[j] <= 59 and MutRefCounts[j] +  MutAltCounts[j] >= 18){
-                                                        nonspecific = "DeNovo";
-                                                        cout << "  yay DeNovo";
-                                                        freqs.push_back(( MutRefCounts[j] +  MutAltCounts[j])/MutAltCounts[j]);
-                                                }
-                                                else if (MutRefCounts[j] +  MutAltCounts[j] < 18)
-                                                        cout <<"   boo too low";
-                                                cout << endl;
-                                        }
-                                        for (int pi=0; pi < varParRefCounts.size(); pi++){
-                                                if (RefRefCounts[pi][j] >0)
+                                        
+					for (int pi=0; pi < varParRefCounts.size(); pi++){
+                                                if (RefRefCounts[pi][j] >0 and AltKmers[j] != RefKmers[j] )//and RefRefCounts[pi][j] <200 and (ExcludeHashes[HashToLong(AltKmers[j])]<2 or ExcludeHashes[HashToLong(RevComp(AltKmers[j]))]<2)) //needs to be fixed, should be based on cov not cutoff of 200 
                                                         varParRefCounts[pi].push_back(RefRefCounts[pi][j]);
-                                                if (RefAltCounts[pi][j] >0)
+                                                if (RefAltCounts[pi][j] >0 and AltKmers[j] != RefKmers[j] and RefAltCounts[pi][j] < 200 and (Hash.count(AltKmers[j]) > 0 or Hash.count(RevComp(AltKmers[j])) > 0)   and (ExcludeHashes[HashToLong(RefKmers[j])]<1 or ExcludeHashes[HashToLong(RevComp(RefKmers[j]))]<1)) //needs to be fixed, should be based on cov not cutoff of 200 
                                                         varParAltCounts[pi].push_back(RefAltCounts[pi][j]);
 
                                         }
 
-                                        if (Hash.count(AltKmers[j]) > 0 and Hash[AltKmers[j]] > 0)
+                                        if (Hash.count(AltKmers[j]) > 0 and Hash[AltKmers[j]] > 0 and AltKmers[j] != RefKmers[j] )
                                                 HashCountsOG.push_back(Hash[AltKmers[j]]);
-                                        else if (Hash.count(RevComp(AltKmers[j])) > 0 and Hash[RevComp(AltKmers[j])])
+                                        else if (Hash.count(RevComp(AltKmers[j])) > 0 and Hash[RevComp(AltKmers[j])] and AltKmers[j] != RefKmers[j] )
                                                 HashCountsOG.push_back(Hash[RevComp(AltKmers[j])]);
-                                        if (Hash[AltKmers[j]] > 0)
+                                        
+					
+					if (Hash[AltKmers[j]] > 0 and AltKmers[j] != RefKmers[j])
                                                 HashCounts.push_back(Hash[AltKmers[j]]);
-                                        else
+                                        else if (Hash[RevComp(AltKmers[j])] > 0 and AltKmers[j] != RefKmers[j])
+						 HashCounts.push_back(Hash[RevComp(AltKmers[j])]);
+					else
                                                 HashCounts.push_back(-1);
                                 }
-                                float freq = 0;
-                                if (freqs.size() > 0){
-                                        for (int i =0; i<freqs.size(); i++){
-                                                freq+=freqs[i];
-                                        }
-                                        freq = freq/freqs.size();
-                                }
+                               // float freq = 0;
+                               // if (freqs.size() > 0){
+                               //         for (int i =0; i<freqs.size(); i++){
+                               //                 freq+=freqs[i];
+                               //         }
+                               //         freq = freq/freqs.size();
+                               //` }
                                 //////////////////////////////////////////////
 
                                 cout << "<><><><><>MutRef<><><><><><>" << endl ;
@@ -786,14 +790,16 @@ void SamRead::GetModes(int pos, string alt,  string reff, int &MutRefMode, int &
                                 }
                                 ///////////////////////////////////////////////
                                 if (varMutRefCounts.size() >1)
-                                        MutRefMode = varMutRefCounts[(varMutRefCounts.size())/2];
+                                        MutRefMode = varMutRefCounts[0];
+					//MutRefMode = varMutRefCounts[(varMutRefCounts.size())/2]; //// switch this for line above to get the mode, right now were taking the min 
                                 else if (varMutRefCounts.size() ==1)
 					MutRefMode = varMutRefCounts[0]; 
 				else
                                         MutRefMode = 0;
 
                                 if (varMutAltCounts.size() >1)
-                                        MutAltMode= varMutAltCounts[(varMutAltCounts.size()-2)/2];
+                                         MutAltMode = varMutAltCounts[0];
+					//MutAltMode= varMutAltCounts[(varMutAltCounts.size()-2)/2]; //// switch this for line above to get the mode, right now were taking the min 
                                 else if (varMutAltCounts.size() ==1)
 					MutAltMode = varMutAltCounts[0];
 				else
@@ -801,7 +807,8 @@ void SamRead::GetModes(int pos, string alt,  string reff, int &MutRefMode, int &
 
                                 for(int pi = 0; pi<varParRefCounts.size(); pi++){
                                         if (varParRefCounts[pi].size() >1)
-                                                ParRefModes.push_back(varParRefCounts[pi][((varParRefCounts[pi].size())/2)]);
+						ParRefModes.push_back(varParRefCounts[pi][0]);
+                                                //ParRefModes.push_back(varParRefCounts[pi][((varParRefCounts[pi].size())/2)]);  //// switch this for line above to get the mode, right now were taking the min 
                                         else if (varParRefCounts[pi].size() ==1)
 						ParRefModes.push_back(varParRefCounts[pi][0]);
 					else
@@ -809,7 +816,8 @@ void SamRead::GetModes(int pos, string alt,  string reff, int &MutRefMode, int &
                                 }
 				for(int pi =0; pi<varParAltCounts.size(); pi++){
 					if (varParAltCounts[pi].size()>1)
-						ParAltModes.push_back(varParAltCounts[pi][((varParAltCounts[pi].size())/2)]);
+						ParAltModes.push_back(varParAltCounts[pi][0]);
+						// ParAltModes.push_back(varParAltCounts[pi][((varParAltCounts[pi].size())/2)]); //// switch this for line above to get the mode, right now were taking the min 
 					else if (varParAltCounts[pi].size()==1)
 						ParAltModes.push_back(varParAltCounts[pi][0]);
 					else
@@ -1306,11 +1314,20 @@ void SamRead::parseMutations( char *argv[])
                                 	vector <int> ParAltModes;
                                 	vector <int> HashCounts;
                                 	vector <int> HashCountsOG;
-                                GetModes(i, alt, reff, MutRefMode, MutAltMode, ParRefModes, ParAltModes, HashCounts, HashCountsOG);
+                                int PossibleAltKmer=0; 
+				GetModes(i, alt, reff, MutRefMode, MutAltMode, ParRefModes, ParAltModes, HashCounts, HashCountsOG, PossibleAltKmer);
                         	int SupportingHashes = GetSupportingHashCount(i, alt,  reff);
 				string Genotype = ShittyGenotyper(MutAltMode, MutRefMode); 
 				string CompressedVarType = compressVar(varType, Positions[startPos], StructCall); 
 					cout <<  chr << "\t" << pos+i << "\t" << CompressedVarType /*"."*/ << "\t" << reff << "\t" << alt << "\t" << SupportingHashes << "\t" << varType << "\t" << "." << "\t" << "." << "\t" << "." << endl;
+				////////////////generatre parent genotypes and check///////////////////////
+				vector <string> ParGenotypes; 
+				for (int p = 0; p< ParRefModes.size(); p++)
+                                {
+                                        ParGenotypes.push_back(ShittyGenotyper(ParAltModes[p], ParRefModes[p]) );
+                                }
+				
+                                cout << endl;
 				////////////////check that parents have enough coverage////////////////////
 				cout << "PAR LOW COV CHECK" << endl; 
 				int NumLowCov = 0; 
@@ -1324,12 +1341,14 @@ void SamRead::parseMutations( char *argv[])
                 			{
 						int sum = 0; 
 						if (hashesRef[k] == hashes[k])
-                                                {sum = parentCountsReference[j][k];cout << "\tParSame"; }
+                                                {sum = parentCountsReference[j][k];cout <<hashesRef[k]<< "\t" << hashes[k] << "\tParSame" << sum; }
                                                 else
-                                                {sum = parentCounts[j][k] + parentCountsReference[j][k]; cout << "\tParDiff";  }
+                                                {sum = parentCounts[j][k] + parentCountsReference[j][k]; cout <<hashesRef[k]<< "\t" << hashes[k] << "\tParDiff" << sum;  }
+						
 						if (sum <= 7 and parentCounts[j][k] + parentCountsReference[j][k] > 0 )
 						{
 							NumLowCov++;
+							 cout << "\tLOWCOV" << NumLowCov ;
 						}
 					}
                 			cout << endl;
@@ -1370,7 +1389,7 @@ void SamRead::parseMutations( char *argv[])
                         	}
 				///////////////////final filter check/////////////////////////////////////////
 				string Filter = "."; 
-				if (AlignmentSegments > 5)
+				if (AlignmentSegments > 10)
 				{
 				  	Denovo = "PoorAlignment"; 
 					stringstream ss;
@@ -1394,8 +1413,8 @@ void SamRead::parseMutations( char *argv[])
                                         Filter+=ss.str();
                                         Filter+=",";  
 				}
-				if (LowCov)
-				//if (lowCount >=3)
+				//if (LowCov)
+				if (lowCount >=2)
 				{
 					cout << "LOW COVERAGE" << endl;
 					Denovo = "LowCov";
@@ -1425,7 +1444,16 @@ void SamRead::parseMutations( char *argv[])
 					}
                                 }	 
 				if (Denovo == "DeNovo" and Filter == ".")
-					Filter = "PASS"; 
+					Filter = "PASS";
+
+				if (Genotype.find("1") == std::string::npos) { 
+					Denovo = "Mosaic"; 
+				}
+				for (int p = 0; p< ParRefModes.size(); p++)
+				{
+					//if (ParGenotypes[p].find("1") != std::string::npos) {
+						 //Denovo = "PresentInParents"; }
+				}
 				/////////////////////////////////////////////////////// 
 				 cout << "startpos = " << startPos << " chrsize = " << ChrPositions.size() << endl; 	
 				 cout << ChrPositions[startPos] << "\t" << endl;
@@ -1442,11 +1470,11 @@ void SamRead::parseMutations( char *argv[])
 				 cout << ";cigar=" << cigar  << endl;
 				 cout << ";" << "CVT=" << CompressedVarType << ";HD=" << endl;
 
-
+				double Score = ((double)SupportingHashes/(double)PossibleAltKmer) * 100.0; 
 			////////////////////////Writing var out to file/////////////////////////
 				cout       << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << SupportingHashes << "\t" << Filter << "\t" << StructCall <<"RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";" << "CVT=" << CompressedVarType << ";HD="; 
 					
-				VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" << Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << SupportingHashes << "\t" << Filter << "\t" << StructCall <<"RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";SB=" << StrandBias << ";" << "CVT=" << CompressedVarType << ";HD="; 
+				VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" << Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << Score << /*SupportingHashes << "/" << PossibleAltKmer << */ "\t" << Filter << "\t" << StructCall << "FS=" << SupportingHashes << "/" << PossibleAltKmer << ";RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";SB=" << StrandBias << ";" << "CVT=" << CompressedVarType << ";HD="; 
 
 				for (int j = 0; j < HashCounts.size(); j++) 
 				{	
@@ -1464,7 +1492,7 @@ void SamRead::parseMutations( char *argv[])
 				//VCFOutFile << ":" << lowC << ":" << ParentMode << ":" << StrandBias;;
 				for (int p = 0; p< ParRefModes.size(); p++)
 				{
-					VCFOutFile << "\t" << ShittyGenotyper(ParAltModes[p], ParRefModes[p]) << ":" << ParAltModes[p] + ParRefModes[p] << ":" << ParRefModes[p] << ":" << ParAltModes[p]; 
+					VCFOutFile << "\t" << ParGenotypes[p] << ":" << ParAltModes[p] + ParRefModes[p] << ":" << ParRefModes[p] << ":" << ParAltModes[p]; 
 				}
 				cout << endl; 
 				VCFOutFile << endl;
@@ -3493,6 +3521,7 @@ options:\
 	VCFOutFile << "##INFO=<ID=AO,Number=1,Type=Integer,Description=\"Alternate allele observations, with partial observations recorded fractionally\">"<<endl;
 	VCFOutFile << "##INFO=<ID=HD,Number=.,Type=String,Description=\"Hash counts for each k-mer overlapping the vareint, -1 indicates no info\">"<< endl;
 	VCFOutFile << "##INFO=<ID=RN,Number=1,Type=String,Description=\"Name of contig that produced the call\">"<< endl;
+	VCFOutFile << "##INFO=<ID=FS,Number=1,Type=String,Description=\"Full score, supporthing kmers \\ possible varient kmers based on sequence\">"<< endl;
 	VCFOutFile << "##INFO=<ID=MQ,Number=1,Type=Integer,Description=\"Mapping quality of the contig that created the call\">"<< endl;
 	VCFOutFile << "##INFO=<ID=cigar,Number=1,Type=String,Description=\"Cigar string for the contig that created the call\">"<< endl;
 	VCFOutFile << "##INFO=<ID=VT,Number=1,Type=String,Description=\"Varient Type\">"<< endl;	
