@@ -528,7 +528,7 @@ done
 RUFUSmodel=$RDIR/bin/ModelDist
 RUFUSfilter=$RDIR/bin/RUFUS.Filter
 RufAlu=$RDIR/bin/RufAlu/src/aluDetect
-RUFUSOverlap=~/bin/RUFUS/scripts/Overlap.sh
+RUFUSOverlap=$RDIR/scripts/Overlap.sh
 RunJelly=$RDIR/cloud/RunJellyForRUFUS
 PullSampleHashes=$RDIR/cloud/CheckJellyHashList.sh
 samtools=$RDIR/bin/samtools/samtools
