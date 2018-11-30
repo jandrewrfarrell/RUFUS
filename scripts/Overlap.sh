@@ -59,7 +59,7 @@ else
 	$bwa mem $humanRefBwa "$File" | $samtools sort -T $File -O bam - > $File.bam
 	$samtools index $File.bam 
 	#$gkno bwa-se -ps human  -q $File -id $File -s $File -o $File.bam -p ILLUMINA
-	$OverlapSam <( $samtools view $File.bam ) .95 25 3 ./TempOverlap/$NameStub.sam $NameStub 1 $Threads
+	$OverlapSam <( $samtools view $File.bam ) .95 25 1 ./TempOverlap/$NameStub.sam $NameStub 1 $Threads
 fi
 
 if [ -s ./TempOverlap/$NameStub.1.fastqd ]
