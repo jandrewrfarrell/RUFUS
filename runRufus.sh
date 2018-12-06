@@ -20,7 +20,7 @@
 # Argbash is a bash code generator used to get arguments parsing right.
 # Argbash is FREE SOFTWARE, see https://argbash.io for more info
 # Generated online by https://argbash.io/generate
-RDIR=/uufs/chpc.utah.edu/common/home/u0991464/bin/testRUFUS/RUFUS
+RDIR=/uufs/chpc.utah.edu/common/home/u0401321/RUFUS
 
 die()
 {
@@ -527,7 +527,7 @@ done
 ########################## set RUFUS directory path variables ##############################
 RUFUSmodel=$RDIR/bin/ModelDist
 RUFUSfilter=$RDIR/bin/RUFUS.Filter
-RufAlu=$RDIR/bin/RufAlu/src/aluDetect
+RufAlu=$RDIR/bin/externals/rufalu/src/rufalu_project/src/aluDetect
 RUFUSOverlap=$RDIR/scripts/Overlap.sh
 RunJelly=$RDIR/cloud/RunJellyForRUFUS
 PullSampleHashes=$RDIR/cloud/CheckJellyHashList.sh
@@ -693,13 +693,13 @@ fi
 
 #TODO: fix hard coding aluLIst path
 ######__RUFALU__#############
-#aluList=/uufs/chpc.utah.edu/common/home/u0401321/RufAlu/aluList/primate_non-LTR_Retrotransposon.fasta
+aluList=$RDIR/resources/primate_non-LTR_Retrotransposon.fasta
+fastaHackPath=$RDIR/bin/externals/fastahack/src/fastahack_project/bin/tools/fastahack
 
-#echo "running RufAlu, command is" 
+echo "running RufAlu, command is" 
 
-#echo "$RufAlu $ProbandFileName $ProbandGenerator.V2.overlap.hashcount.fastq  $aluList $_arg_ref  $(echo $ParentFileNames) "
-
-#$RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref  $(echo $ParentFileNames)
+echo "$RufAlu $ProbandFileName $ProbandGenerator.V2.overlap.hashcount.fastq  $aluList $_arg_ref  $(echo $ParentFileNames) "
+$RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $fastaHackPath  $(echo $ParentFileNames)
 #########################
 
 #echo "seeing what working dir is to pass to RufAlu" $PWD
