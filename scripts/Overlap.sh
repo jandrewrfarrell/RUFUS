@@ -31,7 +31,7 @@ echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 mkdir ./TempOverlap/
 echo "Overlaping $File"
 
-RDIR=/uufs/chpc.utah.edu/common/home/u0401321/RUFUS
+RDIR=/scratch/ucgd/lustre/u0991464/Projects/CEPH.1kg.cut0.5.v5/RUFUS
 
 OverlapHash=$RDIR/bin/Overlap
 OverlapRebion2=$RDIR/bin/OverlapRegion
@@ -120,7 +120,7 @@ else
 	$RDIR/bin/externals/bedtools2/src/bedtools2_project/bin/fastaFromBed -bed <( $RDIR/bin/externals/bedtools2/src/bedtools2_project/bin/bamToBed -i ./$NameStub.overlap.hashcount.fastq.bam) -fi $humanRef -fo $NameStub.overlap.asembly.hash.fastq.ref.fastq 
 fi 
 
-if [ -e ./$NameStub.overlap.hashcount.fastq.Jhash.tab ]
+if [ -e ./$NameStub.overlap.hashcount.fastq.Jhash ]
 then 
 	echo "skipping var hash generationr"
 else
@@ -130,7 +130,7 @@ else
 	$JellyFish dump  -c ./$NameStub.overlap.hashcount.fastq.Jhash > ./$NameStub.overlap.hashcount.fastq.Jhash.tab
 fi 
 
-if [ -e ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash.tab ] 
+if [ -e ./$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash ] 
 then 
 	echo "skipping ref hash generation"
 else

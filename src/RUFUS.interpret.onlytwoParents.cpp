@@ -1337,7 +1337,7 @@ void SamRead::parseMutations( char *argv[])
 
 				for(int k = low ; k <= i+10 and k < hashes.size(); k++)
         			{
-               				for (int j = 0; j < parentCounts.size(); j++)
+               				for (int j = 0; j < 2 /*parentCounts.size()*/; j++)
                 			{
 						int sum = 0; 
 						if (hashesRef[k] == hashes[k])
@@ -1364,7 +1364,7 @@ void SamRead::parseMutations( char *argv[])
                         	{
 					if (hashesRef[j] != hashes[j])
 					{
-					  for (int k = 0; k < parentCounts.size(); k++)
+					  for (int k = 0; k < 2 /*parentCounts.size()*/; k++)
                                	          {
                                 	                cout << "Checking Par Hash " << hashes[j] << "\t" << parentCounts[k][j]  << "\t" << hashesRef[j] << "\t" << parentCountsReference[k][j];
 							float varFreq = 1; 
@@ -1388,10 +1388,7 @@ void SamRead::parseMutations( char *argv[])
                                 	}
                         	}
 				///////////////////final filter check/////////////////////////////////////////
-				string Filter = ".";
- 				if (Genotype.find("1") == std::string::npos) {
-                                        Denovo = "Mosaic";
-                                } 
+				string Filter = "."; 
 				if (AlignmentSegments > 10)
 				{
 				  	Denovo = "PoorAlignment"; 
@@ -1449,6 +1446,9 @@ void SamRead::parseMutations( char *argv[])
 				if (Denovo == "DeNovo" and Filter == ".")
 					Filter = "PASS";
 
+				if (Genotype.find("1") == std::string::npos) { 
+					Denovo = "Mosaic"; 
+				}
 				for (int p = 0; p< ParRefModes.size(); p++)
 				{
 					//if (ParGenotypes[p].find("1") != std::string::npos) {

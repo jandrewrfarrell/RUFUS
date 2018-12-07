@@ -545,9 +545,14 @@ int main(int argc, char* argv[]) {
 
   string line;
   std::vector<string> sequenes;
+  std::vector<string> Osequenes;
   std::vector<string> qual;
+  std::vector<string> Oqual;
   std::vector<string> depth;
+  std::vector<string> Odepth;
   std::vector<string> strand;
+  std::vector<bool> used;
+  std::vector<bool> multi; 
   int lines = -1;
   string L1;
   string L2;
@@ -586,7 +591,9 @@ int main(int argc, char* argv[]) {
             Multiple = true;
           }
         }
-
+	string oseq= L2;
+	string oq = L4; 
+	string od = depths; 
         if (Multiple == true) {
           L2 = TrimLowCoverageEnds(L2, L4, depths, LCcutoff);
         }
@@ -598,6 +605,15 @@ int main(int argc, char* argv[]) {
           depth.push_back(depths);
           strand.push_back(L5);
           ReadSize = L2.size();
+	  Osequenes.push_back(oseq); 
+	  Oqual.push_back(oq);
+	  Odepth.push_back(od);
+	  if (Multiple)
+		  multi.push_back(1);	
+	  else
+		   multi.push_back(0);
+	  used.push_back(0);
+
         } else {
           Rejects++;
         }
