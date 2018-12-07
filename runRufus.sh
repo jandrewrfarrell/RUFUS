@@ -20,7 +20,7 @@
 # Argbash is a bash code generator used to get arguments parsing right.
 # Argbash is FREE SOFTWARE, see https://argbash.io for more info
 # Generated online by https://argbash.io/generate
-RDIR=/scratch/ucgd/lustre/u0991464/Projects/CEPH.1kg.cut0.5.v5/RUFUS
+RDIR=/uufs/chpc.utah.edu/common/home/u0401321/testRUFUS/RUFUS
 
 die()
 {
@@ -687,19 +687,14 @@ else
 
 ##############################################################################################
 
+aluList=$RDIR/resources/primate_non-LTR_Retrotransposon.fasta
+fastaHackPath=$RDIR/bin/externals/fastahack/src/fastahack_project/bin/tools/fastahack
 
+echo "running RufAlu, command is"
 
-	wait
-	######__RUFALU__#############
-	aluList=$RDIR/resources/testData/primate_non-LTR_Retrotransposon.fasta
+echo "$RufAlu $ProbandFileName $ProbandGenerator.V2.overlap.hashcount.fastq  $aluList $_arg_ref  $(echo $ParentFileNames) "
+$RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $fastaHackPath  $(echo $ParentFileNames)
 
-	echo "running RufAlu, command is" 
-	
-	##echo "$RufAlu $ProbandFileName $ProbandGenerator.V2.overlap.hashcount.fastq  $aluList $_arg_ref  $(echo $ParentFileNames) "
-	valgrind $RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref  $(echo $ParentFileNames)
-	#########################
-
-	#echo "seeing what working dir is to pass to RufAlu" $PWD
 fi
 echo "done with everything"
 exit 0
