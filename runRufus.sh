@@ -20,7 +20,7 @@
 # Argbash is a bash code generator used to get arguments parsing right.
 # Argbash is FREE SOFTWARE, see https://argbash.io for more info
 # Generated online by https://argbash.io/generate
-RDIR=/uufs/chpc.utah.edu/common/home/u0401321/RUFUS
+RDIR=/uufs/chpc.utah.edu/common/home/u0401321/testRUFUS/RUFUS
 
 die()
 {
@@ -694,7 +694,7 @@ fi
 #TODO: fix hard coding aluLIst path
 ######__RUFALU__#############
 aluList=$RDIR/resources/primate_non-LTR_Retrotransposon.fasta
-fastaHackPath=$RDIR/bin/externals/fastahack/src/fastahack_project/bin/tools/fastahack
+fastaHackPath=$RDIR/bin/externals/fastahack/src/fastahack_project-build/tools/fastahack
 
 echo "running RufAlu, command is" 
 
