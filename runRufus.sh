@@ -686,14 +686,14 @@ else
     /usr/bin/time bash $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 5 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
 
 ##############################################################################################
-
 aluList=$RDIR/resources/primate_non-LTR_Retrotransposon.fasta
 fastaHackPath=$RDIR/bin/externals/fastahack/src/fastahack_project/bin/tools/fastahack
+jellyfishPath=$RDIR/src/externals/jellyfish-2.2.5/bin/jellyfish
 
 echo "running RufAlu, command is"
 
 echo "$RufAlu $ProbandFileName $ProbandGenerator.V2.overlap.hashcount.fastq  $aluList $_arg_ref  $(echo $ParentFileNames) "
-$RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $fastaHackPath  $(echo $ParentFileNames)
+$RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $fastaHackPath  $(echo $ParentFileNames) $jellyfish
 
 fi
 echo "done with everything"
