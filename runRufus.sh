@@ -695,11 +695,9 @@ fi
 ######__RUFALU__#############
 aluList=$RDIR/resources/primate_non-LTR_Retrotransposon.fasta
 fastaHackPath=$RDIR/bin/externals/fastahack/src/fastahack_project/bin/tools/fastahack
-
-echo "running RufAlu, command is" 
-
-echo "$RufAlu $ProbandFileName $ProbandGenerator.V2.overlap.hashcount.fastq  $aluList $_arg_ref  $(echo $ParentFileNames) "
-$RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $fastaHackPath  $(echo $ParentFileNames)
+jellyfishPath=$RDIR/src/externals/jellyfish-2.2.5/bin/jellyfish
+echo "$RufAlu $ProbandFileName $ProbandGenerator.V2.overlap.hashcount.fastq  $aluList $_arg_ref  $(echo $ParentFileNames) $jellyfishPath "
+$RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $fastaHackPath  $(echo $ParentFileNames) $jellyfishPath
 #########################
 
 #echo "seeing what working dir is to pass to RufAlu" $PWD
