@@ -20,7 +20,7 @@
 # Argbash is a bash code generator used to get arguments parsing right.
 # Argbash is FREE SOFTWARE, see https://argbash.io for more info
 # Generated online by https://argbash.io/generate
-RDIR=/uufs/chpc.utah.edu/common/home/u0401321/testRUFUS/RUFUS
+RDIR=/uufs/chpc.utah.edu/common/home/u0401321/RUFUS
 
 die()
 {
@@ -694,11 +694,10 @@ fi
 #TODO: fix hard coding aluLIst path
 ######__RUFALU__#############
 aluList=$RDIR/resources/primate_non-LTR_Retrotransposon.fasta
-<<<<<<< HEAD
 fastaHackPath=$RDIR/bin/externals/fastahack/src/fastahack_project/bin/tools/fastahack
 jellyfishPath=$RDIR/src/externals/jellyfish-2.2.5/bin/jellyfish
-echo "$RufAlu $ProbandFileName $ProbandGenerator.V2.overlap.hashcount.fastq  $aluList $_arg_ref  $(echo $ParentFileNames) $jellyfishPath "
-$RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $fastaHackPath  $(echo $ParentFileNames) $jellyfishPath
+echo "$RufAlu $ProbandFileName $ProbandGenerator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $jellyfishPath $(echo $ParentFileNames) "
+$RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $fastaHackPath $jellyfishPath  $(echo $ParentFileNames)
 #########################
 
 #echo "seeing what working dir is to pass to RufAlu" $PWD
