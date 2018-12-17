@@ -693,7 +693,7 @@ jellyfishPath=$RDIR/src/externals/jellyfish-2.2.5/bin/jellyfish
 echo "running RufAlu, command is"
 
 echo "$RufAlu $ProbandFileName $ProbandGenerator.V2.overlap.hashcount.fastq  $aluList $_arg_ref  $(echo $ParentFileNames) "
-$RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $fastaHackPath  $(echo $ParentFileNames) $jellyfish
+$RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $fastaHackPath $jellyfishPath  $(echo $ParentFileNames) 
 
 fi
 echo "done with everything"
