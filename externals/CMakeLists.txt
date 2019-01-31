@@ -12,6 +12,8 @@ include(bedtools2.cmake)
 LIST(APPEND RUFUS_DEPENDENCIES ${BEDTOOLS2_PROJECT})
 include(fastahack.cmake)
 LIST(APPEND RUFUS_DEPENDENCIES ${FASTAHACK_PROJECT})
+include(twofus.cmake)
+LIST(APPEND RUFUS_DEPENDENCIES ${TWOFUS_PROJECT})
 
 #include(htslib.cmake)
 #include(samtools.cmake)
