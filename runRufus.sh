@@ -528,6 +528,7 @@ done
 RUFUSmodel=$RDIR/bin/ModelDist
 RUFUSfilter=$RDIR/bin/RUFUS.Filter
 RufAlu=$RDIR/bin/externals/rufalu/src/rufalu_project/src/aluDetect
+TwoFus=$RDIR/bin/externals/twofus/src/twofus_project/bin/tools/runTwofus
 RUFUSOverlap=$RDIR/scripts/Overlap.sh
 RunJelly=$RDIR/cloud/RunJellyForRUFUS
 PullSampleHashes=$RDIR/cloud/CheckJellyHashList.sh
@@ -690,13 +691,8 @@ aluList=$RDIR/resources/primate_non-LTR_Retrotransposon.fasta
 fastaHackPath=$RDIR/bin/externals/fastahack/src/fastahack_project/bin/tools/fastahack
 jellyfishPath=$RDIR/src/externals/jellyfish-2.2.5/bin/jellyfish
 
-
-echo "jellyfishPath in runRufus.sh is: $jellyfishPath"
-
-echo "running RufAlu, command is"
-
-echo "$RufAlu $ProbandFileName $ProbandGenerator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $jellyfishPath  $(echo $ParentFileNames) "
-$RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $fastaHackPath $jellyfishPath  $(echo $ParentFileNames) 
+echo "Attempting to run TwoFus"
+$TwoFus $_arg_subject $aluList $_arg_ref $(echo $ParentFileNames)
 
 fi
 echo "done with everything"
