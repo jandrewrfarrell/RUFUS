@@ -20,7 +20,7 @@
 # Argbash is a bash code generator used to get arguments parsing right.
 # Argbash is FREE SOFTWARE, see https://argbash.io for more info
 # Generated online by https://argbash.io/generate
-RDIR=/scratch/ucgd/lustre/u0991464/RUFUS.simulation.test/testStricterOverlap/RUFUS
+RDIR=/uufs/chpc.utah.edu/common/home/u0401321/RUFUS
 
 die()
 {
@@ -688,10 +688,13 @@ aluList=$RDIR/resources/primate_non-LTR_Retrotransposon.fasta
 fastaHackPath=$RDIR/bin/externals/fastahack/src/fastahack_project/bin/tools/fastahack
 jellyfishPath=$RDIR/src/externals/jellyfish-2.2.5/bin/jellyfish
 
+
+echo "jellyfishPath in runRufus.sh is: $jellyfishPath"
+
 echo "running RufAlu, command is"
 
-echo "$RufAlu $ProbandFileName $ProbandGenerator.V2.overlap.hashcount.fastq  $aluList $_arg_ref  $(echo $ParentFileNames) "
-$RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $fastaHackPath  $(echo $ParentFileNames) $jellyfish
+echo "$RufAlu $ProbandFileName $ProbandGenerator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $jellyfishPath  $(echo $ParentFileNames) "
+$RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $fastaHackPath $jellyfishPath  $(echo $ParentFileNames) 
 
 fi
 echo "cleaning up VCF"
