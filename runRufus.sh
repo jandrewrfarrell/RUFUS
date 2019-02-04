@@ -20,7 +20,7 @@
 # Argbash is a bash code generator used to get arguments parsing right.
 # Argbash is FREE SOFTWARE, see https://argbash.io for more info
 # Generated online by https://argbash.io/generate
-RDIR=/uufs/chpc.utah.edu/common/home/u0401321/testRUFUS/RUFUS
+RDIR=/scratch/ucgd/lustre/u0991464/RUFUS.simulation.test/testStricterOverlap/RUFUS
 
 die()
 {
@@ -666,16 +666,14 @@ else
     rm  "$ProbandGenerator".temp
     mkfifo "$ProbandGenerator".temp
     /usr/bin/time -v  bash "$ProbandGenerator" | "$RDIR"/cloud/PassThroughSamCheck.stranded "$ProbandGenerator".filter.chr >  "$ProbandGenerator".temp &
-    /usr/bin/time -v   "$RUFUSfilter"  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp "$ProbandGenerator" "$K" 13 5 10 "$(echo $Threads -2 | bc)" &
-    #bash $ProbandGenerator | $RDIR/cloud/PassThroughSamCheck.stranded $ProbandGenerator.filter.chr | head 
-    #/usr/bin/time -v "$RUFUSfilter" "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList <(bash $ProbandGenerator | $RDIR/cloud/PassThroughSamCheck.stranded $ProbandGenerator.filter.chr)  "$ProbandGenerator" $K 5 5 10 $(echo $Threads -2 | bc)
+    /usr/bin/time -v   "$RUFUSfilter"  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp "$ProbandGenerator" "$K" 13 1 "$(echo $Threads -2 | bc)" &
     wait
 fi
 ########################################################################################
     echo "starting RUFUS overlap"
 
 ###################__RUFUS_OVERLAP__#############################################
-if [ -e "$ProbandGenerator".V2.overlap.hashcount.fastq.bam.vcf ]
+if [ -e ./Intermediates/"$ProbandGenerator".V2.overlap.hashcount.fastq.bam.vcf ]
 then
     echo "skipping overlap"
 else
@@ -683,7 +681,7 @@ else
 
     echo "Overlap probandGenerator name is $ProbandGenerator"
     
-    /usr/bin/time bash $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 5 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
+    /usr/bin/time bash $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 3 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
 
 ##############################################################################################
 aluList=$RDIR/resources/primate_non-LTR_Retrotransposon.fasta
@@ -696,6 +694,18 @@ echo "$RufAlu $ProbandFileName $ProbandGenerator.V2.overlap.hashcount.fastq  $al
 $RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $fastaHackPath  $(echo $ParentFileNames) $jellyfish
 
 fi
+echo "cleaning up VCF"
+echo "grep ^# $ProbandGenerator.V2.overlap.hashcount.fastq.bam.vcf> ./Intermediates/$ProbandGenerator.V2.overlap.hashcount.fastq.bam.sorted.vcf"
+echo "grep -v  ^# $ProbandGenerator.V2.overlap.hashcount.fastq.bam.vcf | sort -k1,1 -k2,2n >> ./Intermediates/$ProbandGenerator.V2.overlap.hashcount.fastq.bam.sorted.vcf"
+echo "bash $RDIR/scripts/VilterAutosomeOnly ./Intermediates/$ProbandGenerator.V2.overlap.hashcount.fastq.bam.sorted.vcf > ./$ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf"
+
+grep ^# $ProbandGenerator.V2.overlap.hashcount.fastq.bam.vcf> ./Intermediates/$ProbandGenerator.V2.overlap.hashcount.fastq.bam.sorted.vcf
+grep -v  ^# $ProbandGenerator.V2.overlap.hashcount.fastq.bam.vcf | sort -k1,1 -k2,2n >> ./Intermediates/$ProbandGenerator.V2.overlap.hashcount.fastq.bam.sorted.vcf
+bash $RDIR/scripts/VilterAutosomeOnly ./Intermediates/$ProbandGenerator.V2.overlap.hashcount.fastq.bam.sorted.vcf > ./$ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf
+#
+$RDIR/bin/tabix/bgzip -f ./$ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf
+$RDIR/bin/tabix/tabix ./$ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf.gz
+
 echo "done with everything"
 exit 0
 # ] <-- needed because of Argbash

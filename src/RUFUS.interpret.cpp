@@ -712,16 +712,19 @@ void SamRead::GetModes(int pos, string alt,  string reff, int &MutRefMode, int &
                                 string nonspecific = "nonspecific";
                                 //vector <float> freqs;
                                 cout << "checking NonSpecic Kmers";
+				string LastAtlKmer = "boomba";
 				for (int j = lower; j<upper; j++)
                                 {
 					cout <<  AltKmers[j] << endl << RefKmers[j] <<endl;
-					if ( AltKmers[j] != RefKmers[j] and (ExcludeHashes[HashToLong(AltKmers[j])]<1 or ExcludeHashes[HashToLong(RevComp(AltKmers[j]))]<1) )
+					if ( AltKmers[j] != RefKmers[j] and (ExcludeHashes[HashToLong(AltKmers[j])]<1 or ExcludeHashes[HashToLong(RevComp(AltKmers[j]))]<1) and AltKmers[j] != LastAtlKmer)
 					{
+						
 						PossibleVarKmer++;
 						cout << "Different" << endl;
 					} 
 					else
 						cout << "SAME" << endl; 
+					LastAtlKmer = AltKmers[j]; 
                                         if(MutRefCounts[j]>0 and AltKmers[j] != RefKmers[j] ) //and MutRefCounts[j]<200 and (ExcludeHashes[HashToLong(RefKmers[j])]<2 or ExcludeHashes[HashToLong(RevComp(RefKmers[j]))]<2)) //needs to be fixed, should be based on cov not cutoff of 200 
                                                 varMutRefCounts.push_back(MutRefCounts[j]);
                                         if (MutAltCounts[j]>0 and AltKmers[j] != RefKmers[j] and MutAltCounts[j]<200 and (Hash.count(AltKmers[j]) > 0 or Hash.count(RevComp(AltKmers[j])) > 0)  and (ExcludeHashes[HashToLong(AltKmers[j])]<1 or ExcludeHashes[HashToLong(RevComp(AltKmers[j]))]<1)) //needs to be fixed, should be based on cov not cutoff of 200 
@@ -1308,12 +1311,12 @@ void SamRead::parseMutations( char *argv[])
 				}
 				 //***********check that the alese are only baess done**************
 			        ////////Starting Checks /////////////     
-                                	int MutRefMode;
-                                	int MutAltMode;
-                                	vector <int> ParRefModes;
-                                	vector <int> ParAltModes;
-                                	vector <int> HashCounts;
-                                	vector <int> HashCountsOG;
+                                int MutRefMode;
+                                int MutAltMode;
+                                vector <int> ParRefModes;
+                                vector <int> ParAltModes;
+                                vector <int> HashCounts;
+                               	vector <int> HashCountsOG;
                                 int PossibleAltKmer=0; 
 				GetModes(i, alt, reff, MutRefMode, MutAltMode, ParRefModes, ParAltModes, HashCounts, HashCountsOG, PossibleAltKmer);
                         	int SupportingHashes = GetSupportingHashCount(i, alt,  reff);
@@ -1389,6 +1392,7 @@ void SamRead::parseMutations( char *argv[])
                         	}
 				///////////////////final filter check/////////////////////////////////////////
 				string Filter = ".";
+				string InfoFilter = ""; 
  				if (Genotype.find("1") == std::string::npos) {
                                         Denovo = "Mosaic";
                                 } 
@@ -1401,8 +1405,10 @@ void SamRead::parseMutations( char *argv[])
 					if (Filter == ".")
 						Filter = "";  
 					Filter+="PA";
-					Filter+=ss.str();
-					Filter+=","; 
+					InfoFilter+="PA";
+					InfoFilter+=ss.str();
+					InfoFilter+=",";
+					Filter+=";";
 				}
 				if (NumLowCov > 3)
 				{
@@ -1413,8 +1419,10 @@ void SamRead::parseMutations( char *argv[])
 					stringstream ss;
 					ss << NumLowCov; 
 					Filter+="PLC";
-                                        Filter+=ss.str();
-                                        Filter+=",";  
+					InfoFilter+="PLC"; 
+                                        InfoFilter+=ss.str();
+                                        Filter+=";";  
+					InfoFilter+=",";
 				}
 				//if (LowCov)
 				if (lowCount >=2)
@@ -1427,8 +1435,10 @@ void SamRead::parseMutations( char *argv[])
 					if (Filter == ".")
                                                 Filter = "";
 					Filter+="LCH";
-                                        Filter+=ss.str();
-                                        Filter+=","; 
+					InfoFilter+="LCH";
+                                        InfoFilter+=ss.str();
+                                        Filter+=";";
+					InfoFilter+=",";
 				}
 				else
 				   	cout << "GOOD COVERAGE" << endl;
@@ -1442,12 +1452,16 @@ void SamRead::parseMutations( char *argv[])
 						if (Filter == ".")
 							Filter = "";
 						Filter+="SB";
-                                        	Filter+=ss.str();
-                                        	Filter+=",";
+						InfoFilter+="SB";
+                                        	InfoFilter+=ss.str();
+                                        	Filter+=";";
+						InfoFilter+=",";
 					}
                                 }	 
 				if (Denovo == "DeNovo" and Filter == ".")
 					Filter = "PASS";
+				if (InfoFilter=="")
+					InfoFilter="PASS"; 
 
 				for (int p = 0; p< ParRefModes.size(); p++)
 				{
@@ -1472,9 +1486,9 @@ void SamRead::parseMutations( char *argv[])
 
 				double Score = ((double)SupportingHashes/(double)PossibleAltKmer) * 100.0; 
 			////////////////////////Writing var out to file/////////////////////////
-				cout       << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << SupportingHashes << "\t" << Filter << "\t" << StructCall <<"RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";" << "CVT=" << CompressedVarType << ";HD="; 
+				cout       << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << SupportingHashes << "\t" << Filter << "\t" << StructCall <<"FEX=" << InfoFilter << ";RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";" << "CVT=" << CompressedVarType << ";HD="; 
 					
-				VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" << Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << Score << /*SupportingHashes << "/" << PossibleAltKmer << */ "\t" << Filter << "\t" << StructCall << "FS=" << SupportingHashes << "/" << PossibleAltKmer << ";RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";SB=" << StrandBias << ";" << "CVT=" << CompressedVarType << ";HD="; 
+				VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" << Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << Score << /*SupportingHashes << "/" << PossibleAltKmer << */ "\t" << Filter << "\t" << StructCall << "FEX=" << InfoFilter << ";FS=" << SupportingHashes << "/" << PossibleAltKmer << ";RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";SB=" << StrandBias << ";" << "AS=" << AlignmentSegments << ";" << "CVT=" << CompressedVarType << ";HD="; 
 
 				for (int j = 0; j < HashCounts.size(); j++) 
 				{	
@@ -3500,6 +3514,7 @@ options:\
 	string boom = outStub;
 	VCFOutFile.open(boom+ ".vcf"); 
 	BEDOutFile.open(boom+ ".vcf.bed"); 
+	boom = "TempOverlap/" + boom; 
 	BEDBigStuff.open(boom+ ".vcf.Big.bed");
 	BEDNotHandled.open(boom+ ".vcf.NotHandled.bed");
 	Invertions.open(boom+".vcf.invertions.bed");
@@ -3515,6 +3530,7 @@ options:\
 	VCFOutFile << "##FORMAT=<ID=DP,Number=1,Type=Integer,Description=\"Total Kmer depth across the variant\">" << endl;
 	VCFOutFile << "##FORMAT=<ID=RO,Number=1,Type=Integer,Description=\"Mode of reference kmer counts\">" << endl;
 	VCFOutFile << "##FORMAT=<ID=AO,Number=1,Type=Integer,Description=\"Mode of alt kmer counts\">" << endl;
+	VCFOutFile << "##INFO=<ID=FEX,Number=1,Type=String,Description=\"Filters failed and value\">" << endl;
 	VCFOutFile << "##INFO=<ID=SB,Number=1,Type=Float,Description=\"Strand Bias of the aassembled contig\">" << endl;
 	VCFOutFile << "##INFO=<ID=SVTYPE,Number=1,Type=String,Description=\"Type of SV detected\">" << endl;
 	VCFOutFile << "##INFO=<ID=SVLEN,Number=1,Type=Integer,Description=\"Length of SV detected\">" << endl; 
@@ -3531,8 +3547,12 @@ options:\
 	VCFOutFile << "##INFO=<ID=NH,Number=1,Type=Integer,Description=\"Number of alu heads in target region\">" << std::endl;
 	VCFOutFile << "##INFO=<ID=NT,Number=1,Type=Integer,Description=\"Number of polyA tails in target region\">" << std::endl;
 	VCFOutFile << "##INFO=<ID=LT,Number=1,Type=Integer,Description=\"Longest polyA tail in target region\">" << std::endl;
-
 	VCFOutFile << "##INFO=<ID=TB,Number=1,Type=Integer,Description=\"Is tail left bound, right bound, or double bound\">" << std::endl;
+	VCFOutFile << "##INFO=<ID=AS,Number=1,Type=Integer,Description=\"Number of alignment segments in the contig\">" << std::endl;
+	VCFOutFile << "##FILTER=<ID=PA,Description=\"PoorAlignment\">" << std::endl;	
+	VCFOutFile << "##FILTER=<ID=PLC,Description=\"Parents are at low coverage in this region, cannt be sure of genotype\">" << std::endl;
+	VCFOutFile << "##FILTER=<ID=LCH,Description=\"Parents have hashes showing variant at low coverage, likely inherited\">" << std::endl;
+	VCFOutFile << "##FILTER=<ID=SB,Description=\"Contig fails string bias filter\">" << std::endl; 
 	VCFOutFile << "##ALT=<ID=INS:ME:ALU,Description=\"Insertion of ALU element\">" << std::endl;
 	VCFOutFile << "##ALT=<ID=INS:ME:L1,Description=\"Insertion of L1 element\">" << std::endl;
 

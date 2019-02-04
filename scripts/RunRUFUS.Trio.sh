@@ -21,7 +21,7 @@ then
         exit
 fi
 
-RDIR=/scratch/ucgd/lustre/u0991464/Projects/CEPH.1kg.cut0.5.v5/RUFUS
+RDIR=/scratch/ucgd/lustre/u0991464/RUFUS.simulation.test/testStricterOverlap/RUFUS
 RUFUSmodel=$RDIR/bin/ModelDist
 RUFUSbuild=$RDIR/bin/RUFUS.Build
 RUFUSfilter=$RDIR/bin/RUFUS.Filter

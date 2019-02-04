@@ -22,9 +22,44 @@
 #include "Util.h"
 
 using namespace std;
+unsigned long HashToLongLocal( const char* hash, int& len)
+{
+  bitset<64> HashBits;
+  //#pragma omp parellel for                                                                                                                                                                    
+  for(int i=0; i<len;i++)
+    {
+      if (hash[i] == 'A')
+        {
+          HashBits[i*2] = 0;
+          HashBits[i*2+1] = 0;
+        }
+      else  if (hash[i] == 'C')
+        {
+          HashBits[i*2] = 0;
+          HashBits[i*2+1] = 1;
+        }
+      else  if (hash[i] == 'G')
+        {
+          HashBits[i*2] = 1;
+          HashBits[i*2+1] = 0;
+        }
+      else  if (hash[i] == 'T')
+        {
+          HashBits[i*2] = 1;
+          HashBits[i*2+1] = 1;
+        }
+      else
+        {
+          cout << "ERROR, invalid character - " << hash[i] << endl;
+        }
+    }
+  //cout <<  HashBits.to_ulong() << "-" << endl;                                                                                                                                                
+  return HashBits.to_ulong();
+}
 
 int main(int argc, char *argv[]) {
-  cout << "Call is PreBuiltMutHash Mutant.fq  firstpassfile hashsize MinQ HashCountThreshold threads "
+  cout << "Call is PreBuiltMutHash Mutant.fq  firstpassfile hashsize MinQ "
+          "HashCountThreshold window threads "
        << endl;
   double vm, rss, MAXvm, MAXrss;
   MAXvm = 0;
@@ -32,14 +67,15 @@ int main(int argc, char *argv[]) {
   Util::process_mem_usage(vm, rss, MAXvm, MAXrss);
   cout << "VM: " << vm << "; RSS: " << rss << endl;
 
-  int BufferSize = 240;
+  //int BufferSize = 28;
 
   cout << "Paramaters are:\n  PreBuiltMutHash = " << argv[1]
        << "\n  Mutant.fq = " << argv[2] << "\n  out stub = " << argv[3]
        << "\n  HashSize = " << argv[4] << "\n  MinQ = " << argv[5]
-       << "\n  HashCountThreshold = " << argv[6] << "\n  Threads = " << argv[7] << endl;
+       << "\n  HashCountThreshold = " << argv[6] << "\n  Window = " << argv[7]
+       << "\n  Threads = " << argv[8] << endl;
   // Read in file passed to the program on the command line
-
+	cout << "YAAAAAY" << endl; 
   string temp = argv[4];
   int HashSize = atoi(temp.c_str());
   temp = argv[5];
@@ -47,7 +83,13 @@ int main(int argc, char *argv[]) {
   temp = argv[6];
   int HashCountThreshold = atoi(temp.c_str());
   temp = argv[7];
+  int Window = atoi(temp.c_str());
+  temp = argv[8];
   int Threads = atoi(temp.c_str());
+  int BufferSize = Threads*4;
+  int hm1 = HashSize - 1;  
+  char MinQC = char (33+MinQ); 
+  cout << "MinQ = " << MinQ << " so char value is " << 33+MinQ << " so char is " << MinQ << endl;
   ifstream MutHashFile;
   MutHashFile.open(argv[1]);
   if (MutHashFile.is_open()) {
@@ -156,46 +198,33 @@ int main(int argc, char *argv[]) {
 
     while (getline(MutFile, Buffer[pos])) {
       pos++;
-      if (pos >= BufferSize) {
+      if (pos == BufferSize) {
 	break;
       }
     }
-
 #pragma omp parallel for shared(MutOutFile) num_threads(Threads)
     for (int BuffCount = 0; BuffCount < pos; BuffCount += 4) 
     {
-      vector<int> positions;
-      int rejected = 0;
+      const char* qual=Buffer[BuffCount + 3].c_str(); 
+      const char* seq=Buffer[BuffCount + 1].c_str(); 
       int MutHashesFound = 0;
-      bool good = true;
-      int streak = 0;
-      int start = 0;
-
-//      cout << Buffer[BuffCount + 0] << endl << Buffer[BuffCount + 1] << endl << Buffer[BuffCount + 2] << endl << Buffer[BuffCount + 3] << endl; 
-      bool lastMatch = false; 
-      int Pass = false; 
-      for (int i = start; i < Buffer[BuffCount + 1].length() ; i++) {
-//        cout << "at pos " << i << "qual = " << (int)Buffer[BuffCount + 3].c_str()[i] - 33 << " streak = " << streak<< endl; 
-       	if (((int)Buffer[BuffCount + 3].c_str()[i] - 33) < MinQ or (int)Buffer[BuffCount + 1].c_str()[i] == 78) {
-          streak = 0;
-          start = i ;//+ HashSize;
-	  lastMatch =false; 
-
+      int streak = 0; 
+      for (int i = 0; i < Buffer[BuffCount + 1].length() ; i++) {
+       	if (qual[i] < (char) MinQC){ //(((int)Buffer[BuffCount + 3].c_str()[i] - 33) < MinQ){ /// or (int)Buffer[BuffCount + 1].c_str()[i] == 78) {
+	  streak = 0;
         }
 	else
 		streak++;
-
-        if (streak >= HashSize ) 
+        if (streak > hm1 ) 
 	{
-//	  cout << "       testing " << i << " - " << Buffer[BuffCount + 1].substr(i-HashSize+1, HashSize) << endl; 
-          if (Mutations.count(Util::HashToLong(  Buffer[BuffCount + 1].substr(i-HashSize+1, HashSize))) > 0) {
+          const char* hash = seq+i-hm1; 
+          //cout << "i = " << i << " streek = " << streak << " hash - " << string(hash, HashSize)<< endl;  
+	  if (Mutations.count(HashToLongLocal(hash, HashSize )) > 0) {
             MutHashesFound++;
-//            cout << "   found " <<  i << " - " << Buffer[BuffCount + 1].substr(i-HashSize+1, HashSize) << endl; 
-	    Pass = true; 
           }
         }
       }
-      if (MutHashesFound >= HashCountThreshold)
+      if (MutHashesFound > 0)
 	{
 		#pragma omp critical(MutWrite)
                 {
@@ -206,7 +235,6 @@ int main(int argc, char *argv[]) {
                         found++;
                 }
 	}
-//    cout <<  Buffer[BuffCount] << ":MH" << MutHashesFound << endl; 
     }
   }
   MutFile.close();
