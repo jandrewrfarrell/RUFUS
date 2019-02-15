@@ -1,11 +1,6 @@
-SET_PROPERTY(DIRECTORY PROPERTY "EP_BASE" ${ep_base})
-
-
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lstdc++")
-if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") # clang Doesnt use pthread
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-endif()
+
 
 # Setting up external library for FASTAHACK
 SET(FASTAHACK_PROJECT fastahack_project CACHE INTERNAL "fastahack project name")
@@ -15,7 +10,7 @@ ExternalProject_Add(${FASTAHACK_PROJECT}
 	GIT_TAG master
 	INSTALL_COMMAND ""
     UPDATE_COMMAND ""
-    PREFIX ${FASTAHACK_DIR}
+        PREFIX ${FASTAHACK_DIR}
     CMAKE_CACHE_ARGS
         -DCMAKE_C_COMPILER:STRING=${CMAKE_C_COMPILER}
         -DCMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
