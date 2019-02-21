@@ -14,59 +14,7 @@ Salt Lake City, UT 84112-5330
 Email: JAndrewRFarrell@gmail.com         
 http://marthlab.org/
 
-This project is still under development and its not considered stable but you are free to use and any feedback is welcome. 
-
-## Compiler Requirements
-
-**RUFUS requires the use of the gcc/4.9.2 compiler.**  If you are not using the gcc/4.9.2 compiler, RUFUS will not build and install properly.  Please make sure that are using the gcc/4.9.2 compiler before you proceeed.  If you are loading your compiler from a module, cmake may not run the correct compiler path.  If this is the case, try replacing the
-```
-cmake ../
-```
-command with
-```
-cmake ../ -DCMAKE_C_COMPILER=$(which gcc) -DCMAKE_CXX_COMPILER=$(which g++)
-```
-to directly provide cmake with the path to your gcc compiler.
-
-## Ubuntu dependencies
-In order for RUFUS to run on a fresh Ubuntu build, all of the following packages must be installed:
-
-**General**
-```
-sudo apt-get update
-sudo apt-get install python
-sudo apt-get install cmake
-sudo apt-get install wget
-```
-
-**GCC-4.9** (c/c++ compiler)
-```
-sudo apt-get install build-essential
-sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-sudo apt-get install g++-4.9
-```
-
-**zlib** (file compression library)
-```
-sudo apt-get install zlib1g-dev
-sudo apt-get install libbz2-dev
-```
-
-**bzlib** (bz2 file compression library)
-```
-sudo apt-get install libbz2-dev
-sudo apt-get install liblzma-dev
-```
-
-**bc** (floating point precision library)
-```
-sudo apt-get install bc
-```
-
-**Curse** (terminal control library)
-```
-sudo apt-get install libncurses5-dev
-```
+This project is still under development and its not considered stable but you are free to use and any feedback is welcome.
 
 ## Installing RUFUS
 
@@ -92,6 +40,18 @@ make
 
 If you get errors during the installation contact me at at JAndrewRFarrell@gmail.com or submit an issue.  NOTE, to date this only works on linux machines.
 
+## Compiler Requirements
+
+**RUFUS requires the use of the gcc/4.9.2 compiler.**  Please make sure that are using the gcc/4.9.2 compiler before you proceeed. If you are not using gcc/4.9.2 as your default compiler, or if CMake cannot detect the location of your gcc compiler, RUFUS will not build and install properly.   If you are having any issues getting CMake to locate the proper compiler, please repleace the command
+
+```
+cmake ../
+```
+command with
+```
+cmake ../ -DCMAKE_C_COMPILER=/path/to/gcc-4.9.2 -DCMAKE_CXX_COMPILER=/path/to/g++-4.9.2
+```
+to directly provide cmake with the path to your gcc compiler.
 
 ## Testing RUFUS
 
@@ -119,8 +79,6 @@ This file should contain a single varient call.  The call should look exactly as
 ```
 
 If you were unable to reproduce this call, something went wront with the RUFUS install, and you should get the test run to work before proceeding further.  If you are unable to reproduce a successfull test run, please contact me at JAndrewRFarrell@gmail.scom 
-
-
 
 ## Running 
 
@@ -193,3 +151,46 @@ samtools faidx reference.fa
 ```
 
 This will produce the BWA index files, and the fasta file index respectively.  Make sure that the bwa index files and the fasta index file are in the same directory as reference.fa
+
+## Ubuntu dependencies
+In order for RUFUS to run on a fresh Ubuntu build, all of the following packages must be installed:
+
+**General**
+```
+sudo apt-get update
+sudo apt-get install python
+sudo apt-get install cmake
+sudo apt-get install wget
+```
+
+**GCC-4.9** (c/c++ compiler)
+```
+sudo apt-get install build-essential
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+sudo apt-get install g++-4.9
+```
+
+**zlib** (file compression library)
+```
+sudo apt-get install zlib1g-dev
+sudo apt-get install libbz2-dev
+```
+
+**bzlib** (bz2 file compression library)
+```
+sudo apt-get install libbz2-dev
+sudo apt-get install liblzma-dev
+```
+
+**bc** (floating point precision library)
+```
+sudo apt-get install bc
+```
+
+**Curse** (terminal control library)
+```
+sudo apt-get install libncurses5-dev
+```
+
+
+
