@@ -12,11 +12,17 @@ include(bedtools2.cmake)
 LIST(APPEND RUFUS_DEPENDENCIES ${BEDTOOLS2_PROJECT})
 include(fastahack.cmake)
 LIST(APPEND RUFUS_DEPENDENCIES ${FASTAHACK_PROJECT})
+include(jellyfish.cmake)
+LIST(APPEND RUFUS_DEPENDENCIES ${JELLYFISH_PROJECT})
+include(htslib.cmake)
+LIST(APPEND RUFUS_DEPENDENCIES ${HTSLIB_PROJECT})
+include(samtools.cmake)
+LIST(APPEND RUFUS_DEPENDENCIES ${SAMTOOLS_PROJECT})
 
-#include(htslib.cmake)
-#include(samtools.cmake)
 
-SET(RUFUS_SOURCE_DIR ${CMAKE_SOURCE_DIR}/externals/external CACHE INTERNAL "" FORCE)
+
+
+SET(RUFUS_SOURCE_DIR ${CMAKE_SOURCE_DIR}/bin/externals/external CACHE INTERNAL "" FORCE)
 
 SET(RUFUS_EXTERNAL_PROJECT_DIR ${CMAKE_BINARY_DIR}/externals/rufus_external_project CACHE INTERNAL "external project directory")
 SET(RUFUS_EXTERNAL_PROJECT rufus_external_project CACHE INTERNAL "all rufus external projects")

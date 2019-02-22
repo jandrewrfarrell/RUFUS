@@ -376,7 +376,7 @@ echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 #########__CREATE_ALL_GENERATOR_FILES_AND_VARIABLES__#############
 ProbandFileName=$(basename "$_arg_subject")
 ProbandExtension="${ProbandFileName##*.}"
-samtools=$RDIR/bin/externals/samtools/samtools
+samtools=$RDIR/bin/externals/samtools/src/samtools_project/samtools
 echo "proband extension is $ProbandExtension"
 
 if [[ "$ProbandExtension" != "bam" ]] || [[ ! -e "$_arg_subject" ]] && [[ "$ProbandExtension" != "generator" ]]
