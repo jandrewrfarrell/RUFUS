@@ -34,7 +34,7 @@ __Note:__ ./configure must be run from the RUFUS root directory
 **3) Build**
 ```
 cd bin
-cmake ..
+cmake ../ -DCMAKE_C_COMPILER=/path/to/gcc-4.9.2 -DCMAKE_CXX_COMPILER=/path/to/g++-4.9.2
 make
 ```
 
@@ -42,16 +42,7 @@ If you get errors during the installation contact me at at JAndrewRFarrell@gmail
 
 ## Compiler Requirements
 
-**RUFUS requires the use of the gcc/4.9.2 compiler.**  Please make sure that are using the gcc/4.9.2 compiler before you proceeed. If you are not using gcc/4.9.2 as your default compiler, or if CMake cannot detect the location of your gcc compiler, RUFUS will not build and install properly.   If you are having any issues getting CMake to locate the proper compiler, please repleace the command
-
-```
-cmake ../
-```
-command with
-```
-cmake ../ -DCMAKE_C_COMPILER=/path/to/gcc-4.9.2 -DCMAKE_CXX_COMPILER=/path/to/g++-4.9.2
-```
-to directly provide cmake with the path to your gcc compiler.
+**RUFUS requires the use of the gcc/4.9.2 compiler.**  Please make sure that are using the gcc/4.9.2 compiler before you proceeed. If you are not using gcc/4.9.2 as your default compiler, or if CMake cannot detect the location of your gcc compiler, RUFUS will not build and install properly.
 
 ## Testing RUFUS
 
