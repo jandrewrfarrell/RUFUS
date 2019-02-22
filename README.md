@@ -14,7 +14,12 @@ Salt Lake City, UT 84112-5330
 Email: JAndrewRFarrell@gmail.com         
 http://marthlab.org/
 
-This project is still under development and its not considered stable but you are free to use and any feedback is welcome.
+If you get errors during the installation contact me at at JAndrewRFarrell@gmail.com or submit an issue. 
+
+This project is still under development and not fully stable but free to use and any feedback is welcome.
+
+
+__Note:__ RUFUS is only supported on linux environments.
 
 ## Installing RUFUS
 
@@ -38,11 +43,16 @@ cmake ../ -DCMAKE_C_COMPILER=/path/to/gcc-4.9.2 -DCMAKE_CXX_COMPILER=/path/to/g+
 make
 ```
 
-If you get errors during the installation contact me at at JAndrewRFarrell@gmail.com or submit an issue.  NOTE, to date this only works on linux machines.
+If you have gcc-4.9.2 as your default compiler, you may instead use
+
+```
+	cmake ../ -DCMAKE_C_COMPILER=$(which gcc) -DCMAKE_CXX_COMPILER=$(which g++)
+	```
+	
 
 ## Compiler Requirements
 
-**RUFUS requires the use of the gcc/4.9.2 compiler.**  Please make sure that are using the gcc/4.9.2 compiler before you proceeed. If you are not using gcc/4.9.2 as your default compiler, or if CMake cannot detect the location of your gcc compiler, RUFUS will not build and install properly.
+**RUFUS requires the use of the gcc-4.9.2 compiler.**  Please make sure that are using the gcc-4.9.2 compiler before you proceeed. If you are not using gcc-4.9.2 as your default compiler, or if CMake cannot detect the location of your gcc compiler, RUFUS will not build and install properly.
 
 ## Testing RUFUS
 
