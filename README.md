@@ -56,7 +56,7 @@ make
 
 **RUFUS requires the use of the gcc-4.9.2 compiler.**  Please make sure that are using the gcc-4.9.2 compiler before you proceeed. If you are not using gcc-4.9.2 as your default compiler, or if CMake cannot detect the location of your gcc compiler, RUFUS will not build and install properly.
 
-**RUFUS requires Samtools.**. Please make sure that samtools is globally installed in your environment.  RUFUS will not run without a working samtools.
+**RUFUS requires Samtools.** Please make sure that samtools is globally installed in your environment.  RUFUS will not run without a working samtools.
 
 
 
