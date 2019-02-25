@@ -376,7 +376,6 @@ echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 #########__CREATE_ALL_GENERATOR_FILES_AND_VARIABLES__#############
 ProbandFileName=$(basename "$_arg_subject")
 ProbandExtension="${ProbandFileName##*.}"
-samtools=$RDIR/bin/externals/samtools/src/samtools_project/samtools
 echo "proband extension is $ProbandExtension"
 
 if [[ "$ProbandExtension" != "bam" ]] || [[ ! -e "$_arg_subject" ]] && [[ "$ProbandExtension" != "generator" ]]
@@ -387,7 +386,7 @@ elif [[ "$ProbandExtension" = "bam" ]]
 then
     echo "you provided the proband bam file" "$_arg_subject"
     ProbandGenerator="$ProbandFileName".generator
-    echo "$samtools view -F 3328 $_arg_subject" > "$ProbandGenerator"
+    echo "samtools view -F 3328 $_arg_subject" > "$ProbandGenerator"
 elif [[ "$ProbandExtension" = "generator" ]]
 then
     echo "you provided the proband bam file" "$_arg_subject"
@@ -417,7 +416,7 @@ do
     then
 	    parentGenerator="$parentFileName".generator
 	        ParentGenerators+=("$parentGenerator")
-		    echo "$samtools view -F 3328 $parent" > "$parentGenerator"
+		    echo "samtools view -F 3328 $parent" > "$parentGenerator"
 		        echo "You provided the control bam file" "$parent"
     elif [[ "$parentExtension" = "generator" ]]
     then
@@ -529,9 +528,8 @@ RUFUSmodel=$RDIR/bin/ModelDist
 RUFUSfilter=$RDIR/bin/RUFUS.Filter
 RufAlu=$RDIR/bin/externals/rufalu/src/rufalu_project/src/aluDetect
 RUFUSOverlap=$RDIR/scripts/Overlap.sh
-RunJelly=$RDIR/cloud/RunJellyForRUFUS
-PullSampleHashes=$RDIR/cloud/CheckJellyHashList.sh
-samtools=$RDIR/bin/samtools/samtools
+RunJelly=$RDIR/scripts/RunJellyForRUFUS.sh
+PullSampleHashes=$RDIR/scripts/CheckJellyHashList.sh
 modifiedJelly=$RDIR/cloud/jellyfish-MODIFIED-merge/bin/jellyfish
 ############################################################################################
 
@@ -548,7 +546,7 @@ fi
 
 for parent in "${ParentGenerators[@]}"
 do
-     /usr/bin/time -v bash $RunJelly $parent $K $(echo $Threads -2 | bc) 2 
+     /usr/bin/time -v bash $RunJelly $parent $K $(echo $Threads -2 | bc) 2 &
 done
 
 /usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc) 2 
@@ -684,7 +682,7 @@ else
 
     echo "Overlap probandGenerator name is $ProbandGenerator"
     
-    /usr/bin/time bash $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 3 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
+    /usr/bin/time bash  $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 3 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
 fi
 ##############################################################################################
 
