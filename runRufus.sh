@@ -530,7 +530,9 @@ RufAlu=$RDIR/bin/externals/rufalu/src/rufalu_project/src/aluDetect
 RUFUSOverlap=$RDIR/scripts/Overlap.sh
 RunJelly=$RDIR/scripts/RunJellyForRUFUS.sh
 PullSampleHashes=$RDIR/scripts/CheckJellyHashList.sh
-modifiedJelly=$RDIR/cloud/jellyfish-MODIFIED-merge/bin/jellyfish
+#modifiedJelly=$RDIR/cloud/jellyfish-MODIFIED-merge/bin/jellyfish
+modifiedJelly=$RDIR/bin/externals/modified_jellyfish/src/modified_jellyfish_project/bin/jellyfish
+
 ############################################################################################
 
 ####################__GENERATE_JHASH_FILES_FROM_JELLYFISH__#####################
