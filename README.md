@@ -85,7 +85,7 @@ This file should contain a single varient call.  The call should look exactly as
 5:177630000     12896   X-DeNovo        T       G       25      PASS    RN=NODE_Child.bam.generator.V2_0_L273_D22:10:12::MH0;MQ=60;cigar=273M;SB=0.454545;CVT=X;HD=-1_-1_-1_-1_-1_19_-1_19_19_-1_-1_-1_-1_-1_20_20_19_-1_-1_18_-1_18_-1_-1_18_-1_-1_;AO=19;VT=X GT:DP:RO:AO     0/1:39:20:19    0/0:23:23:0     0/0:23:23:0
 ```
 
-If you were unable to reproduce this call, something went wront with the RUFUS install, and you should get the test run to work before proceeding further.  If you are unable to reproduce a successfull test run, please contact me at JAndrewRFarrell@gmail.scom 
+If you were unable to reproduce this call, something went wront with the RUFUS install, and you should get the test run to work before proceeding further.  If you are unable to reproduce a successfull test run, please contact me at JAndrewRFarrell@gmail.com 
 
 ## Running 
 
