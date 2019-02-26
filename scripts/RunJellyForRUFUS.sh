@@ -7,7 +7,7 @@ K=$2
 T=$3
 L=$4
 
-RDIR=/uufs/chpc.utah.edu/common/home/u0401321/RUFUS
+RDIR=./../
 JELLYFISH="$RDIR/bin/externals/jellyfish/src/jellyfish_project/bin/jellyfish"
 SORT="$RDIR/scripts/sort"
 
