@@ -11,12 +11,4 @@ perl -p -i -e "s/RDIR=.*\n/RDIR=$( echo $(pwd)| perl -p -i -e "s/\//\\\\\//g")\n
 perl -p -i -e "s/RDIR=.*\n/RDIR=$( echo $(pwd)| perl -p -i -e "s/\//\\\\\//g")\n/g"  cloud/RunJellyForRUFUS.UGP
 perl -p -i -e "s/RDIR=.*\n/RDIR=$( echo $(pwd)| perl -p -i -e "s/\//\\\\\//g")\n/g"  runRufus.sh
 
-RUFUS_DIR=$(pwd)
-
-if [ ! -d "bin" ]; then
-mkdir bin
-fi
-if [ ! -d "bin/externals" ]; then
-cd bin && mkdir externals && cd externals && mkdir external && cd external && touch CMakeLists.txt
-fi
 
