@@ -35,6 +35,18 @@ add_library(rufus_core STATIC
 	RUFUS.Filter.cpp
 	RUFUS.Build.cpp
 	RUFUS.1kg.filter.cpp
+	PassThroughSamCheck.cpp
+	PassThroughSamCheck.stranded.cpp	
+	
+)
+
+
+add_executable(PassThroughSamCheck.stranded
+	PassThroughSamCheck.stranded.cpp
+)
+
+add_executable(PassThroughSamCheck
+	PassThroughSamCheck.cpp
 )
 
 add_executable(AnnotateOverlap

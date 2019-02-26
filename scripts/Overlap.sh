@@ -170,7 +170,7 @@ for parent in $ParentsJhash
         do
             if [ -s $NameStub.overlap.asembly.hash.fastq.Ref.$parent ]
             then
-                #echo "skipping $NameStub.overlap.asembly.hash.fastq.Ref.$parent already exitst"
+                echo "skipping $NameStub.overlap.asembly.hash.fastq.Ref.$parent already exitst"
             else
 
                 #echo "-$parent-"
@@ -198,7 +198,7 @@ done
 
 if [ -s ./$NameStub.ref.exclude ]
 then
-        #echo "Exclude already exists"
+        echo "Exclude already exists"
 else
         bash $CheckHash $RefHash ./$NameStub.overlap.hashcount.fastq.Jhash.tab 1 > ./$NameStub.ref.RepRefHash
 fi
