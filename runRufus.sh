@@ -1,4 +1,4 @@
-s#!/bin/bash
+#!/bin/bash
 
 # This is a rather minimal example Argbash potential
 # Example taken from http://argbash.readthedocs.io/en/stable/example.html
@@ -20,7 +20,10 @@ s#!/bin/bash
 # Argbash is a bash code generator used to get arguments parsing right.
 # Argbash is FREE SOFTWARE, see https://argbash.io for more info
 # Generated online by https://argbash.io/generate
-RDIR=/uufs/chpc.utah.edu/common/home/u0401321/RUFUS
+RDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+
+echo "RDIR is $RDIR"
 
 die()
 {
