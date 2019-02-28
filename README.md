@@ -25,18 +25,11 @@ __Note:__ RUFUS is only supported on linux environments.
 
  **1) Download**
 ```
-git clone https://github.com/jandrewrfarrell/RUFUS.git   
-```
-
-**2) Configure**
-```
+git clone https://github.com/jandrewrfarrell/RUFUS.git
 cd RUFUS
-./configure.sh
 ```
 
-__Note:__ ./configure must be run from the RUFUS root directory
-
-**3) Build**
+**2) Build**
 ```
 cd bin
 cmake ../ -DCMAKE_C_COMPILER=/path/to/gcc-4.9.2 -DCMAKE_CXX_COMPILER=/path/to/g++-4.9.2
