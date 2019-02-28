@@ -20,7 +20,10 @@
 # Argbash is a bash code generator used to get arguments parsing right.
 # Argbash is FREE SOFTWARE, see https://argbash.io for more info
 # Generated online by https://argbash.io/generate
-RDIR=/uufs/chpc.utah.edu/common/home/u0401321/RUFUS
+RDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+
+echo "RDIR is $RDIR"
 
 die()
 {
@@ -212,20 +215,6 @@ assign_positional_args
 
 # [ <-- needed because of Argbash
 
-
-################__THREE_FINGERED_CLAW_TECHNIQUE__###################
-## Thanks to the noble efforts of the Clan of the White Lotus,     #
-## these 3 functions originate during the late thirteenth century. # 
-## The original author, William Baxter, explained that these       #
-## three functions took 15 years to boil down to what they are     #
-                                                                   #
-yell() { echo "$0: $*" >&2; }                                      #
-barf() { yell "$*"; exit 111; }                                    #
-safe() { "$@" || barf "cannot $*"; }                               #
-                                                                   #
-####################################################################
-
-
 ##############################__CHECK_FOR_MANDATORY_PARAMS__#################################################
 if [ -z $_arg_kmersize ]
 then 
@@ -290,8 +279,6 @@ unset ExcludeTemp
 
 Parents=("${_arg_controls[@]}")
 _arg_ref_cat="${_arg_ref%.*}"
-
-echo "arg ref without fa is" "$_arg_ref_cat"
 
 
 
@@ -376,7 +363,6 @@ echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 #########__CREATE_ALL_GENERATOR_FILES_AND_VARIABLES__#############
 ProbandFileName=$(basename "$_arg_subject")
 ProbandExtension="${ProbandFileName##*.}"
-samtools=$RDIR/bin/externals/samtools/samtools
 echo "proband extension is $ProbandExtension"
 
 if [[ "$ProbandExtension" != "bam" ]] || [[ ! -e "$_arg_subject" ]] && [[ "$ProbandExtension" != "generator" ]]
@@ -387,7 +373,7 @@ elif [[ "$ProbandExtension" = "bam" ]]
 then
     echo "you provided the proband bam file" "$_arg_subject"
     ProbandGenerator="$ProbandFileName".generator
-    echo "$samtools view -F 3328 $_arg_subject" > "$ProbandGenerator"
+    echo "samtools view -F 3328 $_arg_subject" > "$ProbandGenerator"
 elif [[ "$ProbandExtension" = "generator" ]]
 then
     echo "you provided the proband bam file" "$_arg_subject"
@@ -417,7 +403,7 @@ do
     then
 	    parentGenerator="$parentFileName".generator
 	        ParentGenerators+=("$parentGenerator")
-		    echo "$samtools view -F 3328 $parent" > "$parentGenerator"
+		    echo "samtools view -F 3328 $parent" > "$parentGenerator"
 		        echo "You provided the control bam file" "$parent"
     elif [[ "$parentExtension" = "generator" ]]
     then
@@ -506,59 +492,54 @@ parentsExcludeString=""
 space=" "
 jhash=".Jhash"
 
-echo "Building parentString..."
 for parent in "${ParentGenerators[@]}"
 do
   echo "parent is  $parent "
   parentsString=$parentsString$space$parent$jhash
-  echo "parents string equals " $parentsString
 done
 for exclude in "${_arg_exclude[@]}"
 do
-    echo "_arg_exclude is set"
     parentsExcludeString=$parentsExcludeString$space$exclude
-    echo "parent Exclude string" $parentsExcludeString
 done
 
 ##################################################
 
 
 
-########################## set RUFUS directory path variables ##############################
+##########################__SET_EXECUTABLE_PATHS__##############################
 RUFUSmodel=$RDIR/bin/ModelDist
 RUFUSfilter=$RDIR/bin/RUFUS.Filter
 RufAlu=$RDIR/bin/externals/rufalu/src/rufalu_project/src/aluDetect
 RUFUSOverlap=$RDIR/scripts/Overlap.sh
-RunJelly=$RDIR/cloud/RunJellyForRUFUS
-PullSampleHashes=$RDIR/cloud/CheckJellyHashList.sh
-samtools=$RDIR/bin/samtools/samtools
-modifiedJelly=$RDIR/cloud/jellyfish-MODIFIED-merge/bin/jellyfish
+RunJelly=$RDIR/scripts/RunJellyForRUFUS.sh
+PullSampleHashes=$RDIR/scripts/CheckJellyHashList.sh
+modifiedJelly=$RDIR/bin/externals/modified_jellyfish/src/modified_jellyfish_project/bin/jellyfish
+
 ############################################################################################
 
+
+
 ####################__GENERATE_JHASH_FILES_FROM_JELLYFISH__#####################
-
-
-
 JThreads=$(( Threads / 3 ))
 if [ "$JThreads" -lt 3 ]
 then
     JThreads=3
 fi
 
-
 for parent in "${ParentGenerators[@]}"
 do
-     /usr/bin/time -v bash $RunJelly $parent $K $(echo $Threads -2 | bc) 2 
+     /usr/bin/time -v bash $RunJelly $parent $K $(echo $Threads -2 | bc) 2 &
 done
 
 /usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc) 2 
- 
+##############################################################################
 
 
 
+###########################_EMPTY_JHASH_CHECK##############################
 for parent in "${ParentGenerators[@]}"
 do
-        ######Check that we produced Non-empty Jhash tables for parents                                                                                                                                                                       
+    ## Check Jhash files are not empty
      if [ ! -s "$parent".Jhash ]
      then
         echo "@@@@@@@@@@@__WARNING__@@@@@@@@@@@@@"
@@ -569,7 +550,6 @@ do
      fi
 done
 
-  ######Check that we produced Non-empty Jhash tables for Proband
 if [ ! -s "$ProbandGenerator".Jhash ]
 then
     echo "@@@@@@@@@@@__WARNING__@@@@@@@@@@@@@"
@@ -581,6 +561,7 @@ fi
 ##############################################################################
 
 
+
 ##################__GENERATE_JHASH_HISTOGRAMS__#################################
 perl -ni -e 's/ /\t/;print' "$ProbandGenerator".Jhash.histo
 for parent in "${ParentGenerators[@]}"
@@ -588,6 +569,7 @@ do
   perl -ni -e 's/ /\t/;print' "$parent".Jhash.histo
 done
 ##############################################################################
+
 
 
 #######################__RUFUS_Model__############################################
@@ -612,34 +594,10 @@ else
     MutantMinCov="$_arg_min" 
     touch "$ProbandGenerator".Jhash.histo.7.7.model
 fi
-#######################################################################################
-
-
-###########################__RUFUS_BUILD__#################################################
-#echo "starting RUFUS build"
-#if [ -e out."$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList ]
-#then
-#        echo "Skipping build"
-#else
-#    /usr/bin/time -v $RDIR/cloud/jellyfish-MODIFIED-merge/bin/jellyfish merge "$ProbandGenerator".Jhash $(echo $parentsString)  >  out."$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList
-#fi
-#echo "done with RUFUS build "
-
-##if [ ! -s out."$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList ]
-##then
-##   echo "@@@@@@@@@@@__WARNING__@@@@@@@@@@@@@"
-##    echo "out."$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  is empty"
-##    echo "Killing run with exit status 1"
-##    echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-##    kill -9 $$
-## fi
-
-#########################################################################################
+########################################################################################
 
 
 
-
-echo "parents string + exclude string is $parentsString $parentsExcludeString" 
 #################################__HASH_LIST_FILTER__#####################################
 if [ -s "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList ]
 then 
@@ -649,9 +607,9 @@ else
     mkfifo "$ProbandGenerator".temp
     /usr/bin/time -v $modifiedJelly merge "$ProbandGenerator".Jhash $(echo $parentsString) $(echo $parentsExcludeString)  > "$ProbandGenerator".temp & 
     /usr/bin/time -v bash $PullSampleHashes $ProbandGenerator.Jhash "$ProbandGenerator".temp $MutantMinCov > "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList
-    #/usr/bin/time -v bash $PullSampleHashes "$ProbandGenerator".Jhash out."$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList $MutantMinCov > "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList
     wait
 fi
+########################################################################################
 
 
 
@@ -661,46 +619,36 @@ if [ -e "$ProbandGenerator".Mutations.fastq ]
 then
     echo "skipping filter"
 else
-
-    echo "Filter probandGenerator name is $ProbandGenerator"
-
     rm  "$ProbandGenerator".temp
     mkfifo "$ProbandGenerator".temp
-    /usr/bin/time -v  bash "$ProbandGenerator" | "$RDIR"/cloud/PassThroughSamCheck.stranded "$ProbandGenerator".filter.chr >  "$ProbandGenerator".temp &
+    /usr/bin/time -v  bash "$ProbandGenerator" | "$RDIR"/bin/PassThroughSamCheck.stranded "$ProbandGenerator".filter.chr >  "$ProbandGenerator".temp &
     /usr/bin/time -v   "$RUFUSfilter"  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp "$ProbandGenerator" "$K" 5 5 10 "$(echo $Threads -2 | bc)" &
-    #bash $ProbandGenerator | $RDIR/cloud/PassThroughSamCheck.stranded $ProbandGenerator.filter.chr | head 
-    #/usr/bin/time -v "$RUFUSfilter" "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList <(bash $ProbandGenerator | $RDIR/cloud/PassThroughSamCheck.stranded $ProbandGenerator.filter.chr)  "$ProbandGenerator" $K 5 5 10 $(echo $Threads -2 | bc)
     wait
 fi
 ########################################################################################
-    echo "starting RUFUS overlap"
+
+
 
 ###################__RUFUS_OVERLAP__#############################################
 if [ -e "$ProbandGenerator".V2.overlap.hashcount.fastq.bam.vcf ]
 then
-    echo "skipping overlap"
+    echo "Skipping overlap step"
 else
-    echo "starting RUFUS overlap"
-
-    echo "Overlap probandGenerator name is $ProbandGenerator"
-    
-    /usr/bin/time bash $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 3 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
+    echo "Starting RUFUS overlap"
+    /usr/bin/time bash  $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 3 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
+    echo "Done with RUFUS overlap"
 fi
 ##############################################################################################
 
 
-
-
-#TODO: fix hard coding aluLIst path
-######__RUFALU__#############
+############################__RUFALU__#############################
 aluList=$RDIR/resources/primate_non-LTR_Retrotransposon.fasta
 fastaHackPath=$RDIR/bin/externals/fastahack/src/fastahack_project/bin/tools/fastahack
 jellyfishPath=$RDIR/src/externals/jellyfish-2.2.5/bin/jellyfish
 echo "$RufAlu $ProbandFileName $ProbandGenerator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $jellyfishPath $(echo $ParentFileNames) "
 $RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $fastaHackPath $jellyfishPath  $(echo $ParentFileNames)
-#########################
+########################################################################
 
-#echo "seeing what working dir is to pass to RufAlu" $PWD
 
 echo "done with everything"
 exit 0

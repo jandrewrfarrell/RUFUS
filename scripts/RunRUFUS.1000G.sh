@@ -1,4 +1,3 @@
-date
 ProbandGenerator=$1
 K=$2
 Threads=$3
@@ -18,15 +17,15 @@ then
         exit
 fi
 
-RDIR=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/RUFUS
+RDIR=./../
 RUFUSmodel=$RDIR/bin/ModelDist
 RUFUSbuild=$RDIR/bin/RUFUS.Build
 RUFUSfilter=$RDIR/bin/RUFUS.Filter
 RUFUSOverlap=$RDIR/scripts/OverlapBashMultiThread.individual.sh
 DeDupDump=$RDIR/scripts/HumanDedup.grenrator.tenplate
-PullSampleHashes=$RDIR/cloud/CheckJellyHashList.sh
+PullSampleHashes=$RDIR/scripts/CheckJellyHashList.sh
 RUFUS1kgFilter=$RDIR/bin/RUFUS.1kg.filter
-RunJelly=$RDIR/scripts/RunJellyForRUFUS 
+RunJelly=$RDIR/scripts/RunJellyForRUFUS.sh 
 
 
 if [ -s $ProbandGenerator.Jhash.sorted.min2.tab ]
