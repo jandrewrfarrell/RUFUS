@@ -17,7 +17,10 @@ then
         exit
 fi
 
-RDIR=./../
+
+
+CDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+RDIR=$CDIR/../
 RUFUSmodel=$RDIR/bin/ModelDist
 RUFUSbuild=$RDIR/bin/RUFUS.Build
 RUFUSfilter=$RDIR/bin/RUFUS.Filter

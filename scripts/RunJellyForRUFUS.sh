@@ -5,7 +5,10 @@ K=$2
 T=$3
 L=$4
 
-RDIR=./..
+CDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+RDIR=$CDIR/../
+
+
 JELLYFISH="$RDIR/bin/externals/jellyfish/src/jellyfish_project/bin/jellyfish"
 SORT="$RDIR/scripts/sort"
 
