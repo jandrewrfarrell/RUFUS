@@ -28,7 +28,7 @@ Parent3Jhash=$10
 mkdir ./TempOverlap/
 echo "Overlaping $File"
 
-RDIR=/uufs/chpc.utah.edu/common/home/u0991464/d1/home/farrelac/RUFUS
+RDIR=/scratch/ucgd/lustre/u0991464/RUFUS.simulation.test/testStricterOverlap/RUFUS
 
 OverlapHash=$RDIR/bin/Overlap
 OverlapRebion2=$RDIR/bin/OverlapRegion

@@ -22,9 +22,6 @@
 # Generated online by https://argbash.io/generate
 RDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-
-echo "RDIR is $RDIR"
-
 die()
 {
     local _ret=$2
@@ -537,6 +534,7 @@ done
 
 
 ###########################_EMPTY_JHASH_CHECK##############################
+
 for parent in "${ParentGenerators[@]}"
 do
     ## Check Jhash files are not empty
@@ -630,7 +628,7 @@ fi
 
 
 ###################__RUFUS_OVERLAP__#############################################
-if [ -e "$ProbandGenerator".V2.overlap.hashcount.fastq.bam.vcf ]
+if [ -e ./Intermediates/"$ProbandGenerator".V2.overlap.hashcount.fastq.bam.vcf ]
 then
     echo "Skipping overlap step"
 else
@@ -649,6 +647,15 @@ echo "$RufAlu $ProbandFileName $ProbandGenerator.V2.overlap.hashcount.fastq  $al
 $RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $fastaHackPath $jellyfishPath  $(echo $ParentFileNames)
 ########################################################################
 
+
+echo "cleaning up VCF"
+
+grep ^# $ProbandGenerator.V2.overlap.hashcount.fastq.bam.vcf> ./Intermediates/$ProbandGenerator.V2.overlap.hashcount.fastq.bam.sorted.vcf
+grep -v  ^# $ProbandGenerator.V2.overlap.hashcount.fastq.bam.vcf | sort -k1,1 -k2,2n >> ./Intermediates/$ProbandGenerator.V2.overlap.hashcount.fastq.bam.sorted.vcf
+bash $RDIR/scripts/VilterAutosomeOnly ./Intermediates/$ProbandGenerator.V2.overlap.hashcount.fastq.bam.sorted.vcf > ./$ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf
+
+$RDIR/bin/tabix/bgzip -f ./$ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf
+$RDIR/bin/tabix/tabix ./$ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf.gz
 
 echo "done with everything"
 exit 0

@@ -1,5 +1,4 @@
 #!/bin/bash
 RDIR=./../
 BAMTOOLS=$RDIR/src/externals/gkno_launcher/tools/bamtools/bin/bamtools
-
 $BAMTOOLS filter -in $1 -isDuplicate false | $BAMTOOLS convert -format fastq 
