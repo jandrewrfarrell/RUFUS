@@ -362,13 +362,13 @@ ProbandFileName=$(basename "$_arg_subject")
 ProbandExtension="${ProbandFileName##*.}"
 echo "proband extension is $ProbandExtension"
 
-if [[ "$ProbandExtension" != "bam" ]] || [[ ! -e "$_arg_subject" ]] && [[ "$ProbandExtension" != "generator" ]]
+if [[ "$ProbandExtension" != "cram" ]] && [[ "$ProbandExtension" != "bam" ]] || [[ ! -e "$_arg_subject" ]] && [[ "$ProbandExtension" != "generator" ]]
 then 
     echo "The proband bam/generator file" "$_arg_subject" " was not provided or does not exist; killing run with non-zero exit status"
     kill -9 $$
-elif [[ "$ProbandExtension" = "bam" ]]
+elif [[ "$ProbandExtension" == "cram" ]] || [[ "$ProbandExtension" == "bam" ]]
 then
-    echo "you provided the proband bam file" "$_arg_subject"
+    echo "you provided the proband bam/cram file" "$_arg_subject"
     ProbandGenerator="$ProbandFileName".generator
     echo "samtools view -F 3328 $_arg_subject" > "$ProbandGenerator"
 elif [[ "$ProbandExtension" = "generator" ]]
@@ -392,16 +392,16 @@ do
     parentExtension="${parentFileName##*.}"
     echo "parent file extension name is" "$parentExtension"
 
-    if [[ "$parentExtension" != "bam" ]]  && [[ "$parentExtension" != "generator" ]] 
+    if  [[ "$parentExtension" != "cram" ]] && [[ "$parentExtension" != "bam" ]]  && [[ "$parentExtension" != "generator" ]] 
     then
 	echo "The control bam/generator file" "$parent" " was not provided, or does not exist; killing run with non-zero exit status"
 	kill -9 $$
-    elif [[ "$parentExtension" = "bam" ]]
+    elif [[ "$parentExtension" == "cram" ]] || [[ "$parentExtension" == "bam" ]]
     then
 	    parentGenerator="$parentFileName".generator
 	        ParentGenerators+=("$parentGenerator")
 		    echo "samtools view -F 3328 $parent" > "$parentGenerator"
-		        echo "You provided the control bam file" "$parent"
+		        echo "You provided the control bam/cram file" "$parent"
     elif [[ "$parentExtension" = "generator" ]]
     then
 	parentGenerator="$parentFileName"
