@@ -525,10 +525,11 @@ fi
 
 for parent in "${ParentGenerators[@]}"
 do
-     /usr/bin/time -v bash $RunJelly $parent $K $(echo $Threads -2 | bc) 2 
+     /usr/bin/time -v bash $RunJelly $parent $K $(echo $JThreads -2 | bc) 2 &
 done
 
-/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $Threads -2 | bc) 2 
+/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $JThreads -2 | bc) 2 & 
+wait
 ##############################################################################
 
 
@@ -620,7 +621,7 @@ else
     rm  "$ProbandGenerator".temp
     mkfifo "$ProbandGenerator".temp
     /usr/bin/time -v  bash "$ProbandGenerator" | "$RDIR"/bin/PassThroughSamCheck.stranded "$ProbandGenerator".filter.chr >  "$ProbandGenerator".temp &
-    /usr/bin/time -v   "$RUFUSfilter"  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp "$ProbandGenerator" "$K" 5 5 10 "$(echo $Threads -2 | bc)" &
+    /usr/bin/time -v   "$RUFUSfilter"  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp "$ProbandGenerator" "$K" 16 5 1 "$(echo $Threads -2 | bc)" &
     wait
 fi
 ########################################################################################
@@ -628,7 +629,7 @@ fi
 
 
 ###################__RUFUS_OVERLAP__#############################################
-if [ -e ./Intermediates/"$ProbandGenerator".V2.overlap.hashcount.fastq.bam.vcf ]
+if [ -e ./runanywayIntermediates/"$ProbandGenerator".V2.overlap.hashcount.fastq.bam.vcf ]
 then
     echo "Skipping overlap step"
 else
@@ -640,11 +641,11 @@ fi
 
 
 ############################__RUFALU__#############################
-aluList=$RDIR/resources/primate_non-LTR_Retrotransposon.fasta
-fastaHackPath=$RDIR/bin/externals/fastahack/src/fastahack_project/bin/tools/fastahack
-jellyfishPath=$RDIR/src/externals/jellyfish-2.2.5/bin/jellyfish
-echo "$RufAlu $ProbandFileName $ProbandGenerator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $jellyfishPath $(echo $ParentFileNames) "
-$RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $fastaHackPath $jellyfishPath  $(echo $ParentFileNames)
+#aluList=$RDIR/resources/primate_non-LTR_Retrotransposon.fasta
+#fastaHackPath=$RDIR/bin/externals/fastahack/src/fastahack_project/bin/tools/fastahack
+#jellyfishPath=$RDIR/src/externals/jellyfish-2.2.5/bin/jellyfish
+#echo "$RufAlu $ProbandFileName $ProbandGenerator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $jellyfishPath $(echo $ParentFileNames) "
+#$RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $fastaHackPath $jellyfishPath  $(echo $ParentFileNames)
 ########################################################################
 
 
@@ -654,8 +655,8 @@ grep ^# $ProbandGenerator.V2.overlap.hashcount.fastq.bam.vcf> ./Intermediates/$P
 grep -v  ^# $ProbandGenerator.V2.overlap.hashcount.fastq.bam.vcf | sort -k1,1 -k2,2n >> ./Intermediates/$ProbandGenerator.V2.overlap.hashcount.fastq.bam.sorted.vcf
 bash $RDIR/scripts/VilterAutosomeOnly ./Intermediates/$ProbandGenerator.V2.overlap.hashcount.fastq.bam.sorted.vcf > ./$ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf
 
-$RDIR/bin/tabix/bgzip -f ./$ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf
-$RDIR/bin/tabix/tabix ./$ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf.gz
+bgzip -f ./$ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf
+tabix ./$ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf.gz
 
 echo "done with everything"
 exit 0
