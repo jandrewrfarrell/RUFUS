@@ -366,11 +366,16 @@ if [[ "$ProbandExtension" != "cram" ]] && [[ "$ProbandExtension" != "bam" ]] || 
 then 
     echo "The proband bam/generator file" "$_arg_subject" " was not provided or does not exist; killing run with non-zero exit status"
     kill -9 $$
-elif [[ "$ProbandExtension" == "cram" ]] || [[ "$ProbandExtension" == "bam" ]]
+elif [[ "$ProbandExtension" == "bam" ]]
 then
-    echo "you provided the proband bam/cram file" "$_arg_subject"
+    echo "you provided the proband cram file" "$_arg_subject"
     ProbandGenerator="$ProbandFileName".generator
     echo "samtools view -F 3328 $_arg_subject" > "$ProbandGenerator"
+elif [[ "$ProbandExtension" == "cram" ]]
+then
+    echo "you provided the proband cram file" "$_arg_subject"
+    ProbandGenerator="$ProbandFileName".generator
+    echo "samtools view -F 3328 -T $_arg_ref $_arg_subject" > "$ProbandGenerator"
 elif [[ "$ProbandExtension" = "generator" ]]
 then
     echo "you provided the proband bam file" "$_arg_subject"
@@ -621,7 +626,7 @@ else
     rm  "$ProbandGenerator".temp
     mkfifo "$ProbandGenerator".temp
     /usr/bin/time -v  bash "$ProbandGenerator" | "$RDIR"/bin/PassThroughSamCheck.stranded "$ProbandGenerator".filter.chr >  "$ProbandGenerator".temp &
-    /usr/bin/time -v   "$RUFUSfilter"  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp "$ProbandGenerator" "$K" 16 5 1 "$(echo $Threads -2 | bc)" &
+    /usr/bin/time -v   "$RUFUSfilter"  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp "$ProbandGenerator" "$K" 13 1 "$(echo $Threads -2 | bc)" &
     wait
 fi
 ########################################################################################
