@@ -59,6 +59,7 @@ print_help ()
     printf "\t%s\n" "-c, --controls: bam files containing the control subjects ()"
     printf "\t%s\n" "-s,--subject: bam file containing the subject of interest (no default)"
     printf "\t%s\n" "-r,--ref: file path to the desired reference file (no default)"
+    printf "\t%s\n" "-cr,--cramref: file path to the desired reference file to decompress input cram files (no default)"
     printf "\t%s\n" "-t,--threads: number of threads to use (no default) (min 3)"
     printf "\t%s\n" "-k,--kersize: size of k-mer to use (no default)"
     printf "\t%s\n" "-m,--min: overwrites the minimum k-mer count to call variant (no default)"
@@ -73,6 +74,7 @@ s-n>] ...\n' "$0"
     printf "\t%s\n" "-c, --controls: bam files containing the control subjects"
     printf "\t%s\n" "-s,--subject: bam file containing the subject of interest (no default)"
     printf "\t%s\n" "-r,--ref: file path to the desired reference file (no default)"
+    printf "\t%s\n" "-cr,--cramref: file path to the desired reference file to decompress input cram files (no default)"
     printf "\t%s\n" "-t,--threads: number of threads to use (no default) (min 3)"
     printf "\t%s\n" "-f,--refhash: Jhash file containing reference hashList (no default)"
     printf "\t%s\n" "-e,--exclude: Jhash file of kmers to exclude from mutation list (no default)"
@@ -109,6 +111,17 @@ parse_commandline ()
 		;;
 	    -r*)
 		_arg_ref="${_key##-r}"
+		;;
+            -cr|-cramref)
+	         test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+		_arg_cramref="$2"
+		shift
+		;;
+	    -cramref*)
+		_arg_cramref="${_key##--cramref=}"
+	    	;;
+	    -cr*)
+		 _arg_cramref="${_key##-cr}"
 		;;
 	    -t|--threads)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
@@ -375,7 +388,12 @@ elif [[ "$ProbandExtension" == "cram" ]]
 then
     echo "you provided the proband cram file" "$_arg_subject"
     ProbandGenerator="$ProbandFileName".generator
-    echo "samtools view -F 3328 -T $_arg_ref $_arg_subject" > "$ProbandGenerator"
+    if [ "$_arg_cramref" == "" ]
+    then
+         echo "ERROR cram reference not provided for cram input";
+        kill -9 $$  
+     fi
+    echo "samtools view -F 3328 -T $_arg_cramref $_arg_subject" > "$ProbandGenerator"
 elif [[ "$ProbandExtension" = "generator" ]]
 then
     echo "you provided the proband bam file" "$_arg_subject"
@@ -401,13 +419,24 @@ do
     then
 	echo "The control bam/generator file" "$parent" " was not provided, or does not exist; killing run with non-zero exit status"
 	kill -9 $$
-    elif [[ "$parentExtension" == "cram" ]] || [[ "$parentExtension" == "bam" ]]
+    elif [[ "$parentExtension" == "bam" ]]
     then
 	    parentGenerator="$parentFileName".generator
-	        ParentGenerators+=("$parentGenerator")
-		    echo "samtools view -F 3328 $parent" > "$parentGenerator"
-		        echo "You provided the control bam/cram file" "$parent"
-    elif [[ "$parentExtension" = "generator" ]]
+	    ParentGenerators+=("$parentGenerator")
+	    echo "samtools view -F 3328 $parent" > "$parentGenerator"
+	    echo "You provided the control bam file" "$parent"
+    elif [[ "$parentExtension" == "cram" ]] 
+    then
+            parentGenerator="$parentFileName".generator
+            ParentGenerators+=("$parentGenerator")
+	    if [ "$_arg_cramref" == "" ]
+	    then 
+		echo "ERROR cram reference not provided for cram input"; 
+		 kill -9 $$ 
+	    fi
+            echo "samtools view -F 3328 -T $_arg_cramref $parent" > "$parentGenerator"
+            echo "You provided the control cram file" "$parent"    
+elif [[ "$parentExtension" = "generator" ]]
     then
 	parentGenerator="$parentFileName"
         ParentGenerators+=("$parentGenerator")
