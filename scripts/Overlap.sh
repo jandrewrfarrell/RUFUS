@@ -63,7 +63,7 @@ else
 	samtools index $File.bam 
 	#$gkno bwa-se -ps human  -q $File -id $File -s $File -o $File.bam -p ILLUMINA
      
-	$OverlapSam <( samtools view $File.bam ) .95 25 1 ./TempOverlap/$NameStub.sam $NameStub 1 $Threads
+	$OverlapSam <( samtools view  -F 3328 $File.bam ) .95 25 1 ./TempOverlap/$NameStub.sam $NameStub 1 $Threads
 
 fi
 
