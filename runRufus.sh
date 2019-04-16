@@ -80,6 +80,8 @@ s-n>] ...\n' "$0"
     printf "\t%s\n" "-e,--exclude: Jhash file of kmers to exclude from mutation list (no default)"
     printf "\t%s\n" "-k,--kersize: size of k-mer to use (no default)"
     printf "\t%s\n" "-m,--min: overwrites the minimum k-mer count to call variant (no default)"
+    printf "\t%s\n" "-q1,--fastq1: If starting from fastq files, a list of the mate1 fastq files to improve RUFUS.ilter"
+    printf "\t%s\n" "-q2,--fastq2: If starting from fastq files, a list of the mate2 fastq files to improve RUFUS.ilter"
     printf "\t%s\n" "-h,--help: HELP!!!!!!!!!!!!!!!"
     printf "\t%s\n" "-d,--devhelp: HELP!!! for developers"
 }
@@ -112,17 +114,43 @@ parse_commandline ()
 	    -r*)
 		_arg_ref="${_key##-r}"
 		;;
-            -cr|-cramref)
+            
+	    -cr|--cramref)
 	         test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_arg_cramref="$2"
 		shift
 		;;
-	    -cramref*)
+	    --cramref*)
 		_arg_cramref="${_key##--cramref=}"
 	    	;;
 	    -cr*)
 		 _arg_cramref="${_key##-cr}"
 		;;
+	    
+	    -q1|--fastq1)
+                 test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+                _arg_fastqA="$2"
+                shift
+                ;;
+            --fastq1=*)
+                _arg_fastqA="${_key##--fastq1=}"
+                ;;
+            -q1*)
+                 _arg_fastqA="${_key##-q1}"
+                ;;
+	    
+	    -q2|--fastq2)
+                 test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+                _arg_fastqB="$2"
+                shift
+                ;;
+            --fastq2=*)
+                _arg_fastqB="${_key##--fastq2=}"
+                ;;
+            -q2*)
+                 _arg_fastqB="${_key##-q2}"
+                ;;
+	    
 	    -t|--threads)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_arg_threads="$2"
@@ -134,6 +162,7 @@ parse_commandline ()
 	    -t*)
 		_arg_threads="${_key##-t}"
 		;;
+
             -f|--refhash)
                 test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
                 _arg_refhash="$2"
@@ -247,7 +276,8 @@ then
     kill -9 $$
 fi
 
-
+echo "_arg_fastqA = $_arg_fastqA"
+echo "_arg_fastqB = $_arg_fastqB"
 
 
 
@@ -545,7 +575,8 @@ RUFUSOverlap=$RDIR/scripts/Overlap.sh
 RunJelly=$RDIR/scripts/RunJellyForRUFUS.sh
 PullSampleHashes=$RDIR/scripts/CheckJellyHashList.sh
 modifiedJelly=$RDIR/bin/externals/modified_jellyfish/src/modified_jellyfish_project/bin/jellyfish
-
+bwa=$RDIR/bin/externals/bwa/src/bwa_project/bwa
+RUFUSfilterFASTQ=$RDIR/bin/RUFUS.Filter.fastq
 ############################################################################################
 
 
@@ -648,16 +679,41 @@ fi
 
 ######################__RUFUS_FILTER__##################################################
 echo "starting RUFUS filter"
+
+echo "_arg_fastqA = $_arg_fastqA"
+echo "_arg_fastqB = $_arg_fastqB"
 if [ -e "$ProbandGenerator".Mutations.fastq ]
 then
-    echo "skipping filter"
+	echo "skipping filter"
 else
-    rm  "$ProbandGenerator".temp
-    mkfifo "$ProbandGenerator".temp
-    /usr/bin/time -v  bash "$ProbandGenerator" | "$RDIR"/bin/PassThroughSamCheck.stranded "$ProbandGenerator".filter.chr >  "$ProbandGenerator".temp &
-    /usr/bin/time -v   "$RUFUSfilter"  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp "$ProbandGenerator" "$K" 13 1 "$(echo $Threads -2 | bc)" &
-    wait
+	if [ -z $_arg_fastqA ]
+	then 
+	    rm  "$ProbandGenerator".temp
+	    mkfifo "$ProbandGenerator".temp
+	    /usr/bin/time -v  bash "$ProbandGenerator" | "$RDIR"/bin/PassThroughSamCheck.stranded "$ProbandGenerator".filter.chr >  "$ProbandGenerator".temp &
+	    /usr/bin/time -v   "$RUFUSfilter"  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp "$ProbandGenerator" "$K" 13 1 "$(echo $Threads -2 | bc)" &
+	    wait
+	   
+	     $bwa mem $_arg_ref_bwa "$ProbandGenerator".Mutations.fastq | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.bam
+	     samtools index "$ProbandGenerator".Mutations.fastq.bam
+	
+	else
+		echo "Running RUFUS.filter from paired FASTQ files"
+	
+		#mkfifo $_arg_fastqA.temp
+		#mkfifo $_arg_fastqB.temp
+		
+		echo "$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  <(bash $_arg_fastqA) <(bash $_arg_fastqB) "$ProbandGenerator" $K 13 1 "$(echo $Threads -2 | bc)""
+
+		####$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  <(bash $_arg_fastqA) <(bash $_arg_fastqB) "$ProbandGenerator" $K 13 1 "$(echo $Threads -2 | bc)"
+		wait
+	
+		cat "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq > "$ProbandGenerator".Mutations.fastq
+		#$bwa mem $_arg_ref_bwa "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq  | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.bam 
+		#samtools index "$ProbandGenerator".Mutations.fastq.bam
+	fi
 fi
+
 ########################################################################################
 
 
@@ -668,6 +724,7 @@ then
     echo "Skipping overlap step"
 else
     echo "Starting RUFUS overlap"
+    echo "/usr/bin/time bash  $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 3 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash""
     /usr/bin/time bash  $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 3 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
     echo "Done with RUFUS overlap"
 fi

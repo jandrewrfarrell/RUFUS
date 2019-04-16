@@ -55,16 +55,20 @@ JellyFish=$RDIR/bin/externals/jellyfish/src/jellyfish_project/bin/jellyfish
 #	echo "Skipping Overlap"
 #else
 
+if [ -s ./$File.bam ] 
+then 
+	echo "skipping align"
+else
+	$bwa mem $humanRefBwa "$File" | samtools sort -T $File -O bam - > $File.bam
+	samtools index $File.bam 
+fi
+
 if [ -s ./TempOverlap/$NameStub.sam.fastqd ]  
 then 
 	echo "skipping sam assemble"
 else
-	$bwa mem $humanRefBwa "$File" | samtools sort -T $File -O bam - > $File.bam
-	samtools index $File.bam 
-	#$gkno bwa-se -ps human  -q $File -id $File -s $File -o $File.bam -p ILLUMINA
      
 	$OverlapSam <( samtools view  -F 3328 $File.bam ) .95 25 1 ./TempOverlap/$NameStub.sam $NameStub 1 $Threads
-
 fi
 
 if [ -s ./TempOverlap/$NameStub.1.fastqd ]
@@ -155,7 +159,7 @@ for parent in $ParentsJhash
             then
                 echo "skiping Intermediates/$NameStub.overlap.asembly.hash.fastq.$parent already exists"
             else
-                bash $CheckHash $parent ./Intermediates$NameStub.overlap.hashcount.fastq.Jhash.tab 0 > Intermediates/$NameStub".overlap.asembly.hash.fastq."$parent
+                bash $CheckHash $parent ./Intermediates/$NameStub.overlap.hashcount.fastq.Jhash.tab 0 > Intermediates/$NameStub".overlap.asembly.hash.fastq."$parent
             fi
 done
 
@@ -206,6 +210,8 @@ wait
 
 mkfifo check 
 samtools index ./$NameStub.overlap.hashcount.fastq.bam
+
+echo "$RUFUSinterpret -mod Intermediates/$NameStub.overlap.asembly.hash.fastq.sample -mQ 8 -r $humanRef -hf $HashList -o  ./$NameStub.overlap.hashcount.fastq.bam -m 1000000 $(echo $parentCRString) -sR Intermediates/$NameStub.overlap.asembly.hash.fastq.Ref.sample -s Intermediates/$NameStub.overlap.asembly.hash.fastq.sample -e ./Intermediates/$NameStub.ref.RepRefHash "
 
 samtools view ./$NameStub.overlap.hashcount.fastq.bam | $RUFUSinterpret -mod Intermediates/$NameStub.overlap.asembly.hash.fastq.sample -mQ 8 -r $humanRef -hf $HashList -o  ./$NameStub.overlap.hashcount.fastq.bam -m 1000000 $(echo $parentCRString) -sR Intermediates/$NameStub.overlap.asembly.hash.fastq.Ref.sample -s Intermediates/$NameStub.overlap.asembly.hash.fastq.sample -e ./Intermediates/$NameStub.ref.RepRefHash 
 
