@@ -571,7 +571,7 @@ done
 RUFUSmodel=$RDIR/bin/ModelDist
 RUFUSfilter=$RDIR/bin/RUFUS.Filter
 RufAlu=$RDIR/bin/externals/rufalu/src/rufalu_project/src/aluDetect
-TwoFus=$RDIR/bin/externals/twofus/src/twofus_project/bin/tools/runTwoFus
+TwoFus=$RDIR/bin/externals/twofus/src/twofus_project-build/tools/runTwofus
 RUFUSOverlap=$RDIR/scripts/Overlap.sh
 RunJelly=$RDIR/scripts/RunJellyForRUFUS.sh
 PullSampleHashes=$RDIR/scripts/CheckJellyHashList.sh
@@ -731,14 +731,19 @@ else
 fi
 ##############################################################################################
 
-
 ############################__RUFALU__#############################
-#aluList=$RDIR/resources/primate_non-LTR_Retrotransposon.fasta
 #fastaHackPath=$RDIR/bin/externals/fastahack/src/fastahack_project/bin/tools/fastahack
 #jellyfishPath=$RDIR/src/externals/jellyfish-2.2.5/bin/jellyfish
 #echo "$RufAlu $ProbandFileName $ProbandGenerator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $jellyfishPath $(echo $ParentFileNames) "
 #$RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $fastaHackPath $jellyfishPath  $(echo $ParentFileNames)
 ########################################################################
+
+
+
+############################__TWOFUS__#############################
+aluList=$RDIR/resources/primate_non-LTR_Retrotransposon.fasta
+$TwoFus $_arg_subject $aluList $_arg_ref "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList $(echo $ParentFileNames)
+###################################################################
 
 
 echo "cleaning up VCF"
