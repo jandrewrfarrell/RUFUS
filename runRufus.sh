@@ -571,6 +571,7 @@ done
 RUFUSmodel=$RDIR/bin/ModelDist
 RUFUSfilter=$RDIR/bin/RUFUS.Filter
 RufAlu=$RDIR/bin/externals/rufalu/src/rufalu_project/src/aluDetect
+TwoFus=$RDIR/bin/externals/twofus/src/twofus_project/bin/tools/runTwoFus
 RUFUSOverlap=$RDIR/scripts/Overlap.sh
 RunJelly=$RDIR/scripts/RunJellyForRUFUS.sh
 PullSampleHashes=$RDIR/scripts/CheckJellyHashList.sh
