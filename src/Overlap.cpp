@@ -512,34 +512,32 @@ string TrimLowCoverageEnds(string S, string& quals, string& depth, int cutoff) {
       NewQ = quals.c_str()[i] + NewQ;
     }
   }
+ 
 
+  string NewS2 = "";
+  string NewD2 = "";
+  string NewQ2 = "";
   if (NewS.size() > 1) {
-    S = NewS;
-    depth = NewD;
-    quals = NewQ;
     base = false;
-    NewS = "";
-    NewD = "";
-    NewQ = "";
-
-    for (int i = 0; i < S.size(); i++) {
+    for (int i = 0; i < NewS.size(); i++) {
       if (base) {
-        NewS = NewS + S.c_str()[i];
-        NewD = NewD + depth.c_str()[i];
-        NewQ = NewQ + quals.c_str()[i];
-      } else if ((int)depth.c_str()[i] > cutoff) {
+        NewS2 = NewS2 + NewS.c_str()[i];
+        NewD2 = NewD2 + NewD.c_str()[i];
+        NewQ2 = NewQ2 + NewQ.c_str()[i];
+      } else if ((int)NewD.c_str()[i] > cutoff) {
         base = true;
-        NewS = NewS + S.c_str()[i];
-        NewD = NewD + depth.c_str()[i];
-        NewQ = NewQ + quals.c_str()[i];
+        NewS2 = NewS2 + NewS.c_str()[i];
+        NewD2 = NewD2 + NewD.c_str()[i];
+        NewQ2 = NewQ2 + NewQ.c_str()[i];
       }
     }
   }
 
-  depth = NewD;
-  quals = NewQ;
-  return NewS;
+  depth = NewD2;
+  quals = NewQ2;
+  return NewS2;
 }
+
 
 string AdjustBases(string sequence, string qual) {
   int MinQ = 5;
@@ -579,6 +577,15 @@ string FlipStrands(string strand) {
     }
   }
   return NewStrand;
+}
+void compresStrand(string S, int& F, int& R) {
+  for (int i = 0; i < S.size(); i++) {
+    if (S.c_str()[i] == '+')
+      F++;
+    else
+      R++;
+  }
+  return;
 }
 
 int main(int argc, char* argv[]) {
@@ -720,7 +727,7 @@ int main(int argc, char* argv[]) {
         }
       }
 
-      Multiple = false;
+      //Multiple = false;
       if (Multiple == true) {
         L2 = TrimLowCoverageEnds(L2, L4, depths, TrimLCcuttoff);
       }
@@ -1132,14 +1139,16 @@ int main(int argc, char* argv[]) {
 
       if (maxDep >= MinCoverage) {
         count++;
-        report << "@NODE_" << i << "_L=" << sequenes[i].size()
-               << "_D=" << maxDep << endl;
+       int F = 0;
+        int R = 0;
+        compresStrand(strand[i], F, R); 
+	//report << "@NODE_" << i << "_L=" << sequenes[i].size()       << "_D=" << maxDep << endl;
+	report << "@NODE_" << argv[6] << "_" << i << "_L" << sequenes[i].size()<< "_D" << maxDep << ":" << F << ":" << R << ":" << endl;
         report << sequenes[i] << endl;
         report << "+" << endl;
         report << qual[i] << endl;
 
-        Depreport << "@NODE_" << i << "_L=" << sequenes[i].size()
-                  << "_D=" << maxDep << endl;
+        Depreport << "@NODE_" << argv[6] << "_" << i << "_L" << sequenes[i].size()<< "_D" << maxDep << ":" << F << ":" << R << ":" << endl;
         Depreport << sequenes[i] << endl;
         Depreport << "+" << endl;
         Depreport << qual[i] << endl;

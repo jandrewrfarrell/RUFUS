@@ -456,7 +456,7 @@ class SamRead
 	vector<int> Positions; 
 	vector<string> ChrPositions;
 	int AlignmentSegments; 
-
+	int AlignmentSegmentsCigar;
 	vector<long> MutAltCounts; 
 	vector<long> MutRefCounts; 
 	vector<long> MutHashListCounts; 
@@ -472,7 +472,8 @@ class SamRead
 	void createPeakMap(); 
 	void parse(string read);
 	void getRefSeq();
-	void CountAlignmentSegments(); 
+	void CountAlignmentSegments();
+	void CountAlignmentSegmentsCigar();
 	void processCigar();
 	void parseInsertions( SamRead B); 
 	void parseMutations( char *argv[] );
@@ -826,6 +827,25 @@ void SamRead::GetModes(int pos, string alt,  string reff, int &MutRefMode, int &
 					else
 						ParAltModes.push_back( 0); 
 				}
+}
+void SamRead::CountAlignmentSegmentsCigar()
+{
+        AlignmentSegmentsCigar = 0;
+        char last = cigar.c_str()[0];
+        for (int i =1; i < cigar.size(); i++)
+        {
+          if (cigar.c_str()[i] == 'M' or cigar.c_str()[i] == 'S' or cigar.c_str()[i] == 'H' or cigar.c_str()[i] == 'D' or cigar.c_str()[i] == 'I')
+          {}
+          else if (last == 'M' or last == 'S' or last == 'H' or last == 'I' or last == 'D')
+          {
+            AlignmentSegmentsCigar++;
+          }
+          last = cigar.c_str()[i];
+        }
+        if (last == 'M' or last == 'S' or last == 'H' or last == 'I' or last == 'D')
+        {
+                AlignmentSegmentsCigar++;
+        }
 }
 void SamRead::CountAlignmentSegments()
 {
@@ -1396,11 +1416,11 @@ void SamRead::parseMutations( char *argv[])
  				if (Genotype.find("1") == std::string::npos) {
                                         Denovo = "Mosaic";
                                 } 
-				if (AlignmentSegments > 10)
+				if (AlignmentSegments > 10 or AlignmentSegmentsCigar > 10)
 				{
 				  	Denovo = "PoorAlignment"; 
 					stringstream ss;
-					ss << AlignmentSegments; 
+					ss << AlignmentSegments << "-" << AlignmentSegmentsCigar; 
 					Denovo += ss.str();
 					if (Filter == ".")
 						Filter = "";  
@@ -1488,7 +1508,7 @@ void SamRead::parseMutations( char *argv[])
 			////////////////////////Writing var out to file/////////////////////////
 				cout       << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << SupportingHashes << "\t" << Filter << "\t" << StructCall <<"FEX=" << InfoFilter << ";RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";" << "CVT=" << CompressedVarType << ";HD="; 
 					
-				VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" << Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << Score << /*SupportingHashes << "/" << PossibleAltKmer << */ "\t" << Filter << "\t" << StructCall << "FEX=" << InfoFilter << ";FS=" << SupportingHashes << "/" << PossibleAltKmer << ";RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";SB=" << StrandBias << ";" << "AS=" << AlignmentSegments << ";" << "CVT=" << CompressedVarType << ";HD="; 
+				VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" << Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << Score << /*SupportingHashes << "/" << PossibleAltKmer << */ "\t" << Filter << "\t" << StructCall << "FEX=" << InfoFilter << ";FS=" << SupportingHashes << "/" << PossibleAltKmer << ";RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";SB=" << StrandBias << ";" << "AS=" << AlignmentSegments << "-" << AlignmentSegmentsCigar << ";" << "CVT=" << CompressedVarType << ";HD="; 
 
 				for (int j = 0; j < HashCounts.size(); j++) 
 				{	
@@ -1713,6 +1733,7 @@ void SamRead::getRefSeq()
 
 	//**********************************************************************//
 	CountAlignmentSegments(); 	
+	CountAlignmentSegmentsCigar();
 	cout << "After getRefSeq";
 	//FullOutwriteVertical(); 
 }

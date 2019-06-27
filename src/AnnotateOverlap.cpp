@@ -109,6 +109,11 @@ int main(int argc, char *argv[]) {
           good = false;
           break;
         }
+	
+      
+      	int C = Qhash.c_str()[j];
+      	if ((int)C -33 < 3)
+		      good = false; 
       }
       if (good) {
         unsigned long LongHash = Util::HashToLong(hash);

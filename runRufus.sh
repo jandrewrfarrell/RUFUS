@@ -571,7 +571,7 @@ done
 RUFUSmodel=$RDIR/bin/ModelDist
 RUFUSfilter=$RDIR/bin/RUFUS.Filter
 RufAlu=$RDIR/bin/externals/rufalu/src/rufalu_project/src/aluDetect
-RUFUSOverlap=$RDIR/scripts/Overlap.sh
+RUFUSOverlap=$RDIR/scripts/Overlap.shorter.sh
 RunJelly=$RDIR/scripts/RunJellyForRUFUS.sh
 PullSampleHashes=$RDIR/scripts/CheckJellyHashList.sh
 modifiedJelly=$RDIR/bin/externals/modified_jellyfish/src/modified_jellyfish_project/bin/jellyfish
@@ -682,21 +682,17 @@ echo "starting RUFUS filter"
 
 echo "_arg_fastqA = $_arg_fastqA"
 echo "_arg_fastqB = $_arg_fastqB"
-if [ -e "$ProbandGenerator".Mutations.fastq ]
+if [ -e "$ProbandGenerator".Mutations.Mate1.fastq ]
 then
 	echo "skipping filter"
 else
 	if [ -z $_arg_fastqA ]
 	then 
 	    rm  "$ProbandGenerator".temp
-	    mkfifo "$ProbandGenerator".temp
-	    /usr/bin/time -v  bash "$ProbandGenerator" | "$RDIR"/bin/PassThroughSamCheck.stranded "$ProbandGenerator".filter.chr >  "$ProbandGenerator".temp &
-	    /usr/bin/time -v   "$RUFUSfilter"  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp "$ProbandGenerator" "$K" 13 1 "$(echo $Threads -2 | bc)" &
+	    mkfifo "$ProbandGenerator".temp.mate1.fastq "$ProbandGenerator".temp.mate2.fastq
+	    /usr/bin/time -v  bash "$ProbandGenerator" | "$RDIR"/bin/PassThroughSamCheck.stranded "$ProbandGenerator".filter.chr  "$ProbandGenerator".temp >  "$ProbandGenerator".temp &
+	    /usr/bin/time -v   $RUFUSfilterFASTQ  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp.mate1.fastq "$ProbandGenerator".temp.mate2.fastq "$ProbandGenerator" "$K" 13 1 "$(echo $Threads -2 | bc)" &
 	    wait
-	   
-	     $bwa mem $_arg_ref_bwa "$ProbandGenerator".Mutations.fastq | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.bam
-	     samtools index "$ProbandGenerator".Mutations.fastq.bam
-	
 	else
 		echo "Running RUFUS.filter from paired FASTQ files"
 	
@@ -705,15 +701,20 @@ else
 		
 		echo "$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  <(bash $_arg_fastqA) <(bash $_arg_fastqB) "$ProbandGenerator" $K 13 1 "$(echo $Threads -2 | bc)""
 
-		####$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  <(bash $_arg_fastqA) <(bash $_arg_fastqB) "$ProbandGenerator" $K 13 1 "$(echo $Threads -2 | bc)"
+		$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  <(bash $_arg_fastqA) <(bash $_arg_fastqB) "$ProbandGenerator" $K 13 1 "$(echo $Threads -2 | bc)"
 		wait
-	
-		cat "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq > "$ProbandGenerator".Mutations.fastq
-		#$bwa mem $_arg_ref_bwa "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq  | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.bam 
-		#samtools index "$ProbandGenerator".Mutations.fastq.bam
 	fi
 fi
 
+if [ -e "$ProbandGenerator".Mutations.fastq.bam ]
+then 
+	echo "skipping mapping mates" 
+else
+	
+	#cat "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq > "$ProbandGenerator".Mutations.fastq
+        $bwa mem $_arg_ref_bwa <( cat "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq)  | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.bam
+        samtools index "$ProbandGenerator".Mutations.fastq.bam
+fi
 ########################################################################################
 
 

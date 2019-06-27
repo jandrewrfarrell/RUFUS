@@ -14,11 +14,9 @@
 #include <vector>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unordered_map>
+#include <map>
 
 using namespace std;
-
-unordered_map <string, vector<string> > reads;  
 
 
 const vector<string> Split(const string& line, const char delim) {
@@ -38,30 +36,6 @@ int main (int argc, char *argv[])
   ofstream ChrOut;
   ChrOut.open (argv[1]);
   if (ChrOut.is_open())
-    {}
-  else
-    {
-      cout << "ERROR, Output file could not be opened -" << argv[1] << endl;
-      return 0;
-    }
-
-  ofstream mate1;
-  string m1n = argv[2]; 
-  m1n = m1n + ".mate1.fastq"; 
-  mate1.open (m1n);
-  if (mate1.is_open())
-    {}
-  else
-    {
-      cout << "ERROR, Output file could not be opened -" << argv[1] << endl;
-      return 0;
-    }
-
-  ofstream mate2;
-  string m2n = argv[2]; 
-  m2n = m2n + ".mate2.fastq";
-  mate2.open (m2n);
-  if (mate2.is_open())
     {}
   else
     {
@@ -191,93 +165,44 @@ int main (int argc, char *argv[])
       
       string flagstring = "";
 
-      stringstream name; 
-      name.write(tmpName, lenName);
-      string namestr = name.str(); 
-      if (reads.count(namestr) > 0)
-      {
-      	for (int i = flagStart; i< flagEnd; i++)
+      for (int i = flagStart; i< flagEnd; i++)
 	{
 	  flagstring+=L1_array[i];
 	}
       
-      	if ( 0 != (atoi(flagstring.c_str()) & (1 << 4))){
-		mate1.write("@", 1);
-		mate1.write(tmpName, lenName);
-		mate1 << endl;
-		for (int j =seqEnd-1; j>=seqStart; j--){
-		  switch (L1_array[j]){
-		  case 'A' : mate1 << 'T'; break;
-		  case 'C' : mate1 << 'G'; break;
-		  case 'G' : mate1 << 'C'; break; 
-		  case 'T' : mate1 << 'A'; break; 
-		  case 'N' : mate1 << 'N'; break;
-		  }
-		}
-		mate1 << endl; 
-		mate1 << "+" << endl;
-		for (int j =qualEnd-1; j>=qualStart; j--){
-		  mate1 << L1_array[j]; 
-		}
-		mate1 << endl; 
-      	}	
-      	else
+      //int v = atoi(flagstring.c_str());  // flag to dissect
+      //int strand = 0 != (v & (1 << 4));
+      if ( 0 != (atoi(flagstring.c_str()) & (1 << 4))){
+	cout.write("@", 1);
+	cout.write(tmpName, lenName);
+	cout << endl;
+	for (int j =seqEnd-1; j>=seqStart; j--){
+	  switch (L1_array[j]){
+	  case 'A' : cout << 'T'; break;
+	  case 'C' : cout << 'G'; break;
+	  case 'G' : cout << 'C'; break; 
+	  case 'T' : cout << 'A'; break; 
+	  case 'N' : cout << 'N'; break;
+	  }
+	}
+	cout << endl; 
+	cout << "+" << endl;
+	for (int j =qualEnd-1; j>=qualStart; j--){
+	  cout << L1_array[j]; 
+	}
+	cout << endl; 
+      }
+      else
 	{
-	  mate1.write("@", 1);
-	  mate1.write(tmpName, lenName);
-	  mate1 << endl; 
-	  mate1.write(tmpSeq, lenSeq);
-	  mate1 << endl << "+" << endl; 
-	  mate1.write(tmpQual, lenQual); 
-	  mate1 << endl;  
-	}
-        mate2.write("@", 1);
-	//mate2.write("MATE", 4);
-	mate2.write(tmpName, lenName);
-	mate2 << endl; 
-	mate2 << reads[namestr][0];
-	mate2 << endl << "+" << endl;
-	mate2 << reads[namestr][1]; 
-	mate2 << endl; 
-    	reads.erase(namestr); 
-    }
-    else
-    {
-        for (int i = flagStart; i< flagEnd; i++)
-        {
-          flagstring+=L1_array[i];
-        }
-        stringstream seq;
-        stringstream qual; 
-        if ( 0 != (atoi(flagstring.c_str()) & (1 << 4))){
-                for (int j =seqEnd-1; j>=seqStart; j--){
-                  switch (L1_array[j]){
-                  case 'A' : seq << 'T'; break;
-                  case 'C' : seq << 'G'; break;
-                  case 'G' : seq << 'C'; break;
-                  case 'T' : seq << 'A'; break;
-                  case 'N' : seq << 'N'; break;
-                  }
-                }
-                for (int j =qualEnd-1; j>=qualStart; j--){
-                  qual << L1_array[j];
-                }
-               vector <string> temp; 
-               temp.push_back(seq.str());
-	       temp.push_back(qual.str()); 
-	       reads[namestr] = temp; 
-	}
-        else
-        {
-          seq.write(tmpSeq, lenSeq);
-          qual.write(tmpQual, lenQual);
-          vector <string> temp;
-	  temp.push_back(seq.str());
-	  temp.push_back(qual.str());
-	  reads[namestr] = temp;
+	  cout.write("@", 1);
+	  cout.write(tmpName, lenName);
+	  cout << endl; 
+	  cout.write(tmpSeq, lenSeq);
+	  cout << endl << "+" << endl; 
+	  cout.write(tmpQual, lenQual); 
+	  cout << endl;  
 	}
     }
-  }
   ChrOut << current << endl;
   SamIn.close();
   return 0; 

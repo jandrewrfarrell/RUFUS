@@ -871,8 +871,7 @@ int main(int argc, char* argv[]) {
         int F = 0;
         int R = 0;
         compresStrand(strand[i], F, R);
-        report << "@NODE_" << argv[6] << "_" << i << "_L" << sequenes[i].size()
-               << "_D" << maxDep << ":" << F << ":" << R << ":" << endl;
+        report << "@NODE_" << argv[6] << "_" << i << "_L" << sequenes[i].size()<< "_D" << maxDep << ":" << F << ":" << R << ":" << endl;
         report << sequenes[i] << endl;
         report << "+" << endl;
         report << qual[i] << endl;
