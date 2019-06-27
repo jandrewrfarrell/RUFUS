@@ -24,7 +24,7 @@
 using namespace std;
 
 int main(int argc, char *argv[]) {
-  cout << "Call is PreBuiltMutHash Mutant.fq  firstpassfile hashsize MinQ HashCountThreshold threads "
+  cout << "Call is PreBuiltMutHash Mutant.Mate1.fq Mutant.Mate2.fq firstpassfile hashsize MinQ HashCountThreshold threads "
        << endl;
   double vm, rss, MAXvm, MAXrss;
   MAXvm = 0;
@@ -35,18 +35,22 @@ int main(int argc, char *argv[]) {
   int BufferSize = 240;
 
   cout << "Paramaters are:\n  PreBuiltMutHash = " << argv[1]
-       << "\n  Mutant.fq = " << argv[2] << "\n  out stub = " << argv[3]
-       << "\n  HashSize = " << argv[4] << "\n  MinQ = " << argv[5]
-       << "\n  HashCountThreshold = " << argv[6] << "\n  Threads = " << argv[7] << endl;
+       << "\n  Mutant.mate1.fq = " << argv[2]
+       << "\n  Mutant.mate2.fq = " << argv[3] 
+       << "\n  out stub = " << argv[4]
+       << "\n  HashSize = " << argv[5] 
+       << "\n  MinQ = " << argv[6]
+       << "\n  HashCountThreshold = " << argv[7] 
+       << "\n  Threads = " << argv[8] << endl;
   // Read in file passed to the program on the command line
 
-  string temp = argv[4];
+  string temp = argv[5];
   int HashSize = atoi(temp.c_str());
-  temp = argv[5];
-  int MinQ = atoi(temp.c_str());
   temp = argv[6];
-  int HashCountThreshold = atoi(temp.c_str());
+  int MinQ = atoi(temp.c_str());
   temp = argv[7];
+  int HashCountThreshold = atoi(temp.c_str());
+  temp = argv[8];
   int Threads = atoi(temp.c_str());
   ifstream MutHashFile;
   MutHashFile.open(argv[1]);
@@ -58,29 +62,45 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  string filename = argv[2];
-  ifstream MutFile;
-  if (filename == "stdin") {
-    cout << "MutFile is STDIN" << endl;
-    MutFile.open("/dev/stdin");
-  } else {
-    cout << "MutFile is " << argv[2] << endl;
-    MutFile.open(argv[2]);
-  }
-  if (MutFile.is_open()) {
+  ifstream MutFileM1;
+  cout << "MutFile.mate1 is " << argv[2] << endl;
+  MutFileM1.open(argv[2]);
+  
+  if (MutFileM1.is_open()) {
     cout << "##File Opend\n";
   } else {
     cout << "Error, MutFile could not be opened";
     return 0;
   }
-
-  ofstream MutOutFile;
-  string FirstPassFile = argv[3];
-  FirstPassFile += ".Mutations.fastq";
-  MutOutFile.open(FirstPassFile.c_str());
-  if (MutOutFile.is_open()) {
+  ifstream MutFileM2;
+  cout << "MutFile.mate2 is " << argv[3] << endl;
+  MutFileM2.open(argv[3]);
+  
+  if (MutFileM2.is_open()) {
+    cout << "##File Opend\n";
   } else {
-    cout << "ERROR, Output file could not be opened -" << argv[3] << endl;
+    cout << "Error, MutFile could not be opened";
+    return 0; 
+  }
+
+
+  ofstream MutOutFileM1;
+  string FirstPassFile = argv[4];
+  FirstPassFile += ".Mutations.Mate1.fastq";
+  MutOutFileM1.open(FirstPassFile.c_str());
+  if (MutOutFileM1.is_open()) {
+  } else {
+    cout << "ERROR, Output file could not be opened -" << argv[4] << endl;
+    return 0;
+  }
+
+  ofstream MutOutFileM2;
+  FirstPassFile = argv[4];
+  FirstPassFile += ".Mutations.Mate2.fastq";
+  MutOutFileM2.open(FirstPassFile.c_str());
+  if (MutOutFileM2.is_open()) {
+  } else {
+    cout << "ERROR, Output file could not be opened -" << argv[4] << endl;
     return 0;
   }
 
@@ -89,9 +109,6 @@ int main(int argc, char *argv[]) {
   cout << "Reading in pre-built hash talbe\n";
   int lines = 0;
   string L1;
-  string L2;
-  string L3;
-  string L4;
   unsigned long LongHash;
   bool notdone = true;
   cout << "starting " << endl;
@@ -136,14 +153,23 @@ int main(int argc, char *argv[]) {
   St = clock();
   int found = 0;
   lines = 0;
-  string Buffer[2400];
+  string BufferMate1[2400];
+  string BufferMate2[2400];
 
-  while (getline(MutFile, L1)) {
+  while (getline(MutFileM1, L1)) {
     lines++;
-    Buffer[0] = L1;
-    getline(MutFile, Buffer[1]);
-    getline(MutFile, Buffer[2]);
-    getline(MutFile, Buffer[3]);
+    BufferMate1[0] = L1;
+    getline(MutFileM1, BufferMate1[1]);
+    getline(MutFileM1, BufferMate1[2]);
+    getline(MutFileM1, BufferMate1[3]);
+
+    getline(MutFileM2, BufferMate2[0]);
+    getline(MutFileM2, BufferMate2[1]);
+    getline(MutFileM2, BufferMate2[2]);
+    getline(MutFileM2, BufferMate2[3]);
+
+
+
 
     if (lines % 10000 > 1 && (lines % (10000 + Threads) < Threads)) {
       Et = clock();
@@ -154,32 +180,26 @@ int main(int argc, char *argv[]) {
 
     int pos = 4;
 
-    while (getline(MutFile, Buffer[pos])) {
+    while (getline(MutFileM1, BufferMate1[pos])) {
+      getline(MutFileM2, BufferMate2[pos]);
       pos++;
       if (pos >= BufferSize) {
 	break;
       }
     }
 
-#pragma omp parallel for shared(MutOutFile) num_threads(Threads)
+#pragma omp parallel for shared(MutOutFileM1, MutOutFileM2) num_threads(Threads)
     for (int BuffCount = 0; BuffCount < pos; BuffCount += 4) 
     {
-      vector<int> positions;
-      int rejected = 0;
       int MutHashesFound = 0;
-      bool good = true;
       int streak = 0;
       int start = 0;
 
-//      cout << Buffer[BuffCount + 0] << endl << Buffer[BuffCount + 1] << endl << Buffer[BuffCount + 2] << endl << Buffer[BuffCount + 3] << endl; 
-      bool lastMatch = false; 
-      int Pass = false; 
-      for (int i = start; i < Buffer[BuffCount + 1].length() ; i++) {
-//        cout << "at pos " << i << "qual = " << (int)Buffer[BuffCount + 3].c_str()[i] - 33 << " streak = " << streak<< endl; 
-       	if (((int)Buffer[BuffCount + 3].c_str()[i] - 33) < MinQ or (int)Buffer[BuffCount + 1].c_str()[i] == 78) {
+      for (int i = start; i < BufferMate1[BuffCount + 1].length() ; i++) {
+
+       	if (((int)BufferMate1[BuffCount + 3].c_str()[i] - 33) < MinQ or (int)BufferMate1[BuffCount + 1].c_str()[i] == 78) {
           streak = 0;
           start = i ;//+ HashSize;
-	  lastMatch =false; 
 
         }
 	else
@@ -187,29 +207,56 @@ int main(int argc, char *argv[]) {
 
         if (streak >= HashSize ) 
 	{
-//	  cout << "       testing " << i << " - " << Buffer[BuffCount + 1].substr(i-HashSize+1, HashSize) << endl; 
-          if (Mutations.count(Util::HashToLong(  Buffer[BuffCount + 1].substr(i-HashSize+1, HashSize))) > 0) {
+          if (Mutations.count(Util::HashToLong(  BufferMate1[BuffCount + 1].substr(i-HashSize+1, HashSize))) > 0) {
             MutHashesFound++;
-//            cout << "   found " <<  i << " - " << Buffer[BuffCount + 1].substr(i-HashSize+1, HashSize) << endl; 
-	    Pass = true; 
           }
         }
       }
-      if (MutHashesFound >= HashCountThreshold)
-	{
+
+      int MutHashesFoundM2 = 0;
+      int streakM2 = 0;
+      int startM2 = 0;
+
+      for (int i = startM2; i < BufferMate2[BuffCount + 1].length() ; i++) {
+
+        if (((int)BufferMate2[BuffCount + 3].c_str()[i] - 33) < MinQ or (int)BufferMate2[BuffCount + 1].c_str()[i] == 78) {
+          streakM2 = 0;
+          startM2 = i ;//+ HashSize;
+
+        }
+        else
+                streakM2++;
+
+        if (streakM2 >= HashSize )
+        {
+          if (Mutations.count(Util::HashToLong(  BufferMate2[BuffCount + 1].substr(i-HashSize+1, HashSize))) > 0) {
+            MutHashesFoundM2++;
+          }
+        }
+      }  
+
+      if (MutHashesFound >= HashCountThreshold or MutHashesFoundM2 >= HashCountThreshold )
+      {
 		#pragma omp critical(MutWrite)
                 {
-                       MutOutFile << Buffer[BuffCount] << ":MH" << MutHashesFound << endl
-                       << Buffer[BuffCount + 1] << endl
-                       << Buffer[BuffCount + 2] << endl
-                       << Buffer[BuffCount + 3] << endl;
+                       MutOutFileM1 << BufferMate1[BuffCount] << ":MH" << MutHashesFound << endl
+                       << BufferMate1[BuffCount + 1] << endl
+                       << BufferMate1[BuffCount + 2] << endl
+                       << BufferMate1[BuffCount + 3] << endl;
                         found++;
+                      MutOutFileM2 << BufferMate2[BuffCount] << ":MH" << MutHashesFoundM2 << endl
+                       << BufferMate2[BuffCount + 1] << endl
+                       << BufferMate2[BuffCount + 2] << endl
+                       << BufferMate2[BuffCount + 3] << endl;
+			
                 }
-	}
-//    cout <<  Buffer[BuffCount] << ":MH" << MutHashesFound << endl; 
+       }
+
     }
   }
-  MutFile.close();
-  MutOutFile.close();
+  MutFileM1.close();
+  MutFileM2.close();
+  MutOutFileM1.close();
+  MutOutFileM2.close(); 
   cout << "\nDone running RUFUS.Filter.cpp\n";
 }
