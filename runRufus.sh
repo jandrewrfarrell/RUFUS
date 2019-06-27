@@ -576,7 +576,7 @@ RunJelly=$RDIR/scripts/RunJellyForRUFUS.sh
 PullSampleHashes=$RDIR/scripts/CheckJellyHashList.sh
 modifiedJelly=$RDIR/bin/externals/modified_jellyfish/src/modified_jellyfish_project/bin/jellyfish
 bwa=$RDIR/bin/externals/bwa/src/bwa_project/bwa
-RUFUSfilterFASTQ=$RDIR/bin/RUFUS.Filter.fastq
+RUFUSfilterFASTQ=$RDIR/bin/RUFUS.Filter
 ############################################################################################
 
 
@@ -590,7 +590,7 @@ fi
 
 for parent in "${ParentGenerators[@]}"
 do
-     /usr/bin/time -v bash $RunJelly $parent $K $(echo $JThreads -2 | bc) 2 &
+     /usr/bin/time -v bash $RunJelly $parent $K $(echo $JThreads -2 | bc) 2 & 
 done
 
 /usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $JThreads -2 | bc) 2 & 
