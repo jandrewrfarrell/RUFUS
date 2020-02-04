@@ -1,0 +1,465 @@
+335128 232 11
+0 ALU SINE1/7SL	Primates
+0 312 0
+0 Alu1_OG SINE1/7SL	Otolemur garnettii
+312 281 1
+0 Alu1_TS SINE1/7SL	Carlito syrichta
+593 280 0
+0 Alu2_OG SINE1/7SL	Otolemur garnettii
+873 230 0
+0 Alu2_TS SINE1/7SL	Carlito syrichta
+1103 283 0
+0 Alu3_TS SINE1/7SL	Carlito syrichta
+1386 298 1
+0 AluJb SINE1/7SL	Primates
+1684 283 0
+0 AluJo SINE1/7SL	Primates
+1967 283 0
+0 AluJr SINE1/7SL	Primates
+2250 285 0
+0 AluJr4 SINE1/7SL	Primates
+2535 285 1
+0 AluJ_Mim SINE1/7SL	Microcebus murinus
+2820 317 0
+0 AluMacYa3 SINE1/7SL	Macaca
+3137 285 0
+0 AluMacYb2 SINE1/7SL	Macaca
+3422 272 0
+0 AluMacYb4 SINE1/7SL	Macaca
+3694 272 0
+0 AluSc SINE1/7SL	Primates
+3966 280 0
+0 AluSc5 SINE1/7SL	Primates
+4246 280 0
+0 AluSc8 SINE1/7SL	Primates
+4526 282 0
+0 AluSg SINE1/7SL	Primates
+4808 281 0
+0 AluSg1 SINE1/7SL	Primates
+5089 280 1
+0 AluSg4 SINE1/7SL	Primates
+5369 283 0
+0 AluSg7 SINE1/7SL	Primates
+5652 282 0
+0 AluSp SINE1/7SL	Primates
+5934 284 0
+0 AluSq SINE1/7SL	Primates
+6218 284 0
+0 AluSq10 SINE1/7SL	Primates
+6502 286 0
+0 AluSq2 SINE1/7SL	Primates
+6788 286 0
+0 AluSq4 SINE1/7SL	Primates
+7074 285 0
+0 AluSx SINE1/7SL	Primates
+7359 283 0
+0 AluSx1 SINE1/7SL	Primates
+7642 283 0
+0 AluSx3 SINE1/7SL	Primates
+7925 282 0
+0 AluSx4 SINE1/7SL	Primates
+8207 282 0
+0 AluSz SINE1/7SL	Primates
+8489 283 0
+0 AluSz6 SINE1/7SL	Primates
+8772 283 0
+0 AluY SINE1/7SL	Primates
+9055 282 0
+0 AluYa1 SINE1/7SL	Primates
+9337 282 0
+0 AluYa4 SINE1/7SL	Primates
+9619 282 0
+0 AluYa5 SINE1/7SL	Homo sapiens
+9901 282 0
+0 AluYa8 SINE1/7SL	Primates
+10183 281 0
+0 AluYb10 SINE1/7SL	Homo sapiens
+10464 288 0
+0 AluYb11 SINE1/7SL	Homo sapiens
+10752 289 0
+0 AluYb3a1 SINE1/7SL	Primates
+11041 282 0
+0 AluYb3a2 SINE1/7SL	Primates
+11323 282 0
+0 AluYb8 SINE1/7SL	Homo sapiens
+11605 289 0
+0 AluYb8a1 SINE1/7SL	Homo sapiens
+11894 287 0
+0 AluYb9 SINE1/7SL	Homo sapiens
+12181 289 0
+0 AluYbc3a SINE1/7SL	Primates
+12470 283 0
+0 AluYc1 SINE1/7SL	Primates
+12753 282 0
+0 AluYc2 SINE1/7SL	Primates
+13035 282 0
+0 AluYc5 SINE1/7SL	Primates
+13317 270 1
+0 AluYd2 SINE1/7SL	Primates
+13587 270 0
+0 AluYd3 SINE1/7SL	Primates
+13857 270 0
+0 AluYd3a1 SINE1/7SL	Primates
+14127 271 0
+0 AluYd3a1_gib SINE1/7SL	Nomascus leucogenys
+14398 272 0
+0 AluYd8 SINE1/7SL	Primates
+14670 270 0
+0 AluYe2 SINE1/7SL	Primates
+14940 280 0
+0 AluYe5 SINE1/7SL	Primates
+15220 281 0
+0 AluYf1 SINE1/7SL	Primates
+15501 282 0
+0 AluYf2 SINE1/7SL	Primates
+15783 284 0
+0 AluYf5 SINE1/7SL	Primates
+16067 281 0
+0 AluYg6 SINE1/7SL	Primates
+16348 282 0
+0 AluYh9 SINE1/7SL	Primates
+16630 282 0
+0 AluYi6 SINE1/7SL	Primates
+16912 283 0
+0 AluYk11 SINE1/7SL	Primates
+17195 282 0
+0 AluYk12 SINE1/7SL	Primates
+17477 282 0
+0 AluYk13 SINE1/7SL	Homo sapiens
+17759 282 0
+0 AmnSINE1_HS SINE3/5S	Homo sapiens
+18041 576 16
+0 DeuSINE SINE3/5S	Deuterostomia
+18617 347 6
+0 FAM SINE1/7SL	Primates
+18964 168 0
+0 FLAM SINE1/7SL	Primates
+19132 124 0
+0 FRAM SINE1/7SL	Primates
+19256 156 0
+0 GarnAlu1 SINE2/tRNA	Otolemur garnettii
+19412 259 0
+0 GarnAlu2 SINE2/tRNA	Otolemur garnettii
+19671 257 0
+0 GarnAlu3 SINE2/tRNA	Otolemur garnettii
+19928 312 1
+0 GarnAlu3B SINE2/tRNA	Otolemur garnettii
+20240 241 0
+0 Garnel1 SINE2/tRNA	Otolemur garnettii
+20481 94 0
+0 LmeSINE1b SINE3/5S	Deuterostomia
+20575 415 3
+0 LmeSINE1c SINE3/5S	Deuterostomia
+20990 404 1
+0 MamSINE1 SINE2/tRNA	Mammalia
+21394 290 2
+0 MARE3 SINE	Mammalia
+21684 180 2
+0 MER129 SINE	Amniota
+21864 469 3
+0 MER131 SINE	Amniota
+22333 174 0
+0 MIR SINE2/tRNA	Mammalia
+22507 260 0
+0 MIR3 SINE2/tRNA	Mammalia
+22767 224 1
+0 MIRb SINE2/tRNA	Mammalia
+22991 268 0
+0 MIRc SINE2/tRNA	Mammalia
+23259 268 0
+0 PB1D11 SINE1/7SL	Euarchontoglires
+23527 118 0
+0 SVA_A SINE	Homo sapiens
+23645 1640 0
+0 SVA_B SINE	Homo sapiens
+25285 1383 0
+0 SVA_C SINE	Homo sapiens
+26668 1384 0
+0 SVA_D SINE	Homo sapiens
+28052 1386 0
+0 SVA_E SINE	Homo sapiens
+29438 1382 0
+0 SVA_F SINE	Homo sapiens
+30820 1375 0
+0 THER1 SINE2/tRNA	Theria
+32195 263 0
+0 THER2 SINE2/tRNA	Theria
+32458 169 7
+0 UCON3 SINE2/tRNA	Euteleostomi
+32627 172 1
+0 UCON55 SINE2/tRNA	Theria
+32799 170 0
+0 HAL1 L1	Eutheria
+32969 2510 22
+0 HAL1-1B_Cja L1	Callithrix jacchus
+35479 2773 0
+0 HAL1-1C_Cja L1	Callithrix jacchus
+38252 2327 0
+0 HAL1-1_Cja L1	Callithrix jacchus
+40579 2443 0
+0 HAL1B L1	Homo sapiens
+43022 1348 25
+0 IN25 L1	Homo sapiens
+44370 854 33
+0 L1 L1	Homo sapiens
+45224 5403 0
+0 L1-1b_TS L1	Carlito syrichta
+50627 5968 3
+0 L1-1_Cja L1	Callithrix jacchus
+56595 6561 1
+0 L1-1_TS L1	Carlito syrichta
+63156 5277 1
+0 L1-2_Cja L1	Callithrix jacchus
+68433 6486 0
+0 L1-2_TS L1	Carlito syrichta
+74919 6474 12
+0 L1-3_TS L1	Carlito syrichta
+81393 7127 0
+0 L1-4_TS L1	Carlito syrichta
+88520 6258 8
+0 L1-5_TS L1	Carlito syrichta
+94778 6035 1
+0 L1-6_TS L1	Carlito syrichta
+100813 6717 0
+0 L1A_Mim L1	Microcebus murinus
+107530 6545 0
+0 L1B_Mim L1	Microcebus murinus
+114075 5342 24
+0 L1C_Mim L1	Microcebus murinus
+119417 5993 3
+0 L1HS L1	Homo sapiens
+125410 6064 0
+0 L1M1B_5 L1	Homo sapiens
+131474 1263 1
+0 L1M1_5 L1	Eutheria
+132737 3834 10
+0 L1M2A1_5 L1	Homo sapiens
+136571 1842 7
+0 L1M2A_5 L1	Homo sapiens
+138413 2233 8
+0 L1M2B_5 L1	Homo sapiens
+140646 3252 80
+0 L1M2C_5 L1	Homo sapiens
+143898 4038 0
+0 L1M2_5 L1	Homo sapiens
+147936 4191 22
+0 L1M3A_5 L1	Eutheria
+152127 2728 36
+0 L1M3B_5 L1	Homo sapiens
+154855 1175 37
+0 L1M3C_5 L1	Homo sapiens
+156030 1625 21
+0 L1M3DE_5 L1	Eutheria
+157655 2137 58
+0 L1M3D_5 L1	Eutheria
+159792 1375 25
+0 L1M4B L1	Homo sapiens
+161167 5024 82
+0 L1M6B_5end L1	Homo sapiens
+166191 173 0
+0 L1M6_5end L1	Mammalia
+166364 2515 30
+0 L1M7_5end L1	Mammalia
+168879 2237 30
+0 L1MA1 L1	Homo sapiens
+171116 1049 1
+0 L1MA10 L1	Eutheria
+172165 1069 27
+0 L1MA2 L1	Homo sapiens
+173234 1051 1
+0 L1MA3 L1	Homo sapiens
+174285 1058 2
+0 L1MA4 L1	Homo sapiens
+175343 1047 2
+0 L1MA4A L1	Homo sapiens
+176390 1050 1
+0 L1MA5 L1	Homo sapiens
+177440 1047 1
+0 L1MA5A L1	Homo sapiens
+178487 1044 2
+0 L1MA6 L1	Homo sapiens
+179531 1047 0
+0 L1MA7 L1	Homo sapiens
+180578 1038 3
+0 L1MA8 L1	Homo sapiens
+181616 1540 9
+0 L1MA9 L1	Homo sapiens
+183156 1059 1
+0 L1MA9_5 L1	Eutheria
+184215 2113 21
+0 L1MB1 L1	Homo sapiens
+186328 915 1
+0 L1MB2 L1	Homo sapiens
+187243 918 4
+0 L1MB3 L1	Homo sapiens
+188161 930 2
+0 L1MB3_5 L1	Homo sapiens
+189091 2500 4
+0 L1MB4 L1	Homo sapiens
+191591 928 5
+0 L1MB4_5 L1	Eutheria
+192519 1795 40
+0 L1MB5 L1	Homo sapiens
+194314 921 5
+0 L1MB6_5 L1	Eutheria
+195235 1711 36
+0 L1MB7 L1	Eutheria
+196946 922 9
+0 L1MB8 L1	Homo sapiens
+197868 925 2
+0 L1MC1 L1	Homo sapiens
+198793 1080 1
+0 L1MC2 L1	Homo sapiens
+199873 1091 5
+0 L1MC3 L1	Eutheria
+200964 2487 59
+0 L1MC4 L1	Homo sapiens
+203451 2761 54
+0 L1MC4B L1	Eutheria
+206212 1522 71
+0 L1MC4_5end L1	Eutheria
+207734 2555 35
+0 L1MC5 L1	Eutheria
+210289 2174 52
+0 L1MCA_5 L1	Homo sapiens
+212463 2647 13
+0 L1MCB_5 L1	Homo sapiens
+215110 1197 10
+0 L1MCC_5 L1	Homo sapiens
+216307 1536 65
+0 L1MD1 L1	Homo sapiens
+217843 971 13
+0 L1MD1_5 L1	Eutheria
+218814 1010 9
+0 L1MD2 L1	Homo sapiens
+219824 1106 7
+0 L1MD3 L1	Homo sapiens
+220930 1342 6
+0 L1MDA_5 L1	Eutheria
+222272 3320 21
+0 L1MDB_5 L1	Homo sapiens
+225592 1422 11
+0 L1ME1 L1	Homo sapiens
+227014 913 14
+0 L1ME2 L1	Homo sapiens
+227927 911 5
+0 L1ME3 L1	Homo sapiens
+228838 909 5
+0 L1ME3A L1	Homo sapiens
+229747 1156 11
+0 L1ME3C_3end L1	Eutheria
+230903 870 2
+0 L1ME3D_3end L1	Eutheria
+231773 989 4
+0 L1ME3E_3end L1	Eutheria
+232762 989 2
+0 L1ME3F_3end L1	Eutheria
+233751 990 4
+0 L1ME4 L1	Eutheria
+234741 596 7
+0 L1ME4A L1	Homo sapiens
+235337 868 13
+0 L1ME5 L1	Eutheria
+236205 507 6
+0 L1ME5_3end L1	Mammalia
+236712 941 6
+0 L1MEA_5 L1	Homo sapiens
+237653 1089 20
+0 L1MEB_5 L1	Homo sapiens
+238742 1089 21
+0 L1MEC_5 L1	Eutheria
+239831 2527 24
+0 L1MED_5 L1	Homo sapiens
+242358 1615 24
+0 L1MEE_5 L1	Homo sapiens
+243973 916 8
+0 L1MEe_5end L1	Eutheria
+244889 1164 18
+0 L1MEf_5end L1	Mammalia
+246053 2217 40
+0 L1MEg_5end L1	Mammalia
+248270 2101 23
+0 L1ME_ORF2 L1	Homo sapiens
+250371 3285 58
+0 L1P4a_5end L1	Primates
+253656 2596 10
+0 L1P4b_5end L1	Primates
+256252 1783 12
+0 L1P4c_5end L1	Primates
+258035 1583 18
+0 L1P4d_5end L1	Primates
+259618 2035 10
+0 L1P4e_5end L1	Primates
+261653 1391 7
+0 L1PA10 L1	Homo sapiens
+263044 915 1
+0 L1PA11 L1	Homo sapiens
+263959 921 1
+0 L1PA12 L1	Homo sapiens
+264880 915 2
+0 L1PA12_5 L1	Homo sapiens
+265795 3072 8
+0 L1PA13 L1	Homo sapiens
+268867 910 0
+0 L1PA13_5 L1	Homo sapiens
+269777 2278 28
+0 L1PA14 L1	Homo sapiens
+272055 908 0
+0 L1PA14_5 L1	Homo sapiens
+272963 1772 17
+0 L1PA15 L1	Homo sapiens
+274735 912 0
+0 L1PA16 L1	Homo sapiens
+275647 913 0
+0 L1PA16_5 L1	Homo sapiens
+276560 4083 45
+0 L1PA17_5 L1	Homo sapiens
+280643 1734 13
+0 L1PA2 L1	Homo sapiens
+282377 902 1
+0 L1PA3 L1	Homo sapiens
+283279 902 0
+0 L1PA4 L1	Homo sapiens
+284181 902 0
+0 L1PA5 L1	Homo sapiens
+285083 901 5
+0 L1PA6 L1	Homo sapiens
+285984 901 2
+0 L1PA7 L1	Homo sapiens
+286885 901 0
+0 L1PA7_5 L1	Homo sapiens
+287786 1727 5
+0 L1PA8 L1	Homo sapiens
+289513 919 0
+0 L1PB1 L1	Homo sapiens
+290432 898 1
+0 L1PB2 L1	Homo sapiens
+291330 898 0
+0 L1PB2c L1	Homo sapiens
+292228 6582 23
+0 L1PB3 L1	Homo sapiens
+298810 901 1
+0 L1PB4 L1	Homo sapiens
+299711 903 4
+0 L1PBA1_5 L1	Homo sapiens
+300614 600 11
+0 L1PBA_5 L1	Homo sapiens
+301214 3104 35
+0 L1PBB_5 L1	Homo sapiens
+304318 945 20
+0 L1PREC1 L1	Homo sapiens
+305263 6460 0
+0 L1PREC2 L1	Homo sapiens
+311723 8145 0
+0 L1Pt L1	Pan troglodytes
+319868 902 0
+0 L1Pt_5end L1	Pan troglodytes
+320770 2137 0
+0 L1P_MA2 L1	Eutheria
+322907 7678 143
+0 L1_RS1_5end L1	Cercopithecinae
+330585 2248 1
+0 MER25 L1	Eutheria
+332833 2136 83
+0 X9_LINE L1	Euteleostomi
+334969 159 3

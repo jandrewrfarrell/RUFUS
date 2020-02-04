@@ -24,8 +24,6 @@ Threads=$7
 
 echo "final coveage is $FinalCoverage"
 
-
-echo "RUNNING THIS ONE"
 echo "@@@@@@@@@@@@@__IN_OVERLAP__@@@@@@@@@@@@@@@"
 echo "human ref in Overlap is $humanRef"
 echo "bwa human ref in Overlap is $humanRefBwa"
@@ -44,6 +42,7 @@ OverlapRebion2=$RDIR/bin/OverlapRegion
 ReplaceQwithDinFASTQD=$RDIR/bin/ReplaceQwithDinFASTQD
 ConvertFASTqD=$RDIR/bin/ConvertFASTqD.to.FASTQ
 AnnotateOverlap=$RDIR/bin/AnnotateOverlap
+#gkno=$RDIR/bin/gkno_launcher/gkno
 bwa=$RDIR/bin/externals/bwa/src/bwa_project/bwa
 RUFUSinterpret=$RDIR/bin/RUFUS.interpret
 CheckHash=$RDIR/scripts/CheckJellyHashList.sh
@@ -55,7 +54,6 @@ MOBList=$RDIR/resources/primate_non-LTR_Retrotransposon.fasta
 #then 
 #	echo "Skipping Overlap"
 #else
-
 
 if [ -s ./$File.bam ] 
 then 
@@ -119,10 +117,10 @@ else
 	samtools index ./$NameStub.overlap.hashcount.fastq.bam
 fi
 
-if [ -s ./TempOverlap/$NameStub.overlap.hashcount.fastq.MOB.sam ]
-then
+#if [ -s ./TempOverlap/$NameStub.overlap.hashcount.fastq.MOB.sam ]
+#then
 	$bwa mem -t $Threads -Y -E 0,0 -O 6,6  -d 500 -w 500 -L 0,0 $MOBList ./$NameStub.overlap.hashcount.fastq | samtools sort -T $File -O sam - > ./TempOverlap/$NameStub.overlap.hashcount.fastq.MOB.sam
-fi 
+#fi 
 
 
 #############################################################################################################

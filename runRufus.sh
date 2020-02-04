@@ -590,10 +590,11 @@ fi
 
 for parent in "${ParentGenerators[@]}"
 do
-     /usr/bin/time -v bash $RunJelly $parent $K $(echo $JThreads -2 | bc) 2 & 
+     /usr/bin/time -v bash $RunJelly $parent $K $(echo $JThreads -2 | bc) 2  
 done
 
-/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $JThreads -2 | bc) 2 & 
+#/usr/bin/time -v bash $RunJelly $ProbandGenerator $K  $Threads 2
+/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $JThreads -2 | bc) 2  
 wait
 ##############################################################################
 
@@ -712,7 +713,7 @@ then
 else
 	
 	#cat "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq > "$ProbandGenerator".Mutations.fastq
-        $bwa mem $_arg_ref_bwa <( cat "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq)  | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.bam
+        $bwa mem -t $Threads $_arg_ref_bwa <( cat "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq)  | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.bam
         samtools index "$ProbandGenerator".Mutations.fastq.bam
 fi
 ########################################################################################
@@ -733,11 +734,11 @@ fi
 
 
 ############################__RUFALU__#############################
-#aluList=$RDIR/resources/primate_non-LTR_Retrotransposon.fasta
-#fastaHackPath=$RDIR/bin/externals/fastahack/src/fastahack_project/bin/tools/fastahack
-#jellyfishPath=$RDIR/src/externals/jellyfish-2.2.5/bin/jellyfish
-#echo "$RufAlu $ProbandFileName $ProbandGenerator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $jellyfishPath $(echo $ParentFileNames) "
-#$RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $fastaHackPath $jellyfishPath  $(echo $ParentFileNames)
+aluList=$RDIR/resources/primate_non-LTR_Retrotransposon.fasta
+fastaHackPath=$RDIR/bin/externals/fastahack/src/fastahack_project/bin/tools/fastahack
+jellyfishPath=$RDIR/src/externals/jellyfish-2.2.5/bin/jellyfish
+echo "$RufAlu $ProbandFileName $ProbandGenerator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $jellyfishPath $(echo $ParentFileNames) "
+$RufAlu $_arg_subject $_arg_subject.generator.V2.overlap.hashcount.fastq  $aluList $_arg_ref $fastaHackPath $jellyfishPath  $(echo $ParentFileNames)
 ########################################################################
 
 
