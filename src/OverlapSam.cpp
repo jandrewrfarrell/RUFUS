@@ -43,7 +43,7 @@ int Align3(vector<string>& sequenes, vector<string>& quals, string Ap, string Aq
 		end = sequenes.size();
 	}
 
-	#pragma omp parallel for shared(Ap, A, Aqp, index, overlap, bestScore) num_threads(Threads)
+	#pragma omp parallel for shared(Ap, Aqp, index, overlap, bestScore) num_threads(Threads)
 	for (int j = start; j < end; j++) 
 	{
 		int MinOverlap = MinOverlapPassed;
