@@ -29,7 +29,7 @@
 
 using namespace std;
 
-bool FullOut = true;
+bool FullOut = false;
 
 int RebuildHashTable(vector<string>& sequenes, int Ai, int SearchHash, unordered_map<unsigned long, vector<int>>& Hashes, int Threads, unordered_map<unsigned long, int>& Hashesize) 
 {
@@ -89,8 +89,6 @@ int PrepairSearchList(string A, int Ai,	unordered_map<unsigned long, vector<int>
 		if (found == std::string::npos) {
 			unsigned long LongHash = Util::HashToLong(hash);
 			int max=0; 
-		//	omp_set_lock(&lock);
-			//#pragma omp atomic 
 			
 			#pragma omp atomic 
 				max += Hashesize[LongHash];

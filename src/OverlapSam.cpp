@@ -28,7 +28,7 @@
 using namespace std;
 
 bool FullOut = false;
-
+unordered_map<string, bool> DupCheck; 
 int Align3(vector<string>& sequenes, vector<string>& quals, string Ap, string Aqp, int Ai, int& overlap, int& index, float minPercentpassed, bool& PerfectMatch, int MinOverlapPassed, int Threads) 
 {
 	int QualityOffset = 33; //=64; 
@@ -484,6 +484,15 @@ string FlipStrands(string strand) {
 	return NewStrand;
 }
 
+void compresStrand(string S, int& F, int& R) {
+        for (int i = 0; i < S.size(); i++) {
+                if (S.c_str()[i] == '+')
+                        F++;
+                else
+                        R++;
+        }
+        return;
+}
 int main(int argc, char* argv[]) {
 	float MinPercent;
 	int MinOverlap;
@@ -588,71 +597,97 @@ int main(int argc, char* argv[]) {
 		int v = atoi(temp[1].c_str()); 
 
 		//TODO: understand this syntax
-		for (int j = 0; j < 16; ++j) {
+		for (int j = 0; j < 16; ++j) 
+		{
 			b[j] = 0 != (v & (1 << j));
 		}
-
-		if (b[8] or b[11] or b[10] or temp[10].length() < 100) {
-			Rejects++;
-		} else if (b[2] and atoi(temp[4].c_str())>5) {
-			string L4 = temp[10];
-			string L2 = temp[9];
-			L2 = TrimNends(L2, L4);
-
-			if ((double)L2.size() / (double)ReadSize > .6) {
-				ReadSize = L2.size();
-				lines++;
-				Unsequenes.push_back(L2);
-				Unqual.push_back(L4);
-
-				if (b[4] == 0) {
-					Unstrand.push_back("+");
-	} else if (b[4] == 1) {
-					Unstrand.push_back("-");
-	}
-
-				string depths = "";
-				unsigned char C = 1;
-
-				for (int i = 0; i < L2.length(); i++) {
-					depths += C;
-				}
-
-				Undepth.push_back(depths);
-
-			} else {
+		if (DupCheck.count(temp[9]) > 0)
+		{
+			cout << "skipping exact match sequence " << L1 << endl; 
+		}
+		else 
+		{
+			DupCheck[temp[9]] == true; 
+			if (b[8] or b[11] or b[10] or temp[10].length() < 100) 
+			{
 				Rejects++;
-			}
-
-		} else {
-			string L4 = temp[10];
-			string L2 = temp[9];
-			L2 = TrimNends(L2, L4);
-
-			if ((double)L2.size() / (double)ReadSize > .6) {
-				ReadSize = L2.size();
-				lines++;
-				sequenes.push_back(L2);
-				qual.push_back(L4);
-				string depths = "";
-
-				if (b[4] == 0) {
-					strand.push_back("+");
-	}
-				else if (b[4] == 1) {
-					strand.push_back("-");
-	}
-
-				unsigned char C = 1;
-
-				for (int i = 0; i < L2.length(); i++) {
-					depths += C;
+			} 
+			else if (b[2] and atoi(temp[4].c_str())>5) 
+			{
+				string L4 = temp[10];
+				string L2 = temp[9];
+				L2 = TrimNends(L2, L4);
+	
+				if ((double)L2.size() / (double)ReadSize > .6) 
+				{
+					ReadSize = L2.size();
+					lines++;
+					Unsequenes.push_back(L2);
+					Unqual.push_back(L4);
+	
+					if (b[4] == 0) 
+					{
+						Unstrand.push_back("+");
+					} 
+					else if (b[4] == 1) 
+					{
+						Unstrand.push_back("-");
+					}
+	
+					string depths = "";
+					unsigned char C = 1;
+	
+					for (int i = 0; i < L2.length(); i++) 
+					{
+						depths += C;
+					}
+	
+					Undepth.push_back(depths);
+	
+				} 
+				else 
+				{
+					Rejects++;
 				}
-
-				depth.push_back(depths);
-
-			} else {
-				Rejects++;
+	
+			} 
+			else 
+			{
+				string L4 = temp[10];
+				string L2 = temp[9];
+				L2 = TrimNends(L2, L4);
+	
+				if ((double)L2.size() / (double)ReadSize > .6) 
+				{
+					ReadSize = L2.size();
+					lines++;
+					sequenes.push_back(L2);
+					qual.push_back(L4);
+					string depths = "";
+	
+					if (b[4] == 0) 
+					{
+						strand.push_back("+");
+					}
+					else if (b[4] == 1) 
+					{
+						strand.push_back("-");
+					}
+	
+					unsigned char C = 1;
+	
+					for (int i = 0; i < L2.length(); i++) 
+					{
+						depths += C;
+					}
+	
+					depth.push_back(depths);
+	
+				} 
+				else 
+				{
+					Rejects++;
+				}
 			}
 		}
 	}
@@ -852,9 +887,8 @@ int main(int argc, char* argv[]) {
 
 			if (maxDep >= MinCoverage) {
 
-				if (sequenes[i].size() != qual[i].size() &&
-						qual[i].size() != depth[i].size()) {
-					cout << "ERROR, read "
+				if (sequenes[i].size() != qual[i].size() && qual[i].size() != depth[i].size()) {
+						cout << "ERROR, read "
 							 << "@NODE_" << argv[6] << "_" << i << "_L=" << sequenes[i].size()
 							 << "_D=" << maxDep
 							 << " Has the wrong size, Seq = " << sequenes[i].size()
@@ -863,14 +897,15 @@ int main(int argc, char* argv[]) {
 				}
 
 				count++;
-				report << "@NODE_" << argv[6] << "_" << i << "_L=" << sequenes[i].size()
-							 << "_D=" << maxDep << endl;
+				int F = 0;
+                                int R = 0;
+                                compresStrand(strand[i], F, R);
+				report << "@NODE_" << argv[6] << "_" << i << "_L=" << sequenes[i].size() << "_D=" << maxDep  << ":" << F << ":" << R << ":" << endl;
 				report << sequenes[i] << endl;
 				report << "+" << endl;
 				report << qual[i] << endl;
 
-				Depreport << "@NODE_" << argv[6] << "_" << i
-									<< "_L=" << sequenes[i].size() << "_D=" << maxDep << endl;
+				Depreport << "@NODE_" << argv[6] << "_" << i<< "_L=" << sequenes[i].size() << "_D=" << maxDep  << ":" << F << ":" << R << ":" << endl;
 				Depreport << sequenes[i] << endl;
 				Depreport << "+" << endl;
 				Depreport << qual[i] << endl;
