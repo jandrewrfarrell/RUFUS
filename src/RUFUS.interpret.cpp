@@ -5714,7 +5714,8 @@ options:\
 													VCFOutFile << call.str(); 
 			
 													//cout << reads[i].chr << " " << reads[i].pos + readAsig << " to " << reads[reads[i].alignments[1]].chr << " " << reads[reads[i].alignments[1]].sigBreakPoint()+ reads[reads[i].alignments[1]].pos << "\tGenoA " << GenotypeFieldA << "\tGenoB " << GenotypeFieldB << endl; 
-													i = i+j; 
+													if (j >= 0)
+														i = i+j; 
 													continue; 
 												}
 											}
@@ -5887,7 +5888,9 @@ options:\
 																call << reads[i].chr << "\t" << EventPos  << "\t" << Format.str() << "\t" << RefSeq <<  "\t" << AltSeq <<  "\t" << qual  << "\t" << Filter << "\t" << info.str() <<  "\t" << "GT:DP:RO:AO\t" << GenotypeField <<  endl;
 																cout << call.str();
 																VCFOutFile << call.str();
-					
+																if (j >= 0)
+                                                                                                                			i = i+j;
+                                                                                                        			continue;	
 															}
 														}
 		
@@ -6110,7 +6113,9 @@ options:\
 										VCFOutFile << call.str(); 
 										cout << call.str(); 
 									}
-									i = i+j; 
+									if (j >= 0)
+                                                                        	i = i+j;
+                                                                        continue; 
 								}
 								else
 								{
