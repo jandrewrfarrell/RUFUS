@@ -26,7 +26,8 @@
 #include "Util.h"
 
 using namespace std;
-
+unordered_map<unsigned long, int> Mutations;
+int HashSize = -1; 
 bool FullOut = false;
 unordered_map<string, bool> DupCheck; 
 int Align3(vector<string>& sequenes, vector<string>& quals, string Ap, string Aqp, int Ai, int& overlap, int& index, float minPercentpassed, bool& PerfectMatch, int MinOverlapPassed, int Threads) 
@@ -480,6 +481,8 @@ string FlipStrands(string strand) {
 			NewStrand += "-";
 		else if (strand.c_str()[i] == '-')
 			NewStrand += "+";
+		else if(strand.c_str()[i] == '.')
+			 NewStrand += ".";
 	}
 	return NewStrand;
 }
@@ -488,39 +491,75 @@ void compresStrand(string S, int& F, int& R) {
         for (int i = 0; i < S.size(); i++) {
                 if (S.c_str()[i] == '+')
                         F++;
-                else
+                else if (S.c_str()[i] == '-')
                         R++;
         }
         return;
+}
+int CountHashes(string seq)
+{
+	int count=0; 
+	for (int i = 0; i < seq.size()-HashSize; i++)
+	{
+		string hash = seq.substr(i, HashSize); 
+		size_t found = hash.find("N");
+		if (found == string::npos) 
+		{
+			if(Mutations.count(Util::HashToLong( hash)) > 0)
+			{count++;}
+		}
+	}
+	return count; 
+}
+int NumLowQbases(string qual, int min)
+{
+	int count = 0; 
+	for (int i =0; i < qual.size(); i++)
+	{
+		if( int(qual.c_str()[i]) - 33 < min)
+			count++;
+	}
+	return count; 
 }
 int main(int argc, char* argv[]) {
 	float MinPercent;
 	int MinOverlap;
 	int MinCoverage;
 	cout << "you gave " << argc << " Arguments" << endl;
-	if (argc != 9) {
+	if (argc != 10) {
 		cout << "ERROR, wrong numbe of arguemnts\nCall is: SAM, MinPercent, "
 						"MinOverlap, MinCoverage, ReportStub, NodeStub LCcutoff Threads"
 				 << endl
-				 << "		 You Gave\n		 File = " << argv[1]
-				 << "\n		 MinPercent = " << argv[2]
-				 << "\n		 MinOVerlap = " << argv[3]
-				 << "\n		 MinCoverage = " << argv[4]
-				 << "\n		 FileStub = " << argv[5] << "\n		 NodeStub = " << argv[6]
+				 << "		You Gave\n		 File = " << argv[1]
+				 << "\n		MinPercent = " << argv[2]
+				 << "\n	MinOVerlap = " << argv[3]
+				 << "\n	MinCoverage = " << argv[4]
+				 << "\n	FileStub = " << argv[5] 
+				 << "\n	NodeStub = " << argv[6]
+				 << "\n	MinCov = " << argv[7]
+				 << "\n	HashPath = " << argv[8]
+				 << "\n	Threads = " << argv[9]
 				 << endl;
 		return 0;
 	}
-
-	cout << "		 You Gave\n		 File = " << argv[1]
-			 << "\n		 MinPercent = " << argv[2] << "\n		 MinOVerlap = " << argv[3]
-			 << "\n		 MinCoverage = " << argv[4] << "\n		 FileStub = " << argv[5]
-			 << "\n		 NodeStub = " << argv[6] << "\n		 LCcutoff = " << argv[7]
-			 << "\n		 Threads = " << argv[8] << endl;
-
+			cout << "ERROR, wrong numbe of arguemnts\nCall is: SAM, MinPercent, "
+						"MinOverlap, MinCoverage, ReportStub, NodeStub LCcutoff Threads"
+				 << endl
+				 << "	   You Gave\n	       File = " << argv[1]
+				 << "\n	 MinPercent = " << argv[2]
+				 << "\n MinOVerlap = " << argv[3]
+				 << "\n MinCoverage = " << argv[4]
+				 << "\n FileStub = " << argv[5] 
+				 << "\n NodeStub = " << argv[6] 
+				 << "\n MinCovTrimCov = " << argv[7] 
+				 << "\n HashPath = " << argv[8]
+				 << "\n Threads = " << argv[9]
+				 << endl;	
+	
 	ifstream fastq;
 	fastq.open(argv[1]);
 	if (fastq.is_open()) {
-		cout << "Parent File open - " << argv[1] << endl;
+		cout << "File open - " << argv[1] << endl;
 	}	else {
 		cout << "Error, ParentHashFile could not be opened";
 		return 0;
@@ -534,7 +573,8 @@ int main(int argc, char* argv[]) {
 	MinCoverage = atoi(temp.c_str());
 	temp = argv[7];
 	int LCcutoff = atoi(temp.c_str());
-	temp = argv[8];
+	string HashPath = argv[8]; 
+	temp = argv[9];
 	int Threads = atoi(temp.c_str());
 	ofstream report;
 	string FirstPassFile = argv[1];
@@ -545,8 +585,7 @@ int main(int argc, char* argv[]) {
 
 	if (report.is_open()) {
 	} else {
-		cout << "ERROR, Mut-Output file could not be opened - " << FirstPassFile
-				 << endl;
+		cout << "ERROR, Mut-Output file could not be opened - " << FirstPassFile << endl;
 		return 0;
 	}
 
@@ -556,8 +595,7 @@ int main(int argc, char* argv[]) {
 
 	if (report.is_open()) {
 	} else {
-		cout << "ERROR, Mut-Output file could not be opened - " << FirstPassFile
-				 << endl;
+		cout << "ERROR, Mut-Output file could not be opened - " << FirstPassFile << endl;
 		return 0;
 	}
 
@@ -582,12 +620,61 @@ int main(int argc, char* argv[]) {
 	string Fastqd = argv[1];
 	cout << "Reading in SAM \n";
 	int counter = 0;
+	int unalignedCounter = 0;
+	int goodreads = 0;
+	int lowMapQual = 0; 
+	int other = 0; 
+	cout << "reading in hash list" << endl; 
+	ifstream MutHashFile;
+	MutHashFile.open(HashPath);
+	if (MutHashFile.is_open()) {
+		cout << "Parent File open - " << argv[1] << endl;
+	}	// cout << "##File Opend\n";
+	else {
+		cout << "Error, ParentHashFile could not be opened";
+		return 0;
+	}
+
+
+	while (getline(MutHashFile, L1)) {
+		vector<string> temp;
+		temp = Util::Split(L1, '\t');
+
+		if (temp.size() == 2) {
+			unsigned long b = Util::HashToLong(temp[0]);
+			unsigned long revb = Util::HashToLong(Util::RevComp(temp[0]));
+			Mutations.insert(pair<unsigned long, int>(b, 0));
+			Mutations.insert(pair<unsigned long, int>(revb, 0));
+			HashSize = temp[0].size();
+		} else if (temp.size() == 4) {
+			unsigned long b = Util::HashToLong(temp[3]);
+			unsigned long revb = Util::HashToLong(Util::RevComp(temp[3]));
+			Mutations.insert(pair<unsigned long, int>(b, 0));
+			Mutations.insert(pair<unsigned long, int>(revb, 0));
+			HashSize = temp[3].size();
+		}
+		if (temp.size() == 1) {
+			temp = Util::Split(L1, ' ');
+			unsigned long b = Util::HashToLong(temp[0]);
+			unsigned long revb = Util::HashToLong(Util::RevComp(temp[0]));
+			Mutations.insert(pair<unsigned long, int>(b, 0));
+			Mutations.insert(pair<unsigned long, int>(revb, 0));
+			HashSize = temp[0].size();
+		}
+	}
+
+	if (HashSize == -1)
+	{
+		cout << "ERROR Hash Size could not be determined by the HashFile" << endl;
+		return -1; 
+	}
+	cout << "HashSize = " << HashSize << endl; 
 
 	while (getline(fastq, L1)) {
-	counter++;
-
+		counter++;
+		//cout << L1 << endl; 
 		if (counter % 100 == 1) {
-			cout << "Read in " << counter << " lines and rejected " << Rejects
+			cout << "Read in " << counter << " reads, with " << goodreads << " aligned reads, " << unalignedCounter<< " unaligned reads, " << lowMapQual << "low map qual and " << other <<" other with rejected " << Rejects
 					 << " reads\r";
 		}
 
@@ -601,39 +688,58 @@ int main(int argc, char* argv[]) {
 		{
 			b[j] = 0 != (v & (1 << j));
 		}
-		if (DupCheck.count(temp[9]) > 0)
+		//if (DupCheck.count(temp[9]) > 0)
+		//{
+		//	cout << "skipping exact match sequence " << L1 << endl; 
+		//}
+		//else 
 		{
-			cout << "skipping exact match sequence " << L1 << endl; 
-		}
-		else 
-		{
+			int lowq = NumLowQbases(temp[10], 20); 
 			DupCheck[temp[9]] == true; 
-			if (b[8] or b[11] or b[10] or temp[10].length() < 100) 
+			if (b[8] or b[11] or b[10] or temp[9].length() < 100 or lowq > 50) 
 			{
+				//cout << "rejected" << endl; 
+				//cout << L1 << endl; 
 				Rejects++;
 			} 
-			else if (b[2] and atoi(temp[4].c_str())>5) 
+			else if ( b[2] )//or atoi(temp[4].c_str())<5) 
 			{
+				if (b[2])
+					unalignedCounter++;
+				else if (atoi(temp[4].c_str())<5)
+					lowMapQual++;
+				else
+					other++; 
 				string L4 = temp[10];
-				string L2 = temp[9];
+				string L2 = temp[9]; ////////sequence//////////
 				L2 = TrimNends(L2, L4);
-	
+				int hashes = CountHashes(L2);
+				//cout << "poorly mapped read " << L1 << endl; 
+				//cout << "with Hash = " << hashes << endl; 
 				if ((double)L2.size() / (double)ReadSize > .6) 
 				{
 					ReadSize = L2.size();
 					lines++;
 					Unsequenes.push_back(L2);
 					Unqual.push_back(L4);
-	
-					if (b[4] == 0) 
+					if (hashes > 0)
 					{
-						Unstrand.push_back("+");
-					} 
-					else if (b[4] == 1) 
-					{
-						Unstrand.push_back("-");
+						if (b[0]== 0)
+						{
+							Unstrand.push_back(".");
+						}
+						else if (b[4] == 0) 
+						{
+							Unstrand.push_back("+");
+						} 
+						else if (b[4] == 1) 
+						{
+							Unstrand.push_back("-");
+						}
 					}
-	
+					else
+						Unstrand.push_back("."); 
+
 					string depths = "";
 					unsigned char C = 1;
 	
@@ -653,10 +759,14 @@ int main(int argc, char* argv[]) {
 			} 
 			else 
 			{
+				goodreads++; 
+				//cout << "good alignment" << endl; 
 				string L4 = temp[10];
 				string L2 = temp[9];
 				L2 = TrimNends(L2, L4);
-	
+				int hashes = CountHashes(L2);
+				
+				//cout << "Hash = " << hashes << endl;
 				if ((double)L2.size() / (double)ReadSize > .6) 
 				{
 					ReadSize = L2.size();
@@ -665,14 +775,23 @@ int main(int argc, char* argv[]) {
 					qual.push_back(L4);
 					string depths = "";
 	
-					if (b[4] == 0) 
+					if (hashes > 0)
 					{
-						strand.push_back("+");
+						if (b[0]== 0)
+                                                {
+                                                        strand.push_back(".");
+                                                }
+                                                else if (b[4] == 0) 
+						{
+							strand.push_back("+");
+						}
+						else if (b[4] == 1) 
+						{
+							strand.push_back("-");
+						}
 					}
-					else if (b[4] == 1) 
-					{
-						strand.push_back("-");
-					}
+					else
+						strand.push_back(".");
 	
 					unsigned char C = 1;
 	
@@ -885,7 +1004,7 @@ int main(int argc, char* argv[]) {
 				}
 			}
 
-			if (maxDep >= MinCoverage) {
+			if (maxDep >= MinCoverage && maxDep >= 2) {
 
 				if (sequenes[i].size() != qual[i].size() && qual[i].size() != depth[i].size()) {
 						cout << "ERROR, read "
@@ -924,52 +1043,56 @@ int main(int argc, char* argv[]) {
 			}
 		}
 	}
-
-	for (int i = 0; i < Unsequenes.size(); i++) {
-
-		if (FullOut) {
-			cout << ">>>>" << Unsequenes[i] << endl;
-		}
-
-		if (Unsequenes[i] != "moved" && Unsequenes[i].size() >= 95) {
-			int maxDep = -1;
-
-			if (Unsequenes[i].size() != Unqual[i].size() &&
-					Unqual[i].size() != Undepth[i].size()) {
-				cout << "ERROR, read "
-						 << "@NODE_" << argv[6] << "_" << i << "_L=" << Unsequenes[i].size()
-						 << "_D=" << maxDep
-						 << " Has the wrong size, Seq = " << Unsequenes[i].size()
-						 << " Qual = " << Unqual[i].size() << " Dep = " << Undepth[i].size()
-						 << endl;
+	if (MinCoverage <= 1  )
+	{
+		for (int i = 0; i < Unsequenes.size(); i++) {
+	
+			if (FullOut) {
+				cout << ">>>>" << Unsequenes[i] << endl;
 			}
-
-			count++;
-			report << "@NODE_" << argv[6] << "_" << i << "_L=" << Unsequenes[i].size()
-						 << "_D" << maxDep << endl;
-			report << Unsequenes[i] << endl;
-			report << "+" << endl;
-			report << Unqual[i] << endl;
-
-			Depreport << "@NODE_" << argv[6] << "_" << i
-								<< "_L=" << Unsequenes[i].size() << "_D" << maxDep << endl;
-			Depreport << Unsequenes[i] << endl;
-			Depreport << "+" << endl;
-			Depreport << Unqual[i] << endl;
-			Depreport << Unstrand[i] << endl;
-			unsigned char C = Undepth[i].c_str()[0];
-			int booya = C;
-			Depreport << booya;
-
-			for (int w = 1; w < Undepth[i].size(); w++) {
-				C = Undepth[i].c_str()[w];
-				booya = C;
-				Depreport << " " << booya;
+	
+			if (Unsequenes[i] != "moved" && Unsequenes[i].size() >= 95) {
+				int maxDep = -1;
+	
+				if (Unsequenes[i].size() != Unqual[i].size() &&
+						Unqual[i].size() != Undepth[i].size()) {
+					cout << "ERROR, read "
+							 << "@NODE_" << argv[6] << "_" << i << "_L=" << Unsequenes[i].size()
+							 << "_D=" << maxDep
+							 << " Has the wrong size, Seq = " << Unsequenes[i].size()
+							 << " Qual = " << Unqual[i].size() << " Dep = " << Undepth[i].size()
+							 << endl;
+				}
+	
+				count++;
+				report << "@NODE_" << argv[6] << "_" << i << "_L=" << Unsequenes[i].size()
+							 << "_D" << maxDep << endl;
+				report << Unsequenes[i] << endl;
+				report << "+" << endl;
+				report << Unqual[i] << endl;
+	
+				Depreport << "@NODE_" << argv[6] << "_" << i
+									<< "_L=" << Unsequenes[i].size() << "_D" << maxDep << endl;
+				Depreport << Unsequenes[i] << endl;
+				Depreport << "+" << endl;
+				Depreport << Unqual[i] << endl;
+				Depreport << Unstrand[i] << endl;
+				unsigned char C = Undepth[i].c_str()[0];
+				int booya = C;
+				Depreport << booya;
+	
+				for (int w = 1; w < Undepth[i].size(); w++) {
+					C = Undepth[i].c_str()[w];
+					booya = C;
+					Depreport << " " << booya;
+				}
+	
+				Depreport << endl;
 			}
-
-			Depreport << endl;
 		}
 	}
+	else
+		cout << "min coverage = " << MinCoverage << " skipping Unaligned sequences" << endl; 
 	cout << "\nWrote " << count << " sequences" << endl;
 	report.close();
 }

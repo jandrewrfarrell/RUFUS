@@ -478,6 +478,8 @@ string FlipStrands(string strand) {
 			NewStrand += "-";
 		else if (strand.c_str()[i] == '-')
 			NewStrand += "+";
+		else if (strand.c_str()[i] == '.')
+			NewStrand += ".";
 	}
 	return NewStrand;
 }
@@ -486,7 +488,7 @@ void compresStrand(string S, int& F, int& R) {
 	for (int i = 0; i < S.size(); i++) {
 		if (S.c_str()[i] == '+')
 			F++;
-		else
+		else if (S.c_str()[i] == '-')
 			R++;
 	}
 	return;
