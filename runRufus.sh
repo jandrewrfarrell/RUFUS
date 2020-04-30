@@ -52,7 +52,7 @@ _arg_threads=
 _arg_kmersize=
 _arg_min=
 _arg_refhash=
-
+_arg_saliva="FALSE"
 print_help ()
 {
     printf "%s\n" "The general script's help msg"
@@ -101,7 +101,7 @@ parse_commandline ()
 	    --subject=*)
 		_arg_subject="${_key##--subject=}"
 		;;
-	    -s*)
+	    -s)
 		_arg_subject="${_key##-s}"
 		;;
 	    -r|--ref)
@@ -207,6 +207,10 @@ parse_commandline ()
 		;;
 	    -m*)
 		_arg_min="${_key##-m}"
+		;;
+	    --saliva)
+	        _arg_saliva="TRUE"
+		echo "Saliva subject sample provided"
 		;;
 	    -h|--help)
 		print_help
@@ -594,11 +598,11 @@ fi
 
 for parent in "${ParentGenerators[@]}"
 do
-     /usr/bin/time -v bash $RunJelly $parent $K $(echo $JThreads -2 | bc) 2  
+     /usr/bin/time -v bash $RunJelly $parent $K $(echo $JThreads -2 | bc) 2 & 
 done
 
 #/usr/bin/time -v bash $RunJelly $ProbandGenerator $K  $Threads 2
-/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $JThreads -2 | bc) 2    
+/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $JThreads -2 | bc) 2 &    
 wait
 ##############################################################################
 
@@ -730,6 +734,15 @@ else
 	samtools index "$ProbandGenerator".Mutations.fastq.bam
 fi
 ########################################################################################
+if [ $_arg_saliva == "TRUE" ]
+then 
+	echo "saliva sample provided, only using aligned mutant contigs" 
+	mv "$ProbandGenerator".Mutations.fastq.bam "$ProbandGenerator".Mutations.fastq.FULL.bam 
+	samtools index "$ProbandGenerator".Mutations.fastq.FULL.bam
+	rm "$ProbandGenerator".Mutations.fastq.bam.bai
+	samtools view -F 12 -b "$ProbandGenerator".Mutations.fastq.FULL.bam > "$ProbandGenerator".Mutations.fastq.bam
+	samtools index "$ProbandGenerator".Mutations.fastq.bam
+fi
 
 
 
