@@ -195,7 +195,7 @@ int main(int argc, char *argv[]) {
       int streak = 0;
       int start = 0;
 
-      for (int i = start; i < BufferMate1[BuffCount + 1].length() ; i++) {
+      for (int i = start; i < BufferMate1[BuffCount + 1].length()-1 ; i++) {
 
        	if (((int)BufferMate1[BuffCount + 3].c_str()[i] - 33) < MinQ or (int)BufferMate1[BuffCount + 1].c_str()[i] == 78) {
           streak = 0;
@@ -217,7 +217,7 @@ int main(int argc, char *argv[]) {
       int streakM2 = 0;
       int startM2 = 0;
 
-      for (int i = startM2; i < BufferMate2[BuffCount + 1].length() ; i++) {
+      for (int i = startM2; i < BufferMate2[BuffCount + 1].length()-1 ; i++) {
 
         if (((int)BufferMate2[BuffCount + 3].c_str()[i] - 33) < MinQ or (int)BufferMate2[BuffCount + 1].c_str()[i] == 78) {
           streakM2 = 0;
@@ -239,12 +239,12 @@ int main(int argc, char *argv[]) {
       {
 		#pragma omp critical(MutWrite)
                 {
-                       MutOutFileM1 << BufferMate1[BuffCount] << ":MH" << MutHashesFound << endl
+                       MutOutFileM1 << BufferMate1[BuffCount] << endl //<< ":MH" << MutHashesFound << endl
                        << BufferMate1[BuffCount + 1] << endl
                        << BufferMate1[BuffCount + 2] << endl
                        << BufferMate1[BuffCount + 3] << endl;
                         found++;
-                      MutOutFileM2 << BufferMate2[BuffCount] << ":MH" << MutHashesFoundM2 << endl
+                      MutOutFileM2 << BufferMate2[BuffCount] << endl //<< ":MH" << MutHashesFoundM2 << endl
                        << BufferMate2[BuffCount + 1] << endl
                        << BufferMate2[BuffCount + 2] << endl
                        << BufferMate2[BuffCount + 3] << endl;
