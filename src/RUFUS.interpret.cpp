@@ -2897,7 +2897,10 @@ void SamRead::parse(string read)
 		reverse = atoi(temp2[2].c_str()); 
 		cout << "forward = " << forward << endl; 
 		cout << "reverse = " << reverse << endl; 
-		StrandBias = ((float)forward)/((float)forward+(float)reverse); 
+		if (forward+reverse ==0)
+			StrandBias = 1; 
+		else
+			StrandBias = ((float)forward)/((float)forward+(float)reverse); 
 		cout << "strand bias = " << StrandBias << endl; 
 	}
 	else{
@@ -4675,7 +4678,7 @@ void LastDitch(vector<SamRead>& reads, int i, int A, int B, int& CurrentSVeventI
 					
 				
 }
-int main (int argc, char *argv[])
+main (int argc, char *argv[])
 {
 
 cout << "###########################RUNNING THIS ONE#########################" << endl; 
@@ -5135,6 +5138,7 @@ options:\
 	VCFOutFile << "##INFO=<ID=AS,Number=1,Type=Integer,Description=\"Number of alignment segments in the contig\">" << std::endl;
 	VCFOutFile << "##INFO=<ID=MT,Number=1,Type=String,Description=\"Mobil element sequence inserted\">"<< endl;
 	VCFOutFile << "##INFO=<ID=SVID,Number=1,Type=String,Description=\"Uniuqe ID given to an SV event with multiple brekends so it can be quicky identified\">"<< endl;
+	VCFOutFile << "##INFO=<ID=SOURCE,Number=1,Type=String,Description=\"Location in the genome where the inserted sequence came from\">"<< endl;
 	VCFOutFile << "##INFO=<ID=SVDES,Number=1,Type=String,Description=\"If available RUFUS will interpret the SV type for you\">"<< endl;
 	VCFOutFile << "##FILTER=<ID=PA,Description=\"PoorAlignment\">" << std::endl;	
 	VCFOutFile << "##FILTER=<ID=PLC,Description=\"Parents are at low coverage in this region, cannt be sure of genotype\">" << std::endl;
@@ -6084,7 +6088,7 @@ options:\
 													}
 													else
 													{TargetSize = -1;}
-													if (TargetSize >= 0)
+													if (TargetSize >= 0 && TargetSize < 1000000)
 													{
 														RefSeq =  Reff.getSubSequence(reads[EnterA].chr, EventPos-1, 1+TargetSize);
 														AltSeq = Reff.getSubSequence(reads[EnterA].chr, EventPos-1, 1);

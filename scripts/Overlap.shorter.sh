@@ -70,9 +70,9 @@ then
 	echo "skipping sam assemble"
 else
      
-	$OverlapSam <( samtools view  -F 3328 $File.bam ) .95 20 1 ./TempOverlap/$NameStub.sam $NameStub 1 $Threads
+	$OverlapSam <( samtools view  -F 3328 $File.bam | awk '$9 > 100 || $9 < -100 || $9==0' ) .95 20 1 ./TempOverlap/$NameStub.sam $NameStub 1 $HashList $Threads
+	#$OverlapSam <( samtools view  -F 3328 $File.bam ) .95 20 1 ./TempOverlap/$NameStub.sam $NameStub 1 $HashList $Threads
 fi
-
 if [ -s ./TempOverlap/$NameStub.1.fastqd ]
 then 	
 	echo "skipping first overlap"
@@ -115,8 +115,9 @@ if [ -s ./$NameStub.overlap.hashcount.fastq.bam ]
 then 
 	echo "skipping contig alignment" 
 else
-        $bwa mem -t $Threads -Y -E 0,0 -O 6,6  -d 500 -w 500 -L 2,2 $humanRefBwa ./$NameStub.overlap.hashcount.fastq | samtools sort -T $File -O bam - > ./$NameStub.overlap.hashcount.fastq.bam
-	samtools index ./$NameStub.overlap.hashcount.fastq.bam
+#        $bwa mem -t $Threads -Y -E 0,0 -O 6,6  -d 500 -w 500 -L 2,2 $humanRefBwa ./$NameStub.overlap.hashcount.fastq | samtools sort -T $File -O bam - > ./$NameStub.overlap.hashcount.fastq.bam
+	$bwa mem -t $Threads -Y -E 0,0 -O 6,6  -L 2,2 $humanRefBwa ./$NameStub.overlap.hashcount.fastq | samtools sort -T $File -O bam - > ./$NameStub.overlap.hashcount.fastq.bam
+         samtools index ./$NameStub.overlap.hashcount.fastq.bam
 fi
 
 if [ -s ./TempOverlap/$NameStub.overlap.hashcount.fastq.MOB.sam ]

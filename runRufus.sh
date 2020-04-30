@@ -578,6 +578,8 @@ PullSampleHashes=$RDIR/scripts/CheckJellyHashList.sh
 modifiedJelly=$RDIR/bin/externals/modified_jellyfish/src/modified_jellyfish_project/bin/jellyfish
 bwa=$RDIR/bin/externals/bwa/src/bwa_project/bwa
 RUFUSfilterFASTQ=$RDIR/bin/RUFUS.Filter
+fastp=$RDIR/bin/externals/fastp/src/fastp_project/fastp
+samblaster=$RDIR/bin/externals/samblaster/src/samblaster_project/samblaster
 ############################################################################################
 
 
@@ -588,6 +590,7 @@ if [ "$JThreads" -lt 3 ]
 then
     JThreads=3
 fi
+#JThreads=$Threads
 
 for parent in "${ParentGenerators[@]}"
 do
@@ -595,7 +598,7 @@ do
 done
 
 #/usr/bin/time -v bash $RunJelly $ProbandGenerator $K  $Threads 2
-/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $JThreads -2 | bc) 2 & 
+/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $JThreads -2 | bc) 2 &   
 wait
 ##############################################################################
 
@@ -674,6 +677,7 @@ else
     /usr/bin/time -v $modifiedJelly merge "$ProbandGenerator".Jhash $(echo $parentsString) $(echo $parentsExcludeString)  > "$ProbandGenerator".temp & 
     /usr/bin/time -v bash $PullSampleHashes $ProbandGenerator.Jhash "$ProbandGenerator".temp $MutantMinCov $MaxHashDepth > "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList 
     wait
+    
 fi
 ########################################################################################
 
@@ -715,8 +719,15 @@ then
 else
 	
 	#cat "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq > "$ProbandGenerator".Mutations.fastq
-        $bwa mem -t $Threads $_arg_ref_bwa <( cat "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq)  | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.bam
-        samtools index "$ProbandGenerator".Mutations.fastq.bam
+        #$bwa mem -t $Threads $_arg_ref_bwa <( cat "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq)  | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.bam
+        $fastp -i "$ProbandGenerator".Mutations.Mate1.fastq -I "$ProbandGenerator".Mutations.Mate2.fastq -m -o "$ProbandGenerator".Mutations.Mate1.fastq.fastp.fastq -O "$ProbandGenerator".Mutations.Mate2.fastq.fastp.fastq --merged_out "$ProbandGenerator".Mutations.Mate1.fastq.merged.fastq
+	$bwa mem -t $Threads $_arg_ref_bwa "$ProbandGenerator".Mutations.Mate1.fastq.fastp.fastq "$ProbandGenerator".Mutations.Mate2.fastq.fastp.fastq  | $samblaster | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.pared.bam
+	$bwa mem -t $Threads $_arg_ref_bwa "$ProbandGenerator".Mutations.Mate1.fastq.merged.fastq  | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.merged.bam
+	samtools merge "$ProbandGenerator".Mutations.fastq.bam "$ProbandGenerator".Mutations.fastq.merged.bam "$ProbandGenerator".Mutations.fastq.pared.bam 
+	#$bwa mem -t $Threads $_arg_ref_bwa "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq  | $samblaster | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.bam
+	samtools index "$ProbandGenerator".Mutations.fastq.merged.bam
+	samtools index "$ProbandGenerator".Mutations.fastq.pared.bam
+	samtools index "$ProbandGenerator".Mutations.fastq.bam
 fi
 ########################################################################################
 
