@@ -1,6 +1,10 @@
 #!/bin/bash
 
 set -e
+
+echo "checking for samtools"
+which samtools 
+echo "samtools found"
 # This is a rather minimal example Argbash potential
 # Example taken from http://argbash.readthedocs.io/en/stable/example.html
 
@@ -670,7 +674,10 @@ else
 fi
 ########################################################################################
 
-
+if [ -z $MutantMinCov ]; then 
+	echo "ERROR: No min coverage set, possible error in Model"
+	exit 100
+fi 
 
 #################################__HASH_LIST_FILTER__#####################################
 if [ -s "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList ]
@@ -689,7 +696,11 @@ else
 fi
 ########################################################################################
 
-
+wc -l "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList | awk '{print $1}'
+if [ $(wc -l "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList | awk '{print $1}') -eq "0" ]; then 
+	echo "ERROR: No mutant hashes identfied, either the files are exactly the same of something went wrong in previous step" 
+	exit 100
+fi
 
 ######################__RUFUS_FILTER__##################################################
 echo "starting RUFUS filter"
@@ -701,8 +712,13 @@ then
 	echo "skipping filter"
 else
 	if [ -z $_arg_fastqA ]
-	then 
-	    rm  "$ProbandGenerator".temp
+	then
+	    if [ -e "$ProbandGenerator".temp.mate1.fastq ]; then 
+	    	rm  "$ProbandGenerator".temp.mate1.fastq
+	    fi
+	    if [ -e "$ProbandGenerator".temp.mate2.fastq ]; then
+                rm  "$ProbandGenerator".temp.mate2.fastq
+            fi
 	    mkfifo "$ProbandGenerator".temp.mate1.fastq "$ProbandGenerator".temp.mate2.fastq
 	    /usr/bin/time -v  bash "$ProbandGenerator" | "$RDIR"/bin/PassThroughSamCheck.stranded "$ProbandGenerator".filter.chr  "$ProbandGenerator".temp >  "$ProbandGenerator".temp &
 	    /usr/bin/time -v   $RUFUSfilterFASTQ  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp.mate1.fastq "$ProbandGenerator".temp.mate2.fastq "$ProbandGenerator" "$K" 13 1 "$(echo $Threads -2 | bc)" &
@@ -710,8 +726,6 @@ else
 	else
 		echo "Running RUFUS.filter from paired FASTQ files"
 	
-		#mkfifo $_arg_fastqA.temp
-		#mkfifo $_arg_fastqB.temp
 		
 		echo "$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  <(bash $_arg_fastqA) <(bash $_arg_fastqB) "$ProbandGenerator" $K 13 1 "$(echo $Threads -2 | bc)""
 
@@ -721,6 +735,13 @@ else
 		wait
 	fi
 fi
+
+if [ $(wc -l "$ProbandGenerator".Mutations.Mate1.fastq) -eq "0" ]; then
+	echo "ERROR: No mutant fastq reads idenfied.  Either the files are exactly the same of something went wrong in previous step" 
+	exit 100
+fi
+
+
 if [ -e "$ProbandGenerator".Mutations.fastq.bam ]
 then 
 	echo "skipping mapping mates" 
@@ -749,6 +770,11 @@ then
 fi
 
 
+
+if [ $( samtools view "$ProbandGenerator".Mutations.fastq.bam | wc -l ) -eq "0" ]; then
+        echo "ERROR: BWA failed on "$ProbandGenerator".Mutations.fastq.  Either the files are exactly the same of something went wrong in previous step" 
+        exit 100
+fi 
 
 ###################__RUFUS_OVERLAP__#############################################
 if [ -e ./runanywayIntermediates/"$ProbandGenerator".V2.overlap.hashcount.fastq.bam.vcf ]
