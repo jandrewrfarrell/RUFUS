@@ -73,6 +73,7 @@ print_help ()
     printf "\t%s\n" "-m,--min: overwrites the minimum k-mer count to call variant (no default)"
     printf "\t%s\n" "--saliva: flag to indicate that the subject sample is a buccal swab and likely contains a significant fractino of contaminant DNA"
     printf "\t%s\n" "--exome: flat go set if your input data is exome sequecing. Sugjested you also set -m, default is -m 20"
+    printf "\t%s\n" "--MaxAllele: Max size for insert/deletion events to put the entire alt sequence in. (default 1000)"
     printf "\t%s\n" "-h,--help: HELP!!!!!!!!!!!!!!!"
 }
 
@@ -90,6 +91,7 @@ s-n>] ...\n' "$0"
     printf "\t%s\n" "-e,--exclude: Jhash file of kmers to exclude from mutation list (no default)"
     printf "\t%s\n" "-k,--kersize: size of k-mer to use (no default)"
     printf "\t%s\n" "-m,--min: overwrites the minimum k-mer count to call variant (no default)"
+    printf "\t%s\n" "--MaxAllele: Max size for insert/deletion events to put the entire alt sequence in. (default 1000)"
     printf "\t%s\n" "--saliva: flag to indicate that the subject sample is a buccal swab and likely contains a significant fractino of contaminant DNA"
     printf "\t%s\n" "--exome: flat go set if your input data is exome sequecing. Sugjested you also set -m, default is -m 20"
     printf "\t%s\n" "-q1,--fastq1: If starting from fastq files, a list of the mate1 fastq files to improve RUFUS.ilter"
