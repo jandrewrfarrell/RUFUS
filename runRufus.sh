@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -e
 # This is a rather minimal example Argbash potential
 # Example taken from http://argbash.readthedocs.io/en/stable/example.html
 
@@ -598,11 +599,11 @@ fi
 
 for parent in "${ParentGenerators[@]}"
 do
-     /usr/bin/time -v bash $RunJelly $parent $K $(echo $JThreads -2 | bc) 2 & 
+     /usr/bin/time -v bash $RunJelly $parent $K $(echo $JThreads -2 | bc) 2  
 done
 
 #/usr/bin/time -v bash $RunJelly $ProbandGenerator $K  $Threads 2
-/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $JThreads -2 | bc) 2 &    
+/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $JThreads -2 | bc) 2     
 wait
 ##############################################################################
 
@@ -676,7 +677,10 @@ if [ -s "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList ]
 then 
     echo "skipping $ProbandGenerator.HashList pull "
 else
-    rm  "$ProbandGenerator".temp
+    if [ -e "$ProbandGenerator".temp ]
+    then 
+    	rm  "$ProbandGenerator".temp
+    fi
     mkfifo "$ProbandGenerator".temp
     /usr/bin/time -v $modifiedJelly merge "$ProbandGenerator".Jhash $(echo $parentsString) $(echo $parentsExcludeString)  > "$ProbandGenerator".temp & 
     /usr/bin/time -v bash $PullSampleHashes $ProbandGenerator.Jhash "$ProbandGenerator".temp $MutantMinCov $MaxHashDepth > "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList 

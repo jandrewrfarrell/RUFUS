@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -e 
+
 humanRef=$1
 File=$2
 FinalCoverage=$3
@@ -30,8 +33,18 @@ echo "@@@@@@@@@@@@@__IN_OVERLAP__@@@@@@@@@@@@@@@"
 echo "human ref in Overlap is $humanRef"
 echo "bwa human ref in Overlap is $humanRefBwa"
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-mkdir ./TempOverlap/
-mkdir ./Intermediates/
+if [ ! -d "./TempOverlap/" ]
+then 
+	mkdir ./TempOverlap/
+else
+	echo "TempOverlap already present"
+fi
+if [ ! -d "./Intermediates/" ]
+then
+	mkdir ./Intermediates/
+else
+	echo "Intermediates already present"
+fi
 echo "Overlaping $File"
 
 CDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
@@ -210,17 +223,26 @@ done
 
 #echo "final parent String is  $parentCRString"
 ##########################################################################################
-
+echo "here "
 if [ -s ./Intermediates/$NameStub.ref.RepRefHash ]
 then
         echo "Exclude already exists"
 else
-	echo "bash $CheckHash $refHash ./Intermediates/$NameStub.overlap.hashcount.fastq.Jhash.tab 0 $MaxCov > Intermediates/$NameStub.ref.RepRefHash"
-	bash $CheckHash $refHash ./Intermediates/$NameStub.overlap.hashcount.fastq.Jhash.tab 0 $MaxCov> Intermediates/$NameStub.ref.RepRefHash
+	if [ -z $refHash]
+	then 
+		echo "refhash not provided, skipping"
+		touch  Intermediates/$NameStub.ref.RepRefHash
+	else
+		
+		echo "this one" 
+		echo "bash $CheckHash $refHash ./Intermediates/$NameStub.overlap.hashcount.fastq.Jhash.tab 0 $MaxCov > Intermediates/$NameStub.ref.RepRefHash"
+		bash $CheckHash $refHash ./Intermediates/$NameStub.overlap.hashcount.fastq.Jhash.tab 0 $MaxCov> Intermediates/$NameStub.ref.RepRefHash
+		echo "outa this"
+	fi
 fi
 wait
 
-mkfifo check 
+
 samtools index ./$NameStub.overlap.hashcount.fastq.bam
 
 echo "$RUFUSinterpret -mob ./TempOverlap/$NameStub.overlap.hashcount.fastq.MOB.sam  -mod Intermediates/$NameStub.overlap.asembly.hash.fastq.sample -mQ 8 -r $humanRef -hf $HashList -o  ./$NameStub.overlap.hashcount.fastq.bam -m 1000000 $(echo $parentCRString) -sR Intermediates/$NameStub.overlap.asembly.hash.fastq.Ref.sample -s Intermediates/$NameStub.overlap.asembly.hash.fastq.sample -e ./Intermediates/$NameStub.ref.RepRefHash "
