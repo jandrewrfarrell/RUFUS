@@ -295,7 +295,7 @@ then
     kill -9 $$
 fi
 
-if [ ${#_arg_exclude[@]} -eq 0 ] && [ ${#_arg_controls[@]} -eq 0 ]
+if [ ${#_arg_exclude[@]} -eq "0" ] && [ ${#_arg_controls[@]} -eq "0" ]
 then
     echo "You must provide RUFUS with atleast one control sample"
     echo "Killing run with non-zero exit status"
@@ -326,7 +326,7 @@ unset new_arary
 unset ExcludeTemp
 ##########################################################
 
-if [ $_arg_exome -eq "TRUE" ]; then 
+if [ $_arg_exome == "TRUE" ]; then 
 	echo "Exome run set.  Settin max kmer to 1M and saliva = true"
 	MaxHashDepth=1000000
 	_arg_saliva="TRUE"
@@ -565,7 +565,7 @@ else
 fi
 
 #####__CHECK_IF_MIN_IS_PROVIDED__#####
-if [ -z $_arg_min ] && [ $_arg_exome -eq "TRUE" ]; then
+if [ -z $_arg_min ] && [ $_arg_exome == "TRUE" ]; then
 	echo "Exome run, min must bet set, auto setting to 20"
 	_arg_min="20"
 fi
