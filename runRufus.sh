@@ -58,6 +58,7 @@ _arg_kmersize=
 _arg_min=
 _arg_refhash=
 _arg_saliva="FALSE"
+_arg_exome="FALSE"
 print_help ()
 {
     printf "%s\n" "The general script's help msg"
@@ -217,6 +218,10 @@ parse_commandline ()
 	        _arg_saliva="TRUE"
 		echo "Saliva subject sample provided"
 		;;
+	    --exome)
+	       _arg_exome="TRUE"
+	       echo "Exome run"
+	       ;;
 	    -h|--help)
 		print_help
 		exit 0
@@ -310,6 +315,11 @@ unset new_arary
 unset ExcludeTemp
 ##########################################################
 
+if [ $_arg_exome -eq "TRUE" ]; then 
+	echo "Exome run set.  Settin max kmer to 1M and saliva = true"
+	MaxHashDepth=1000000
+	_arg_saliva="TRUE"
+fi
 
 
 #############################################################################################################
@@ -544,6 +554,11 @@ else
 fi
 
 #####__CHECK_IF_MIN_IS_PROVIDED__#####
+if [ -z $_arg_min ] && [ $_arg_exome -eq "TRUE" ]; then
+	echo "Exome run, min must bet set, auto setting to 20"
+	_arg_min="20"
+fi
+
 if [ -z "$_arg_min" ]
 then
       echo "\$_arg_min is empty"
@@ -551,6 +566,8 @@ else
       echo "\$_arg_min is NOT empty"
       MutantMinCov=$_arg_min
 fi
+
+ 
 
 echo "_arg_min is $_arg_min"
 echo "MutantMinCov is $MutantMinCov"
@@ -658,7 +675,12 @@ then
     then
         echo "skipping model"
 	MutantMinCov=$(head -2 "$ProbandGenerator".Jhash.histo.7.7.model | tail -1 )
-        echo "mutant min coverage from generated model is $MutantMinCov"
+	echo "mutant min coverage from generated model is $MutantMinCov"
+
+	MutantSC=$(head -4 "$ProbandGenerator".Jhash.histo.7.7.model | tail -1 )
+	echo "mutant SC coverage from generated model is $MutantSC"
+	MaxHashDepth=$(echo "$MutantSC * 5" | bc)
+	echo "MaxHashDepth = $MaxHashDepth"
 
     else
 	echo "staring model"
@@ -666,6 +688,11 @@ then
         echo "done with model"
 	MutantMinCov=$(head -2 "$ProbandGenerator".Jhash.histo.7.7.model | tail -1 )
 	echo "mutant min coverage from generated model is $MutantMinCov"
+   	
+	MutantSC=$(head -4 "$ProbandGenerator".Jhash.histo.7.7.model | tail -1 )
+        echo "mutant SC coverage from generated model is $MutantSC"
+        MaxHashDepth=$(echo "$MutantSC * 5" | bc)
+        echo "MaxHashDepth = $MaxHashDepth" 
     fi
 else 
     echo "min was provided, min is $_arg_min" 
