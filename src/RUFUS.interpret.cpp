@@ -2507,7 +2507,7 @@ void SamRead::parseMutations( char *argv[], vector<SamRead>& reads)
 			////////////////////////Writing var out to file/////////////////////////
 				cout       << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << SupportingHashes << "\t" << Filter << "\t" << StructCall <<"FEX=" << InfoFilter << ";RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";" << "CVT=" << CompressedVarType << ";HD="; 
 				
-				VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" << Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << Score << /*SupportingHashes << "/" << PossibleAltKmer << */ "\t" << Filter << "\t" << "SVID=" << reads[alignments[0]].SVeventid << StructCall << "PH=" << phase << ";FEX=" << InfoFilter << ";FS=" << SupportingHashes << "/" << PossibleAltKmer << ";RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";SB=" << StrandBias << ";" << "AS=" << AlignmentSegments << "-" << AlignmentSegmentsCigar << ";" << "CVT=" << CompressedVarType << ";HD="; 
+				VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" << Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << Score << /*SupportingHashes << "/" << PossibleAltKmer << */ "\t" << Filter << "\t" << "PH=" << phase << ";FEX=" << InfoFilter << ";FS=" << SupportingHashes << "/" << PossibleAltKmer << ";RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";SB=" << StrandBias << ";" << "AS=" << AlignmentSegments << "-" << AlignmentSegmentsCigar << ";" << "CVT=" << CompressedVarType << ";HD="; 
 				//VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" << Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << Score << /*SupportingHashes << "/" << PossibleAltKmer << */ "\t" << Filter << "\t" << StructCall << "PH=" << phase << ";FEX=" << InfoFilter << ";FS=" << SupportingHashes << "/" << PossibleAltKmer << ";RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";SB=" << StrandBias << ";" << "AS=" << AlignmentSegments << "-" << AlignmentSegmentsCigar << ";" << "CVT=" << CompressedVarType << ";HD="; 
 
 				for (int j = 0; j < HashCounts.size(); j++) 
@@ -3281,7 +3281,7 @@ SamRead BetterWay(vector<SamRead> reads)
 						//return reads[A]; 
 					}
 					//if(reads[A].ChrPositions[i] == LastAlignedChr and abs(reads[A].Positions[i] -LastAlignedPos ) < MaxVarentSize ) //must be on the same chromosome
-					if(reads[A].chr == reads[B].chr and abs(reads[A].Positions[i] -LastAlignedPos ) < MaxVarentSize ) //must be on the same chromosome
+					if(reads[A].chr == reads[B].chr and abs(reads[A].Positions[i] -LastAlignedPos ) <= (MaxVarentSize+1000) ) //must be on the same chromosome
 					{
 //						cout << "wel this dosnt make any sense" << endl; //reads are in order in the bam so A should always be downstream of B, theus the deletion shoould be detected in B
 						BEDBigStuff << reads[A].chr << "\t" << LastAlignedPos << "\t" << reads[A].Positions[i] << "\t" << "Deletion" << endl;
@@ -3298,7 +3298,7 @@ SamRead BetterWay(vector<SamRead> reads)
 					else
 					{
 						//if( reads[A].ChrPositions[i] == LastAlignedChr and abs(reads[A].Positions[i] -LastAlignedPos ) >= MaxVarentSize )
-						if( reads[A].chr == reads[B].chr and abs(reads[A].Positions[i] -LastAlignedPos ) >= MaxVarentSize )
+						if( reads[A].chr == reads[B].chr and abs(reads[A].Positions[i] -LastAlignedPos ) >= MaxVarentSize + 1000 )
 						{
 							int Abreak = findBreak(reads[A]);
 							int Bbreak = findBreak(reads[B]);
@@ -3381,7 +3381,7 @@ SamRead BetterWay(vector<SamRead> reads)
 						}
 					}
 				}
-				else if (reads[A].Positions[i] -LastAlignedPos < 0 and abs(reads[A].Positions[i] -LastAlignedPos ) < MaxVarentSize) // indicates a possible insertion or tandem duplication
+				else if (reads[A].Positions[i] -LastAlignedPos < 0 and abs(reads[A].Positions[i] -LastAlignedPos ) <= MaxVarentSize +1000) // indicates a possible insertion or tandem duplication
 				{
 					 if (LastAlignedQ == '!'  or reads[A].qual.c_str()[i] == '!')
 					{
@@ -3480,7 +3480,7 @@ SamRead BetterWay(vector<SamRead> reads)
 					}
 	
 				}
-				else if( reads[A].Positions[i] -LastAlignedPos < 0  and abs(reads[A].Positions[i] -LastAlignedPos ) >= MaxVarentSize )
+				else if( reads[A].Positions[i] -LastAlignedPos < 0  and abs(reads[A].Positions[i] -LastAlignedPos ) >= MaxVarentSize +1000 )
 				{
 					 if (LastAlignedQ == '!'  or reads[A].qual.c_str()[i] == '!')
 					{
@@ -3547,7 +3547,7 @@ SamRead BetterWay(vector<SamRead> reads)
 					//if(reads[B].ChrPositions[i] == LastAlignedChr  and abs(reads[B].Positions[i] - LastAlignedPos ) < MaxVarentSize )
 					cout << "yup this one " << "abs(" << reads[B].Positions[i]<< "  - " << LastAlignedPos <<" ) < " << MaxVarentSize << endl; 
 					cout << abs(reads[B].Positions[i] - LastAlignedPos )  << endl; 
-					if(reads[B].chr == reads[A].chr  and abs(reads[B].Positions[i] - LastAlignedPos ) < MaxVarentSize )
+					if(reads[B].chr == reads[A].chr  and abs(reads[B].Positions[i] - LastAlignedPos ) <= MaxVarentSize +1000 )
 					{
 						cout << "striahgtup deletion, size = " <<  abs(reads[B].Positions[i] -LastAlignedPos ) << " at base " << i << " from Position " << LastAlignedPos << " to " << reads[B].Positions[i] << endl; 
 						BEDBigStuff << reads[B].chr << "\t" << LastAlignedPos << "\t" << reads[B].Positions[i]  << "\t" << "Deletion" << endl;
@@ -3572,7 +3572,7 @@ SamRead BetterWay(vector<SamRead> reads)
 					{
 						cout << "fond one way too big" << endl; 
 						// if( reads[A].ChrPositions[i] == LastAlignedChr and abs(reads[B].Positions[i] -LastAlignedPos ) >= MaxVarentSize )
-						if( reads[A].chr == reads[B].chr and abs(reads[B].Positions[i] -LastAlignedPos ) >= MaxVarentSize )
+						if( reads[A].chr == reads[B].chr and abs(reads[B].Positions[i] -LastAlignedPos ) >= MaxVarentSize +1000 )
 						{
 							int Abreak = findBreak(reads[A]);
 							int Bbreak = findBreak(reads[B]);
@@ -3658,7 +3658,7 @@ SamRead BetterWay(vector<SamRead> reads)
 					}
 
 				}
-				else if (reads[B].Positions[i] -LastAlignedPos < 0 and abs(reads[B].Positions[i] - LastAlignedPos ) < MaxVarentSize) // indicates a possible insertion or tandem duplication
+				else if (reads[B].Positions[i] -LastAlignedPos < 0 and abs(reads[B].Positions[i] - LastAlignedPos ) < MaxVarentSize +1000 ) // indicates a possible insertion or tandem duplication
 				{
 					cout << "IN POSSIBLE TANDEM DUP BIT" << endl; 
 					 if (LastAlignedQ == '!' or reads[B].qual.c_str()[i] == '!' )
@@ -3717,7 +3717,7 @@ SamRead BetterWay(vector<SamRead> reads)
 					}
 
 				}
-				else if( reads[B].Positions[i] -LastAlignedPos < 0  and abs(reads[B].Positions[i] -LastAlignedPos ) >= MaxVarentSize )
+				else if( reads[B].Positions[i] -LastAlignedPos < 0  and abs(reads[B].Positions[i] -LastAlignedPos ) >= MaxVarentSize +1000 )
 				{
 					 if (LastAlignedQ == '!' or reads[B].qual.c_str()[i] == '!')
 					{
@@ -4722,7 +4722,7 @@ options:\
 	
 	string MutHashFilePath = "" ;
 	string MutHashFilePathReference = "";
-	MaxVarentSize = 1000000;
+	//MaxVarentSize = 1000000;
 	string RefFile = ""; 
 	string HashListFile = "" ; 	
 	string samFile = "stdin"; 
@@ -5489,7 +5489,7 @@ options:\
 				if (reads[i].sigBreakPoint() > 0 || reads[reads[i].alignments[1]].sigBreakPoint() > 0 || BreakpointInUnalignedCenter(reads[i], reads[reads[i].alignments[1]] ))
 				{
 					cout << "one of them has a sig breakpoint" << endl; 
-					if (((reads[reads[i].alignments[1]].pos + reads[reads[i].alignments[1]].BreakPoint()) - (reads[i].pos+reads[i].BreakPoint())) > 1000)
+					if (((reads[reads[i].alignments[1]].pos + reads[reads[i].alignments[1]].BreakPoint()) - (reads[i].pos+reads[i].BreakPoint())) > MaxVarentSize)
 					{
 						cout << "its big enough " << abs((reads[reads[i].alignments[1]].pos + reads[reads[i].alignments[1]].BreakPoint()) - (reads[i].pos+reads[i].BreakPoint())) << endl; 
 						if (GetReadOrientation(reads[i].flag) == GetReadOrientation(reads[reads[i].alignments[1]].flag))
