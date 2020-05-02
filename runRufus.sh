@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -e 
 
 echo "checking for samtools"
 which samtools 
@@ -757,9 +757,15 @@ else
 	    if [ -e "$ProbandGenerator".temp.mate2.fastq ]; then
                 rm  "$ProbandGenerator".temp.mate2.fastq
             fi
+	    if [ -e "$ProbandGenerator".temp ]; then 
+		    rm "$ProbandGenerator".temp 
+            fi
+	    echo "running this one " 
 	    mkfifo "$ProbandGenerator".temp.mate1.fastq "$ProbandGenerator".temp.mate2.fastq
+	    sleep 1
 	    /usr/bin/time -v  bash "$ProbandGenerator" | "$RDIR"/bin/PassThroughSamCheck.stranded "$ProbandGenerator".filter.chr  "$ProbandGenerator".temp >  "$ProbandGenerator".temp &
 	    /usr/bin/time -v   $RUFUSfilterFASTQ  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp.mate1.fastq "$ProbandGenerator".temp.mate2.fastq "$ProbandGenerator" "$K" 13 1 "$(echo $Threads -2 | bc)" &
+	    
 	    wait
 	else
 		echo "Running RUFUS.filter from paired FASTQ files"
