@@ -17,7 +17,13 @@ then
 	echo "Skipping jelly, $GEN.Jhash alreads exists"
 else
 	echo "Running jellyfish for $GEN"
+	if [ -e $GEN.Jhash.temp ]; then 
+		rm $GEN.Jhash.temp
+	fi
 	mkfifo $GEN.Jhash.temp
+	if [ -e $GEN.fq ]; then 
+		rm $GEN.fq
+	fi
 	mkfifo $GEN.fq
 	bash $GEN | $RDIR/bin/PassThroughSamCheck $GEN.Jelly.chr > $GEN.fq &
 	/usr/bin/time -v $JELLYFISH count --disk -m $K -L $L -s 8G -t $T -o $GEN.Jhash -C $GEN.fq
