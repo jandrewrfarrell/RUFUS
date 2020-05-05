@@ -780,7 +780,7 @@ else
 	fi
 fi
 
-if [ $(wc -l "$ProbandGenerator".Mutations.Mate1.fastq) -eq "0" ]; then
+if [ $(wc -l "$ProbandGenerator".Mutations.Mate1.fastq | awk '{print $1}') -eq "0" ]; then
 	echo "ERROR: No mutant fastq reads idenfied.  Either the files are exactly the same of something went wrong in previous step" 
 	exit 100
 fi
@@ -815,7 +815,7 @@ fi
 
 
 
-if [ $( samtools view "$ProbandGenerator".Mutations.fastq.bam | wc -l ) -eq "0" ]; then
+if [ $( samtools view "$ProbandGenerator".Mutations.fastq.bam | wc -l | awk '{print $1}') -eq "0" ]; then
         echo "ERROR: BWA failed on "$ProbandGenerator".Mutations.fastq.  Either the files are exactly the same of something went wrong in previous step" 
         exit 100
 fi 

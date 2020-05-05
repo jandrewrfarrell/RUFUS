@@ -79,6 +79,12 @@ else
 	samtools index $File.bam 
 fi
 
+if [ $( samtools view $File.bam | wc -l | awk '{print $1}') -eq "0" ]; then
+        echo "ERROR: BWA failed on $File .  Either the files are exactly the same of something went wrong in previous step" 
+        exit 100
+fi
+
+
 if [ -s ./TempOverlap/$NameStub.sam.fastqd ]  
 then 
 	echo "skipping sam assemble"
@@ -87,30 +93,57 @@ else
 	$OverlapSam <( samtools view  -F 3328 $File.bam | awk '$9 > 100 || $9 < -100 || $9==0' ) .95 20 1 ./TempOverlap/$NameStub.sam $NameStub 1 $HashList $Threads
 	#$OverlapSam <( samtools view  -F 3328 $File.bam ) .95 20 1 ./TempOverlap/$NameStub.sam $NameStub 1 $HashList $Threads
 fi
+
+if [ $( wc -l ./TempOverlap/$NameStub.sam.fastqd | awk '{print $1}') -eq "0" ]; then
+	echo "ERROR Assembly produce output for ./TempOverlap/$NameStub.sam.fastqd"
+	exit 100
+fi
+
 if [ -s ./TempOverlap/$NameStub.1.fastqd ]
 then 	
 	echo "skipping first overlap"
 else
 	time $OverlapHash ./TempOverlap/$NameStub.sam.fastqd .98 50 1 FP 20 1 ./TempOverlap/$NameStub.1 0 $Threads #> $File.overlap.out
-fi 
+fi
+
+if [ $( wc -l ./TempOverlap/$NameStub.1.fastqd | awk '{print $1}') -eq "0" ]; then
+        echo "ERROR Assembly produce output for ./TempOverlap/$NameStub.1.fastqd"
+        exit 100
+fi
+
 if [ -s ./TempOverlap/$NameStub.2.fastqd ]
 then 
 	echo "skipping second overlap"
 else
 	time $OverlapHash ./TempOverlap/$NameStub.1.fastqd .98 50 2 FP 20 1 ./TempOverlap/$NameStub.2 1 $Threads #>>  $File.overlap.out
 fi
+
+if [ $( wc -l ./TempOverlap/$NameStub.2.fastqd | awk '{print $1}') -eq "0" ]; then
+        echo "ERROR Assembly produce output for ./TempOverlap/$NameStub.2.fastqd"
+        exit 100
+fi
+
 if [ -s ./TempOverlap/$NameStub.3.fastqd ]
 then
         echo "skipping second overlap"
 else
         time $OverlapHash ./TempOverlap/$NameStub.2.fastqd .98 25 2 $NameStub 20 1 ./TempOverlap/$NameStub.3 1 $Threads #>>  $File.overlap.out
 fi
+if [ $( wc -l ./TempOverlap/$NameStub.3.fastqd | awk '{print $1}') -eq "0" ]; then
+        echo "ERROR Assembly produce output for ./TempOverlap/$NameStub.3.fastqd"
+        exit 100
+fi
+
 if [ -s ./TempOverlap/$NameStub.4.fastqd ]
 then
         echo "skipping second overlap"
 else
         time $OverlapRebion2 ./TempOverlap/$NameStub.3.fastqd .98 25 $FinalCoverage  ./TempOverlap/$NameStub.4 $NameStub 1 $Threads > /dev/null
 	#time $OverlapHash ./TempOverlap/$NameStub.3.fastqd .98 25 $FinalCoverage $NameStub 15 1 ./TempOverlap/$NameStub.4 1 $Threads #>>  $File.overlap.out
+fi
+if [ $( wc -l ./TempOverlap/$NameStub.4.fastqd | awk '{print $1}') -eq "0" ]; then 
+        echo "ERROR Assembly produce output for ./TempOverlap/$NameStub.4.fastqd"
+        exit 100
 fi
 if [ -s ./$NameStub.overlap.hashcount.fastq ]
 then 
@@ -125,6 +158,11 @@ else
 fi
 
 
+if [ $( wc -l ./$NameStub.overlap.hashcount.fastq | awk '{print $1}') -eq "0" ]; then 
+        echo "ERROR Assembly produce output for ./$NameStub.overlap.hashcount.fastq"
+        exit 100
+fi
+
 if [ -s ./$NameStub.overlap.hashcount.fastq.bam ]
 then 
 	echo "skipping contig alignment" 
@@ -134,6 +172,13 @@ else
          samtools index ./$NameStub.overlap.hashcount.fastq.bam
 fi
 
+if [ $( samtools view ./$NameStub.overlap.hashcount.fastq.bam | wc -l | awk '{print $1}') -eq "0" ]; then
+        echo "ERROR: BWA failed on ./$NameStub.overlap.hashcount.fastq.bam .  Either the files are exactly the same of something went wrong in previous step" 
+        exit 100
+fi
+
+
+#############################################################################################################
 if [ -s ./TempOverlap/$NameStub.overlap.hashcount.fastq.MOB.sam ]
 then
 	echo "skipping MOB alignemnt check "
@@ -142,7 +187,6 @@ else
 fi 
 
 
-#############################################################################################################
 if [ -e ./Intermediates/$NameStub.overlap.asembly.hash.fastq.ref.fastq ]
 then 
 	echo "skipping pull reference sequecnes"
