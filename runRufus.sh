@@ -59,7 +59,7 @@ _arg_min=
 _arg_refhash=
 _arg_saliva="FALSE"
 _arg_exome="FALSE"
-MaxAlleleSize="1000"
+_MaxAlleleSize="1000"
 print_help ()
 {
     printf "%s\n" "The general script's help msg"
@@ -229,10 +229,19 @@ parse_commandline ()
 	       _arg_exome="TRUE"
 	       echo "Exome run"
 	       ;;
-	    --MaxAllele)
+	    -A|--MaxAllele)
 	       test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-	       MaxAlleleSize="$2"
+	       _MaxAlleleSize="$2"
+	       echo "_MaxAlleleSize set to $_MaxAlleleSize"
+	       shift
 	       ;;
+	    --MaxAllele=*)
+                _MaxAlleleSize="${_key##--MaxAllele=}"
+		echo "other spot _MaxAlleleSize set to $_MaxAlleleSize"
+                ;;
+	    -A*)
+	   	_MaxAlleleSize="${_key##-A}"
+		;;
 	    -h|--help)
 		print_help
 		exit 0
@@ -716,7 +725,7 @@ if [ -z $MutantMinCov ]; then
 	echo "ERROR: No min coverage set, possible error in Model"
 	exit 100
 fi 
-
+echo "made it "
 #################################__HASH_LIST_FILTER__#####################################
 if [ -s "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList ]
 then 
@@ -732,6 +741,8 @@ else
     wait
     
 fi
+
+echo "made it here "
 ########################################################################################
 
 wc -l "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList | awk '{print $1}'
@@ -826,8 +837,8 @@ then
     echo "Skipping overlap step"
 else
     echo "Starting RUFUS overlap"
-    echo "/usr/bin/time bash  $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 3 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$MaxAlleleSize" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash""
-    /usr/bin/time bash  $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 3 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$MaxAlleleSize" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
+    echo "/usr/bin/time bash  $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 3 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$_MaxAlleleSize" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash""
+    /usr/bin/time bash  $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 3 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$_MaxAlleleSize" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
     echo "Done with RUFUS overlap"
 fi
 ##############################################################################################
