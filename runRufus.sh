@@ -99,7 +99,7 @@ s-n>] ...\n' "$0"
     printf "\t%s\n" "-h,--help: HELP!!!!!!!!!!!!!!!"
     printf "\t%s\n" "-d,--devhelp: HELP!!! for developers"
 }
-
+re='^[0-9]+$'; 
 parse_commandline ()
 {
     while test $# -gt 0
@@ -168,13 +168,25 @@ parse_commandline ()
 	    -t|--threads)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_arg_threads="$2"
+		if ! [[ $_arg_threads =~ $re ]] ; then
+                       echo "Threads must be a number "
+                       exit 100
+                fi
 		shift
 		;;
 	    --threads=*)
 		_arg_threads="${_key##--threads=}"
+		 if ! [[ $_arg_threads =~ $re ]] ; then
+                       echo "Threads must be a number "
+                       exit 100
+                fi
 		;;
 	    -t*)
 		_arg_threads="${_key##-t}"
+		 if ! [[ $_arg_threads =~ $re ]] ; then
+                       echo "Threads must be a number "
+                       exit 100
+                fi
 		;;
 
             -f|--refhash)
@@ -195,9 +207,17 @@ parse_commandline ()
 		;;
 	    --kmersize=*)
 		_arg_kmersize="${_key##--kmersize=}"
+		 if ! [[ $_arg_kmersize =~ $re ]] ; then
+                       echo "kmer size must be a number "
+                       exit 100
+                fi
 		;;
 	    -k*)
 		_arg_kmersize="${_key##-k}"
+		if ! [[ $_arg_kmersize =~ $re ]] ; then
+                       echo "kmer size must be a number "
+                       exit 100
+                fi
 		;;
 	    -c|--controls)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
@@ -213,13 +233,25 @@ parse_commandline ()
 	    -m|--min)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_arg_min="$2"
+		if ! [[ $_arg_min =~ $re ]] ; then
+                       echo "arg -m must be a number "
+                       exit 100
+                fi
 		shift
 		;;
 	    --min=*)
 		_arg_min="${_key##--min=}"
+		if ! [[ $_arg_min =~ $re ]] ; then
+                       echo "arg -m must be a number "
+                       exit 100
+                fi
 		;;
 	    -m*)
 		_arg_min="${_key##-m}"
+		if ! [[ $_arg_min =~ $re ]] ; then
+                       echo "arg -m must be a number "
+                       exit 100
+                fi
 		;;
 	    --saliva)
 	        _arg_saliva="TRUE"
@@ -232,15 +264,27 @@ parse_commandline ()
 	    -A|--MaxAllele)
 	       test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 	       _MaxAlleleSize="$2"
+	       if ! [[ $_MaxAlleleSize =~ $re ]] ; then
+		       echo "MaxAlleleSize must be a number "
+		       exit 100
+	       fi
 	       echo "_MaxAlleleSize set to $_MaxAlleleSize"
 	       shift
 	       ;;
 	    --MaxAllele=*)
                 _MaxAlleleSize="${_key##--MaxAllele=}"
+		if ! [[ $_MaxAlleleSize =~ $re ]] ; then
+                       echo "MaxAlleleSize must be a number "
+                       exit 100
+                fi
 		echo "other spot _MaxAlleleSize set to $_MaxAlleleSize"
                 ;;
 	    -A*)
 	   	_MaxAlleleSize="${_key##-A}"
+		if ! [[ $_MaxAlleleSize =~ $re ]] ; then
+                       echo "MaxAlleleSize must be a number "
+                       exit 100
+                fi
 		;;
 	    -h|--help)
 		print_help
