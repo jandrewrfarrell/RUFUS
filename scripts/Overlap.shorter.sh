@@ -90,7 +90,7 @@ then
 	echo "skipping sam assemble"
 else
      
-	$OverlapSam <( samtools view  -F 3328 $File.bam | awk '$9 > 100 || $9 < -100 || $9==0' ) .95 20 1 ./TempOverlap/$NameStub.sam $NameStub 1 $HashList $Threads
+	$OverlapSam <( samtools view  -F 3328 $File.bam | awk '$9 > 100 || $9 < -100 || $9==0' ) .95 50 1 ./TempOverlap/$NameStub.sam $NameStub 1 $HashList $Threads
 	#$OverlapSam <( samtools view  -F 3328 $File.bam ) .95 20 1 ./TempOverlap/$NameStub.sam $NameStub 1 $HashList $Threads
 fi
 
@@ -103,7 +103,7 @@ if [ -s ./TempOverlap/$NameStub.1.fastqd ]
 then 	
 	echo "skipping first overlap"
 else
-	time $OverlapHash ./TempOverlap/$NameStub.sam.fastqd .98 50 1 FP 20 1 ./TempOverlap/$NameStub.1 0 $Threads #> $File.overlap.out
+	time $OverlapHash ./TempOverlap/$NameStub.sam.fastqd .98 100 1 FP 20 1 ./TempOverlap/$NameStub.1 0 $Threads #> $File.overlap.out
 fi
 
 if [ $( wc -l ./TempOverlap/$NameStub.1.fastqd | awk '{print $1}') -eq "0" ]; then
@@ -115,7 +115,7 @@ if [ -s ./TempOverlap/$NameStub.2.fastqd ]
 then 
 	echo "skipping second overlap"
 else
-	time $OverlapHash ./TempOverlap/$NameStub.1.fastqd .98 50 2 FP 20 1 ./TempOverlap/$NameStub.2 1 $Threads #>>  $File.overlap.out
+	time $OverlapHash ./TempOverlap/$NameStub.1.fastqd .98 75 2 FP 20 1 ./TempOverlap/$NameStub.2 1 $Threads #>>  $File.overlap.out
 fi
 
 if [ $( wc -l ./TempOverlap/$NameStub.2.fastqd | awk '{print $1}') -eq "0" ]; then
@@ -127,7 +127,7 @@ if [ -s ./TempOverlap/$NameStub.3.fastqd ]
 then
         echo "skipping second overlap"
 else
-        time $OverlapHash ./TempOverlap/$NameStub.2.fastqd .98 25 2 $NameStub 20 1 ./TempOverlap/$NameStub.3 1 $Threads #>>  $File.overlap.out
+        time $OverlapHash ./TempOverlap/$NameStub.2.fastqd .98 50 2 $NameStub 20 1 ./TempOverlap/$NameStub.3 1 $Threads #>>  $File.overlap.out
 fi
 if [ $( wc -l ./TempOverlap/$NameStub.3.fastqd | awk '{print $1}') -eq "0" ]; then
         echo "ERROR Assembly produce output for ./TempOverlap/$NameStub.3.fastqd"
@@ -138,7 +138,7 @@ if [ -s ./TempOverlap/$NameStub.4.fastqd ]
 then
         echo "skipping second overlap"
 else
-        time $OverlapRebion2 ./TempOverlap/$NameStub.3.fastqd .98 25 $FinalCoverage  ./TempOverlap/$NameStub.4 $NameStub 1 $Threads > /dev/null
+        time $OverlapRebion2 ./TempOverlap/$NameStub.3.fastqd .98 50 $FinalCoverage  ./TempOverlap/$NameStub.4 $NameStub 1 $Threads > /dev/null
 	#time $OverlapHash ./TempOverlap/$NameStub.3.fastqd .98 25 $FinalCoverage $NameStub 15 1 ./TempOverlap/$NameStub.4 1 $Threads #>>  $File.overlap.out
 fi
 if [ $( wc -l ./TempOverlap/$NameStub.4.fastqd | awk '{print $1}') -eq "0" ]; then 
@@ -177,16 +177,18 @@ if [ $( samtools view ./$NameStub.overlap.hashcount.fastq.bam | wc -l | awk '{pr
         exit 100
 fi
 
-
+echo "string hash lookup"
 #############################################################################################################
-if [ -s ./TempOverlap/$NameStub.overlap.hashcount.fastq.MOB.sam ]
+echo "staring MOB check"
+if [ -s ./Intermediates/$NameStub.overlap.hashcount.fastq.MOB.sam ]
 then
 	echo "skipping MOB alignemnt check "
 else 
-	$bwa mem -t $Threads -Y -E 0,0 -O 6,6  -d 500 -w 500 -L 0,0 $MOBList ./$NameStub.overlap.hashcount.fastq | samtools sort -T $File -O sam - > ./TempOverlap/$NameStub.overlap.hashcount.fastq.MOB.sam
+	$bwa mem -t $Threads -Y -E 0,0 -O 6,6  -d 500 -w 500 -L 0,0 $MOBList ./$NameStub.overlap.hashcount.fastq | samtools sort -T $File -O sam - > ./Intermediates/$NameStub.overlap.hashcount.fastq.MOB.sam
 fi 
 
 
+echo "starting reference pull "
 if [ -e ./Intermediates/$NameStub.overlap.asembly.hash.fastq.ref.fastq ]
 then 
 	echo "skipping pull reference sequecnes"
@@ -196,6 +198,7 @@ else
 
 fi 
 
+echo "starting var hash generatrion" 
 if [ -e ./Intermediates/$NameStub.overlap.hashcount.fastq.Jhash ]
 then 
 	echo "skipping var hash generationr"
@@ -206,6 +209,7 @@ else
 	$JellyFish dump  -c ./Intermediates/$NameStub.overlap.hashcount.fastq.Jhash > ./Intermediates/$NameStub.overlap.hashcount.fastq.Jhash.tab
 fi 
 
+echo "starting ref hash generation"
 if [ -s ./Intermediates/$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash ] 
 then 
 	echo "skipping ref hash generation"
@@ -214,6 +218,7 @@ else
 	$JellyFish dump -c  ./Intermediates/$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash > ./Intermediates/$NameStub.overlap.asembly.hash.fastq.ref.fastq.Jhash.tab
 fi
  
+ echo "pull hashes from sample" 
 if [ -s Intermediates/$NameStub.overlap.asembly.hash.fastq.sample ]
 then
         echo "skipping  Intermediates/$NameStub.overlap.asembly.hash.fastq.sample file already exitst"
@@ -222,6 +227,8 @@ else
         bash $CheckHash $SampleJhash ./Intermediates/$NameStub.overlap.hashcount.fastq.Jhash.tab 0 $MaxCov> Intermediates/$NameStub.overlap.asembly.hash.fastq.sample
 	echo "done with hash lookup"
 fi
+
+echo "pull hashes from controls" 
 for parent in $ParentsJhash
         do
             if [ -s Intermediates/$NameStub.overlap.asembly.hash.fastq.$parent ]
@@ -290,12 +297,12 @@ wait
 
 samtools index ./$NameStub.overlap.hashcount.fastq.bam
 
-echo "$RUFUSinterpret -mob ./TempOverlap/$NameStub.overlap.hashcount.fastq.MOB.sam  -mod Intermediates/$NameStub.overlap.asembly.hash.fastq.sample -mQ 8 -r $humanRef -hf $HashList -o  ./$NameStub.overlap.hashcount.fastq.bam -m $MaxAlleleSize $(echo $parentCRString) -sR Intermediates/$NameStub.overlap.asembly.hash.fastq.Ref.sample -s Intermediates/$NameStub.overlap.asembly.hash.fastq.sample -e ./Intermediates/$NameStub.ref.RepRefHash "
+echo "$RUFUSinterpret -mob ./Intermediates/$NameStub.overlap.hashcount.fastq.MOB.sam  -mod Intermediates/$NameStub.overlap.asembly.hash.fastq.sample -mQ 8 -r $humanRef -hf $HashList -o  ./$NameStub.overlap.hashcount.fastq.bam -m $MaxAlleleSize $(echo $parentCRString) -sR Intermediates/$NameStub.overlap.asembly.hash.fastq.Ref.sample -s Intermediates/$NameStub.overlap.asembly.hash.fastq.sample -e ./Intermediates/$NameStub.ref.RepRefHash "
 
 echo ""
 echo "" 
 echo ""
-echo "$RUFUSinterpret -mob ./TempOverlap/$NameStub.overlap.hashcount.fastq.MOB.sam -mod Intermediates/$NameStub.overlap.asembly.hash.fastq.sample -mQ 8 -r $humanRef -hf $HashList -o  ./$NameStub.overlap.hashcount.fastq.bam -m $MaxAlleleSize $(echo $parentCRString) -sR Intermediates/$NameStub.overlap.asembly.hash.fastq.Ref.sample -s Intermediates/$NameStub.overlap.asembly.hash.fastq.sample -e ./Intermediates/$NameStub.ref.RepRefHash"
-samtools view ./$NameStub.overlap.hashcount.fastq.bam | $RUFUSinterpret -mob ./TempOverlap/$NameStub.overlap.hashcount.fastq.MOB.sam -mod Intermediates/$NameStub.overlap.asembly.hash.fastq.sample -mQ 8 -r $humanRef -hf $HashList -o  ./$NameStub.overlap.hashcount.fastq.bam -m $MaxAlleleSize $(echo $parentCRString) -sR Intermediates/$NameStub.overlap.asembly.hash.fastq.Ref.sample -s Intermediates/$NameStub.overlap.asembly.hash.fastq.sample -e ./Intermediates/$NameStub.ref.RepRefHash 
+echo "$RUFUSinterpret -mob ./Intermediates/$NameStub.overlap.hashcount.fastq.MOB.sam -mod Intermediates/$NameStub.overlap.asembly.hash.fastq.sample -mQ 8 -r $humanRef -hf $HashList -o  ./$NameStub.overlap.hashcount.fastq.bam -m $MaxAlleleSize $(echo $parentCRString) -sR Intermediates/$NameStub.overlap.asembly.hash.fastq.Ref.sample -s Intermediates/$NameStub.overlap.asembly.hash.fastq.sample -e ./Intermediates/$NameStub.ref.RepRefHash"
+samtools view ./$NameStub.overlap.hashcount.fastq.bam | $RUFUSinterpret -mob ./Intermediates/$NameStub.overlap.hashcount.fastq.MOB.sam -mod Intermediates/$NameStub.overlap.asembly.hash.fastq.sample -mQ 1 -r $humanRef -hf $HashList -o  ./$NameStub.overlap.hashcount.fastq.bam -m $MaxAlleleSize $(echo $parentCRString) -sR Intermediates/$NameStub.overlap.asembly.hash.fastq.Ref.sample -s Intermediates/$NameStub.overlap.asembly.hash.fastq.sample -e ./Intermediates/$NameStub.ref.RepRefHash 
 
 

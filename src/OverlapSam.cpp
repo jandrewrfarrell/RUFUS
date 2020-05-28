@@ -38,7 +38,7 @@ int Align3(vector<string>& sequenes, vector<string>& quals, string Ap, string Aq
 	int bestScore = 0;
 	int NumReads = sequenes.size();
 	int start = Ai + 1;
-	int end = start + 100; 
+	int end = start + 10; 
 	if (end > sequenes.size()) 
 	{
 		end = sequenes.size();

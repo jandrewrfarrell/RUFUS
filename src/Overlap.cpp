@@ -754,6 +754,7 @@ int main(int argc, char* argv[]) {
 				ReadSize = L2.size();
 			} else {
 				Rejects++;
+				bad << L1 << endl << L2 << endl << L3 << endl << L4 << endl;
 			}
 		}
 	} else {
@@ -1140,7 +1141,7 @@ int main(int argc, char* argv[]) {
 
 			if (maxDep >= MinCoverage) {
 				count++;
-			 int F = 0;
+			 	int F = 0;
 				int R = 0;
 				compresStrand(strand[i], F, R); 
 	//report << "@NODE_" << i << "_L=" << sequenes[i].size()			 << "_D=" << maxDep << endl;

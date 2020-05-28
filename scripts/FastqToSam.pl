@@ -32,8 +32,9 @@ while ($l1 = <Fastq>)
 	chomp $l1; 
 	chomp $l2; 
 	chomp $l4;
-	my $name = substr($l1, 1); 
-	print "$name	0	*	0	*	*	*	0	0	$l2	$l4	\n";
+	#my $name = substr($l1, 1); 
+	my @t = split ' ', $l1;
+	print "$t[0]	0	*	0	*	*	*	0	0	$l2	$l4	\n";
 }
 #Call should be GFFfile, FastaReff, SNPFilePath
 

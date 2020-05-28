@@ -64,9 +64,12 @@ int main(int argc, char *argv[]) {
 
   ifstream MutFileM1;
   cout << "MutFile.mate1 is " << argv[2] << endl;
-  MutFileM1.open(argv[2]);
-  
-  if (MutFileM1.is_open()) {
+ 
+ MutFileM1.open(argv[2]);
+ 
+ cout << "here " << endl;  
+ 
+ if (MutFileM1.is_open()) {
     cout << "##File Opend\n";
   } else {
     cout << "Error, MutFile could not be opened";

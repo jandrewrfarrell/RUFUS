@@ -2443,7 +2443,7 @@ void SamRead::parseMutations( char *argv[], vector<SamRead>& reads)
 				   	cout << "GOOD COVERAGE" << endl;
 				if (StrandBias >= 0){
 
-					if (StrandBias >0.9 or StrandBias < 0.1)
+					if (StrandBias >0.99999 or StrandBias < 0.00001)
 					{	
 						Denovo = "StrandBias";
 						stringstream ss;
@@ -5100,7 +5100,7 @@ options:\
 	string boom = outStub;
 	VCFOutFile.open(boom+ ".vcf"); 
 	BEDOutFile.open(boom+ ".vcf.bed"); 
-	boom = "TempOverlap/" + boom; 
+	boom = "Intermediates/" + boom; 
 	BEDBigStuff.open(boom+ ".vcf.Big.bed");
 	BEDNotHandled.open(boom+ ".vcf.NotHandled.bed");
 	Invertions.open(boom+".vcf.invertions.bed");
@@ -5293,6 +5293,7 @@ options:\
 			
 			// do I have a breakpoint supporoted by hashes
 			int bp = reads[i].sigBreakPoint();
+			cout << "HEREbp = " << bp << endl; 
 			if (bp > 0)
 			{
 				cout << "Passed SigBreakpoint check MobLoop" << endl; 
@@ -6633,6 +6634,7 @@ options:\
 		{
 			read.writetofile(Unaligned);
 			Unaligned << endl;
+			cout << "read unaligned, skipping" << endl; 
 		}
 		//if  (read.first)
 		{
@@ -6698,6 +6700,10 @@ options:\
 				//reads[i].CheckPhase();
 				read.parseMutations(argv, reads);
 			}
+			else
+			{
+				cout << "map qual " << read.mapQual << " less than mim map qual of " << MinMapQual << endl; 
+			}
 		}
 	}
 	cout << "finding multi contig events, " << reads.size() << endl;
@@ -6709,16 +6715,20 @@ options:\
 		{
 			cout << "possible large insertion" << endl;
 			reads[i].write();
-		 	int start = -1;
+		 	int start = -5;
                         while (start + i < 0)
                         {start ++;}
-			for ( int j = start;j<=1 && j+i >= 0 && j+i < reads.size() ; j++)
+			for ( int j = start; j <= 5 && j+i >= 0 && j+i < reads.size() ; j++)
 			{
-				if (reads[i+j].alignments.size() == 1 && reads[i].clipPattern == "cm"  && reads[i].sigBreakPoint() > 0 && reads[i].chr == reads[i+j].chr  && reads[i+j].SVeventid ==  0)
+				cout << "I = " << i <<  "and  J = " << j << endl; 
+				cout << reads[i+j].name << " sig break point = " << reads[i+j].sigBreakPoint() << endl; 
+				if (reads[i+j].alignments.size() == 1 && reads[i+j].clipPattern == "cm"  && reads[i+j].sigBreakPoint() > 0 && reads[i].chr == reads[i+j].chr  && reads[i+j].SVeventid ==  0)
 				{
 					cout << "even more possible large insert" << endl;
-					int positionI = reads[i].pos + reads[i].sigBreakPoint();
-					int positionJ = reads[i+j].pos + reads[i+j].sigBreakPoint();
+					int sbI = reads[i].sigBreakPoint();
+					int sbJ = reads[i+j].sigBreakPoint();
+					int positionI = reads[i].pos + sbI;
+					int positionJ = reads[i+j].pos + sbJ;
 					
 						//if (abs(positionAa - positionBa) < HashSize || abs(positionAb -  positionBb) < HashSize || abs(positionAa -  positionBb) < HashSize || abs(positionAb - positionBa) < HashSize )
 						
@@ -6734,18 +6744,20 @@ options:\
 							else
 								pos = positionJ;
 
+							cout << "pos = " << pos << endl; 
 							int end = 0; 
 							if(positionI > positionJ)
 								end = positionI;
 							else
 								end = positionJ; 
-							
+							cout << "end = " << end << endl; 
 							
 
-							int startBreak = reads[i].sigBreakPoint() - reads[i+j].sigBreakPoint(); 
+							int startBreak = positionI - positionJ ; 
 
 							stringstream call; 
 
+							cout << "here 1" << endl; 
 							stringstream Format;
 							if (startBreak>0)
 							{
@@ -6755,6 +6767,7 @@ options:\
 							{
 								Format << abs(startBreak) << "D"; 
 							}
+							cout << "here 2 " << endl; 
 							stringstream alt; 
 							stringstream ref; 
 							stringstream info; 
@@ -6769,17 +6782,25 @@ options:\
 								ref << Reff.getSubSequence(reads[i].chr, pos -1 -1  , 1+abs(startBreak));
 								 alt << Reff.getSubSequence(reads[i].chr, pos -1 -1 , 1); 
 							}
+							cout << "here 3" << endl; 
 							//ref << "-" << Reff.getSubSequence(reads[i].chr, pos -1 -1 + abs(startBreak)+1, size - abs(startBreak) - abs(endBreak) ); 
-							alt << "-" << reads[i].getClippedSequence(positionI, "mc") << "NNNNNNNNNNNNNNNNNNNN" << reads[i+j].getClippedSequence(positionI, "cm"); 
-							 
+							cout <<" posI = " << sbI << " and pos j = " << sbJ << endl; 
+							string leftseq = reads[i].getClippedSequence(sbI, "mc");  
+							cout << "here 3.11" << endl; 
+							string rightseq =  reads[i+j].getClippedSequence(sbJ, "cm"); 
+							cout << "here 3.12" << endl; 
+							alt << "-" << reads[i].getClippedSequence(sbI, "mc") << "NNNNNNNNNNNNNNNNNNNN" << reads[i+j].getClippedSequence(sbJ, "cm"); 
+							cout << "here 3.1" << endl;  
 							Format <<  alt.str().length()<<"+" << "LargeInsert"; 	
+							cout << "here 3.2" << endl; 
 							int readAmut=0;
 							int readApos=0;
 							int readBmut=0;
 							int readBpos=0;
 							reads[i].GetQualityHashes(readAmut, readApos, reads[i].sigBreakPoint());
+							cout << "here 3.3" << endl; 
 							reads[i+j].GetQualityHashes(readBmut, readBpos, reads[i+j].sigBreakPoint());
-
+							cout << "here 4" << endl; 
 							float qual = -100;
 							if ((readApos+readBpos) > 0)
 								qual = ((float)readAmut+(float)readBmut) / ((float)readApos+(float)readBpos) * 100.0;
@@ -6793,7 +6814,7 @@ options:\
 								phase = reads[i].phase;
 							else if (reads[i+j].phase != "none")
 								phase = reads[i+j].phase;	
-						
+							cout << "here 5" << endl; 
 							CurrentSVeventID++;
 							for(int k = 0; k < reads[i].alignments.size(); k++)
 							{reads[reads[i].alignments[k]].SVeventid = CurrentSVeventID;}
@@ -6807,7 +6828,7 @@ options:\
 		
 							int GMap = 0;
 							int minMapQual = 30;
-	
+							cout << "here 6" << endl; 
 							if (reads[i].mapQual > minMapQual)
 								GMap++;
 							if ( reads[i+j].mapQual > minMapQual)
