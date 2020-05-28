@@ -280,7 +280,7 @@ if [ -s ./Intermediates/$NameStub.ref.RepRefHash ]
 then
         echo "Exclude already exists"
 else
-	if [ -z $refHash]
+	if [ -z $refHash ]
 	then 
 		echo "refhash not provided, skipping"
 		touch  Intermediates/$NameStub.ref.RepRefHash
