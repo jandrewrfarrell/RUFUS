@@ -9,7 +9,7 @@ SET(MODIFIED_JELLYFISH_LIB)
 ExternalProject_Add(${MODIFIED_JELLYFISH_PROJECT}
 	URL ${PROJECT_SOURCE_DIR}/src/modifiedJellyfish.tar.gz
 
-        CONFIGURE_COMMAND ${PROJECT_SOURCE_DIR}/bin/externals/modified_jellyfish/src/modified_jellyfish_project/configure --prefix=${PROJECT_SOURCE_DIR}/bin/externals/modified_jellyfish/src/modified_jellyfish_project/
+        CONFIGURE_COMMAND ${PROJECT_BINARY_DIR}/externals/modified_jellyfish/src/modified_jellyfish_project/configure --prefix=${PROJECT_BINARY_DIR}/externals/modified_jellyfish/src/modified_jellyfish_project/
         BUILD_IN_SOURCE 1
         BUILD_COMMAND make
         INSTALL_COMMAND make install
