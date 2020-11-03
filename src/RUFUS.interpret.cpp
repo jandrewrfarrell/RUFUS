@@ -918,7 +918,8 @@ string SamRead::createStructGenotype(int spot)
 	if (start <0)
 		start = 0; 
 	string hash  =""; 
-	for(int i = start; i < spot; i++)
+	cout << "hereTESTING " << endl; 
+	for(int i = start; i < spot && i+HashSize < seq.size(); i++)
 	{
 		hash = seq.substr(i, HashSize);
 		unsigned long int LongHash = HashToLong(hash);
@@ -926,7 +927,7 @@ string SamRead::createStructGenotype(int spot)
 		if (Hash.count(hash) > 0)//if (MutantHashes.count(LongHash))
 		{
 			MutAltCounts.push_back(Hash[hash]);
-			cout << hash << "\t" << Hash[hash]; 
+			cout << hash << "\t" << Hash[hash] << " i = " << i << " seq.size = " <<  seq.size() << " HashSize = " << HashSize ; 
 			for (int i =0; i<sParAltCounts.size(); i++)
 			{
 				if (ParentHashes[i].count(LongHash)>0)
@@ -943,7 +944,7 @@ string SamRead::createStructGenotype(int spot)
 		else if (Hash.count(RevComp(hash)) > 0)
 		{ 
 			MutAltCounts.push_back(Hash[RevComp(hash)]);
-			cout << hash << "\t" << Hash[RevComp(hash)];
+			cout << hash << "\t" << Hash[RevComp(hash)] << " i = " << i << " seq.size = " <<  seq.size() << " HashSize = " << HashSize;
 			for (int i =0; i<sParAltCounts.size(); i++)
 			{       
 				if (ParentHashes[i].count(LongHash)>0)
@@ -985,10 +986,11 @@ string SamRead::createStructGenotype(int spot)
 	}
 	string refs = Reff.getSubSequence(chr, pos+spot-HashSize, HashSize+HashSize);
 	cout << "refs = " << refs << endl ; 
-	for (int i = 0; i<refs.size()-HashSize && refs.size() > 0 ; i++)
+	cout << "hereTESTING" << endl; 
+	for (int i = 0; i+HashSize < refs.size() && refs.size() > 0 ; i++)
 	{
 		hash = refs.substr(i, HashSize);
-		cout << "hash = " << hash << endl; 
+		cout << "hash = " << hash << " i = " << i << " refs.size = " << refs.size() << endl; 
 		unsigned long int LongHash = HashToLong(hash);
 		if (MutantHashes.count(LongHash) > 0)
 		{
@@ -4567,7 +4569,7 @@ void LastDitch(vector<SamRead>& reads, int i, int A, int B, int& CurrentSVeventI
 	if ( reads[reads[i].alignments[A]].clipPattern == "mc")
 	{
 		cout << "here 3" << endl; 
-		ref = Reff.getSubSequence(reads[reads[i].alignments[A]].chr, reads[reads[i].alignments[A]].pos+bp -1 -1   , 1 );
+		ref = Reff.getSubSequence(reads[reads[i].alignments[A]].chr, reads[reads[i].alignments[A]].pos+bp  -1   , 1 );
 		string altseq =  Reff.getSubSequence(reads[i].chr, reads[i].pos+bp -1 -1 , 1 );
 		if( reads[reads[i].alignments[A]].clipPattern == "mc" && GetReadOrientation(reads[reads[i].alignments[A]].flag) == GetReadOrientation(reads[reads[i].alignments[B]].flag))
 		{
@@ -4609,7 +4611,19 @@ void LastDitch(vector<SamRead>& reads, int i, int A, int B, int& CurrentSVeventI
 			Format << "bnd_" << reads[reads[i].alignments[A]].BNDid ;
 			SVDES = "InvertedTranslocation";
 		}
-	}				
+	}
+	else
+	{
+
+		 	cout << "here 4c" << endl;
+                	ref = Reff.getSubSequence(reads[reads[i].alignments[A]].chr, reads[reads[i].alignments[A]].pos+bp -1  ,1);
+			string altseq = Reff.getSubSequence(reads[reads[i].alignments[A]].chr, reads[reads[i].alignments[A]].pos+bp -1 ,1);
+			string insertseq = GetUnalignedCenter(reads[reads[i].alignments[A]], reads[reads[i].alignments[B]]);
+                        alt << altseq << insertseq;
+                        alt << "[" << reads[reads[i].alignments[B]].chr << ":" << reads[reads[i].alignments[B]].pos+sbp -1 << "[";
+                        Format <<  "bnd_" << reads[reads[i].alignments[A]].BNDid;
+                        SVDES = "MessyTranslocations";	 
+	}
 	cout << "here 6" << endl; 
 		
 	string FullfilterA = reads[reads[i].alignments[A]].filterSV(); 
@@ -5140,6 +5154,7 @@ options:\
 	VCFOutFile << "##INFO=<ID=SVID,Number=1,Type=String,Description=\"Uniuqe ID given to an SV event with multiple brekends so it can be quicky identified\">"<< endl;
 	VCFOutFile << "##INFO=<ID=SOURCE,Number=1,Type=String,Description=\"Location in the genome where the inserted sequence came from\">"<< endl;
 	VCFOutFile << "##INFO=<ID=SVDES,Number=1,Type=String,Description=\"If available RUFUS will interpret the SV type for you\">"<< endl;
+	VCFOutFile << "##INFO=<ID=MATEID,Number=1,Type=String,Description=\"If available, the id of the call that is the mate of this one\">"<< endl;
 	VCFOutFile << "##FILTER=<ID=PA,Description=\"PoorAlignment\">" << std::endl;	
 	VCFOutFile << "##FILTER=<ID=PLC,Description=\"Parents are at low coverage in this region, cannt be sure of genotype\">" << std::endl;
 	VCFOutFile << "##FILTER=<ID=LCH,Description=\"Parents have hashes showing variant at low coverage, likely inherited\">" << std::endl;
@@ -5510,7 +5525,9 @@ options:\
 									GenotypeField = reads[i].createStructGenotype(reads[i].sigBreakPoint());
 								else 
 									GenotypeField = reads[reads[i].alignments[1]].createStructGenotype(reads[reads[i].alignments[1]].sigBreakPoint());
-							
+					
+								if (GenotypeField == "")
+									cout << "ERRORGeno DUP" << " " << GenotypeField << endl;
 								string insertseq = GetUnalignedCenter(reads[i], reads[reads[i].alignments[1]]);	
 								int targetsize = ((reads[reads[i].alignments[1]].pos + reads[reads[i].alignments[1]].BreakPoint()) - (reads[i].pos + reads[i].BreakPoint())) *-1;
 								stringstream Format ;
@@ -5612,6 +5629,9 @@ options:\
 									GenotypeField = reads[i].createStructGenotype(reads[i].sigBreakPoint());
 								else 
 									GenotypeField = reads[reads[i].alignments[1]].createStructGenotype(reads[reads[i].alignments[1]].sigBreakPoint());
+								
+								if (GenotypeField == "")
+									cout << "ERRORGeno DUP" << " " << GenotypeField << endl; 
 								cout << "here" << endl; 
 								string insertseq = GetUnalignedCenter(reads[i], reads[reads[i].alignments[1]]);	
 								int targetsize = ((reads[reads[i].alignments[1]].pos + reads[reads[i].alignments[1]].BreakPoint()) - (reads[i].pos + reads[i].BreakPoint())) ;
@@ -5620,7 +5640,7 @@ options:\
 								Format << InterpretTargetSize(targetsize); ////////////////////////////////////
 								cout << "here2" << endl; 
 								
-								string ref = Reff.getSubSequence(reads[i].chr, reads[i].pos + reads[i].BreakPoint() -1 , 1); 
+								string ref = Reff.getSubSequence(reads[i].chr, reads[i].pos + reads[i].BreakPoint() -1 -1 , 1); 
 								
 								stringstream alt ; 
 								alt << insertseq; 
@@ -5700,6 +5720,98 @@ options:\
 				}
 			}
 		}
+		
+		
+	}
+	cout << "###################done with multi contigs####################" << endl; 
+	for (int i = 0; i < reads.size(); i++)
+	{
+		SamRead read = reads[i];
+		cout << "starting work on  " << endl;
+		cout << read.name  << endl;
+		cout << "alignments = " << read.alignments.size()  << endl;
+
+		if (strcmp(read.chr.c_str(), "*") == 0)
+		{
+			read.writetofile(Unaligned);
+			Unaligned << endl;
+			cout << "read unaligned, skipping" << endl; 
+		}
+		//if  (read.first)
+		{
+			//if it looks like a simple split read alignment colaps it into a single read
+
+			if (read.first  and read.alignments.size() > 1)
+			{
+				cout << "picking two best alignments" << endl;
+				map <float,int> alignScores;
+				for (int j = 0; j < read.alignments.size(); j++){
+					float score = (float) reads[read.alignments[j]].AlignScore;
+					while (not (alignScores.find(score) == alignScores.end())){
+					  score = score * 1.0001;
+					}
+					alignScores[score] = j;
+				}
+				vector <int> goodPos;
+				std::map<float, int>::reverse_iterator it;
+				for ( it = alignScores.rbegin(); it != alignScores.rend(); it++ )
+				{
+					cout << it->first << " - " << it->second << endl;
+					goodPos.push_back(it->second);
+				}
+				cout << "atempting colaps "<< read.name << endl;
+				vector<SamRead> R;
+
+				for(int j =0; j < read.alignments.size(); j++) //read.alignments.size(); j++)
+				{
+					//these better be sorted by position
+					//if (reads[read.alignments[j]].chr == read.chr)
+					if (j == goodPos[0] or j == goodPos[1])
+					{
+						R.push_back(reads[read.alignments[j]]);
+						cout << reads[read.alignments[j]].name << endl;
+					}
+				}
+				cout << "made it out o this loop" << endl;
+				if (R.size() ==2 && /*R[0].chr == R[1].chr && */ (R[0].mapQual > 0 and R[1].mapQual > 0) && R[0].SVeventid == 0 )
+				{
+					cout << "straing better way Rsize = " << R.size() << endl;
+					read = BetterWay(R);
+					cout << "ending better way" << endl;
+				}
+
+			}
+			else if(read.first and read.alignments.size() >2)
+			{
+				BEDNotHandled << "too many alignments" << endl;
+				BEDNotHandled << read.chr << "\t" << read.pos << "\t" << read.pos+read.seq.size() << "\t" << read.name << "\t" << read.cigar << endl;
+				cout << "too many alignments" << endl;
+				cout << read.chr << "\t" << read.pos << "\t" << read.pos+read.seq.size() << "\t" << read.name << "\t" << read.cigar << endl;
+				for (int j = 0; j< read.alignments.size(); j++)
+				{
+					SamRead mate = reads[read.alignments[j]];
+					cout << j << "\t" << mate.chr << "\t" << mate.pos << "\t" << mate.pos+mate.seq.size() << "\t" << mate.name << "\t" << mate.cigar << endl;
+					 BEDNotHandled << mate.chr << "\t" << mate.pos << "\t" << mate.pos+mate.seq.size() << "\t" << mate.name << "\t" << mate.cigar << endl;
+					mate.writetofile(BEDNotHandled);
+				}
+				BEDNotHandled << endl << endl;
+			}
+			if (read.mapQual > MinMapQual and read.alignments.size() <=2)
+			{
+				//reads[i].CheckPhase();
+				read.parseMutations(argv, reads);
+			}
+			else
+			{
+				cout << "map qual " << read.mapQual << " less than mim map qual of " << MinMapQual << endl; 
+			}
+		}
+	}
+	cout << "finding multi contig events, " << reads.size() << endl;
+	//Mopping up less likey multi contig optoins
+	for (int i = 0; i < reads.size()-1; i++)
+		
+	{
 		// chekcing translocation
 		if (reads[i].alignments.size()==2)
 		{
@@ -5897,7 +6009,7 @@ options:\
 													//buildng up info field
 													stringstream info;
 										       			info << "SVTYPE=BND;MATEID=bnd_" << reads[reads[i].alignments[1]].BNDid << ";";
-													info << "SVID=" << CurrentSVeventID; 
+													info << "SVID=" << CurrentSVeventID<< ";"; 
 													if (SVDES !="")
 													{info << "SVDES=" << SVDES << ";";}
 													string phase="none";
@@ -6489,14 +6601,14 @@ options:\
 			{
 				cout << "yay" << endl; 
 				cout << reads[start].chr << " and " << reads[exit].chr << endl; 
-				if (reads[start].chr == reads[exit].chr && (reads[exit].sigBreakPoint() > 0 || reads[start].sigBreakPoint() > 0))
+				if (reads[start].chr == reads[exit].chr && (reads[exit].sigBreakPoint() > 0 || reads[start].sigBreakPoint() > 0)  && ( reads[exit].mapQual > 0 && reads[start].mapQual > 0 ))
 				{
 					cout << "yay2" << endl; 
-					int TargetSize = (reads[exit].pos+reads[exit].sigBreakPoint()) - (reads[start].pos+reads[start].sigBreakPoint());
+					int TargetSize = ((reads[exit].pos+reads[exit].sigBreakPoint()) - (reads[start].pos+reads[start].sigBreakPoint())) * -1;
 					if (reads[start].SVeventid ==0)
 					{
 						cout << "found tripple" << endl; 
-						int pos = reads[start].pos +  reads[start].BreakPoint(); 
+						int pos = reads[start].pos +  reads[start].BreakPoint() -1 ; 
 						reads[start].write();
 						reads[mid].write();
 						reads[exit].write();
@@ -6520,11 +6632,18 @@ options:\
 						string Format = InterpretTargetSize(TargetSize); 
 						Format += "trippleDUP"; 
 						cout << "here 3" << endl; 
-						string ref = Reff.getSubSequence(reads[start].chr, reads[start].pos+reads[start].BreakPoint()-1 ,1); 
-						
+						string ref = Reff.getSubSequence(reads[start].chr, reads[start].pos+reads[start].BreakPoint()-1-1  ,1); 
+						if (TargetSize < 0)
+							ref = ref + Reff.getSubSequence(reads[start].chr, reads[start].pos+reads[start].BreakPoint()-1  , TargetSize *-1);
+
 						stringstream alt ; 
-						alt << Reff.getSubSequence(reads[start].chr, reads[start].pos+reads[start].BreakPoint()-1 ,1);
-						alt << Reff.getSubSequence(reads[mid].chr, reads[mid].pos+reads[mid].BreakPoint(), reads[mid].CountBasesAligned(reads[mid].BreakPoint())+1) ;
+						
+						alt << Reff.getSubSequence(reads[start].chr, reads[start].pos+reads[start].BreakPoint() -1 -1  ,1);
+						if (TargetSize > 0)
+							 alt << Reff.getSubSequence(reads[start].chr, reads[start].pos+reads[start].BreakPoint()-1  , TargetSize );
+						alt << reads[mid].seq.substr(reads[start].BreakPoint(), reads[exit].BreakPoint() - reads[start].BreakPoint()  ) ;
+						//alt << reads[mid].seq.substr(reads[start].BreakPoint(), reads[mid].CountBasesAligned(reads[mid].BreakPoint())+1 +reads[mid].BreakPoint()- reads[start].BreakPoint()  ) ;
+						//alt << Reff.getSubSequence(reads[mid].chr, reads[mid].pos+reads[mid].BreakPoint(), reads[mid].CountBasesAligned(reads[mid].BreakPoint())+1) ;
 						cout << "here 3" << endl; 
 						string FullfilterA = reads[start].filterSV(); 
 						string FullfilterB = reads[mid].filterSV(); 
@@ -6619,98 +6738,7 @@ options:\
 				}
 			}
 		}
-		//could add the very large insert tandem stuff here
-		
-	}
-	cout << "###################done with multi contigs####################" << endl; 
-	for (int i = 0; i < reads.size(); i++)
-	{
-		SamRead read = reads[i];
-		cout << "starting work on  " << endl;
-		cout << read.name  << endl;
-		cout << "alignments = " << read.alignments.size()  << endl;
-
-		if (strcmp(read.chr.c_str(), "*") == 0)
-		{
-			read.writetofile(Unaligned);
-			Unaligned << endl;
-			cout << "read unaligned, skipping" << endl; 
-		}
-		//if  (read.first)
-		{
-			//if it looks like a simple split read alignment colaps it into a single read
-
-			if (read.first  and read.alignments.size() > 1)
-			{
-				cout << "picking two best alignments" << endl;
-				map <float,int> alignScores;
-				for (int j = 0; j < read.alignments.size(); j++){
-					float score = (float) reads[read.alignments[j]].AlignScore;
-					while (not (alignScores.find(score) == alignScores.end())){
-					  score = score * 1.0001;
-					}
-					alignScores[score] = j;
-				}
-				vector <int> goodPos;
-				std::map<float, int>::reverse_iterator it;
-				for ( it = alignScores.rbegin(); it != alignScores.rend(); it++ )
-				{
-					cout << it->first << " - " << it->second << endl;
-					goodPos.push_back(it->second);
-				}
-				cout << "atempting colaps "<< read.name << endl;
-				vector<SamRead> R;
-
-				for(int j =0; j < read.alignments.size(); j++) //read.alignments.size(); j++)
-				{
-					//these better be sorted by position
-					//if (reads[read.alignments[j]].chr == read.chr)
-					if (j == goodPos[0] or j == goodPos[1])
-					{
-						R.push_back(reads[read.alignments[j]]);
-						cout << reads[read.alignments[j]].name << endl;
-					}
-				}
-				cout << "made it out o this loop" << endl;
-				if (R.size() ==2 && /*R[0].chr == R[1].chr && */ (R[0].mapQual > 0 and R[1].mapQual > 0) && R[0].SVeventid == 0 )
-				{
-					cout << "straing better way Rsize = " << R.size() << endl;
-					read = BetterWay(R);
-					cout << "ending better way" << endl;
-				}
-
-			}
-			else if(read.first and read.alignments.size() >2)
-			{
-				BEDNotHandled << "too many alignments" << endl;
-				BEDNotHandled << read.chr << "\t" << read.pos << "\t" << read.pos+read.seq.size() << "\t" << read.name << "\t" << read.cigar << endl;
-				cout << "too many alignments" << endl;
-				cout << read.chr << "\t" << read.pos << "\t" << read.pos+read.seq.size() << "\t" << read.name << "\t" << read.cigar << endl;
-				for (int j = 0; j< read.alignments.size(); j++)
-				{
-					SamRead mate = reads[read.alignments[j]];
-					cout << j << "\t" << mate.chr << "\t" << mate.pos << "\t" << mate.pos+mate.seq.size() << "\t" << mate.name << "\t" << mate.cigar << endl;
-					 BEDNotHandled << mate.chr << "\t" << mate.pos << "\t" << mate.pos+mate.seq.size() << "\t" << mate.name << "\t" << mate.cigar << endl;
-					mate.writetofile(BEDNotHandled);
-				}
-				BEDNotHandled << endl << endl;
-			}
-			if (read.mapQual > MinMapQual and read.alignments.size() <=2)
-			{
-				//reads[i].CheckPhase();
-				read.parseMutations(argv, reads);
-			}
-			else
-			{
-				cout << "map qual " << read.mapQual << " less than mim map qual of " << MinMapQual << endl; 
-			}
-		}
-	}
-	cout << "finding multi contig events, " << reads.size() << endl;
-	//Mopping up less likey multi contig optoins
-	for (int i = 0; i < reads.size()-1; i++)
-		
-	{
+		//could add the very large insert tandem stuff here	
 		if ( reads[i].alignments.size() >=1 && reads[i].clipPattern == "mc" && reads[i].sigBreakPoint() > 0 && reads[i].SVeventid == 0 )
 		{
 			cout << "possible large insertion" << endl;
@@ -6733,7 +6761,7 @@ options:\
 						//if (abs(positionAa - positionBa) < HashSize || abs(positionAb -  positionBb) < HashSize || abs(positionAa -  positionBb) < HashSize || abs(positionAb - positionBa) < HashSize )
 						
 						
-						if (abs(positionI - positionJ) < 1000000 && reads[i].SVeventid ==0 && reads[i+j].SVeventid == 0)
+						if (abs(positionI - positionJ) < 1000000 && reads[i].SVeventid ==0 && reads[i+j].SVeventid == 0 && (reads[i].mapQual > 0 && reads[i+j].mapQual > 0))
 						{
 							cout << "Found Large Insert" << endl; 
 							reads[i].write(); 
@@ -6772,7 +6800,7 @@ options:\
 							stringstream ref; 
 							stringstream info; 
 							string GenotypeField; 
-							ref << Reff.getSubSequence(reads[i].chr, pos -1 -1, 1); 
+							//ref << Reff.getSubSequence(reads[i].chr, pos -1 -1, 1); 
 							alt << "<INS>"; 
 							if (startBreak>0){
 								ref << Reff.getSubSequence(reads[i].chr, pos -1 -1  , 1);
