@@ -60,6 +60,8 @@ _arg_refhash=
 _arg_saliva="FALSE"
 _arg_exome="FALSE"
 _MaxAlleleSize="1000"
+_arg_mosaic="FALSE"
+_assemblySpeed="full"
 print_help ()
 {
     printf "%s\n" "The general script's help msg"
@@ -74,6 +76,7 @@ print_help ()
     printf "\t%s\n" "--saliva: flag to indicate that the subject sample is a buccal swab and likely contains a significant fractino of contaminant DNA"
     printf "\t%s\n" "--exome: flat go set if your input data is exome sequecing. Sugjested you also set -m, default is -m 20"
     printf "\t%s\n" "--MaxAllele: Max size for insert/deletion events to put the entire alt sequence in. (default 1000)"
+    printf "\t%s\n" "-L: Reprot Mosaic/Low Frequency/Somatic variants (default FALSE)"
     printf "\t%s\n" "-h,--help: HELP!!!!!!!!!!!!!!!"
 }
 
@@ -93,6 +96,7 @@ s-n>] ...\n' "$0"
     printf "\t%s\n" "-m,--min: overwrites the minimum k-mer count to call variant (no default)"
     printf "\t%s\n" "--MaxAllele: Max size for insert/deletion events to put the entire alt sequence in. (default 1000)"
     printf "\t%s\n" "--saliva: flag to indicate that the subject sample is a buccal swab and likely contains a significant fractino of contaminant DNA"
+    printf "\t%s\n" "-L: Reprot Mosaic/Low Frequency/Somatic variants (default FALSE)"
     printf "\t%s\n" "--exome: flat go set if your input data is exome sequecing. Sugjested you also set -m, default is -m 20"
     printf "\t%s\n" "-q1,--fastq1: If starting from fastq files, a list of the mate1 fastq files to improve RUFUS.ilter"
     printf "\t%s\n" "-q2,--fastq2: If starting from fastq files, a list of the mate2 fastq files to improve RUFUS.ilter"
@@ -257,6 +261,10 @@ parse_commandline ()
 	        _arg_saliva="TRUE"
 		echo "Saliva subject sample provided"
 		;;
+	    --vs)
+                _assemblySpeed="veryfast"
+                echo "Very fast assembly being used"
+                ;; 
 	    --exome)
 	       _arg_exome="TRUE"
 	       echo "Exome run"
@@ -279,6 +287,10 @@ parse_commandline ()
                 fi
 		echo "other spot _MaxAlleleSize set to $_MaxAlleleSize"
                 ;;
+	    -L)
+	      _arg_mosaic="TRUE"
+	      echo "Reporting mosaic/low frequence variants"
+	      ;;
 	    -A*)
 	   	_MaxAlleleSize="${_key##-A}"
 		if ! [[ $_MaxAlleleSize =~ $re ]] ; then
@@ -688,7 +700,7 @@ do
 done
 
 #/usr/bin/time -v bash $RunJelly $ProbandGenerator $K  $Threads 2
-/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $JThreads -2 | bc) 2     
+/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $JThreads -2 | bc) 2    
 wait
 ##############################################################################
 
@@ -840,22 +852,29 @@ if [ $(wc -l "$ProbandGenerator".Mutations.Mate1.fastq | awk '{print $1}') -eq "
 	exit 100
 fi
 
-
+shortinsert="false"
 if [ -e "$ProbandGenerator".Mutations.fastq.bam ]
 then 
 	echo "skipping mapping mates" 
 else
-	
-	#cat "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq > "$ProbandGenerator".Mutations.fastq
-        #$bwa mem -t $Threads $_arg_ref_bwa <( cat "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq)  | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.bam
-        $fastp -i "$ProbandGenerator".Mutations.Mate1.fastq -I "$ProbandGenerator".Mutations.Mate2.fastq -m -o "$ProbandGenerator".Mutations.Mate1.fastq.fastp.fastq -O "$ProbandGenerator".Mutations.Mate2.fastq.fastp.fastq --merged_out "$ProbandGenerator".Mutations.Mate1.fastq.merged.fastq
-	$bwa mem -t $Threads $_arg_ref_bwa "$ProbandGenerator".Mutations.Mate1.fastq.fastp.fastq "$ProbandGenerator".Mutations.Mate2.fastq.fastp.fastq  | $samblaster | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.pared.bam
-	$bwa mem -t $Threads $_arg_ref_bwa "$ProbandGenerator".Mutations.Mate1.fastq.merged.fastq  | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.merged.bam
-	samtools merge "$ProbandGenerator".Mutations.fastq.bam "$ProbandGenerator".Mutations.fastq.merged.bam "$ProbandGenerator".Mutations.fastq.pared.bam 
-	#$bwa mem -t $Threads $_arg_ref_bwa "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq  | $samblaster | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.bam
-	samtools index "$ProbandGenerator".Mutations.fastq.merged.bam
-	samtools index "$ProbandGenerator".Mutations.fastq.pared.bam
-	samtools index "$ProbandGenerator".Mutations.fastq.bam
+	if [ $shortinsert = "false" ]
+	then
+		echo "skipping fastp fix"
+                $bwa mem -t $Threads $_arg_ref_bwa "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq | $samblaster | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.bam 
+                samtools index "$ProbandGenerator".Mutations.fastq.bam	
+	else
+		echo "using fastp fix" 
+		#cat "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq > "$ProbandGenerator".Mutations.fastq
+        	#$bwa mem -t $Threads $_arg_ref_bwa <( cat "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq)  | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.bam
+        	$fastp -i "$ProbandGenerator".Mutations.Mate1.fastq -I "$ProbandGenerator".Mutations.Mate2.fastq -m -o "$ProbandGenerator".Mutations.Mate1.fastq.fastp.fastq -O "$ProbandGenerator".Mutations.Mate2.fastq.fastp.fastq --merged_out "$ProbandGenerator".Mutations.Mate1.fastq.merged.fastq
+		$bwa mem -t $Threads $_arg_ref_bwa "$ProbandGenerator".Mutations.Mate1.fastq.fastp.fastq "$ProbandGenerator".Mutations.Mate2.fastq.fastp.fastq  | $samblaster | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.pared.bam
+		$bwa mem -t $Threads $_arg_ref_bwa "$ProbandGenerator".Mutations.Mate1.fastq.merged.fastq  | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.merged.bam
+		samtools merge "$ProbandGenerator".Mutations.fastq.bam "$ProbandGenerator".Mutations.fastq.merged.bam "$ProbandGenerator".Mutations.fastq.pared.bam 
+		#$bwa mem -t $Threads $_arg_ref_bwa "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq  | $samblaster | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.bam
+		samtools index "$ProbandGenerator".Mutations.fastq.merged.bam
+		samtools index "$ProbandGenerator".Mutations.fastq.pared.bam
+		samtools index "$ProbandGenerator".Mutations.fastq.bam
+	fi
 fi
 ########################################################################################
 if [ $_arg_saliva == "TRUE" ]
@@ -876,13 +895,13 @@ if [ $( samtools view "$ProbandGenerator".Mutations.fastq.bam | wc -l | awk '{pr
 fi 
 
 ###################__RUFUS_OVERLAP__#############################################
-if [ -e ./runanywayIntermediates/"$ProbandGenerator".V2.overlap.hashcount.fastq.bam.vcf ]
+if [ -e $ProbandGenerator.V2.overlap.hashcount.fastq.bam.vcf.runanyway ]
 then
     echo "Skipping overlap step"
 else
     echo "Starting RUFUS overlap"
-    echo "/usr/bin/time bash  $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 3 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$_MaxAlleleSize" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash""
-    /usr/bin/time bash  $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 3 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$_MaxAlleleSize" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
+    echo "/usr/bin/time bash  $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 5 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$_MaxAlleleSize" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash""
+    /usr/bin/time bash  $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 5 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$_MaxAlleleSize" "$_assemblySpeed" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
     echo "Done with RUFUS overlap"
 fi
 ##############################################################################################
@@ -900,8 +919,16 @@ fi
 echo "cleaning up VCF"
 
 grep ^# $ProbandGenerator.V2.overlap.hashcount.fastq.bam.vcf> ./Intermediates/$ProbandGenerator.V2.overlap.hashcount.fastq.bam.sorted.vcf
-grep -v  ^# $ProbandGenerator.V2.overlap.hashcount.fastq.bam.vcf | sort -k1,1 -k2,2n >> ./Intermediates/$ProbandGenerator.V2.overlap.hashcount.fastq.bam.sorted.vcf
-bash $RDIR/scripts/VilterAutosomeOnly ./Intermediates/$ProbandGenerator.V2.overlap.hashcount.fastq.bam.sorted.vcf > ./$ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf
+grep -v  ^# $ProbandGenerator.V2.overlap.hashcount.fastq.bam.vcf | sort -k1,1V -k2,2n >> ./Intermediates/$ProbandGenerator.V2.overlap.hashcount.fastq.bam.sorted.vcf
+echo "ar_mosaic = $_arg_mosaic"
+if [ "$_arg_mosaic" == "TRUE" ]
+then
+	echo "including mosaic"; 
+	bash $RDIR/scripts/VilterAutosomeOnly ./Intermediates/$ProbandGenerator.V2.overlap.hashcount.fastq.bam.sorted.vcf > ./$ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf
+else
+	echo "excluding mosaic"; 
+	bash $RDIR/scripts/VilterAutosomeOnly.withoutMosaic ./Intermediates/$ProbandGenerator.V2.overlap.hashcount.fastq.bam.sorted.vcf > ./$ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf
+fi
 
 bgzip -f ./$ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf
 tabix ./$ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf.gz
