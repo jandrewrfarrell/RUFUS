@@ -62,6 +62,7 @@ _arg_exome="FALSE"
 _MaxAlleleSize="1000"
 _arg_mosaic="FALSE"
 _assemblySpeed="full"
+_parallel_jelly="no"
 print_help ()
 {
     printf "%s\n" "The general script's help msg"
@@ -100,6 +101,8 @@ s-n>] ...\n' "$0"
     printf "\t%s\n" "--exome: flat go set if your input data is exome sequecing. Sugjested you also set -m, default is -m 20"
     printf "\t%s\n" "-q1,--fastq1: If starting from fastq files, a list of the mate1 fastq files to improve RUFUS.ilter"
     printf "\t%s\n" "-q2,--fastq2: If starting from fastq files, a list of the mate2 fastq files to improve RUFUS.ilter"
+    printf "\t%s\n" "--vs: use very short assembly methods, recomneded when you are expecting over 10,000 variants "
+    printf "\t%s\n" "--pj: parallelize jellyfish step, only use if you have more than 96G of ram"
     printf "\t%s\n" "-h,--help: HELP!!!!!!!!!!!!!!!"
     printf "\t%s\n" "-d,--devhelp: HELP!!! for developers"
 }
@@ -264,6 +267,10 @@ parse_commandline ()
 	    --vs)
                 _assemblySpeed="veryfast"
                 echo "Very fast assembly being used"
+                ;;
+	   --pj)
+                _parallel_jelly="yes"
+                echo "Paralellizing jellyfish, assuming 3 samples"
                 ;; 
 	    --exome)
 	       _arg_exome="TRUE"
@@ -686,22 +693,42 @@ samblaster=$RDIR/bin/externals/samblaster/src/samblaster_project/samblaster
 
 
 
+
 ####################__GENERATE_JHASH_FILES_FROM_JELLYFISH__#####################
-JThreads=$(( Threads / 3 ))
-if [ "$JThreads" -lt 3 ]
-then
-    JThreads=3
-fi
-#JThreads=$Threads
+if [ $_parallel_jelly == "yes" ]
+then 
 
-for parent in "${ParentGenerators[@]}"
-do
-     /usr/bin/time -v bash $RunJelly $parent $K $(echo $JThreads -2 | bc) 2  
-done
+	JThreads=$(( Threads / 3 ))
+	if [ "$JThreads" -lt 3 ]
+	then
+	    JThreads=3
+	fi
+	#JThreads=$Threads
+	
+	for parent in "${ParentGenerators[@]}"
+	do
+	     /usr/bin/time -v bash $RunJelly $parent $K $(echo $JThreads -2 | bc) 2  &
+	done
+	
+	#/usr/bin/time -v bash $RunJelly $ProbandGenerator $K  $Threads 2
+	/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $JThreads -2 | bc) 2  & 
+	wait
+else
+        JThreads=$Threads
+	if [ "$JThreads" -lt 3 ]
+        then
+            JThreads=3
+        fi
 
-#/usr/bin/time -v bash $RunJelly $ProbandGenerator $K  $Threads 2
-/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $JThreads -2 | bc) 2    
-wait
+        for parent in "${ParentGenerators[@]}"
+        do
+             /usr/bin/time -v bash $RunJelly $parent $K $(echo $JThreads -2 | bc) 2  
+        done
+
+        #/usr/bin/time -v bash $RunJelly $ProbandGenerator $K  $Threads 2
+        /usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $JThreads -2 | bc) 2  
+        wait
+fi 	
 ##############################################################################
 
 
