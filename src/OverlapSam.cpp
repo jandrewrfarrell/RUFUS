@@ -38,7 +38,7 @@ int Align3(vector<string>& sequenes, vector<string>& quals, string Ap, string Aq
 	int bestScore = 0;
 	int NumReads = sequenes.size();
 	int start = Ai + 1;
-	int end = start + 10; 
+	int end = start + 3; 
 	if (end > sequenes.size()) 
 	{
 		end = sequenes.size();
@@ -542,7 +542,7 @@ int main(int argc, char* argv[]) {
 				 << endl;
 		return 0;
 	}
-			cout << "ERROR, wrong numbe of arguemnts\nCall is: SAM, MinPercent, "
+			cout << "YAY,right numbe of arguemnts\nCall is: SAM, MinPercent, "
 						"MinOverlap, MinCoverage, ReportStub, NodeStub LCcutoff Threads"
 				 << endl
 				 << "	   You Gave\n	       File = " << argv[1]
@@ -767,6 +767,8 @@ int main(int argc, char* argv[]) {
 				int hashes = CountHashes(L2);
 				
 				//cout << "Hash = " << hashes << endl;
+				//if (hashes > 0)
+				//{
 				if ((double)L2.size() / (double)ReadSize > .6) 
 				{
 					ReadSize = L2.size();
@@ -807,6 +809,7 @@ int main(int argc, char* argv[]) {
 				{
 					Rejects++;
 				}
+				//}
 			}
 		}
 	}

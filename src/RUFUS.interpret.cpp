@@ -46,6 +46,7 @@ int totalDeleted;
 int totalAdded;
 int MaxVarentSize = 1000; 
 int ParLowCovThreshold = 7; 
+int SegThreshold = 10;
 ofstream VCFOutFile;
 ofstream BEDOutFile;
 ofstream BEDBigStuff;
@@ -667,7 +668,7 @@ string SamRead::filterSV()
 		if (StrandBias >0.99 || StrandBias < 0.01)
 			Filter+="SB;"; 
 	}
-	if(AlignmentSegments > 10 || AlignmentSegmentsCigar > 10)
+	if(AlignmentSegments > SegThreshold || AlignmentSegmentsCigar > SegThreshold)
 	{
 		Filter+="PA;"; 
 	}
@@ -1958,6 +1959,17 @@ void SamRead::CheckPhase()
 		convert << phased[1];
 		phase = "PHASED-" + convert.str() + "-" + ParNames[1]; 
 	}
+	else if (phased[0]>0 and phased[1] >0)
+	{
+	
+		cout << "Conflicting PHASED CONTIG " << phased[0] << "-" << phased[1]  << endl; 
+		ostringstream convert;
+		ostringstream convert2;
+		convert << phased[1];
+		convert2 << phased[0]; 
+
+		phase = "ConflictingPHASED-" + convert.str() + "-" + convert2.str(); 
+	}
 	cout << "done checking phasing" << endl; 
 }
 string compressVar(string line, int start, string& StructCall)
@@ -2397,7 +2409,7 @@ void SamRead::parseMutations( char *argv[], vector<SamRead>& reads)
  				if (Genotype.find("1") == std::string::npos) {
 					Denovo = "Mosaic";
 				} 
-				if (AlignmentSegments > 10 or AlignmentSegmentsCigar > 10)
+				if (AlignmentSegments > SegThreshold or AlignmentSegmentsCigar > SegThreshold)
 				{
 				  	Denovo = "PoorAlignment"; 
 					stringstream ss;
@@ -4732,6 +4744,7 @@ options:\
   -mod  arg  Path to the model file from RUFUS.model\n\
   -e    arg  Path to Kmer file to exlude from LowCov check\n\
   -mob  arg  Path to a bam file of the aligned contigs to a mobil element list\n\
+  -as   arg  alignemnt segments threshold (default: 10)\n\
 ";
 	
 	string MutHashFilePath = "" ;
@@ -4744,6 +4757,7 @@ options:\
 	string ModelFilePath = "";
 	string ExcludeFilePath = ""; 
 	string MobBam = ""; 
+	 SegThreshold = 10; 
 	int MinMapQual = 0; 
 	for(int i = 1; i< argc; i++)
 	{
@@ -4793,6 +4807,12 @@ options:\
 			MaxVarentSize =  atoi(argv[i+1]);
 			i++;
 			cout << "YAAAY added MaxVarSize = " << MaxVarentSize << endl;
+		}
+		else if (p == "-as")
+		{
+			SegThreshold = atoi(argv[i+1]); 
+			i++;
+			cout << "AlignmentSegmentThreshold = " << SegThreshold << endl; 
 		}
 		else if (p == "-c")
 		{

@@ -26,7 +26,7 @@
 
 using namespace std;
 
-bool FullOut = true;
+bool FullOut = false;
 
 int Align3(vector<string>& sequenes, vector<string>& quals, string Ap,string Aqp, int Ai, int& overlap, int& index, float minPercentpassed,bool& PerfectMatch, int MinOverlapPassed, int Threads) {
 	int QualityOffset = 33; //=64;

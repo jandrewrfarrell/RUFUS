@@ -10,12 +10,13 @@ HashList=$5
 HashSize=$6
 Threads=$7
 MaxAlleleSize=$8
+speed=$9
 
-SampleJhash=$9
-ParentsJhash=${10}
+SampleJhash=${10}
+ParentsJhash=${11}
 
-humanRefBwa=${11}
-refHash=${12}
+humanRefBwa=${12}
+refHash=${13}
 MaxCov=100000
 echo " you gave
 File=$2
@@ -84,79 +85,104 @@ if [ $( samtools view $File.bam | wc -l | awk '{print $1}') -eq "0" ]; then
         exit 100
 fi
 
-
-if [ -s ./TempOverlap/$NameStub.sam.fastqd ]  
-then 
-	echo "skipping sam assemble"
-else
-     
-	$OverlapSam <( samtools view  -F 3328 $File.bam | awk '$9 > 100 || $9 < -100 || $9==0' ) .95 50 1 ./TempOverlap/$NameStub.sam $NameStub 1 $HashList $Threads
-	#$OverlapSam <( samtools view  -F 3328 $File.bam ) .95 20 1 ./TempOverlap/$NameStub.sam $NameStub 1 $HashList $Threads
-fi
-
-if [ $( wc -l ./TempOverlap/$NameStub.sam.fastqd | awk '{print $1}') -eq "0" ]; then
-	echo "ERROR Assembly produce output for ./TempOverlap/$NameStub.sam.fastqd"
-	exit 100
-fi
-
-if [ -s ./TempOverlap/$NameStub.1.fastqd ]
-then 	
-	echo "skipping first overlap"
-else
-	time $OverlapHash ./TempOverlap/$NameStub.sam.fastqd .98 100 1 FP 20 1 ./TempOverlap/$NameStub.1 0 $Threads #> $File.overlap.out
-fi
-
-if [ $( wc -l ./TempOverlap/$NameStub.1.fastqd | awk '{print $1}') -eq "0" ]; then
-        echo "ERROR Assembly produce output for ./TempOverlap/$NameStub.1.fastqd"
-        exit 100
-fi
-
-if [ -s ./TempOverlap/$NameStub.2.fastqd ]
-then 
-	echo "skipping second overlap"
-else
-	time $OverlapHash ./TempOverlap/$NameStub.1.fastqd .98 75 2 FP 20 1 ./TempOverlap/$NameStub.2 1 $Threads #>>  $File.overlap.out
-fi
-
-if [ $( wc -l ./TempOverlap/$NameStub.2.fastqd | awk '{print $1}') -eq "0" ]; then
-        echo "ERROR Assembly produce output for ./TempOverlap/$NameStub.2.fastqd"
-        exit 100
-fi
-
-if [ -s ./TempOverlap/$NameStub.3.fastqd ]
+if [ "$speed" == "veryfast" ]
 then
-        echo "skipping second overlap"
+	echo "running very fast assembly"; 
+	if [ -s ./TempOverlap/$NameStub.sam.fastqd ]
+	then
+	        echo "skipping sam assemble"
+	else
+	
+	        $OverlapSam <( samtools view  -F 3328 $File.bam | awk '$9 > 100 || $9 < -100 || $9==0' ) .95 20 $FinalCoverage ./TempOverlap/$NameStub.sam $NameStub 1 $HashList $Threads
+	fi
+	if [ -s ./$NameStub.overlap.hashcount.fastq ]
+	then
+	        echo "skipping final overlap work"
+	else
+	
+	        $ReplaceQwithDinFASTQD ./TempOverlap/$NameStub.sam.fastqd > ./$NameStub.overlap.fastqd
+	        $ConvertFASTqD ./$NameStub.overlap.fastqd > ./$NameStub.overlap.fastq
+	
+	        echo "$AnnotateOverlap $HashList ./$NameStub.overlap.fastq TempOverlap/$NameStub.overlap.asembly.hash.fastq > ./$NameStub.overlap.hashcount.fastq"              
+	              $AnnotateOverlap $HashList ./$NameStub.overlap.fastq TempOverlap/$NameStub.overlap.asembly.hash.fastq > ./$NameStub.overlap.hashcount.fastq
+	fi	
 else
-        time $OverlapHash ./TempOverlap/$NameStub.2.fastqd .98 50 2 $NameStub 20 1 ./TempOverlap/$NameStub.3 1 $Threads #>>  $File.overlap.out
-fi
-if [ $( wc -l ./TempOverlap/$NameStub.3.fastqd | awk '{print $1}') -eq "0" ]; then
-        echo "ERROR Assembly produce output for ./TempOverlap/$NameStub.3.fastqd"
-        exit 100
-fi
+	echo "Running full assembly"; 
+	
+	if [ -s ./TempOverlap/$NameStub.sam.fastqd ]  
+	then 
+		echo "skipping sam assemble"
+	else
+	     
+		#$OverlapSam <( samtools view  -F 3328 $File.bam | awk '$9 > 100 || $9 < -100 || $9==0' ) .95 20 1 ./TempOverlap/$NameStub.sam $NameStub 1 $HashList $Threads
+		$OverlapSam <( samtools view  -F 3328 $File.bam ) .95 20 1 ./TempOverlap/$NameStub.sam $NameStub 1 $HashList $Threads
+	fi
+	
+	if [ $( wc -l ./TempOverlap/$NameStub.sam.fastqd | awk '{print $1}') -eq "0" ]; then
+		echo "ERROR Assembly produce output for ./TempOverlap/$NameStub.sam.fastqd"
+		exit 100
+	fi
+	
+	if [ -s ./TempOverlap/$NameStub.1.fastqd ]
+	then 	
+		echo "skipping first overlap"
+	else
+		time $OverlapHash ./TempOverlap/$NameStub.sam.fastqd .98 100 1 FP 20 1 ./TempOverlap/$NameStub.1 0 $Threads #> $File.overlap.out
+	fi
+	
+	if [ $( wc -l ./TempOverlap/$NameStub.1.fastqd | awk '{print $1}') -eq "0" ]; then
+	        echo "ERROR Assembly produce output for ./TempOverlap/$NameStub.1.fastqd"
+	        exit 100
+	fi
+	
+	if [ -s ./TempOverlap/$NameStub.2.fastqd ]
+	then 
+		echo "skipping second overlap"
+	else
+		time $OverlapHash ./TempOverlap/$NameStub.1.fastqd .98 75 2 FP 20 1 ./TempOverlap/$NameStub.2 1 $Threads #>>  $File.overlap.out
+	fi
+	
+	if [ $( wc -l ./TempOverlap/$NameStub.2.fastqd | awk '{print $1}') -eq "0" ]; then
+	        echo "ERROR Assembly produce output for ./TempOverlap/$NameStub.2.fastqd"
+	        exit 100
+	fi
+	
+	if [ -s ./TempOverlap/$NameStub.3.fastqd ]
+	then
+	        echo "skipping third overlap"
+	else
+	        time $OverlapHash ./TempOverlap/$NameStub.2.fastqd .98 50 2 $NameStub 20 1 ./TempOverlap/$NameStub.3 1 $Threads #>>  $File.overlap.out
+	fi
+	if [ $( wc -l ./TempOverlap/$NameStub.3.fastqd | awk '{print $1}') -eq "0" ]; then
+	        echo "ERROR Assembly produce output for ./TempOverlap/$NameStub.3.fastqd"
+	        exit 100
+	fi
+	
+	if [ -s ./TempOverlap/$NameStub.4.fastqd ]
+	then
+	        echo "skipping fourth overlap"
+	else
+	        time $OverlapRebion2 ./TempOverlap/$NameStub.3.fastqd .98 50 $FinalCoverage  ./TempOverlap/$NameStub.4 $NameStub 1 $Threads 
+		#time $OverlapHash ./TempOverlap/$NameStub.3.fastqd .98 25 $FinalCoverage $NameStub 15 1 ./TempOverlap/$NameStub.4 1 $Threads #>>  $File.overlap.out
+	fi
+	if [ $( wc -l ./TempOverlap/$NameStub.4.fastqd | awk '{print $1}') -eq "0" ]; then 
+	        echo "ERROR Assembly produce output for ./TempOverlap/$NameStub.4.fastqd"
+	        exit 100
+	fi
+ 
 
-if [ -s ./TempOverlap/$NameStub.4.fastqd ]
-then
-        echo "skipping second overlap"
-else
-        time $OverlapRebion2 ./TempOverlap/$NameStub.3.fastqd .98 50 $FinalCoverage  ./TempOverlap/$NameStub.4 $NameStub 1 $Threads > /dev/null
-	#time $OverlapHash ./TempOverlap/$NameStub.3.fastqd .98 25 $FinalCoverage $NameStub 15 1 ./TempOverlap/$NameStub.4 1 $Threads #>>  $File.overlap.out
+	if [ -s ./$NameStub.overlap.hashcount.fastq ]
+	then 
+		echo "skipping final overlap work"
+	else
+	
+		$ReplaceQwithDinFASTQD ./TempOverlap/$NameStub.4.fastqd > ./$NameStub.overlap.fastqd
+		$ConvertFASTqD ./$NameStub.overlap.fastqd > ./$NameStub.overlap.fastq
+	
+		echo "$AnnotateOverlap $HashList ./$NameStub.overlap.fastq TempOverlap/$NameStub.overlap.asembly.hash.fastq > ./$NameStub.overlap.hashcount.fastq"              
+		      $AnnotateOverlap $HashList ./$NameStub.overlap.fastq TempOverlap/$NameStub.overlap.asembly.hash.fastq > ./$NameStub.overlap.hashcount.fastq
+	fi
 fi
-if [ $( wc -l ./TempOverlap/$NameStub.4.fastqd | awk '{print $1}') -eq "0" ]; then 
-        echo "ERROR Assembly produce output for ./TempOverlap/$NameStub.4.fastqd"
-        exit 100
-fi
-if [ -s ./$NameStub.overlap.hashcount.fastq ]
-then 
-	echo "skipping final overlap work"
-else
-
-	$ReplaceQwithDinFASTQD ./TempOverlap/$NameStub.4.fastqd > ./$NameStub.overlap.fastqd
-	$ConvertFASTqD ./$NameStub.overlap.fastqd > ./$NameStub.overlap.fastq
-
-	echo "$AnnotateOverlap $HashList ./$NameStub.overlap.fastq TempOverlap/$NameStub.overlap.asembly.hash.fastq > ./$NameStub.overlap.hashcount.fastq"              
-	      $AnnotateOverlap $HashList ./$NameStub.overlap.fastq TempOverlap/$NameStub.overlap.asembly.hash.fastq > ./$NameStub.overlap.hashcount.fastq
-fi
-
 
 if [ $( wc -l ./$NameStub.overlap.hashcount.fastq | awk '{print $1}') -eq "0" ]; then 
         echo "ERROR Assembly produce output for ./$NameStub.overlap.hashcount.fastq"
@@ -235,6 +261,7 @@ for parent in $ParentsJhash
             then
                 echo "skiping Intermediates/$NameStub.overlap.asembly.hash.fastq.$parent already exists"
             else
+		echo "pulling  Intermediates/$NameStub".overlap.asembly.hash.fastq."$parent"
                 bash $CheckHash $parent ./Intermediates/$NameStub.overlap.hashcount.fastq.Jhash.tab 0 $MaxCov> Intermediates/$NameStub".overlap.asembly.hash.fastq."$parent
             fi
 done
@@ -303,6 +330,6 @@ echo ""
 echo "" 
 echo ""
 echo "$RUFUSinterpret -mob ./Intermediates/$NameStub.overlap.hashcount.fastq.MOB.sam -mod Intermediates/$NameStub.overlap.asembly.hash.fastq.sample -mQ 8 -r $humanRef -hf $HashList -o  ./$NameStub.overlap.hashcount.fastq.bam -m $MaxAlleleSize $(echo $parentCRString) -sR Intermediates/$NameStub.overlap.asembly.hash.fastq.Ref.sample -s Intermediates/$NameStub.overlap.asembly.hash.fastq.sample -e ./Intermediates/$NameStub.ref.RepRefHash"
-samtools view ./$NameStub.overlap.hashcount.fastq.bam | $RUFUSinterpret -mob ./Intermediates/$NameStub.overlap.hashcount.fastq.MOB.sam -mod Intermediates/$NameStub.overlap.asembly.hash.fastq.sample -mQ 1 -r $humanRef -hf $HashList -o  ./$NameStub.overlap.hashcount.fastq.bam -m $MaxAlleleSize $(echo $parentCRString) -sR Intermediates/$NameStub.overlap.asembly.hash.fastq.Ref.sample -s Intermediates/$NameStub.overlap.asembly.hash.fastq.sample -e ./Intermediates/$NameStub.ref.RepRefHash 
+samtools view ./$NameStub.overlap.hashcount.fastq.bam | grep -v chrUn | $RUFUSinterpret -mob ./Intermediates/$NameStub.overlap.hashcount.fastq.MOB.sam -mod Intermediates/$NameStub.overlap.asembly.hash.fastq.sample -mQ 1 -r $humanRef -hf $HashList -o  ./$NameStub.overlap.hashcount.fastq.bam -m $MaxAlleleSize $(echo $parentCRString) -sR Intermediates/$NameStub.overlap.asembly.hash.fastq.Ref.sample -s Intermediates/$NameStub.overlap.asembly.hash.fastq.sample -e ./Intermediates/$NameStub.ref.RepRefHash 
 
 
