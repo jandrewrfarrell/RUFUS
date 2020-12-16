@@ -63,12 +63,14 @@ _MaxAlleleSize="1000"
 _arg_mosaic="FALSE"
 _assemblySpeed="full"
 _parallel_jelly="no"
+_pairedEnd="true"
 print_help ()
 {
     printf "%s\n" "The general script's help msg"
     printf 'Usage: %s [-s|--subject <arg>] [-r|--ref <arg>] [-t|--threads <arg>] [-k|--kmersize <arg>] [-m|--min <arg>] [-h|--help] [<controls-1>] ... [<controls-n>] ...\n' "$0"
     printf "\t%s\n" "-c, --controls: bam files containing the control subjects ()"
     printf "\t%s\n" "-s,--subject: bam file containing the subject of interest (no default)"
+    printf "\t%s\n" "--se: subject bam file is single end reads, not paired (default is to assume paired end data)"
     printf "\t%s\n" "-r,--ref: file path to the desired reference file (no default)"
     printf "\t%s\n" "-cr,--cramref: file path to the desired reference file to decompress input cram files (no default)"
     printf "\t%s\n" "-t,--threads: number of threads to use (no default) (min 3)"
@@ -88,6 +90,7 @@ print_devhelp ()
 s-n>] ...\n' "$0"
     printf "\t%s\n" "-c, --controls: bam files containing the control subjects"
     printf "\t%s\n" "-s,--subject: bam file containing the subject of interest (no default)"
+    printf "\t%s\n" "--se: subject bam file is single end reads, not paired (default is to assume paired end data)"
     printf "\t%s\n" "-r,--ref: file path to the desired reference file (no default)"
     printf "\t%s\n" "-cr,--cramref: file path to the desired reference file to decompress input cram files (no default)"
     printf "\t%s\n" "-t,--threads: number of threads to use (no default) (min 3)"
@@ -268,6 +271,10 @@ parse_commandline ()
                 _assemblySpeed="veryfast"
                 echo "Very fast assembly being used"
                 ;;
+	   --se)
+	   	_pairedEnd="false"
+		echo "Sample Bam file is single end data"
+		;;
 	   --pj)
                 _parallel_jelly="yes"
                 echo "Paralellizing jellyfish, assuming 3 samples"
@@ -399,9 +406,15 @@ unset ExcludeTemp
 ##########################################################
 
 if [ $_arg_exome == "TRUE" ]; then 
-	echo "Exome run set.  Settin max kmer to 1M and saliva = true"
+	echo "Exome run set.  Setting max kmer to 1M and saliva = true and making sure a lower cutoff was set "
 	MaxHashDepth=1000000
 	_arg_saliva="TRUE"
+
+	if [ -z $_arg_min ]
+	then 
+		echo "Minimum not provided, picking a min of 20 for the alt count" 
+		_arg_min="20"
+	fi 
 fi
 
 
@@ -637,10 +650,10 @@ else
 fi
 
 #####__CHECK_IF_MIN_IS_PROVIDED__#####
-if [ -z $_arg_min ] && [ $_arg_exome == "TRUE" ]; then
-	echo "Exome run, min must bet set, auto setting to 20"
-	_arg_min="20"
-fi
+#if [ -z $_arg_min ] && [ $_arg_exome == "TRUE" ]; then
+#	echo "Exome run, min must bet set, auto setting to 20"
+#	_arg_min="20"
+#fi
 
 if [ -z "$_arg_min" ]
 then
@@ -687,6 +700,7 @@ PullSampleHashes=$RDIR/scripts/CheckJellyHashList.sh
 modifiedJelly=$RDIR/bin/externals/modified_jellyfish/src/modified_jellyfish_project/bin/jellyfish
 bwa=$RDIR/bin/externals/bwa/src/bwa_project/bwa
 RUFUSfilterFASTQ=$RDIR/bin/RUFUS.Filter
+RUFUSfilterFASTQse=$RDIR/bin/RUFUS.Filter.single
 fastp=$RDIR/bin/externals/fastp/src/fastp_project/fastp
 samblaster=$RDIR/bin/externals/samblaster/src/samblaster_project/samblaster
 ############################################################################################
@@ -789,13 +803,19 @@ then
 	echo "staring model"
         /usr/bin/time -v "$RUFUSmodel" "$ProbandGenerator".Jhash.histo $K 150 $Threads
         echo "done with model"
-	MutantMinCov=$(head -2 "$ProbandGenerator".Jhash.histo.7.7.model | tail -1 )
-	echo "mutant min coverage from generated model is $MutantMinCov"
-   	
-	MutantSC=$(head -4 "$ProbandGenerator".Jhash.histo.7.7.model | tail -1 )
-        echo "mutant SC coverage from generated model is $MutantSC"
-        MaxHashDepth=$(echo "$MutantSC * 5" | bc)
-        echo "MaxHashDepth = $MaxHashDepth" 
+	if [ -e "$ProbandGenerator.Jhash.histo.7.7.model" ]
+	then
+		MutantMinCov=$(head -2 "$ProbandGenerator".Jhash.histo.7.7.model | tail -1 )
+		echo "mutant min coverage from generated model is $MutantMinCov"
+   		
+		MutantSC=$(head -4 "$ProbandGenerator".Jhash.histo.7.7.model | tail -1 )
+        	echo "mutant SC coverage from generated model is $MutantSC"
+        	MaxHashDepth=$(echo "$MutantSC * 5" | bc)
+        	echo "MaxHashDepth = $MaxHashDepth"
+	else
+		echo "ERROR, model didn't run properly"
+		exit
+	fi 
     fi
 else 
     echo "min was provided, min is $_arg_min" 
@@ -807,7 +827,12 @@ fi
 if [ -z $MutantMinCov ]; then 
 	echo "ERROR: No min coverage set, possible error in Model"
 	exit 100
-fi 
+fi
+if [ "$MutantMinCov" -lt "3" ]
+        then
+                echo "ERROR, model couldnt pick a sensible lower cutoff, check your subject bam file"
+                exit
+        fi
 echo "made it "
 #################################__HASH_LIST_FILTER__#####################################
 if [ -s "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList ]
@@ -839,70 +864,116 @@ echo "starting RUFUS filter"
 
 echo "_arg_fastqA = $_arg_fastqA"
 echo "_arg_fastqB = $_arg_fastqB"
-if [ -e "$ProbandGenerator".Mutations.Mate1.fastq ]
-then
-	echo "skipping filter"
-else
-	if [ -z $_arg_fastqA ]
-	then
-	    if [ -e "$ProbandGenerator".temp.mate1.fastq ]; then 
-	    	rm  "$ProbandGenerator".temp.mate1.fastq
-	    fi
-	    if [ -e "$ProbandGenerator".temp.mate2.fastq ]; then
-                rm  "$ProbandGenerator".temp.mate2.fastq
-            fi
-	    if [ -e "$ProbandGenerator".temp ]; then 
-		    rm "$ProbandGenerator".temp 
-            fi
-	    echo "running this one " 
-	    mkfifo "$ProbandGenerator".temp.mate1.fastq "$ProbandGenerator".temp.mate2.fastq
-	    sleep 1
-	    /usr/bin/time -v  bash "$ProbandGenerator" | "$RDIR"/bin/PassThroughSamCheck.stranded "$ProbandGenerator".filter.chr  "$ProbandGenerator".temp >  "$ProbandGenerator".temp &
-	    /usr/bin/time -v   $RUFUSfilterFASTQ  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp.mate1.fastq "$ProbandGenerator".temp.mate2.fastq "$ProbandGenerator" "$K" 13 1 "$(echo $Threads -2 | bc)" &
-	    
-	    wait
-	else
-		echo "Running RUFUS.filter from paired FASTQ files"
-	
-		
-		echo "$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  <(bash $_arg_fastqA) <(bash $_arg_fastqB) "$ProbandGenerator" $K 13 1 "$(echo $Threads -2 | bc)""
-
-		#$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  <(bash $_arg_fastqA) <(bash $_arg_fastqB) "$ProbandGenerator" $K 13 1 "$(echo $Threads -2 | bc)"
-		echo $RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  $_arg_fastqA $_arg_fastqB "$ProbandGenerator" $K 13 1 "$(echo $Threads -2 | bc)"
-		$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  $_arg_fastqA $_arg_fastqB "$ProbandGenerator" $K 13 1 "$(echo $Threads -2 | bc)"
-		wait
-	fi
-fi
-
-if [ $(wc -l "$ProbandGenerator".Mutations.Mate1.fastq | awk '{print $1}') -eq "0" ]; then
-	echo "ERROR: No mutant fastq reads idenfied.  Either the files are exactly the same of something went wrong in previous step" 
-	exit 100
-fi
-
-shortinsert="false"
-if [ -e "$ProbandGenerator".Mutations.fastq.bam ]
+if [ $_pairedEnd == "true" ]
 then 
-	echo "skipping mapping mates" 
-else
-	if [ $shortinsert = "false" ]
+	if [ -e "$ProbandGenerator".Mutations.Mate1.fastq ]
 	then
-		echo "skipping fastp fix"
-                $bwa mem -t $Threads $_arg_ref_bwa "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq | $samblaster | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.bam 
-                samtools index "$ProbandGenerator".Mutations.fastq.bam	
+		echo "skipping filter"
 	else
-		echo "using fastp fix" 
-		#cat "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq > "$ProbandGenerator".Mutations.fastq
-        	#$bwa mem -t $Threads $_arg_ref_bwa <( cat "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq)  | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.bam
-        	$fastp -i "$ProbandGenerator".Mutations.Mate1.fastq -I "$ProbandGenerator".Mutations.Mate2.fastq -m -o "$ProbandGenerator".Mutations.Mate1.fastq.fastp.fastq -O "$ProbandGenerator".Mutations.Mate2.fastq.fastp.fastq --merged_out "$ProbandGenerator".Mutations.Mate1.fastq.merged.fastq
-		$bwa mem -t $Threads $_arg_ref_bwa "$ProbandGenerator".Mutations.Mate1.fastq.fastp.fastq "$ProbandGenerator".Mutations.Mate2.fastq.fastp.fastq  | $samblaster | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.pared.bam
-		$bwa mem -t $Threads $_arg_ref_bwa "$ProbandGenerator".Mutations.Mate1.fastq.merged.fastq  | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.merged.bam
-		samtools merge "$ProbandGenerator".Mutations.fastq.bam "$ProbandGenerator".Mutations.fastq.merged.bam "$ProbandGenerator".Mutations.fastq.pared.bam 
-		#$bwa mem -t $Threads $_arg_ref_bwa "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq  | $samblaster | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.bam
-		samtools index "$ProbandGenerator".Mutations.fastq.merged.bam
-		samtools index "$ProbandGenerator".Mutations.fastq.pared.bam
-		samtools index "$ProbandGenerator".Mutations.fastq.bam
+		if [ -z $_arg_fastqA ]
+		then
+		    if [ -e "$ProbandGenerator".temp.mate1.fastq ]; then 
+		    	rm  "$ProbandGenerator".temp.mate1.fastq
+		    fi
+		    if [ -e "$ProbandGenerator".temp.mate2.fastq ]; then
+	                rm  "$ProbandGenerator".temp.mate2.fastq
+	            fi
+		    if [ -e "$ProbandGenerator".temp ]; then 
+			    rm "$ProbandGenerator".temp 
+	            fi
+		    echo "running this one " 
+		    mkfifo "$ProbandGenerator".temp.mate1.fastq "$ProbandGenerator".temp.mate2.fastq
+		    sleep 1
+		    /usr/bin/time -v  bash "$ProbandGenerator" | "$RDIR"/bin/PassThroughSamCheck.stranded "$ProbandGenerator".filter.chr  "$ProbandGenerator".temp >  "$ProbandGenerator".temp &
+		    /usr/bin/time -v   $RUFUSfilterFASTQ  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp.mate1.fastq "$ProbandGenerator".temp.mate2.fastq "$ProbandGenerator" "$K" 13 1 "$(echo $Threads -2 | bc)" &
+		    
+		    wait
+		else
+			echo "Running RUFUS.filter from paired FASTQ files"
+		
+			
+			echo "$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  <(bash $_arg_fastqA) <(bash $_arg_fastqB) "$ProbandGenerator" $K 13 1 "$(echo $Threads -2 | bc)""
+	
+			#$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  <(bash $_arg_fastqA) <(bash $_arg_fastqB) "$ProbandGenerator" $K 13 1 "$(echo $Threads -2 | bc)"
+			echo $RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  $_arg_fastqA $_arg_fastqB "$ProbandGenerator" $K 13 1 "$(echo $Threads -2 | bc)"
+			$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  $_arg_fastqA $_arg_fastqB "$ProbandGenerator" $K 13 1 "$(echo $Threads -2 | bc)"
+			wait
+		fi
 	fi
-fi
+	
+	if [ $(wc -l "$ProbandGenerator".Mutations.Mate1.fastq | awk '{print $1}') -eq "0" ]; then
+		echo "ERROR: No mutant fastq reads idenfied.  Either the files are exactly the same of something went wrong in previous step" 
+		exit 100
+	fi
+	
+	shortinsert="false"
+	if [ -e "$ProbandGenerator".Mutations.fastq.bam ]
+	then 
+		echo "skipping mapping mates" 
+	else
+		if [ $shortinsert = "false" ]
+		then
+			echo "skipping fastp fix"
+	                $bwa mem -t $Threads $_arg_ref_bwa "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq | $samblaster | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.bam 
+	                samtools index "$ProbandGenerator".Mutations.fastq.bam	
+		else
+			echo "using fastp fix" 
+			#cat "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq > "$ProbandGenerator".Mutations.fastq
+	        	#$bwa mem -t $Threads $_arg_ref_bwa <( cat "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq)  | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.bam
+	        	$fastp -i "$ProbandGenerator".Mutations.Mate1.fastq -I "$ProbandGenerator".Mutations.Mate2.fastq -m -o "$ProbandGenerator".Mutations.Mate1.fastq.fastp.fastq -O "$ProbandGenerator".Mutations.Mate2.fastq.fastp.fastq --merged_out "$ProbandGenerator".Mutations.Mate1.fastq.merged.fastq
+			$bwa mem -t $Threads $_arg_ref_bwa "$ProbandGenerator".Mutations.Mate1.fastq.fastp.fastq "$ProbandGenerator".Mutations.Mate2.fastq.fastp.fastq  | $samblaster | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.pared.bam
+			$bwa mem -t $Threads $_arg_ref_bwa "$ProbandGenerator".Mutations.Mate1.fastq.merged.fastq  | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.merged.bam
+			samtools merge "$ProbandGenerator".Mutations.fastq.bam "$ProbandGenerator".Mutations.fastq.merged.bam "$ProbandGenerator".Mutations.fastq.pared.bam 
+			#$bwa mem -t $Threads $_arg_ref_bwa "$ProbandGenerator".Mutations.Mate1.fastq "$ProbandGenerator".Mutations.Mate2.fastq  | $samblaster | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.bam
+			samtools index "$ProbandGenerator".Mutations.fastq.merged.bam
+			samtools index "$ProbandGenerator".Mutations.fastq.pared.bam
+			samtools index "$ProbandGenerator".Mutations.fastq.bam
+		fi
+	fi
+else
+#########put se pipe here
+	if [ -e "$ProbandGenerator".Mutations.fastq ]
+	then
+		echo "skipping filter"
+	else
+		if [ -z $_arg_fastqA ]
+		then
+
+		    echo "running this one filer SE" 
+	            sleep 1
+	            if [ -e "$ProbandGenerator".temp ]; then
+	                            rm  "$ProbandGenerator".temp
+	            fi
+	                mkfifo "$ProbandGenerator".temp
+	            /usr/bin/time -v  bash "$ProbandGenerator" | "$RDIR"/bin/PassThroughSamCheck.stranded.se "$ProbandGenerator".filter.chr  "$ProbandGenerator".temp >  "$ProbandGenerator".temp &
+	            /usr/bin/time -v   $RUFUSfilterFASTQse  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp  "$ProbandGenerator" "$K" 13 1 "$(echo $Threads -2 | bc)" &
+		    wait
+		else
+			echo "Running RUFUS.filter from single FASTQ files"
+			echo "havent written this yet EXITing"
+			exit
+			#########WRITE THIS##########	
+			wait
+		fi
+	fi
+	
+	if [ $(wc -l "$ProbandGenerator".Mutations.fastq | awk '{print $1}') -eq "0" ]; then
+		echo "ERROR: No mutant fastq reads idenfied.  Either the files are exactly the same of something went wrong in previous step" 
+		exit 100
+	fi
+	
+	shortinsert="false"
+	if [ -e "$ProbandGenerator".Mutations.fastq.bam ]
+	then 
+		echo "skipping mapping mates" 
+	else
+	                $bwa mem -t $Threads $_arg_ref_bwa "$ProbandGenerator".Mutations.fastq | $samblaster | samtools sort -T "$ProbandGenerator".Mutations.fastq -O bam - > "$ProbandGenerator".Mutations.fastq.bam 
+	                samtools index "$ProbandGenerator".Mutations.fastq.bam	
+			
+	fi
+
+fi 
+
 ########################################################################################
 if [ $_arg_saliva == "TRUE" ]
 then 
@@ -922,7 +993,7 @@ if [ $( samtools view "$ProbandGenerator".Mutations.fastq.bam | wc -l | awk '{pr
 fi 
 
 ###################__RUFUS_OVERLAP__#############################################
-if [ -e $ProbandGenerator.V2.overlap.hashcount.fastq.bam.vcf.runanyway ]
+if [ -e $ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf.gz ]
 then
     echo "Skipping overlap step"
 else
