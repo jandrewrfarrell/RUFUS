@@ -721,11 +721,11 @@ then
 	
 	for parent in "${ParentGenerators[@]}"
 	do
-	     /usr/bin/time -v bash $RunJelly $parent $K $(echo $JThreads -2 | bc) 2  &
+	      bash $RunJelly $parent $K $(echo $JThreads -2 | bc) 2  &
 	done
 	
-	#/usr/bin/time -v bash $RunJelly $ProbandGenerator $K  $Threads 2
-	/usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $JThreads -2 | bc) 2  & 
+	# bash $RunJelly $ProbandGenerator $K  $Threads 2
+	 bash $RunJelly $ProbandGenerator $K $(echo $JThreads -2 | bc) 2  & 
 	wait
 else
         JThreads=$Threads
@@ -736,11 +736,11 @@ else
 
         for parent in "${ParentGenerators[@]}"
         do
-             /usr/bin/time -v bash $RunJelly $parent $K $(echo $JThreads -2 | bc) 2  
+              bash $RunJelly $parent $K $(echo $JThreads -2 | bc) 2  
         done
 
-        #/usr/bin/time -v bash $RunJelly $ProbandGenerator $K  $Threads 2
-        /usr/bin/time -v bash $RunJelly $ProbandGenerator $K $(echo $JThreads -2 | bc) 2  
+        # bash $RunJelly $ProbandGenerator $K  $Threads 2
+         bash $RunJelly $ProbandGenerator $K $(echo $JThreads -2 | bc) 2  
         wait
 fi 	
 ##############################################################################
@@ -801,7 +801,7 @@ then
 
     else
 	echo "staring model"
-        /usr/bin/time -v "$RUFUSmodel" "$ProbandGenerator".Jhash.histo $K 150 $Threads
+         "$RUFUSmodel" "$ProbandGenerator".Jhash.histo $K 150 $Threads
         echo "done with model"
 	if [ -e "$ProbandGenerator.Jhash.histo.7.7.model" ]
 	then
@@ -844,8 +844,8 @@ else
     	rm  "$ProbandGenerator".temp
     fi
     mkfifo "$ProbandGenerator".temp
-    /usr/bin/time -v $modifiedJelly merge "$ProbandGenerator".Jhash $(echo $parentsString) $(echo $parentsExcludeString)  > "$ProbandGenerator".temp & 
-    /usr/bin/time -v bash $PullSampleHashes $ProbandGenerator.Jhash "$ProbandGenerator".temp $MutantMinCov $MaxHashDepth > "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList 
+     $modifiedJelly merge "$ProbandGenerator".Jhash $(echo $parentsString) $(echo $parentsExcludeString)  > "$ProbandGenerator".temp & 
+     bash $PullSampleHashes $ProbandGenerator.Jhash "$ProbandGenerator".temp $MutantMinCov $MaxHashDepth > "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList 
     wait
     
 fi
@@ -853,8 +853,9 @@ fi
 echo "made it here "
 ########################################################################################
 
-wc -l "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList | awk '{print $1}'
-if [ $(wc -l "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList | awk '{print $1}') -eq "0" ]; then 
+#wc -l "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList | awk '{print $1}'
+#if [ $(wc -l "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList | awk '{print $1}') -eq "0" ]; then 
+if [ $(head  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList | wc -l | awk '{print $1}') -eq "0" ]; then
 	echo "ERROR: No mutant hashes identfied, either the files are exactly the same of something went wrong in previous step" 
 	exit 100
 fi
@@ -884,8 +885,8 @@ then
 		    echo "running this one " 
 		    mkfifo "$ProbandGenerator".temp.mate1.fastq "$ProbandGenerator".temp.mate2.fastq
 		    sleep 1
-		    /usr/bin/time -v  bash "$ProbandGenerator" | "$RDIR"/bin/PassThroughSamCheck.stranded "$ProbandGenerator".filter.chr  "$ProbandGenerator".temp >  "$ProbandGenerator".temp &
-		    /usr/bin/time -v   $RUFUSfilterFASTQ  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp.mate1.fastq "$ProbandGenerator".temp.mate2.fastq "$ProbandGenerator" "$K" 13 1 "$(echo $Threads -2 | bc)" &
+		      bash "$ProbandGenerator" | "$RDIR"/bin/PassThroughSamCheck.stranded "$ProbandGenerator".filter.chr  "$ProbandGenerator".temp >  "$ProbandGenerator".temp &
+		       $RUFUSfilterFASTQ  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp.mate1.fastq "$ProbandGenerator".temp.mate2.fastq "$ProbandGenerator" "$K" 13 1 "$(echo $Threads -2 | bc)" &
 		    
 		    wait
 		else
@@ -900,8 +901,8 @@ then
 			wait
 		fi
 	fi
-	
-	if [ $(wc -l "$ProbandGenerator".Mutations.Mate1.fastq | awk '{print $1}') -eq "0" ]; then
+	#if [ $(wc -l "$ProbandGenerator".Mutations.Mate1.fastq | awk '{print $1}') -eq "0" ]; then	
+	if [ $(head "$ProbandGenerator".Mutations.Mate1.fastq | wc -l | awk '{print $1}') -eq "0" ]; then
 		echo "ERROR: No mutant fastq reads idenfied.  Either the files are exactly the same of something went wrong in previous step" 
 		exit 100
 	fi
@@ -945,8 +946,8 @@ else
 	                            rm  "$ProbandGenerator".temp
 	            fi
 	                mkfifo "$ProbandGenerator".temp
-	            /usr/bin/time -v  bash "$ProbandGenerator" | "$RDIR"/bin/PassThroughSamCheck.stranded.se "$ProbandGenerator".filter.chr  "$ProbandGenerator".temp >  "$ProbandGenerator".temp &
-	            /usr/bin/time -v   $RUFUSfilterFASTQse  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp  "$ProbandGenerator" "$K" 13 1 "$(echo $Threads -2 | bc)" &
+	              bash "$ProbandGenerator" | "$RDIR"/bin/PassThroughSamCheck.stranded.se "$ProbandGenerator".filter.chr  "$ProbandGenerator".temp >  "$ProbandGenerator".temp &
+	               $RUFUSfilterFASTQse  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp  "$ProbandGenerator" "$K" 13 1 "$(echo $Threads -2 | bc)" &
 		    wait
 		else
 			echo "Running RUFUS.filter from single FASTQ files"
@@ -957,7 +958,8 @@ else
 		fi
 	fi
 	
-	if [ $(wc -l "$ProbandGenerator".Mutations.fastq | awk '{print $1}') -eq "0" ]; then
+	#if [ $(wc -l "$ProbandGenerator".Mutations.fastq | awk '{print $1}') -eq "0" ]; then
+	if [ $(head "$ProbandGenerator".Mutations.fastq | wc -l  | awk '{print $1}') -eq "0" ]; then
 		echo "ERROR: No mutant fastq reads idenfied.  Either the files are exactly the same of something went wrong in previous step" 
 		exit 100
 	fi
@@ -987,7 +989,7 @@ fi
 
 
 
-if [ $( samtools view "$ProbandGenerator".Mutations.fastq.bam | wc -l | awk '{print $1}') -eq "0" ]; then
+if [ $( samtools view "$ProbandGenerator".Mutations.fastq.bam | head | wc -l | awk '{print $1}') -eq "0" ]; then
         echo "ERROR: BWA failed on "$ProbandGenerator".Mutations.fastq.  Either the files are exactly the same of something went wrong in previous step" 
         exit 100
 fi 
@@ -998,8 +1000,8 @@ then
     echo "Skipping overlap step"
 else
     echo "Starting RUFUS overlap"
-    echo "/usr/bin/time bash  $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 5 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$_MaxAlleleSize" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash""
-    /usr/bin/time bash  $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 5 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$_MaxAlleleSize" "$_assemblySpeed" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
+    echo " bash  $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 5 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$_MaxAlleleSize" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash""
+     bash  $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 5 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$_MaxAlleleSize" "$_assemblySpeed" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
     echo "Done with RUFUS overlap"
 fi
 ##############################################################################################

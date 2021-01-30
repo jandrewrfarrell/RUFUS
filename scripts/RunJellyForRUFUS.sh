@@ -26,8 +26,7 @@ else
 	fi
 	mkfifo $GEN.fq
 	bash $GEN | $RDIR/bin/PassThroughSamCheck $GEN.Jelly.chr > $GEN.fq &
-	/usr/bin/time -v $JELLYFISH count --disk -m $K -L $L -s 8G -t $T -o $GEN.Jhash -C $GEN.fq
-	#/usr/bin/time -v $JELLYFISH histo -f -o $GEN.Jhash.histo $GEN.Jhash 
+	$JELLYFISH count --disk -m $K -L $L -s 8G -t $T -o $GEN.Jhash -C $GEN.fq
 	rm $GEN.Jhash.temp
 	rm $GEN.fq
 
@@ -35,7 +34,7 @@ else
 fi
 
 if [ ! -s  $GEN.Jhash.histo ]; then 
-	/usr/bin/time -v $JELLYFISH histo -f -o $GEN.Jhash.histo $GEN.Jhash
+	$JELLYFISH histo -f -o $GEN.Jhash.histo $GEN.Jhash
 fi
 if [ $(awk '$2 > 0' $GEN.Jhash.histo | wc -l ) -eq "0" ]; then  
 	echo "ERROR: jellyfish failed on the file $GEN"
