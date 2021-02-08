@@ -23,6 +23,13 @@ __Note:__ RUFUS is only supported on linux environments.
 
 ## Installing RUFUS
 
+### With Docker
+Build the Dockerfile using Docker.
+```
+docker build -t rufus .
+```
+
+### Manually
  **1) Download**
 ```
 git clone https://github.com/jandrewrfarrell/RUFUS.git
