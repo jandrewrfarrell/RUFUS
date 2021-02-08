@@ -31,6 +31,7 @@ cd RUFUS
 
 **2) Build**
 ```
+mkdir bin
 cd bin
 cmake ../ -DCMAKE_C_COMPILER=/path/to/gcc-4.9.2 -DCMAKE_CXX_COMPILER=/path/to/g++-4.9.2
 make
@@ -39,6 +40,7 @@ make
 If you have gcc-4.9.2 as your default compiler, you may instead use
 
 ```
+mkdir bin
 cd bin
 cmake ../ -DCMAKE_C_COMPILER=$(which gcc) -DCMAKE_CXX_COMPILER=$(which g++)
 make
