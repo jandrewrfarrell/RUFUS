@@ -27,8 +27,23 @@ RUN set -ex; \
 	echo done
 	
 # Runtime tools
-RUN set -ex; \
-	apt install samtools; \
-	echo done
 
+# Setup samtools 1.11
+RUN set -ex; \
+	BUILD_DEPS="cmake build-essential libncurses5-dev zlib1g-dev libbz2-dev libbz2-dev liblzma-dev"; \
+	apt-get install -y python wget git bc $BUILD_DEPS; \
+# Get samtools and build it
+	cd /; \
+	wget https://github.com/samtools/samtools/releases/download/1.11/samtools-1.11.tar.bz2; \
+	tar -xjf samtools-1.11.tar.bz2; \
+	cd samtools*; \
+	./configure; \
+	make; \
+	make install; \
+	cd /; \
+	rm -rf samtools*; \
+# Cleanup
+	apt-get purge -y --auto-remove $BUILD_DEPS; \
+	apt-get clean; \
+	echo done
 
