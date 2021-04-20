@@ -31,6 +31,7 @@ cd RUFUS
 
 **2) Build**
 ```
+mkdir bin
 cd bin
 cmake ../ -DCMAKE_C_COMPILER=/path/to/gcc-4.9.2 -DCMAKE_CXX_COMPILER=/path/to/g++-4.9.2
 make
