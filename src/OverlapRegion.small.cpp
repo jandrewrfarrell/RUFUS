@@ -35,7 +35,7 @@ int Align3(vector<string>& sequenes, vector<string>& quals, string Ap,string Aqp
 	int bestScore = 0;
 	int NumReads = sequenes.size();
 	int start = Ai + 1;
-	int end = start+10 ; //sequenes.size();
+	int end = start+100 ; //sequenes.size();
 	if (end > sequenes.size())
 	{
 		end = sequenes.size(); 
@@ -557,6 +557,9 @@ int main(int argc, char* argv[]) {
 	ofstream Depreport;
 	FirstPassFile += "d";
 	Depreport.open(FirstPassFile.c_str());
+	string f = FirstPassFile+ "boom"; 
+	//ofstream tempO; 
+	//tempO.open(f); 
 
 	if (report.is_open()) {
 	} else {
@@ -642,6 +645,21 @@ int main(int argc, char* argv[]) {
 					
 					used.push_back(0);
 
+					//tempO << L1 << endl; 
+					//tempO << L2 << endl;
+					//tempO << L3 << endl; 
+					//tempO << L4 << endl;
+					//tempO << L5 << endl; 
+					
+					//unsigned char C = depths.c_str()[0];
+                                	//int booya = C;
+                                	//tempO << booya;
+					//for (int w = 1; w < depths.size(); w++) {
+                                        //	C = depths.c_str()[w];
+                                       // 	booya = C;
+                                       // 	tempO << " " << booya;
+                                	//}
+					//tempO << endl; 
 				} else {
 					Rejects++;
 				}
@@ -690,7 +708,7 @@ int main(int argc, char* argv[]) {
 			}
 		}
 	}
-
+	tempO.close(); 
 	cout << endl;
 	int NumReads = sequenes.size();
 	cout << "\nDone reading in \n		 Read in a total of " << NumReads + Rejects

@@ -26,7 +26,8 @@
 using namespace std;
 
 double pi = 3.14159L;
-bool Diploid = true;
+bool Diploid = false;
+bool DiploidSimpel = true; 
 
 double norm(double x, double mu, double sigma, double skew, double p) {
 	if (x < mu) {
@@ -384,8 +385,16 @@ int main(int argc, char* argv[]) {
 		return 0;
 	}
 
-	string path;
+	ofstream ProbFile;
+	string path = argv[1];
+	path += ".7.7boom.prob";
+	ProbFile.open(path.c_str());
 
+	if (ProbFile.is_open()) {
+	} else {
+		cout << "Error, Prob file could not be opened";
+		return 0;
+	}
 
 	ofstream ModelFile;
 	path = argv[1];
@@ -407,7 +416,7 @@ int main(int argc, char* argv[]) {
 		cout << "Error, Model file could not be opened";
 		return 0;
 	}
- 	
+
 	double SC = 1;
 	double SCvalue = -1;
 	double stdi = -1;
@@ -515,7 +524,11 @@ int main(int argc, char* argv[]) {
 		else
 			histo2[i] = 0;
 	}
-
+	if (DiploidSimpel)
+	{
+		SC = SC/2; 
+		stdev = stdev*0.5; 
+	}
 	double factor = 1;
 	double skew = 0;
 	double Power = 1;
@@ -831,9 +844,9 @@ int main(int argc, char* argv[]) {
 
 	cout << "GenomeSize = " << GenomeSize << endl;
 
-//	for (long i = 1; i < SC; i++) {
-//		prob[i][1] = model[i][1] / histo[i];
-//	}
+	for (long i = 1; i < SC; i++) {
+		prob[i][1] = model[i][1] / histo[i];
+	}
 
 	int CutOff = -1;
 
@@ -866,29 +879,11 @@ int main(int argc, char* argv[]) {
 			break;
 		}
 	}
-	
-	ofstream ProbFile;
-        path = argv[1];
-        path += ".7.7.prob";
-        ProbFile.open(path.c_str());
 
-        if (ProbFile.is_open()) {
-        } else {
-                cout << "Error, Prob file could not be opened";
-                return 0;
-        }
-	
-	cout << "here1" << endl; 
 	ModelFile << 3 << endl << kcutoff << endl;	// Inflection << endl;
-	DistFile << 3 << endl << kcutoff << endl; 
-	ProbFile <<  3 << endl << kcutoff << endl;
 	ModelFile << HistoSum << endl;
-	DistFile << HistoSum << endl;
-	ProbFile << HistoSum << endl;
 	ModelFile << rawSC << endl;  
-	DistFile << rawSC << endl;
-	ProbFile << rawSC << endl;
-	cout << "here" << endl; 
+	DistFile << HistoSum << endl;
 
 	for (long CopyNumber = 1; CopyNumber < model[1].size(); CopyNumber++) {
 		long LocalSum = 0;
@@ -947,23 +942,9 @@ int main(int argc, char* argv[]) {
 		DistFile << endl;
 	}
 
-	for (long c = 1; c < dist[1].size(); c++) {
-                DistFile << '\t' << dist[0][c];
-        }
-	 DistFile.close();
-        
-	
-	 ProbFile << endl << endl; 
-        for (long k = 1; k < prob.size(); k++) {
-                ProbFile << k << '\t' << ErrorDist[k] << '\t' << 0;
-
-                for (long c = 1; c < prob[1].size(); c++) {
-                        ProbFile << '\t' <<prob[k][c];
-                }
-                ProbFile << endl;
-        }
-
 	ProbFile.close();
+	DistFile.close();
+	ModelFile.close();
 	cout << "GenomeSize = " << GenomeSize << endl;
 	cout << "Inflection point = " << Inflection << endl;
 	cout << "Recomended RUFUS cutoff = " << SC - (5 * stdev) << endl;

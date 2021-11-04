@@ -42,7 +42,7 @@ while ($l1 = <Fastq>)
 		}
 		else
 		{
-			print "$l1\tUNIUQE\n";
+			print "$l1\n"; #\tUNIUQE\n";
 			$chr = $temp[0];
 			$pos = $temp[1];
 			$ref = $temp[3];

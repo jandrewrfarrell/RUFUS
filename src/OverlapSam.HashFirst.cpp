@@ -30,7 +30,7 @@ unordered_map<unsigned long, int> Mutations;
 int HashSize = -1; 
 bool FullOut = false;
 unordered_map<string, bool> DupCheck; 
-int Align3(vector<string>& sequenes, vector<string>& quals, string Ap, string Aqp, int Ai, int& overlap, int& index, float minPercentpassed, bool& PerfectMatch, int MinOverlapPassed, int Threads) 
+int Align3(vector<string>& sequenes, vector<string>& quals, vector<string>& strand, string phase, string Ap, string Aqp, int Ai, int& overlap, int& index, float minPercentpassed, bool& PerfectMatch, int MinOverlapPassed, int Threads) 
 {
 	int QualityOffset = 33; //=64; 
 	int MinQual = 20;
@@ -38,7 +38,7 @@ int Align3(vector<string>& sequenes, vector<string>& quals, string Ap, string Aq
 	int bestScore = 0;
 	int NumReads = sequenes.size();
 	int start = Ai + 1;
-	int end = start + 3; 
+	int end = start + 10; 
 	if (end > sequenes.size()) 
 	{
 		end = sequenes.size();
@@ -47,190 +47,205 @@ int Align3(vector<string>& sequenes, vector<string>& quals, string Ap, string Aq
 	#pragma omp parallel for shared(Ap, Aqp, index, overlap, bestScore) num_threads(Threads)
 	for (int j = start; j < end; j++) 
 	{
-		int MinOverlap = MinOverlapPassed;
-		float minPercent = minPercentpassed;
-		int LocalBestScore = 0;
-		int LocalIndex = -1;
-		int LocalOverlap = 0;
-		string A;
-		int Alen;
-		string Aq;
-		//#pragma omp critical
-		{
-			A = Ap;
-			Alen = A.length();
-			Aq = Aqp;
-		}
-		string B;
-		string Bq;
-		int Blength = -1;
-		int Alength = Alen;
-		int k;
+		bool run = false; 
 
-		//#pragma omp critical
-		{
-			B = sequenes[j];
-			Bq = quals[j];
-		}
-		Blength = B.length();
-		int window = -1;
-		int longest = -1;
-		bool Asmaller = true;
+		size_t found = strand[j].find(".");
+		
+		if (phase == "wh" && found == string::npos)
+		{run = true;}
+		if (phase == "nh" && found != string::npos)
+		{run = true;}
+		if (phase == "all")
+		{run = true;}
+		
 
-		if (Blength > Alength) 
-		{
-			window = Alength;
-			longest = Blength;
-			Asmaller = false;
-		} 
-		else 
-		{
-			window = Blength;
-			longest = Alength;
-			Asmaller = true;
-		}
-
-		int MM = window - (window * minPercent);
-		int Acount = 0;
-		int Bcount = 0;
-
-		for (int i = 0; i <= longest - window; i++) 
-		{
-			float score = 0;
-			//first check where the reads completely overlap
-			for (k = 0; k < window; k++) 
+			if (run)
 			{
-				if (A.c_str()[k + Acount] == B.c_str()[k + Bcount]) 
-				{
-					if (B.c_str()[k + Bcount] != 'N' && (int)Aq.c_str()[k + Acount] > 5 && (int)Bq.c_str()[k + Bcount] > 5) 
-					{
-						score++;
-					}
-				}
-				if ((k - score) > MM) 
-				{
-					score = -1;
-					break;
-				}
+			int MinOverlap = MinOverlapPassed;
+			float minPercent = minPercentpassed;
+			int LocalBestScore = 0;
+			int LocalIndex = -1;
+			int LocalOverlap = 0;
+			string A;
+			int Alen;
+			string Aq;
+			//#pragma omp critical
+			{
+				A = Ap;
+				Alen = A.length();
+				Aq = Aqp;
 			}
-
-			if (Asmaller) 
+			string B;
+			string Bq;
+			int Blength = -1;
+			int Alength = Alen;
+			int k;
+	
+			//#pragma omp critical
 			{
-				Acount++;
-			} else {
-				Bcount++;
+				B = sequenes[j];
+				Bq = quals[j];
 			}
-
-			if (verbose) 
+			Blength = B.length();
+			int window = -1;
+			int longest = -1;
+			bool Asmaller = true;
+	
+			if (Blength > Alength) 
 			{
-				cout << "	Score = " << score << endl;
+				window = Alength;
+				longest = Blength;
+				Asmaller = false;
+			} 
+			else 
+			{
+				window = Blength;
+				longest = Alength;
+				Asmaller = true;
 			}
-
-			float percent = score / (window);
-			if (percent >= minPercent) 
+	
+			int MM = window - (window * minPercent);
+			int Acount = 0;
+			int Bcount = 0;
+	
+			for (int i = 0; i <= longest - window; i++) 
 			{
-				if (LocalBestScore < score) 
-				{
-					LocalBestScore = score;
-					LocalIndex = j;
-					if (Asmaller) 
-					{
-						LocalOverlap = i * -1;
-					} else {
-						LocalOverlap = i;
-					}
-				}
-				if (score == window) {
-					PerfectMatch = true;
-					break;
-				}
-			}
-		}
-
-		if (PerfectMatch == false) 
-		{
-			for (int i = window - 1; i >= MinOverlap; i--) 
-			{
-				if (verbose) {cout << "i = " << i << endl;}
-
 				float score = 0;
-				for (k = 0; k <= i; k++) 
+				//first check where the reads completely overlap
+				for (k = 0; k < window; k++) 
 				{
-					if (verbose) {cout << "	k = " << k << " so A = " << Alength - i + k<< " /\\ B = " << 0 + k << endl;}
-					if (verbose) {cout << "		 A >> " << A.c_str()[Alength - i + k - 1] << "="<< B.c_str()[0 + k] << " << B" << endl;}
-					
-					if (A.c_str()[Alength - i + k - 1] == B.c_str()[0 + k]) 
+					if (A.c_str()[k + Acount] == B.c_str()[k + Bcount]) 
 					{
-						if (B.c_str()[0 + k] != 'N' && (int)Aq.c_str()[Alength - i + k - 1] > 5 &&(int)Bq.c_str()[0 + k] > 5) 
+						if (B.c_str()[k + Bcount] != 'N' && (int)Aq.c_str()[k + Acount] > 5 && (int)Bq.c_str()[k + Bcount] > 5) 
 						{
 							score++;
 						}
 					}
-					if ((k - score) > MM) {
+					if ((k - score) > MM) 
+					{
 						score = -1;
 						break;
 					}
 				}
-				if (verbose) {cout << "	Score = " << score << endl;}
-
-				float percent = score / (k);
+	
+				if (Asmaller) 
+				{
+					Acount++;
+				} else {
+					Bcount++;
+				}
+	
+				if (verbose) 
+				{
+					cout << "	Score = " << score << endl;
+				}
+	
+				float percent = score / (window);
 				if (percent >= minPercent) 
 				{
 					if (LocalBestScore < score) 
 					{
 						LocalBestScore = score;
 						LocalIndex = j;
-						LocalOverlap = i - Alength + 1;
-						if (score == i) 
+						if (Asmaller) 
 						{
-							break;
+							LocalOverlap = i * -1;
+						} else {
+							LocalOverlap = i;
 						}
 					}
-				}
-			}
-
-			for (int i = window - 1; i >= MinOverlap; i--) 
-			{
-				if (verbose) {	cout << "i = " << i << endl;}
-				float score = 0;
-				for (k = 0; k <= i; k++) {
-					if (B.c_str()[Blength - i + k - 1] == A.c_str()[0 + k]) 
-					{
-						if (A.c_str()[0 + k] != 'N' && (int)Aq.c_str()[0 + k] > 5 && (int)Bq.c_str()[Blength - i + k - 1] > 5) 
-						{
-							score++;
-						}
-					}
-					if ((k - score) > MM) {
-						score = -1;
+					if (score == window) {
+						PerfectMatch = true;
 						break;
 					}
 				}
-
-				if (verbose) {cout << "	Score = " << score << endl;}
-
-				float percent = score / (k);
-				if (percent >= minPercent) 
+			}
+	
+			if (PerfectMatch == false) 
+			{
+				for (int i = window - 1; i >= MinOverlap; i--) 
 				{
-					if (LocalBestScore < score) 
+					if (verbose) {cout << "i = " << i << endl;}
+	
+					float score = 0;
+					for (k = 0; k <= i; k++) 
 					{
-						LocalBestScore = score;
-						LocalIndex = j;
-						LocalOverlap = Blength - i - 1;
-						if (score == i) 
+						if (verbose) {cout << "	k = " << k << " so A = " << Alength - i + k<< " /\\ B = " << 0 + k << endl;}
+						if (verbose) {cout << "		 A >> " << A.c_str()[Alength - i + k - 1] << "="<< B.c_str()[0 + k] << " << B" << endl;}
+						
+						if (A.c_str()[Alength - i + k - 1] == B.c_str()[0 + k]) 
 						{
+							if (B.c_str()[0 + k] != 'N' && (int)Aq.c_str()[Alength - i + k - 1] > 5 &&(int)Bq.c_str()[0 + k] > 5) 
+							{
+								score++;
+							}
+						}
+						if ((k - score) > MM) {
+							score = -1;
 							break;
+						}
+					}
+					if (verbose) {cout << "	Score = " << score << endl;}
+	
+					float percent = score / (k);
+					if (percent >= minPercent) 
+					{
+						if (LocalBestScore < score) 
+						{
+							LocalBestScore = score;
+							LocalIndex = j;
+							LocalOverlap = i - Alength + 1;
+							if (score == i) 
+							{
+								break;
+							}
+						}
+					}
+				}
+	
+				for (int i = window - 1; i >= MinOverlap; i--) 
+				{
+					if (verbose) {	cout << "i = " << i << endl;}
+					float score = 0;
+					for (k = 0; k <= i; k++) {
+						if (B.c_str()[Blength - i + k - 1] == A.c_str()[0 + k]) 
+						{
+							if (A.c_str()[0 + k] != 'N' && (int)Aq.c_str()[0 + k] > 5 && (int)Bq.c_str()[Blength - i + k - 1] > 5) 
+							{
+								score++;
+							}
+						}
+						if ((k - score) > MM) {
+							score = -1;
+							break;
+						}
+					}
+	
+					if (verbose) {cout << "	Score = " << score << endl;}
+	
+					float percent = score / (k);
+					if (percent >= minPercent) 
+					{
+						if (LocalBestScore < score) 
+						{
+							LocalBestScore = score;
+							LocalIndex = j;
+							LocalOverlap = Blength - i - 1;
+							if (score == i) 
+							{
+								break;
+							}
 						}
 					}
 				}
 			}
-		}
-		#pragma omp critical(updateCounts)
-		{
-			if (bestScore < LocalBestScore) {
-				bestScore = LocalBestScore;
-				index = LocalIndex;
-				overlap = LocalOverlap;
+			#pragma omp critical(updateCounts)
+			{
+				if (bestScore < LocalBestScore) {
+					bestScore = LocalBestScore;
+					index = LocalIndex;
+					overlap = LocalOverlap;
+				}
 			}
 		}
 	}
@@ -767,8 +782,6 @@ int main(int argc, char* argv[]) {
 				int hashes = CountHashes(L2);
 				
 				//cout << "Hash = " << hashes << endl;
-				//if (hashes > 0)
-				//{
 				if ((double)L2.size() / (double)ReadSize > .6) 
 				{
 					ReadSize = L2.size();
@@ -809,7 +822,6 @@ int main(int argc, char* argv[]) {
 				{
 					Rejects++;
 				}
-				//}
 			}
 		}
 	}
@@ -828,161 +840,164 @@ int main(int argc, char* argv[]) {
 
 	for (std::vector<string>::size_type i = 0; i < sequenes.size(); i++) 
 	{
+
 		string A = sequenes[i];
 		string Aqual = qual[i];
 		string Adep = depth[i];
 		string Astr = strand[i];
-
-		if (FullOut) {
-			cout << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<**************************************************************>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
-		}
-
-		Et = clock();
-
-		if ((int)i % 10 < 1){
-			gettimeofday(&end, NULL);
-			float Dt = end.tv_sec - start.tv_sec;
-			cout << "aligning " << i << " of " << NumReads << ", \% done = " << ((double)i / (double)NumReads) * 100.00<< ", TotalTime= " << Dt << " , second per read = " << Dt / i<< ", \% finding match = "<< ((double)FoundMatch / (double)i) * 100.00 << "\r";
-		}
-
-		if (FullOut) {
-			Dt = ((double)(Et - St)) / CLOCKS_PER_SEC;
-			cout << "aligning " << i << " of " << NumReads
-					 << "\% done = " << ((double)i / (double)NumReads) * 100.00
-					 << ", TotalTime= " << Dt << " , second per read = " << Dt / i
-					 << ", \% finding match = "
-					 << ((double)FoundMatch / (double)i) * 100.00 << endl
-					 << A << endl;
-
-			for (int z = 0; z < Adep.length(); z++) {
-				int bam = Adep.c_str()[z];
-				cout << bam;
-			}
-			cout << endl;
-		}
-
-		int k = -1;
-		int bestIndex = -1;
-		bool PerfectMatch = false;
-		int booya = Align3(sequenes, qual, A, Aqual, i, k, bestIndex, MinPercent, PerfectMatch, MinOverlap, Threads);
-		if (FullOut) {
-			cout << "best forward score is " << booya << " k is " << k << endl;
-		}
-
-		if (!(PerfectMatch)) {
-			string revA = Util::RevComp(A);
-			string revAqual = Util::RevQual(Aqual);
-			string revAdep = Util::RevQual(Adep);
-			string revAstr = FlipStrands(Astr);
-			int revk = -1;
-			int revbestIndex = -1;
-			int revbooya =
-	Align3(sequenes, qual, revA, revAqual, i, revk, revbestIndex,
-
-				 MinPercent, PerfectMatch, MinOverlap, Threads);
+		size_t found = Astr.find(".");
+                if (found == string::npos)
+		{
 			if (FullOut) {
-				cout << "best reverse score is " << revbooya << " k is " << revk
-						 << endl;
+				cout << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<**************************************************************>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
 			}
-
-			if (revbooya > booya) {
-				A = revA;
-				Aqual = revAqual;
-				Adep = revAdep;
-				Astr = revAstr;
-				k = revk;
-				booya = revbooya;
-				bestIndex = revbestIndex;
+	
+			Et = clock();
+	
+			if ((int)i % 10 < 1){
+				gettimeofday(&end, NULL);
+				float Dt = end.tv_sec - start.tv_sec;
+				cout << "aligning " << i << " of " << NumReads << ", \% done = " << ((double)i / (double)NumReads) * 100.00<< ", TotalTime= " << Dt << " , second per read = " << Dt / i<< ", \% finding match = "<< ((double)FoundMatch / (double)i) * 100.00 << "\r";
 			}
-
-		} else {
+	
 			if (FullOut) {
-				cout << "Perfect Match Found, Skipping Referse Search" << endl;
-			}
-		}
-
-		if (booya < MinOverlap) {
-			if (FullOut) {
-				cout << "No good match found, skipping" << endl;
-			}
-		} else {
-			FoundMatch++;
-			string B = sequenes[bestIndex];
-			string Bqual = qual[bestIndex];
-			string Bdep = depth[bestIndex];
-			string Bstr = strand[bestIndex];
-
-			if (k > 0) {
-
-				if (FullOut) {
-					cout << "found match at " << k << endl;
-
-					for (int z = 0; z < k; z++) {
-			cout << "+";
-		}
-
-					cout << A << endl << B << endl;
-
-					for (int z = 0; z < Bdep.length(); z++) {
-						int bam = Bdep.c_str()[z];
-						cout << bam;
-					}
-
-					cout << endl;
+				Dt = ((double)(Et - St)) / CLOCKS_PER_SEC;
+				cout << "aligning " << i << " of " << NumReads
+						 << "\% done = " << ((double)i / (double)NumReads) * 100.00
+						 << ", TotalTime= " << Dt << " , second per read = " << Dt / i
+						 << ", \% finding match = "
+						 << ((double)FoundMatch / (double)i) * 100.00 << endl
+						 << A << endl;
+	
+				for (int z = 0; z < Adep.length(); z++) {
+					int bam = Adep.c_str()[z];
+					cout << bam;
 				}
+				cout << endl;
+			}
+	
+			int k = -1;
+			int bestIndex = -1;
+			bool PerfectMatch = false;
+			int booya = Align3(sequenes, qual, strand, "wh", A, Aqual, i, k, bestIndex, MinPercent, PerfectMatch, MinOverlap, Threads);
+			if (FullOut) {
+				cout << "best forward score is " << booya << " k is " << k << endl;
+			}
+	
+			if (!(PerfectMatch)) {
+				string revA = Util::RevComp(A);
+				string revAqual = Util::RevQual(Aqual);
+				string revAdep = Util::RevQual(Adep);
+				string revAstr = FlipStrands(Astr);
+				int revk = -1;
+				int revbestIndex = -1;
+				int revbooya =	Align3(sequenes, qual, strand, "wh",  revA, revAqual, i, revk, revbestIndex,
+	
+					 MinPercent, PerfectMatch, MinOverlap, Threads);
+				if (FullOut) {
+					cout << "best reverse score is " << revbooya << " k is " << revk
+							 << endl;
+				}
+	
+				if (revbooya > booya) {
+					A = revA;
+					Aqual = revAqual;
+					Adep = revAdep;
+					Astr = revAstr;
+					k = revk;
+					booya = revbooya;
+					bestIndex = revbestIndex;
+				}
+	
 			} else {
 				if (FullOut) {
-					cout << "found match at " << k << endl;
-					cout << A << endl;
-
-					for (int z = 0; z < abs(k); z++) {
-			cout << "-";
-		}
-
-					cout << B << endl;
-
-					for (int z = 0; z < abs(k); z++) { 
-			cout << "-";
-		}
-
+					cout << "Perfect Match Found, Skipping Referse Search" << endl;
+				}
+			}
+	
+			if (booya < MinOverlap) {
+				if (FullOut) {
+					cout << "No good match found, skipping" << endl;
+				}
+			} else {
+				FoundMatch++;
+				string B = sequenes[bestIndex];
+				string Bqual = qual[bestIndex];
+				string Bdep = depth[bestIndex];
+				string Bstr = strand[bestIndex];
+	
+				if (k > 0) {
+	
+					if (FullOut) {
+						cout << "found match at " << k << endl;
+	
+						for (int z = 0; z < k; z++) {
+				cout << "+";
+			}
+	
+						cout << A << endl << B << endl;
+	
+						for (int z = 0; z < Bdep.length(); z++) {
+							int bam = Bdep.c_str()[z];
+							cout << bam;
+						}
+	
+						cout << endl;
+					}
+				} else {
+					if (FullOut) {
+						cout << "found match at " << k << endl;
+						cout << A << endl;
+	
+						for (int z = 0; z < abs(k); z++) {
+				cout << "-";
+			}
+	
+						cout << B << endl;
+	
+						for (int z = 0; z < abs(k); z++) { 
+				cout << "-";
+			}
+	
+						for (int z = 0; z < Bdep.length(); z++) {
+							int bam = Bdep.c_str()[z];
+							cout << bam;
+						}
+	
+						cout << endl;
+					}
+				}
+	
+				if (i == bestIndex) {
+					cout << "ERROR ____________________ SAME READS " << endl;
+				}
+				if (A.size() != Adep.size() && B.size() != Bdep.size()) {
+					cout << " ERRPR somethis the wrong size\n	A= " << A.size()
+							 << " Ad = " << Adep.size() << " B= " << B.size()
+							 << " Bd = " << Bdep.size() << endl;
+				}
+	
+				string combined =
+		ColapsContigs(A, B, k, Aqual, Bqual, Adep, Bdep, Astr, Bstr);
+	
+				if (combined.size() != Bdep.size()) {
+					cout << " ERRPR combined is the wrong size\n	C= " << combined.size()
+							 << " Bd = " << Bdep.size() << endl;
+				}
+	
+				sequenes[bestIndex] = combined;
+				qual[bestIndex] = Bqual;
+				depth[bestIndex] = Bdep;
+				strand[bestIndex] = Bstr;
+				sequenes[i] = "moved";
+	
+				if (FullOut) {
+					cout << combined << endl;
+	
 					for (int z = 0; z < Bdep.length(); z++) {
 						int bam = Bdep.c_str()[z];
 						cout << bam;
 					}
-
-					cout << endl;
-				}
-			}
-
-			if (i == bestIndex) {
-				cout << "ERROR ____________________ SAME READS " << endl;
-			}
-			if (A.size() != Adep.size() && B.size() != Bdep.size()) {
-				cout << " ERRPR somethis the wrong size\n	A= " << A.size()
-						 << " Ad = " << Adep.size() << " B= " << B.size()
-						 << " Bd = " << Bdep.size() << endl;
-			}
-
-			string combined =
-	ColapsContigs(A, B, k, Aqual, Bqual, Adep, Bdep, Astr, Bstr);
-
-			if (combined.size() != Bdep.size()) {
-				cout << " ERRPR combined is the wrong size\n	C= " << combined.size()
-						 << " Bd = " << Bdep.size() << endl;
-			}
-
-			sequenes[bestIndex] = combined;
-			qual[bestIndex] = Bqual;
-			depth[bestIndex] = Bdep;
-			strand[bestIndex] = Bstr;
-			sequenes[i] = "moved";
-
-			if (FullOut) {
-				cout << combined << endl;
-
-				for (int z = 0; z < Bdep.length(); z++) {
-					int bam = Bdep.c_str()[z];
-					cout << bam;
 				}
 			}
 		}
@@ -990,7 +1005,6 @@ int main(int argc, char* argv[]) {
 
 	cout << "\n\nRESULTS\n";
 	int count = 0;
-	cout << "sequenes size = " << sequenes.size() << endl; 
 	for (int i = 0; i < sequenes.size(); i++) {
 
 		if (FullOut) {
@@ -1008,7 +1022,7 @@ int main(int argc, char* argv[]) {
 				}
 			}
 
-			if (maxDep >= MinCoverage /*&& maxDep >= 2*/) {
+			if (maxDep >= MinCoverage && maxDep >= 2) {
 
 				if (sequenes[i].size() != qual[i].size() && qual[i].size() != depth[i].size()) {
 						cout << "ERROR, read "

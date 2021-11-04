@@ -29,7 +29,7 @@
 
 using namespace std;
 
-bool FullOut = false;
+bool FullOut = true;
 
 int RebuildHashTable(vector<string>& sequenes, int Ai, int SearchHash, unordered_map<unsigned long, vector<int>>& Hashes, int Threads, unordered_map<unsigned long, int>& Hashesize) 
 {

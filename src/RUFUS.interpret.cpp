@@ -34,11 +34,17 @@
 
 using namespace std;
 
+bool IsExome = false; 
+vector <vector<double>> DistGlobal;
+vector <vector<int>> DistLimitsGlobal; 
+int Dist1XCutoff = -1; 
+vector <double> GenPrior; 
 vector <string> ParNames; 
 vector <unordered_map <unsigned long int, int> > ParentHashes;
 unordered_map  <unsigned long int, int> MutantHashes; 
 unordered_map <unsigned long int, int> ExcludeHashes;
 FastaReference Reff;
+int ScGlobal = -1; 
 int CurrentSVeventID = 0; 
 int MaxBND = 0; 
 int HashSize = 25; 
@@ -64,6 +70,32 @@ const vector<string> Split(const string& line, const char delim) {
     while ( getline(lineStream, token, delim) )
 	tokens.push_back(token);
     return tokens;
+}
+double entropyMulti(string s, int size)
+{
+        unordered_map <string, int> events;
+        int step =size;
+        int count = 0;
+        for (int i = 0; i < s.size()+1 - size ; i+=step)
+        {
+                count++;
+                if (events.count(s.substr(i, size)) > 0)
+                {events[s.substr(i, size)]++;}
+                else
+                {events[s.substr(i, size)]=1;}//cout << "added " << s.substr(i, size)  << endl; } 
+        }
+
+        //cout << "I saw " << count << "events" << endl; 
+        double log = -1 * log2(double(events[s.substr(0, size)]) / double (count));
+        //cout << s.c_str()[0] << "," << log;
+        for (int i = 0+step; i < s.size()+1-size; i+=step)
+        {
+          //      cout << " - " << s.substr(i, size) << "," << -1*log2(double(events[s.substr(i, size)]) / double (count));
+                log = log + (-1*log2(double(events[s.substr(i, size)]) / double (count)));
+        }
+        //cout << " - ";
+        //cout << s << " - " << log << endl;
+       return log/double(count) ;
 }
 unsigned long HashToLong (string hash)
 {
@@ -576,8 +608,8 @@ class SamRead
 	vector<long> MutContigCounts; 
 	vector<long> MutHashListCounts; 
 
-	vector<vector <long>> RefAltCounts; 
-	vector<vector <long>> RefRefCounts; 
+	vector<vector <long>> ParAltCounts; 
+	vector<vector <long>> ParRefCounts; 
 	vector<string> AltKmers;
 	vector<string> RefKmers;	
 	bool first; // = true;  
@@ -592,6 +624,7 @@ class SamRead
 	void processCigar();
 	void parseInsertions( SamRead B); 
 	void parseMutations( char *argv[], vector<SamRead>& reads );
+	void GetModes2(int pos, string alt, string reff, int &MutRefMode, int &MutAltMode,  vector <int> &HashCounts, int &PossibleVarKmer);
 	void GetModes(int pos, string alt, string reff, int &MutRefMode, int &MutAltMode, vector <int> &ParRefModes, vector <int> &ParAltModes,  vector <int> &HashCounts, vector <int> &HashCountsOG, int &PossibleVarKmer);
 	//string ShittyGenotyper(int Alt, int Ref); 	
 	int GetSupportingHashCount(int pos, string alt,  string reff);
@@ -1544,6 +1577,335 @@ int SamRead::GetSupportingHashCount(int pos, string alt,  string reff)
 				}
 	return Count; 
 }
+int PickDepthSomatic(vector<int> Counts)
+{
+	cout << "using somatic depth, size of counts is " << Counts.size() <<endl;
+	double total = 0; 
+	double sum = 0; 
+	for (int i = 0; i< Counts.size(); i++)
+	{
+		if (Counts[i] < Dist1XCutoff)
+		{
+			total++; 
+			sum+=Counts[i]; 
+		}
+	}
+	cout << "total under " << Dist1XCutoff << " is " << total << endl; 
+	if (total == 0)
+	{
+		cout << " there were none, summing all " << endl; 
+		for (int i = 0; i < Counts.size(); i++)
+        	{                	
+			cout << "     " << Counts[i] << endl; 
+               	        total++;
+                        sum+=Counts[i];	
+        	}
+	}
+	
+	cout << "depth is = " << sum  << " / " << total << " = " << sum/total << endl;
+        double average = sum/total;
+        average = average +0.5;
+        return (int) average;
+
+}
+int PickDepthAverage(vector<int> Counts, int maxI)
+{
+	double maxD = -1;
+        int C = -1;
+	double sum = 0; 
+	double total = 0; 
+        for (int i = 0; i < Counts.size(); i++)
+        {
+                int depth = Counts[i];
+                if (depth > DistGlobal[maxI].size()){depth = DistGlobal[maxI].size();}
+                cout << "Count = " << Counts[i] << " depth = " << depth << " dist = " <<  DistGlobal[maxI][depth] ;
+                if (depth > DistLimitsGlobal[maxI][0] && depth < DistLimitsGlobal[maxI][1])
+                {
+			sum+= depth; 
+			total++;
+			cout << "	keeping"; 
+                }
+                cout << endl;
+
+        }
+	cout << "depth is = " << sum/total << endl; 
+	double average = sum/total; 
+	average = average +0.5; 
+        return (int) average;
+}
+int PickDepth(vector<int> Counts, int maxI)
+{
+	double maxD = -1;
+        int C = -1;
+        for (int i = 0; i < Counts.size(); i++)
+        {
+                int depth = Counts[i];
+                if (depth > DistGlobal[maxI].size()){depth = DistGlobal[maxI].size();}
+                cout << "Count = " << Counts[i] << " depth = " << depth << " dist = " <<  DistGlobal[maxI][depth] ;
+                if (DistGlobal[maxI][depth] > maxD)
+                {
+                        cout << " found new depest";
+                        maxD = DistGlobal[maxI][depth];
+                        C = Counts[i];
+                }
+                cout << endl;
+        }
+	return C; 
+}
+string BayseanGenotyper(vector<int> Counts, int& count, string VarNum)
+{
+	for (int i =0; i < Counts.size(); i++){cout << Counts[i] << ", ";}cout << endl; 
+	if (Counts.size() ==0)
+	{
+		cout << "no counts, must be 0" << endl;
+		count = 0; 
+		return ""; 
+	}
+
+	long double Pb = 0.0 ;
+	long double PbA = 0.0 ; 
+	vector <int> PA; 
+
+	int offset = 0;
+	vector<long double> sums;
+	for (int copy = 0+offset; copy < DistGlobal.size() ; copy ++)
+	{
+		long double sum = 0; 
+		for (int j = 0; j<Counts.size(); j++)
+		{
+			int depth = Counts[j]; 
+			if (depth > DistGlobal[copy].size()){depth = DistGlobal[copy].size();}
+			sum+=DistGlobal[copy][depth]; 
+		}
+		if (sum > 1){cout << "WTF sum is greater than 1, oh wait sum can be greater than if  we see the same kmer over and over " << sum << endl; }
+		sums.push_back(sum);
+		Pb += sum; 
+	}
+	cout << "Pb = " << Pb << endl; 
+	cout << "sums = "; 
+	for (int i =0; i < sums.size(); i++){cout << sums[i] << ", ";} cout << endl;
+
+
+	vector<long double> PaB; 
+	for (int i = 0; i < sums.size(); i++)
+	{
+		PaB.push_back((sums[i] * GenPrior[i]) / Pb);
+	}
+	
+	cout << "P(A|B) = "; 
+	for (int i =0; i < PaB.size(); i++){cout << PaB[i] << ", ";} cout << endl;
+
+
+	double max = -1; 
+	int maxI =-1; 
+	////pick bets copy number dist
+	for (int i =0; i< PaB.size(); i++)
+	{
+		if (PaB[i] > max)
+		{
+			max = PaB[i]; 
+			maxI = i;
+		}
+	}
+
+	////pick best k, for now were going to fo the k with highest prob dist, not sure this is the best as it will skew counts towards expectations
+	//double maxD = -1;
+	//int C = -1;
+	//for (int i = 0; i < Counts.size(); i++)
+	//{
+	//	int depth = Counts[i];
+	//	if (depth > DistGlobal[maxI].size()){depth = DistGlobal[maxI].size();}
+	//	cout << "Count = " << Counts[i] << " depth = " << depth << " dist = " <<  DistGlobal[maxI][depth] ;  
+	//	if (DistGlobal[maxI][depth] > maxD)
+	//	{
+	//		cout << " found new depest"; 
+	//		maxD = DistGlobal[maxI][depth]; 
+	//		C = Counts[i];
+	//	}
+	//	cout << endl; 
+	//}
+	int C; 
+	if (maxI <=2)
+		C = PickDepthSomatic(Counts);
+	else
+		int C = PickDepthAverage(Counts, maxI);
+	
+	//int C = PickDepth(Counts, maxI); 
+	/////////
+	stringstream ss; 
+	ss << max << "-" << maxI;
+	cout << ss.str()<< "-boomba" <<  endl;
+	ss << " - C = " << C << endl;
+
+	count = C; 
+	cout << ss.str() << endl; 
+	
+	string g ;
+	if (maxI == 0)
+	{}
+	else if (maxI == 1)
+	{
+		cout << "no idea how this happened" << endl; 
+	}
+	else if (maxI == 2)
+	{
+		g = VarNum; 
+	}
+	else if (maxI > 2)
+	{
+		//will need to fix this when I fix model to show odd types
+		g = VarNum; 
+		for (int i =0; i < (maxI -2)  ; i++)
+		{
+			g = g+VarNum; 
+		}
+	}
+	cout << "bayesgeno is returing " << g << endl; 
+	return g;
+}
+string ParseGenotype(string alt, string ref) 
+{
+	cout << "alt = " << alt << " with size = " << alt.length() << " or " << alt.size() << " and ref = " << ref << " with size = " << ref.length() << " or " << ref.size() << endl; 
+	string newG = ""; 
+	if (ref == "")
+	{}
+	else if (ref.length()==0)
+	{}
+	else
+	{
+		newG+=ref.c_str()[0]; 
+		for (int i = 1; i < ref.length(); i++)
+		{
+			newG+= "/" ; 
+			newG+= "0";//ref.c_str()[i]; 
+		}
+	}
+	
+	if (alt == "")
+	{}
+	else if (alt.length()==0)
+	{}
+	else
+	{
+		if (newG.length()>0)
+			newG+= "/";
+		newG+=alt.c_str()[0];
+		for (int i=1; i < alt.length(); i++)
+		{
+			newG+= "/"; 
+			newG+= alt.c_str()[i]; 
+		}
+	}
+	if (newG == ""){newG = ".";}
+	return newG; 
+}
+double GetModes3(int pos, string alt,  string reff, vector<long int> RefCounts, vector<long int> AltCounts, vector<string> AltKmers, vector<string> RefKmers,  vector <int> &HashCounts, int &PossibleVarKmer, string& genotype, int& refCount, int& altCount)
+{
+	int lower = pos - HashSize+1;
+        if (lower < 0){lower =0;}
+        int upper = pos + alt.length()+reff.length()-1;
+        cout << pos<<" + "<< alt.length() << " + " << reff.length() << endl;
+        if (upper > RefCounts.size()){
+                cout << "this is going to break " << upper << " > " << RefCounts.size() << endl;
+                upper = RefCounts.size();
+        }
+	
+	vector <int> varMutRefCounts;
+        vector <int> varMutAltCounts;
+        vector <int> temp;
+        string nonspecific = "nonspecific";
+        string LastAtlKmer = "boomba";
+        cout << "lower = " << lower << " upper = " << upper << endl; 
+	for (int j = lower; j<upper; j++)
+        {
+		cout << j << "	" << AltKmers[j]  << "	" << RefKmers[j] << "	" << AltCounts[j]  << "	" << RefCounts[j] << endl; 
+                if ( AltKmers[j] != RefKmers[j] and (ExcludeHashes[HashToLong(AltKmers[j])]<1 && ExcludeHashes[HashToLong(RevComp(AltKmers[j]))]<1) and AltKmers[j] != LastAtlKmer)
+                {PossibleVarKmer++;} /////count the number of candidate kmers for later use
+
+                LastAtlKmer = AltKmers[j];
+
+                if(RefCounts[j]>0 and AltKmers[j] != RefKmers[j])
+                        varMutRefCounts.push_back(RefCounts[j]);
+                if (AltCounts[j]>0 and AltKmers[j] != RefKmers[j] and (Hash.count(AltKmers[j]) > 0 or Hash.count(RevComp(AltKmers[j])) > 0)  and (ExcludeHashes[HashToLong(AltKmers[j])]<1 && ExcludeHashes[HashToLong(RevComp(AltKmers[j]))]<1))
+                        varMutAltCounts.push_back(AltCounts[j]);
+
+                //////This is for the infro field, better make sure the mut is the last one calculated ////////////
+                if (Hash[AltKmers[j]] > 0 and AltKmers[j] != RefKmers[j])
+                        HashCounts.push_back(Hash[AltKmers[j]]);
+                else if (Hash[RevComp(AltKmers[j])] > 0 and AltKmers[j] != RefKmers[j])
+                         HashCounts.push_back(Hash[RevComp(AltKmers[j])]);
+                else
+                        HashCounts.push_back(-1);
+                //////////////////////////////////////////////////////////////////////////////////////////////////
+        }
+        sort (varMutRefCounts.begin(), varMutRefCounts.end());
+        sort (varMutAltCounts.begin(), varMutAltCounts.end());
+
+	cout << "Calculating alt genotpey bayesway" << endl;
+	string AltGenotype = BayseanGenotyper(varMutAltCounts, altCount, "1");
+	cout << "BayesGeno returned for alt " << altCount << " and " << AltGenotype << endl;
+	cout << "Calculating Reg genotype bayesway" << endl;
+	string RefGenotype = BayseanGenotyper(varMutRefCounts, refCount, "0");
+cout << "BayesGeno returned for ref " << refCount << " and " << RefGenotype << endl;
+	cout << "done with bayesway " << endl; ;
+	
+	genotype = ParseGenotype(AltGenotype, RefGenotype);  
+	
+
+	double something; 
+	return something;
+}
+/*void SamRead::GetModes2(int pos, string alt,  string reff, int &MutRefMode, int &MutAltMode, vector <int> &HashCounts, int &PossibleVarKmer)
+{
+	int lower = pos-HashSize+1;
+	if (lower < 0){lower =0;}
+	int upper = pos+alt.length()+reff.length()-1;
+	cout << pos<<" + "<< alt.length() << " + " << reff.length() << endl;
+	if (upper > MutRefCounts.size()){
+		cout << "this is going to break " << upper << " > " << MutRefCounts.size() << endl;
+		upper = MutRefCounts.size();
+	}
+
+	//////////////chekcing allele frequencies /////////// 
+	//vector <int> HashCountsOG;
+	vector <int> varMutRefCounts;
+	vector <int> varMutAltCounts;
+	vector <int> temp;
+	string nonspecific = "nonspecific";
+	string LastAtlKmer = "boomba";
+	for (int j = lower; j<upper; j++)
+	{
+		if ( AltKmers[j] != RefKmers[j] and (ExcludeHashes[HashToLong(AltKmers[j])]<1 && ExcludeHashes[HashToLong(RevComp(AltKmers[j]))]<1) and AltKmers[j] != LastAtlKmer)
+		{PossibleVarKmer++;} /////count the number of candidate kmers for later use
+		
+		LastAtlKmer = AltKmers[j]; 
+		
+		if(MutRefCounts[j]>0 and AltKmers[j] != RefKmers[j])  
+			varMutRefCounts.push_back(MutRefCounts[j]);
+		if (MutAltCounts[j]>0 and AltKmers[j] != RefKmers[j] and (Hash.count(AltKmers[j]) > 0 or Hash.count(RevComp(AltKmers[j])) > 0)  and (ExcludeHashes[HashToLong(AltKmers[j])]<1 && ExcludeHashes[HashToLong(RevComp(AltKmers[j]))]<1)) 
+			varMutAltCounts.push_back(MutAltCounts[j]);
+	
+		//////This is for the infro field, better make sure the mut is the last one calculated ////////////
+		if (Hash[AltKmers[j]] > 0 and AltKmers[j] != RefKmers[j])
+			HashCounts.push_back(Hash[AltKmers[j]]);
+		else if (Hash[RevComp(AltKmers[j])] > 0 and AltKmers[j] != RefKmers[j])
+			 HashCounts.push_back(Hash[RevComp(AltKmers[j])]);
+		else
+			HashCounts.push_back(-1);
+		//////////////////////////////////////////////////////////////////////////////////////////////////
+	}
+       	sort (varMutRefCounts.begin(), varMutRefCounts.end());
+	sort (varMutAltCounts.begin(), varMutAltCounts.end());
+
+	
+	
+	///////////////////////////////////////////////
+	cout << "Calculating alt genotpey bayesway" << endl; 
+	string AltGenotype = BayseanGenotyper(varMutAltCounts);
+	cout << "Calculating Reg genotype bayesway" << endl; 
+	string RegGenotype = BayseanGenotyper(varMutRefCounts);
+	cout << "done with bayesway"; 
+}*/
 void SamRead::GetModes(int pos, string alt,  string reff, int &MutRefMode, int &MutAltMode, vector <int> &ParRefModes, vector <int> &ParAltModes,  vector <int> &HashCounts, vector <int> &HashCountsOG, int &PossibleVarKmer)
 {
 	int lower = pos-HashSize+1;
@@ -1582,16 +1944,16 @@ void SamRead::GetModes(int pos, string alt,  string reff, int &MutRefMode, int &
 	//	else
 	//		cout << "SAME" << endl; 
 		LastAtlKmer = AltKmers[j]; 
-		if(MutRefCounts[j]>0 and AltKmers[j] != RefKmers[j] ) //and MutRefCounts[j]<200 and (ExcludeHashes[HashToLong(RefKmers[j])]<2 or ExcludeHashes[HashToLong(RevComp(RefKmers[j]))]<2)) //needs to be fixed, should be based on cov not cutoff of 200 
+		if(MutRefCounts[j]>0 and AltKmers[j] != RefKmers[j] and MutRefCounts[j] < 400 )//and (ExcludeHashes[HashToLong(RefKmers[j])]<2 or ExcludeHashes[HashToLong(RevComp(RefKmers[j]))]<2)) //needs to be fixed, should be based on cov not cutoff of 400 
 			varMutRefCounts.push_back(MutRefCounts[j]);
-		if (MutAltCounts[j]>0 and AltKmers[j] != RefKmers[j] and MutAltCounts[j]<200 and (Hash.count(AltKmers[j]) > 0 or Hash.count(RevComp(AltKmers[j])) > 0)  and (ExcludeHashes[HashToLong(AltKmers[j])]<1 && ExcludeHashes[HashToLong(RevComp(AltKmers[j]))]<1)) //needs to be fixed, should be based on cov not cutoff of 200 
+		if (MutAltCounts[j]>0 and AltKmers[j] != RefKmers[j] and MutAltCounts[j] < 400 and (Hash.count(AltKmers[j]) > 0 or Hash.count(RevComp(AltKmers[j])) > 0)  and (ExcludeHashes[HashToLong(AltKmers[j])]<1 && ExcludeHashes[HashToLong(RevComp(AltKmers[j]))]<1)) //needs to be fixed, should be based on cov not cutoff of 400 
 			varMutAltCounts.push_back(MutAltCounts[j]);
 		
 		for (int pi=0; pi < varParRefCounts.size(); pi++){
-			if (RefRefCounts[pi][j] >0 and AltKmers[j] != RefKmers[j] )//and RefRefCounts[pi][j] <200 and (ExcludeHashes[HashToLong(AltKmers[j])]<2 or ExcludeHashes[HashToLong(RevComp(AltKmers[j]))]<2)) //needs to be fixed, should be based on cov not cutoff of 200 
-				varParRefCounts[pi].push_back(RefRefCounts[pi][j]);
-			if (RefAltCounts[pi][j] >0 and AltKmers[j] != RefKmers[j] and RefAltCounts[pi][j] < 200 and (Hash.count(AltKmers[j]) > 0 or Hash.count(RevComp(AltKmers[j])) > 0)   and (ExcludeHashes[HashToLong(RefKmers[j])]<1 && ExcludeHashes[HashToLong(RevComp(RefKmers[j]))]<1)) //needs to be fixed, should be based on cov not cutoff of 200 
-				varParAltCounts[pi].push_back(RefAltCounts[pi][j]);
+			if (ParRefCounts[pi][j] >0 and AltKmers[j] != RefKmers[j] and ParRefCounts[pi][j] <400)// and (ExcludeHashes[HashToLong(AltKmers[j])]<2 or ExcludeHashes[HashToLong(RevComp(AltKmers[j]))]<2)) //needs to be fixed, should be based on cov not cutoff of 400 
+				varParRefCounts[pi].push_back(ParRefCounts[pi][j]);
+			if (ParAltCounts[pi][j] >0 and AltKmers[j] != RefKmers[j] and ParAltCounts[pi][j] < 400 and (Hash.count(AltKmers[j]) > 0 or Hash.count(RevComp(AltKmers[j])) > 0)   and (ExcludeHashes[HashToLong(RefKmers[j])]<1 && ExcludeHashes[HashToLong(RevComp(RefKmers[j]))]<1)) //needs to be fixed, should be based on cov not cutoff of 400 
+				varParAltCounts[pi].push_back(ParAltCounts[pi][j]);
 
 		}
 
@@ -1655,15 +2017,15 @@ void SamRead::GetModes(int pos, string alt,  string reff, int &MutRefMode, int &
 */	}
 	///////////////////////////////////////////////
 	if (varMutRefCounts.size() >1)
-		MutRefMode = varMutRefCounts[0];
-		//MutRefMode = varMutRefCounts[(varMutRefCounts.size())/2]; //// switch this for line above to get the mode, right now were taking the min 
+		//MutRefMode = varMutRefCounts[0];
+		MutRefMode = varMutRefCounts[(varMutRefCounts.size())/2]; //// switch this for line above to get the mode, right now were taking the min 
 	else if (varMutRefCounts.size() ==1)
 		MutRefMode = varMutRefCounts[0]; 
 	else
 		MutRefMode = 0;
 	if (varMutAltCounts.size() >1)
-		 MutAltMode = varMutAltCounts[0];
-		//MutAltMode= varMutAltCounts[(varMutAltCounts.size()-2)/2]; //// switch this for line above to get the mode, right now were taking the min 
+		// MutAltMode = varMutAltCounts[0];
+		MutAltMode= varMutAltCounts[(varMutAltCounts.size()-2)/2]; //// switch this for line above to get the mode, right now were taking the min 
 	else if (varMutAltCounts.size() ==1)
 		MutAltMode = varMutAltCounts[0];
 	else
@@ -1671,8 +2033,8 @@ void SamRead::GetModes(int pos, string alt,  string reff, int &MutRefMode, int &
 	for(int pi = 0; pi<varParRefCounts.size(); pi++)
 	{
 		if (varParRefCounts[pi].size() >1)
-			ParRefModes.push_back(varParRefCounts[pi][0]);
-			//ParRefModes.push_back(varParRefCounts[pi][((varParRefCounts[pi].size())/2)]);  //// switch this for line above to get the mode, right now were taking the min 
+			//ParRefModes.push_back(varParRefCounts[pi][0]);
+			ParRefModes.push_back(varParRefCounts[pi][((varParRefCounts[pi].size())/2)]);  //// switch this for line above to get the mode, right now were taking the min 
 		else if (varParRefCounts[pi].size() ==1)
 			ParRefModes.push_back(varParRefCounts[pi][0]);
 		else
@@ -1681,8 +2043,8 @@ void SamRead::GetModes(int pos, string alt,  string reff, int &MutRefMode, int &
 	for(int pi =0; pi<varParAltCounts.size(); pi++)
 	{
 		if (varParAltCounts[pi].size()>1)
-			ParAltModes.push_back(varParAltCounts[pi][0]);
-			// ParAltModes.push_back(varParAltCounts[pi][((varParAltCounts[pi].size())/2)]); //// switch this for line above to get the mode, right now were taking the min 
+			//ParAltModes.push_back(varParAltCounts[pi][0]);
+			 ParAltModes.push_back(varParAltCounts[pi][((varParAltCounts[pi].size())/2)]); //// switch this for line above to get the mode, right now were taking the min 
 		else if (varParAltCounts[pi].size()==1)
 			ParAltModes.push_back(varParAltCounts[pi][0]);
 		else
@@ -1732,15 +2094,15 @@ int SamRead::CheckParentCov(int &mode)
 	bool good = true;
 	int lowC = 0;  
 	vector<int> cov; 
-	for (int pi = 0; pi < RefRefCounts.size(); pi++){
-		for (int i = 0; i < RefRefCounts[pi].size(); i++){
+	for (int pi = 0; pi < ParRefCounts.size(); pi++){
+		for (int i = 0; i < ParRefCounts[pi].size(); i++){
 			if (RefKmers[i] != ""){
 				int ParRef = 0;
 				int ParAlt = 0; 
-				if (RefAltCounts[pi][i] > 0)
-					ParAlt = RefAltCounts[pi][i]; 
-				if (RefRefCounts[pi][i] > 0)
-					ParRef = RefRefCounts[pi][i]; 
+				if (ParAltCounts[pi][i] > 0)
+					ParAlt = ParAltCounts[pi][i]; 
+				if (ParRefCounts[pi][i] > 0)
+					ParRef = ParRefCounts[pi][i]; 
 				cov.push_back(ParRef+ParAlt); 
 				if (ParRef+ParAlt > 0 && ParRef+ParAlt < 10)
 					lowC++; 
@@ -1870,7 +2232,7 @@ void SamRead::writetofile(ofstream &out)
 
 void SamRead::writeVertical()
 {
-	cout << "ParentHashes size = " <<  ParentHashes.size() << "RefAltCounts size " << RefAltCounts.size() << endl;
+	cout << "ParentHashes size = " <<  ParentHashes.size() << "ParAltCounts size " << ParAltCounts.size() << endl;
 	cout << name << endl;
 	cout << "   flag = " << flag << endl;
 	cout << "   chr " << chr << " - " << pos << " qual = " << mapQual <<  endl;
@@ -1882,8 +2244,8 @@ void SamRead::writeVertical()
 
 		cout << seq.c_str()[i] << "\t" << qual.c_str()[i] << "\t" << cigarString.c_str()[i] << "\t" << RefSeq.c_str()[i] << "\t" << ChrPositions[i] << "\t" << Positions[i] << "\t" << MutAltCounts[i] << "\t" << MutRefCounts[i] << "\t" << MutHashListCounts[i] << "\t" ;
 		cout << "\tParents";
-		for (int pi=0; pi < RefAltCounts.size(); pi++){
-			cout << "\t" << RefAltCounts[pi][i] << "\t" << RefRefCounts[pi][i];
+		for (int pi=0; pi < ParAltCounts.size(); pi++){
+			cout << "\t" << ParAltCounts[pi][i] << "\t" << ParRefCounts[pi][i];
 		}
 		cout << "\t" << RefKmers[i] << "\t" << AltKmers[i]; 
 		cout<< endl;
@@ -1892,7 +2254,7 @@ void SamRead::writeVertical()
 void SamRead::CheckPhase()
 {
 	cout << "Checking Phasing" << endl; 
-	cout << "ParentHashes size = " <<  ParentHashes.size() << " RefAltCounts size " << RefAltCounts.size() << endl;
+	cout << "ParentHashes size = " <<  ParentHashes.size() << " ParAltCounts size " << ParAltCounts.size() << endl;
 	cout << name << endl;
 	cout << "   flag = " << flag << endl;
 	cout << "   chr " << chr << " - " << pos << " qual = " << mapQual <<  endl;
@@ -1907,28 +2269,28 @@ void SamRead::CheckPhase()
 		cout << seq.c_str()[i] << "\t" << qual.c_str()[i] << "\t" << cigarString.c_str()[i] << "\t" << RefSeq.c_str()[i] << "\t" << ChrPositions[i] << "\t" << Positions[i] << "\tMutContigCounts=" << MutContigCounts[i] << "\t" << MutAltCounts[i] << "\t" << MutRefCounts[i] << "\t" << MutHashListCounts[i] << "\t" ;
 		//cout << "made it all the way here " << endl; 
 		cout << "\tParents";
-		for (int pi=0; pi < RefAltCounts.size(); pi++){
-			cout << "\t" << RefAltCounts[pi][i] << "\t" << RefRefCounts[pi][i];
+		for (int pi=0; pi < ParAltCounts.size(); pi++){
+			cout << "\t" << ParAltCounts[pi][i] << "\t" << ParRefCounts[pi][i];
 		}
 		bool p = false; 
-		if (RefAltCounts.size()>=2)
+		if (ParAltCounts.size()>=2)
 		{
-			if (RefAltCounts[0][i] == 0 & RefAltCounts[1][i] > 3 && MutContigCounts[i] > 2	      && RefAltCounts[0][i] >= 0 && RefAltCounts[1][i] >= 0 && RefRefCounts[0][i] >= 0 && RefRefCounts[1][i] >=0)
+			if (ParAltCounts[0][i] == 0 & ParAltCounts[1][i] > 3 && MutContigCounts[i] > 2	      && ParAltCounts[0][i] >= 0 && ParAltCounts[1][i] >= 0 && ParRefCounts[0][i] >= 0 && ParRefCounts[1][i] >=0)
 			{	
 				p=true;
 				phased[1]++; 
 			}	
-			else if(RefAltCounts[0][i] > 3 & RefAltCounts[1][i] == 0 && MutContigCounts[i] > 2		 && RefAltCounts[0][i] >= 0 && RefAltCounts[1][i] >= 0 && RefRefCounts[0][i] >= 0 && RefRefCounts[1][i] >=0)
+			else if(ParAltCounts[0][i] > 3 & ParAltCounts[1][i] == 0 && MutContigCounts[i] > 2		 && ParAltCounts[0][i] >= 0 && ParAltCounts[1][i] >= 0 && ParRefCounts[0][i] >= 0 && ParRefCounts[1][i] >=0)
 			{	
 				p=true;
 				phased[0]++;
 			}
-			else if(RefRefCounts[0][i] ==0 && RefRefCounts[1][i] > 3  && MutContigCounts[i] < -2	       && RefAltCounts[0][i] >= 0 && RefAltCounts[1][i] >= 0 && RefRefCounts[0][i] >= 0 && RefRefCounts[1][i] >=0)
+			else if(ParRefCounts[0][i] ==0 && ParRefCounts[1][i] > 3  && MutContigCounts[i] < -2	       && ParAltCounts[0][i] >= 0 && ParAltCounts[1][i] >= 0 && ParRefCounts[0][i] >= 0 && ParRefCounts[1][i] >=0)
 			{	
 				p=true; 
 				phased[1]++;
 			}
-			else if(RefRefCounts[0][i] > 3 && RefRefCounts[1][i] == 0   && MutContigCounts[i] < -2		&& RefAltCounts[0][i] >= 0 && RefAltCounts[1][i] >= 0 && RefRefCounts[0][i] >= 0 && RefRefCounts[1][i] >=0)
+			else if(ParRefCounts[0][i] > 3 && ParRefCounts[1][i] == 0   && MutContigCounts[i] < -2		&& ParAltCounts[0][i] >= 0 && ParAltCounts[1][i] >= 0 && ParRefCounts[0][i] >= 0 && ParRefCounts[1][i] >=0)
 			{	
 				p=true; 
 				phased[0]++;
@@ -2305,28 +2667,50 @@ void SamRead::parseMutations( char *argv[], vector<SamRead>& reads)
 				vector <int> ParAltModes;
 				vector <int> HashCounts;
 			       	vector <int> HashCountsOG;
-				int PossibleAltKmer=0; 
-				GetModes(i, alt, reff, MutRefMode, MutAltMode, ParRefModes, ParAltModes, HashCounts, HashCountsOG, PossibleAltKmer);
+				vector <string> ParGenotypes;
 				int SupportingHashes = GetSupportingHashCount(i, alt,  reff);
-				string Genotype = ShittyGenotyper(MutAltMode, MutRefMode); 
-				string CompressedVarType = compressVar(varType, Positions[startPos], StructCall); 
-					cout <<  chr << "\t" << pos+i << "\t" << CompressedVarType /*"."*/ << "\t" << reff << "\t" << alt << "\t" << SupportingHashes << "\t" << varType << "\t" << "." << "\t" << "." << "\t" << "." << endl;
-				////////////////generatre parent genotypes and check///////////////////////
-				vector <string> ParGenotypes; 
-				for (int p = 0; p< ParRefModes.size(); p++)
+				string CompressedVarType = compressVar(varType, Positions[startPos], StructCall);
+				string Genotype = "-1"; 
+				int PossibleAltKmer=0; 
+				if (IsExome == true)
 				{
-					ParGenotypes.push_back(ShittyGenotyper(ParAltModes[p], ParRefModes[p]) );
+					GetModes(i, alt, reff, MutRefMode, MutAltMode, ParRefModes, ParAltModes, HashCounts, HashCountsOG, PossibleAltKmer);
+					Genotype = ShittyGenotyper(MutAltMode, MutRefMode); 
+                                	for (int p = 0; p< parentCounts.size(); p++)
+                                	{
+                                	        ParGenotypes.push_back(ShittyGenotyper(ParAltModes[p], ParRefModes[p]) );
+                                	}	
 				}
-				
+				else
+				{
+					//GetModes2(i, alt, reff, MutRefMode, MutAltMode, HashCounts, PossibleAltKmer);
+					for (int pi=0; pi < parentCounts.size(); pi++)
+					{
+						int temp; 
+						ParRefModes.push_back(temp); 
+						ParAltModes.push_back(temp); 
+						ParGenotypes.push_back("");
+						vector <int> ParHashCounts; 
+						int ParPossibleAltKmer; 
+						GetModes3(i, alt,  reff, ParRefCounts[pi], ParAltCounts[pi], AltKmers, RefKmers,  ParHashCounts, ParPossibleAltKmer, ParGenotypes[pi], ParRefModes[pi], ParAltModes[pi]);
+						cout << "parent geno = " << ParGenotypes[pi]  << " ref = " << ParRefModes[pi]  << " alt = " << ParAltModes[pi]  << endl; 
+					}
+ 					GetModes3(i, alt,  reff, MutRefCounts, MutAltCounts, AltKmers, RefKmers,  HashCounts, PossibleAltKmer, Genotype, MutRefMode, MutAltMode);
+
+					
+				}
+
+				cout <<  chr << "\t" << pos+i << "\t" << CompressedVarType /*"."*/ << "\t" << reff << "\t" << alt << "\t" << SupportingHashes << "\t" << varType << "\t" << "." << "\t" << "." << "\t" << "." << endl;
+				////////////////generatre parent genotypes and check///////////////////////
 				cout << endl;
 				////////////////check that parents have enough coverage////////////////////
 				cout << "PAR LOW COV CHECK" << endl; 
 				int NumLowCov = 0; 
-				int low = i-HashSize-10; 
+				int low = i-HashSize-50; 
 				if (low < 0)
 				  low = 0; 
 
-				for(int k = low ; k <= i+10 and k < hashes.size(); k++)
+				for(int k = low ; k <= i+50 and k < hashes.size(); k++)
 				{
 	       				for (int j = 0; j < parentCounts.size(); j++)
 					{
@@ -2336,7 +2720,7 @@ void SamRead::parseMutations( char *argv[], vector<SamRead>& reads)
 						else
 						{sum = parentCounts[j][k] + parentCountsReference[j][k]; cout <<hashesRef[k]<< "\t" << hashes[k] << "\tParDiff-" << sum;  }
 						
-						if (sum <= 7 and parentCounts[j][k] + parentCountsReference[j][k] > 2 )
+						if (sum <= ParLowCovThreshold  and parentCounts[j][k] + parentCountsReference[j][k] > 2 )
 						{
 							NumLowCov++;
 							 cout << "\tLOWCOV-" << NumLowCov ;
@@ -2423,7 +2807,7 @@ void SamRead::parseMutations( char *argv[], vector<SamRead>& reads)
 					InfoFilter+=",";
 					Filter+=";";
 				}
-				if (NumLowCov > 3)
+				if (NumLowCov > 25)
 				{
 					Denovo = "ParLowCovRegion";
 					cout << "ParLowCov " << NumLowCov << endl;
@@ -2501,6 +2885,21 @@ void SamRead::parseMutations( char *argv[], vector<SamRead>& reads)
 					//if (ParGenotypes[p].find("1") != std::string::npos) {
 						 //Denovo = "PresentInParents"; }
 				}
+				///// lets play with entropy ////////
+				cout << "starting entropy" << endl; 
+				int estart = i - 25; 
+				int eend = i + 25; 
+				if (estart < 0){estart = 0;}
+				if (eend >= seq.size()){eend = seq.size()-1;}
+				cout << "start = " << estart << " end = " << eend << endl;
+				string refContext = RefSeq.substr(estart, eend-estart); 
+				cout << "reff -= " << refContext << endl; 
+				double w1 = entropyMulti(refContext, 1); 
+				double w2 = entropyMulti(refContext, 2); 
+				double w3 = entropyMulti(refContext, 3);
+				double w4 = entropyMulti(refContext, 4);
+				double w5 = entropyMulti(refContext, 5);
+				cout << "done with entropy" << endl; 
 				/////////////////////////////////////////////////////// 
 				 cout << "startpos = " << startPos << " chrsize = " << ChrPositions.size() << endl; 	
 				 cout << ChrPositions[startPos] << "\t" << endl;
@@ -2521,7 +2920,7 @@ void SamRead::parseMutations( char *argv[], vector<SamRead>& reads)
 			////////////////////////Writing var out to file/////////////////////////
 				cout       << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << SupportingHashes << "\t" << Filter << "\t" << StructCall <<"FEX=" << InfoFilter << ";RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";" << "CVT=" << CompressedVarType << ";HD="; 
 				
-				VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" << Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << Score << /*SupportingHashes << "/" << PossibleAltKmer << */ "\t" << Filter << "\t" << "PH=" << phase << ";FEX=" << InfoFilter << ";FS=" << SupportingHashes << "/" << PossibleAltKmer << ";RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";SB=" << StrandBias << ";" << "AS=" << AlignmentSegments << "-" << AlignmentSegmentsCigar << ";" << "CVT=" << CompressedVarType << ";HD="; 
+				VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" << Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << Score << /*SupportingHashes << "/" << PossibleAltKmer << */ "\t" << Filter << "\t" << "PH=" << phase << ";EN=" << w1 << "," << w2<< "," << w3<< "," << w4<< "," << w5 << "," << refContext << ";FEX=" << InfoFilter << ";FS=" << SupportingHashes << "/" << PossibleAltKmer << ";RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";SB=" << StrandBias << ";" << "AS=" << AlignmentSegments << "-" << AlignmentSegmentsCigar << ";" << "CVT=" << CompressedVarType << ";HD="; 
 				//VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" << Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << Score << /*SupportingHashes << "/" << PossibleAltKmer << */ "\t" << Filter << "\t" << StructCall << "PH=" << phase << ";FEX=" << InfoFilter << ";FS=" << SupportingHashes << "/" << PossibleAltKmer << ";RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";SB=" << StrandBias << ";" << "AS=" << AlignmentSegments << "-" << AlignmentSegmentsCigar << ";" << "CVT=" << CompressedVarType << ";HD="; 
 
 				for (int j = 0; j < HashCounts.size(); j++) 
@@ -2762,8 +3161,8 @@ void SamRead::LookUpKmers()
 {
 //	cout << "SeqSize = " << seq.size() << " RefSize = " << RefSeq.size() << endl;
 	vector <long> blank;
-	RefAltCounts.clear();
-	RefRefCounts.clear();
+	ParAltCounts.clear();
+	ParRefCounts.clear();
 	MutHashListCounts.clear();
 	MutContigCounts.clear(); 
 	MutAltCounts.clear();
@@ -2771,8 +3170,8 @@ void SamRead::LookUpKmers()
 	RefKmers.clear();
 	AltKmers.clear();
 	for (int pi = 0; pi < ParentHashes.size(); pi++){
-		RefAltCounts.push_back(blank);
-		RefRefCounts.push_back(blank);
+		ParAltCounts.push_back(blank);
+		ParRefCounts.push_back(blank);
 	}
 	for (int j = 0; j<seq.size(); j++)
 	{
@@ -2797,7 +3196,7 @@ void SamRead::LookUpKmers()
 			if (hash == Refhash){
 				MutAltCounts.push_back(0);
 				for (int pi = 0; pi < ParentHashes.size(); pi++){
-					RefAltCounts[pi].push_back(0);
+					ParAltCounts[pi].push_back(0);
 				}
 			}
 			else{
@@ -2809,10 +3208,10 @@ void SamRead::LookUpKmers()
 				
 				for (int pi = 0; pi < ParentHashes.size(); pi++){
 					if (ParentHashes[pi].count(HashToLong(hash)) > 0){
-						RefAltCounts[pi].push_back(ParentHashes[pi][HashToLong(hash)]);
+						ParAltCounts[pi].push_back(ParentHashes[pi][HashToLong(hash)]);
 					}
 					else
-						RefAltCounts[pi].push_back(-1);
+						ParAltCounts[pi].push_back(-1);
 				}
 			}
 
@@ -2829,7 +3228,7 @@ void SamRead::LookUpKmers()
 			MutAltCounts.push_back(-3);
 			MutHashListCounts.push_back(-3); 
 			for (int pi = 0; pi < ParentHashes.size(); pi++){
-				RefAltCounts[pi].push_back(-3);
+				ParAltCounts[pi].push_back(-3);
 			}
 		}
 
@@ -2843,10 +3242,10 @@ void SamRead::LookUpKmers()
 
 			for (int pi = 0; pi < ParentHashes.size(); pi++){
 				if (ParentHashes[pi].count(HashToLong(Refhash)) > 0){
-						RefRefCounts[pi].push_back(ParentHashes[pi][HashToLong(Refhash)]);
+						ParRefCounts[pi].push_back(ParentHashes[pi][HashToLong(Refhash)]);
 				}
 				else
-					RefRefCounts[pi].push_back(-1);
+					ParRefCounts[pi].push_back(-1);
 			}
 
 		}
@@ -2854,7 +3253,7 @@ void SamRead::LookUpKmers()
 
 			MutRefCounts.push_back(-3);
 			for (int pi = 0; pi < ParentHashes.size(); pi++){
-				RefRefCounts[pi].push_back(-3);
+				ParRefCounts[pi].push_back(-3);
 			}
 		}
 
@@ -4454,8 +4853,8 @@ int MobAligneBases(MobRead M, SamRead R)
 		cout << "flipping" << endl; 
 		Read.flipRead(); 
 	}
-	R.write(); 
-	M.write(); 
+//	R.write(); 
+//	M.write(); 
 	int MobBase = 0; 
 	int MD = 0; 
 	int RD = 0; 
@@ -4483,8 +4882,8 @@ int MobAligneBases(MobRead M, SamRead R)
 		else
 			cout << "\tnone" << endl; 
 	}
-	Read.write();
-	M.write(); 
+//	Read.write();
+//	M.write(); 
 
 	cout << "MobBases alibned to this read = " << MobBase << endl; 
 	return MobBase; 
@@ -4704,6 +5103,130 @@ void LastDitch(vector<SamRead>& reads, int i, int A, int B, int& CurrentSVeventI
 					
 				
 }
+
+void ProcessDist(string ModelFilePath) 
+{
+	ifstream ModelFile;
+	ModelFile.open (ModelFilePath);
+	if (ModelFile.is_open())
+	{ cout << "ModelFile is open";}
+	else
+	{
+		cout << "Error no model file given, not worring abou this now" << endl;
+		return;
+	}
+	string line; 
+	getline(ModelFile, line); 
+	if ( line == "exome" )
+	{
+		cout << "exome data given, skipping bayes genotyping" << endl; 
+		IsExome = true; 
+		return; 
+	}
+	getline(ModelFile, line); 
+	int lower = atoi(line.c_str()); 
+	getline(ModelFile, line); 
+	getline(ModelFile, line); 
+	ScGlobal = atoi(line.c_str()); 
+	getline(ModelFile, line); 
+	getline(ModelFile, line); 
+	getline(ModelFile, line); 
+	vector<double> holder; 
+	vector<string> temp = Split(line, '\t'); 
+	for(int i =0; i < temp.size()-1; i++)
+	{
+		DistGlobal.push_back(holder); 
+	}
+	for(int i =1; i < temp.size(); i++)
+	{
+		DistGlobal[i].push_back(atof(temp[i].c_str()));
+	}
+	while( getline(ModelFile, line))
+	{
+		temp = Split(line, '\t'); 
+		for(int i =1; i < temp.size(); i++)
+        	{
+                	DistGlobal[i-1].push_back(atof(temp[i].c_str()));
+        	}
+	}
+	///////flip it good 
+//	vector<vector<double>> holder2; 
+//	for (int i = 0; i < DistGlobal[0].size(); i++)
+//	{
+//		vector<double> g; 
+//		for (int j = 0; j < DistGlobal.size(); j++)
+//		{
+//			g.push_back(DistGlobal[j][i]); 
+//		}
+//		holder2.push_back(g); 
+//	}
+//	DistGlobal = holder2; 
+	GenPrior.push_back(0.5);
+	GenPrior.push_back(0.5); 
+	for (int i = 2; i < DistGlobal.size(); i++)
+	{
+		GenPrior.push_back(1.0/((double) i)); 
+	}
+}
+
+vector<int> GetHighAndLowForDist(int copy, double percent)
+{
+	double maxP = -1; 
+	int maxK = -1; 
+	double sum = 0; 
+	for(int i =0; i < DistGlobal[copy].size(); i++)
+	{
+		sum+=DistGlobal[copy][i]; 
+		if (DistGlobal[copy][i] > maxP)
+		{
+			maxP = DistGlobal[copy][i]; 
+			maxK = i; 
+		}
+	}
+	double cumulative = DistGlobal[copy][maxK];  
+	int lower = maxK;
+	int upper = maxK; 
+	while ( lower > 0 && upper < DistGlobal[copy].size() && cumulative/sum < percent)
+	{
+		lower+= -1;
+		upper++; 
+		cumulative+= DistGlobal[copy][lower]; 
+		cumulative+= DistGlobal[copy][upper];
+	}
+	while ( lower > 0 && cumulative/sum < percent)
+	{
+		lower+= -1;
+		cumulative+= DistGlobal[copy][lower];
+	}
+	while ( upper < DistGlobal[copy].size() && cumulative/sum < percent)
+	{
+		upper++;
+		cumulative+= DistGlobal[copy][upper];
+	}
+	vector <int> limits; 
+	limits.push_back(lower); 
+	limits.push_back(upper); 
+	return limits; 
+
+}
+
+void ProcessHighAndLowDist()
+{
+        for ( int i = 0; i < DistGlobal.size(); i++)
+        {
+                DistLimitsGlobal.push_back(GetHighAndLowForDist(i, 0.997));
+	}
+	// just chekcing, this can be deleted
+	for (int i = 0; i < DistLimitsGlobal.size(); i++)
+	{
+		cout << "copy = " << i << " low = " << DistLimitsGlobal[i][0] << " high = " << DistLimitsGlobal[i][1] << endl; 
+	}
+	if (DistLimitsGlobal.size() > 3)
+		Dist1XCutoff = DistLimitsGlobal[2][1]; 
+	else
+		Dist1XCutoff = 100000;
+	
+}
 main (int argc, char *argv[])
 {
 
@@ -4890,22 +5413,40 @@ options:\
 			return -1; 
 		}
 	}
+	ProcessDist(ModelFilePath);
+	if (IsExome == false)
+	{	ProcessHighAndLowDist(); 
+
+		cout << "checking Dist File" << endl;
+        	for (int copy =0; copy < 5; copy++)
+        	{
+        	        for (int k = 0; k < 11; k++)
+        	        {
+        	                cout << DistGlobal[copy][k] << "   ";
+        	        }
+        	        cout << endl;
+	
+	        }
+		cout << "done checking dist file " << endl; 	
+		cout << "checking priors " << endl; 
+		for (int i = 0; i < GenPrior.size(); i++)
+		{
+			cout << "GenePrior " << i <<  " = " << GenPrior[i] << endl; 
+		}
+	}
 	unordered_map <string, MobRead> mobs; 
 	if (MobBam != "")
 	{	
 		cout << "mob aligned contigs provided: " << MobBam << endl; 
 		cout << "reading in sam file " << endl; 
 		ifstream reader; 
-		cout << "1" << endl;
 		reader.open(MobBam);
-		cout << "2" << endl;
 		string line;
-		cout << "3" << endl;
 		while (getline(reader, line))
 		{
 			if (line.c_str()[0] == '@')
 			{
-				cout << " HEADER LINE = " << line << endl;
+//				cout << " HEADER LINE = " << line << endl;
 			}
 			else
 			{
@@ -4918,97 +5459,130 @@ options:\
 					{
 						if (mobs[temp.name].AS < temp.AS)
 						{
-							cout << " Writing over mob with better one " << line << endl;
+//							cout << " Writing over mob with better one " << line << endl;
 							mobs[temp.name] = temp;
 						}
 					}
 					else
 					{
-						cout << " Adding Mob Alignment " << line << endl;
+//						cout << " Adding Mob Alignment " << line << endl;
 						mobs[temp.name] = temp;
 					}
 				}
 			}
 		}
 	}
-	cout << "yaya finished mob " << endl; 
-	for (int i = 0; i < ParentHashFilePaths.size(); i++)
+	cout << "yaya finished mob " << endl;
+	#pragma omp parallel sections
 	{
-		ifstream reader; 
-		reader.open (argv[ParentHashFilePaths[i]]); 
-		string line = "";
-		unordered_map <unsigned long int, int> hl;  
-		while (getline(reader, line))
+		#pragma omp section
 		{
-			vector <string> temp = Split(line, ' '); 
-			unsigned long hash = HashToLong(temp[0]); 
-			hl[hash] = atoi(temp[1].c_str());
-			hash = HashToLong(RevComp(temp[0])); 
-			hl[hash] = atoi(temp[1].c_str()); 
-		}
-		ParentHashes.push_back(hl); 
-		reader.close(); 
-	}
-	for (int i = 0; i < ParentHashFilePathsReference.size(); i++)
-	{
-		ifstream reader;
-		reader.open (argv[ParentHashFilePathsReference[i]]);
-		string line = "";
-		unordered_map <unsigned long int, int> hl;
-		while (getline(reader, line))
-		{
-			vector <string> temp = Split(line, ' ');
-			unsigned long hash = HashToLong(temp[0]);
-			ParentHashes[i][hash] = atoi(temp[1].c_str());
-			hash = HashToLong(RevComp(temp[0]));
-			ParentHashes[i][hash] = atoi(temp[1].c_str());
-		}
-		reader.close();
-	}
-	cout << "check parent thing" << endl; 
-	for(int i =0; i < ParentHashes.size(); i++)
-	{
-		cout << "sample " << i << endl;
-	}
-	
-	ifstream reader;
-	reader.open (MutHashFilePath);
-	string line = "";
-	while (getline(reader, line))
-	{
+			for (int i = 0; i < ParentHashFilePaths.size(); i++) 
+			{
+				cout << "adding a entry to ParentHashes " << i << endl; 
+				unordered_map <unsigned long int, int> hl;
+				 ParentHashes.push_back(hl);
+			}
+			#pragma omp parallel for shared(ParentHashes)  
+			for (int i = 0; i < ParentHashFilePaths.size(); i++)
+			{
+				cout << " reading in parent " << i << " alt hashes" << endl; 
+				ifstream reader; 
+				reader.open (argv[ParentHashFilePaths[i]]); 
+				string line = "";
+				unordered_map <unsigned long int, int> hl;  
+				while (getline(reader, line))
+				{
+					vector <string> temp = Split(line, ' '); 
+					unsigned long hash = HashToLong(temp[0]); 
+					hl[hash] = atoi(temp[1].c_str());
+					hash = HashToLong(RevComp(temp[0])); 
+					hl[hash] = atoi(temp[1].c_str()); 
+				}
+				cout << "pushing back " << i << " size of parent hash is " << ParentHashes.size() << endl; 
+				#pragma omp critical
+				{
+					ParentHashes[i] = hl; 
+					cout << "done pushing back " << i << endl; 
+					reader.close(); 
+				}
+			}
+			cout << "done with parent Alt Hashes, starting Ref " << endl; 	
+			#pragma omp parallel for
+			for (int i = 0; i < ParentHashFilePathsReference.size(); i++)
+			{
+				cout << " reading in parent " << i << " ref hashes" << endl;
+				ifstream reader;
+				reader.open (argv[ParentHashFilePathsReference[i]]);
+				string line = "";
+				//unordered_map <unsigned long int, int> hl;
+				while (getline(reader, line))
+				{
+					vector <string> temp = Split(line, ' ');
+					unsigned long hash = HashToLong(temp[0]);
+					ParentHashes[i][hash] = atoi(temp[1].c_str());
+					hash = HashToLong(RevComp(temp[0]));
+					ParentHashes[i][hash] = atoi(temp[1].c_str());
+				}
+				reader.close();
+			}
 		
-		vector <string> temp = Split(line, ' ');
-		unsigned long hash = HashToLong(temp[0]);
-		MutantHashes[hash] = atoi(temp[1].c_str());
-		hash = HashToLong(RevComp(temp[0]));
-		MutantHashes[hash] = atoi(temp[1].c_str());
-	}
-	reader.close(); 
-	
-	reader.open (MutHashFilePathReference);
-	line = "";
-	while (getline(reader, line))
-	{
+			cout << "check parent thing" << endl; 
+			for(int i =0; i < ParentHashes.size(); i++)
+			{
+				cout << "sample " << i << endl;
+			
+			}
+		}
+		#pragma omp section
+		{
 
-		vector <string> temp = Split(line, ' ');
-		unsigned long hash = HashToLong(temp[0]);
-		MutantHashes[hash] = atoi(temp[1].c_str());
-		hash = HashToLong(RevComp(temp[0]));
-		MutantHashes[hash] = atoi(temp[1].c_str());
+			cout << "reading in mutant alt hashes" << endl; 
+			ifstream reader;
+			reader.open (MutHashFilePath);
+			string line = "";
+			while (getline(reader, line))
+			{
+		
+				vector <string> temp = Split(line, ' ');
+				unsigned long hash = HashToLong(temp[0]);
+				MutantHashes[hash] = atoi(temp[1].c_str());
+				hash = HashToLong(RevComp(temp[0]));
+				MutantHashes[hash] = atoi(temp[1].c_str());
+			}
+			reader.close(); 
+		
+			cout << "reading in mutant ref hashes" << endl; 
+			reader.open (MutHashFilePathReference);
+			line = "";
+			while (getline(reader, line))
+			{
+
+				vector <string> temp = Split(line, ' ');
+				unsigned long hash = HashToLong(temp[0]);
+				MutantHashes[hash] = atoi(temp[1].c_str());
+				hash = HashToLong(RevComp(temp[0]));
+				MutantHashes[hash] = atoi(temp[1].c_str());
+			}
+			reader.close();			
+		}
+		#pragma omp section
+		{
+			ifstream reader;
+			string line; 
+			reader.open(ExcludeFilePath); 
+			while (getline(reader, line))
+			{
+				vector <string> temp = Split(line, ' ');
+				unsigned long hash = HashToLong(temp[0]);
+				//cout << "adding " << temp[0] << " with C=" << temp[1] << endl; 
+				ExcludeHashes[hash] =  atoi(temp[1].c_str());
+				//hash = HashToLong(RevComp(temp[0]));
+				//ExcludeHashes[hash] =  atoi(temp[1].c_str());
+			}
+			reader.close();
+		}
 	}
-	reader.close();			
-	
-	reader.open(ExcludeFilePath); 
-	while (getline(reader, line))
-	{
-		vector <string> temp = Split(line, ' ');
-		unsigned long hash = HashToLong(temp[0]);
-		//cout << "adding " << temp[0] << " with C=" << temp[1] << endl; 
-		ExcludeHashes[hash] =  atoi(temp[1].c_str());
-		//hash = HashToLong(RevComp(temp[0]));
-		//ExcludeHashes[hash] =  atoi(temp[1].c_str());
-	}
-	reader.close();
 	//***********************************************
 	//cout << "Call is Reference Contigs.fa OutStub HashList MaxVarientSize" << endl;
 	double vm, rss, MAXvm, MAXrss;
@@ -5022,16 +5596,16 @@ options:\
 
 	Reff.open(RefFile);
 
-	ifstream ModelFile; 
-	ModelFile.open (ModelFilePath); 
-	if (ModelFile.is_open())
-	{ cout << "ModelFile is open";}
-	else
-	{
-		cout << "Error no model file given, not worring abou this now" << endl;
-		//return -1;
-	}
-
+//	ifstream ModelFile; 
+//	ModelFile.open (ModelFilePath); 
+//	if (ModelFile.is_open())
+//	{ cout << "ModelFile is open";}
+//	else
+//	{
+//		cout << "Error no model file given, not worring abou this now" << endl;
+//		//return -1;
+//	}
+	
       	ifstream HashList;
       	HashList.open (HashListFile);
       	if ( HashList.is_open())
@@ -5041,7 +5615,7 @@ options:\
       		cout << "Error, HashList could not be opened";
       		return -1;
       	}
-	line = "";
+	string line = "";
 	getline(HashList, line);
 	cout << "line = " << line << endl; 
 	char seperator = '\t';
@@ -5151,6 +5725,7 @@ options:\
 	VCFOutFile << "##FORMAT=<ID=RO,Number=1,Type=Integer,Description=\"Mode of reference kmer counts\">" << endl;
 	VCFOutFile << "##FORMAT=<ID=AO,Number=1,Type=Integer,Description=\"Mode of alt kmer counts\">" << endl;
 	VCFOutFile << "##INFO=<ID=PH,Number=1,Type=String,Description=\"If read backed phasing is possible, the name of the sample that the variant was inherited from\">" << endl;
+	VCFOutFile << "##INFO=<ID=EN,Number=1,Type=String,Description=\"in development, something to do with entropy\">" << endl;
 	VCFOutFile << "##INFO=<ID=FEX,Number=1,Type=String,Description=\"Filters failed and value\">" << endl;
 	VCFOutFile << "##INFO=<ID=SB,Number=1,Type=Float,Description=\"Strand Bias of the aassembled contig\">" << endl;
 	VCFOutFile << "##INFO=<ID=SVTYPE,Number=1,Type=String,Description=\"Type of SV detected\">" << endl;
@@ -5829,8 +6404,10 @@ options:\
 	}
 	cout << "finding multi contig events, " << reads.size() << endl;
 	//Mopping up less likey multi contig optoins
+	bool cleanup = true; 
+	if (cleanup == true)
+	{
 	for (int i = 0; i < reads.size()-1; i++)
-		
 	{
 		// chekcing translocation
 		if (reads[i].alignments.size()==2)
@@ -6380,12 +6957,19 @@ options:\
                                 {start ++;}	
 				for ( int j = start ;j<=1 && j+i >= 0 && j+i < reads.size() ; j++)
 				{
-					if(reads[i+j].alignments.size() > 1 & j != 0 )
+					cout << "checking " << reads[i].name << " - " << " VS " << reads[i+j].name << endl; 
+					if(reads[i].chr == reads[i+j].chr)
 					{
-						if(reads[i+j].chr == reads[reads[i+j].alignments[1]].chr  && GetReadOrientation(reads[i+j].flag) != GetReadOrientation(reads[reads[i+j].alignments[1]].flag)  && reads[i+j].sigBreakPoint() > 0 &&  (reads[i+j].alignments[1]-1 == reads[i].alignments[1] || reads[i+j].alignments[1]+1 == reads[i].alignments[1]))
+						cout << "passed chr check" << endl; 
+						if(reads[i+j].alignments.size() > 1 & j != 0 )
 						{
-							if(reads[i].chr == reads[i+j].chr)
+							cout << "passed alignents check" << endl; 
+							if(reads[i+j].chr == reads[reads[i+j].alignments[1]].chr  
+								&& GetReadOrientation(reads[i+j].flag) != GetReadOrientation(reads[reads[i+j].alignments[1]].flag)  
+								&& reads[i+j].sigBreakPoint() > 0 
+								&&  (reads[i+j].alignments[1]-1 == reads[i].alignments[1] || reads[i+j].alignments[1]+1 == reads[i].alignments[1]))
 							{
+								cout << "found strong candidate for inversion" << endl; 
 								int positionAa = reads[i].pos + reads[i].sigBreakPoint();
 								int positionBa = reads[i+j].pos + reads[i+j].sigBreakPoint();
 								int positionAb = reads[reads[i].alignments[1]].pos + reads[reads[i].alignments[1]].sigBreakPoint();
@@ -6395,7 +6979,7 @@ options:\
 									//if (abs(positionAa - positionBa) < HashSize || abs(positionAb -  positionBb) < HashSize || abs(positionAa -  positionBb) < HashSize || abs(positionAb - positionBa) < HashSize )
 									
 
-									if (abs(positionAa - positionBa) < HashSize || abs(positionAb -  positionBb) < HashSize )
+									//if (abs(positionAa - positionBa) < HashSize || abs(positionAb -  positionBb) < HashSize )
 									{
 										CurrentSVeventID++;
 										cout << "Found Invertion" << endl; 
@@ -6490,6 +7074,8 @@ options:\
 											GMap++;
 										
 										stringstream Format;
+										int startoffset = abs(startBreak); 
+										int endoffset = abs(endBreak) ; 
 										if (startBreak>0)
 										{
 											Format << abs(startBreak) << "Y";
@@ -6499,7 +7085,7 @@ options:\
 											Format << abs(startBreak) << "D";
 										}
 										Format << InterpretInsertSize(STARTinsertedseq); 
-										Format <<  size << "V";
+										Format <<  size - startoffset - endoffset << "V";
 										if (endBreak>0)
 										{
 											Format << abs(endBreak) << "Y";
@@ -6965,14 +7551,18 @@ options:\
 						}
 						cout << "built thing" << endl; 
 						int polyAbp = reads[i].isPolyA(temp);
+						cout << "first mobalign" << endl; 
 						int myMobBase = MobAligneBases(mobs[reads[i].name], reads[i]); 
+						cout << "done with first mobalign " << endl; 
 						vector <int> secondMobBase;
 						int maxSecondMob = 0; 
 						for( int j = 1; j<reads[i].alignments.size(); j++)
 						{
+							cout << "next mobalign " << i << endl; 
 							secondMobBase.push_back(MobAligneBases(mobs[reads[i].name], reads[reads[i].alignments[j]]));
-							if ( secondMobBase[i] > maxSecondMob)
-							{maxSecondMob = secondMobBase[i];}
+							cout << "done with next mobalign " << j << endl; 
+							if ( secondMobBase[j-1] > maxSecondMob)
+							{maxSecondMob = secondMobBase[j-1];}
 						}
 						cout << "checking Distnace" << endl; 
 						cout << "size = " << reads[i].alignments.size()<< endl; ; 
@@ -7127,6 +7717,7 @@ options:\
 			}
 		}
 	}
+	}
 
 	cout << "Done with Multi contig events" << endl; 
 
@@ -7139,4 +7730,3 @@ options:\
 	cout << "finishing RUFUS.Interpret for " << outStub << std::endl;
 	return 0; 
 }
-	

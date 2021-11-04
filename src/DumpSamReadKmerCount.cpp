@@ -542,7 +542,7 @@ int main(int argc, char* argv[]) {
 				 << endl;
 		return 0;
 	}
-			cout << "YAY,right numbe of arguemnts\nCall is: SAM, MinPercent, "
+			cout << "ERROR, wrong numbe of arguemnts\nCall is: SAM, MinPercent, "
 						"MinOverlap, MinCoverage, ReportStub, NodeStub LCcutoff Threads"
 				 << endl
 				 << "	   You Gave\n	       File = " << argv[1]
@@ -714,7 +714,8 @@ int main(int argc, char* argv[]) {
 				string L2 = temp[9]; ////////sequence//////////
 				L2 = TrimNends(L2, L4);
 				int hashes = CountHashes(L2);
-				//cout << "poorly mapped read " << L1 << endl; 
+				
+				cout << "poorly_mapped_read " << L1 << " " << hashes << endl; 
 				//cout << "with Hash = " << hashes << endl; 
 				if ((double)L2.size() / (double)ReadSize > .6) 
 				{
@@ -765,10 +766,8 @@ int main(int argc, char* argv[]) {
 				string L2 = temp[9];
 				L2 = TrimNends(L2, L4);
 				int hashes = CountHashes(L2);
-				
+				 cout << "mapped_read " << L1 << " " << hashes << endl;
 				//cout << "Hash = " << hashes << endl;
-				//if (hashes > 0)
-				//{
 				if ((double)L2.size() / (double)ReadSize > .6) 
 				{
 					ReadSize = L2.size();
@@ -809,10 +808,10 @@ int main(int argc, char* argv[]) {
 				{
 					Rejects++;
 				}
-				//}
 			}
 		}
 	}
+	return 0; 
 
 	cout << endl;
 	int NumReads = sequenes.size();
@@ -990,7 +989,6 @@ int main(int argc, char* argv[]) {
 
 	cout << "\n\nRESULTS\n";
 	int count = 0;
-	cout << "sequenes size = " << sequenes.size() << endl; 
 	for (int i = 0; i < sequenes.size(); i++) {
 
 		if (FullOut) {
@@ -1008,7 +1006,7 @@ int main(int argc, char* argv[]) {
 				}
 			}
 
-			if (maxDep >= MinCoverage /*&& maxDep >= 2*/) {
+			if (maxDep >= MinCoverage && maxDep >= 2) {
 
 				if (sequenes[i].size() != qual[i].size() && qual[i].size() != depth[i].size()) {
 						cout << "ERROR, read "
