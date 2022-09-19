@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
 
 	while (getline(MutHashFile, L1)) {
 		vector<string> temp;
-		temp = Util::Split(L1, '\t');
+		temp = Util::Split(L1, ' ');
 
 		if (temp.size() == 2) {
 			unsigned long b = Util::HashToLong(temp[0]);
@@ -133,8 +133,8 @@ int main(int argc, char *argv[])
 			Mutations.insert(pair<unsigned long, int>(b, 0));
 			Mutations.insert(pair<unsigned long, int>(revb, 0));
 		}
-		if (temp.size() == 1) {
-			temp = Util::Split(L1, ' ');
+		if (temp.size() == 1) { 
+			temp = Util::Split(L1, '\t');
 			unsigned long b = Util::HashToLong(temp[0]);
 			unsigned long revb = Util::HashToLong(Util::RevComp(temp[0]));
 			Mutations.insert(pair<unsigned long, int>(b, 0));
@@ -204,6 +204,7 @@ int main(int argc, char *argv[])
 			{
 			 	if (((int)BufferMate1[BuffCount + 3].c_str()[i] - 33) < MinQ || (int)BufferMate1[BuffCount + 1].c_str()[i] == 78) 
 				{
+					//cout << "found bad base in read " << BufferMate1[BuffCount + 0] << "at pos " << i << " base " << BufferMate1[BuffCount + 1].c_str()[i] << " qual = " << BufferMate1[BuffCount + 3].c_str()[i]  << " = " << (int)BufferMate1[BuffCount + 3].c_str()[i] - 33 << endl; 
 					streak = 0;
 					start = i ;//+ HashSize;
 				}
@@ -243,6 +244,7 @@ int main(int argc, char *argv[])
 				{
 					if (((int)BufferMate2[BuffCount + 3].c_str()[i] - 33) < MinQ || (int)BufferMate2[BuffCount + 1].c_str()[i] == 78) 
 					{
+						//cout << "found bad base in read2 " << BufferMate2[BuffCount + 0] << "at pos " << i << " base " << BufferMate2[BuffCount + 1].c_str()[i] << " qual = " << BufferMate2[BuffCount + 3].c_str()[i]  << " = " << (int)BufferMate2[BuffCount + 3].c_str()[i] - 33 << endl;
 						streakM2 = 0;
 						startM2 = i ;//+ HashSize;
 	

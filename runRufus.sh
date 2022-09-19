@@ -64,6 +64,10 @@ _arg_mosaic="FALSE"
 _assemblySpeed="full"
 _parallel_jelly="no"
 _pairedEnd="true"
+_arg_region=
+_arg_filterK=1
+_arg_ParLowK=2
+_filterMinQ=15
 print_help ()
 {
     printf "%s\n" "The general script's help msg"
@@ -106,6 +110,7 @@ s-n>] ...\n' "$0"
     printf "\t%s\n" "-q2,--fastq2: If starting from fastq files, a list of the mate2 fastq files to improve RUFUS.ilter"
     printf "\t%s\n" "--vs: use very short assembly methods, recomneded when you are expecting over 10,000 variants "
     printf "\t%s\n" "--pj: parallelize jellyfish step, only use if you have more than 96G of ram"
+    printf "\t%s\n" "--region: Run RUFUS only on a samtools style region"
     printf "\t%s\n" "-h,--help: HELP!!!!!!!!!!!!!!!"
     printf "\t%s\n" "-d,--devhelp: HELP!!! for developers"
 }
@@ -263,6 +268,46 @@ parse_commandline ()
                        exit 100
                 fi
 		;;
+	     --filterK)
+	     	 test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+                _arg_filterK=$2
+                if ! [[ $_arg_filterK =~ $re ]] ; then
+                       echo "arg --filterK must be a number "
+                       exit 100
+                fi
+		shift
+                ;;
+	     --filterMinQ)
+                 test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+                echo "found a filter min q call "
+		_filterMinQ=$2
+                if ! [[ $_filterMinQ =~ $re ]] ; then
+                       echo "arg --filterK must be a number "
+                       exit 100
+                fi
+                shift
+                ;;	
+	     --ParLowK)
+                 test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+                _arg_ParLowK=$2
+                if ! [[ $_arg_ParLowK =~ $re ]] ; then
+                       echo "arg --ParLowK must be a number "
+                       exit 100
+                fi
+                shift
+                ;;
+	   --region)
+	   	echo "region passed"
+	   	test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+		_arg_region="$2"
+		shift
+		echo "$_arg_region"
+		echo "region = $_arg_region"
+                if  [[ -z $_arg_region  ]] ; then
+                       echo "arg region must not be empyt "
+                       exit 100
+                fi
+                ;;	
 	    --saliva)
 	        _arg_saliva="TRUE"
 		echo "Saliva subject sample provided"
@@ -353,9 +398,10 @@ assign_positional_args ()
 	done
 }
 
+
 parse_commandline "$@"
 assign_positional_args
-
+##exit
 
 # [ <-- needed because of Argbash
 
@@ -381,6 +427,9 @@ then
     kill -9 $$
 fi
 
+echo "_arg_ParLowK = $_arg_ParLowK"
+echo "_arg_filterK = $_arg_filterK"
+echo "_filterMinQ = $_filterMinQ"
 echo "_arg_fastqA = $_arg_fastqA"
 echo "_arg_fastqB = $_arg_fastqB"
 
@@ -529,7 +578,7 @@ elif [[ "$ProbandExtension" == "bam" ]]
 then
     echo "you provided the proband cram file" "$_arg_subject"
     ProbandGenerator="$ProbandFileName".generator
-    echo "samtools view -F 3328 $_arg_subject" > "$ProbandGenerator"
+    echo "samtools view -F 3328 $_arg_subject $_arg_region" > "$ProbandGenerator"
 elif [[ "$ProbandExtension" == "cram" ]]
 then
     echo "you provided the proband cram file" "$_arg_subject"
@@ -539,7 +588,7 @@ then
          echo "ERROR cram reference not provided for cram input";
         kill -9 $$  
      fi
-    echo "samtools view -F 3328 -T $_arg_cramref $_arg_subject" > "$ProbandGenerator"
+    echo "samtools view -F 3328 -T $_arg_cramref $_arg_subject  $_arg_region" > "$ProbandGenerator"
 elif [[ "$ProbandExtension" = "generator" ]]
 then
     echo "you provided the proband bam file" "$_arg_subject"
@@ -569,7 +618,7 @@ do
     then
 	    parentGenerator="$parentFileName".generator
 	    ParentGenerators+=("$parentGenerator")
-	    echo "samtools view -F 3328 $parent" > "$parentGenerator"
+	    echo "samtools view -F 3328 $parent  $_arg_region" > "$parentGenerator"
 	    echo "You provided the control bam file" "$parent"
     elif [[ "$parentExtension" == "cram" ]] 
     then
@@ -580,9 +629,9 @@ do
 		echo "ERROR cram reference not provided for cram input"; 
 		 kill -9 $$ 
 	    fi
-            echo "samtools view -F 3328 -T $_arg_cramref $parent" > "$parentGenerator"
+            echo "samtools view -F 3328 -T $_arg_cramref $parent  $_arg_region" > "$parentGenerator"
             echo "You provided the control cram file" "$parent"    
-elif [[ "$parentExtension" = "generator" ]]
+    elif [[ "$parentExtension" = "generator" ]]
     then
 	parentGenerator="$parentFileName"
         ParentGenerators+=("$parentGenerator")
@@ -637,7 +686,7 @@ done
 echo "Value of K is: $K"
 echo "Value of Threads is: $Threads"
 echo "value of ref is: $ref"
-echo "value of min is: $min" 
+echo "value of min is: $_arg_min" 
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 #################################################################################
 
@@ -721,7 +770,7 @@ then
 	
 	for parent in "${ParentGenerators[@]}"
 	do
-	      bash $RunJelly $parent $K $(echo $JThreads -2 | bc) 2  &
+	      bash $RunJelly $parent $K $(echo $JThreads -2 | bc) $_arg_ParLowK  &
 	done
 	
 	# bash $RunJelly $ProbandGenerator $K  $Threads 2
@@ -736,7 +785,7 @@ else
 
         for parent in "${ParentGenerators[@]}"
         do
-              bash $RunJelly $parent $K $(echo $JThreads -2 | bc) 2  
+              bash $RunJelly $parent $K $(echo $JThreads -2 | bc) $_arg_ParLowK  
         done
 
         # bash $RunJelly $ProbandGenerator $K  $Threads 2
@@ -785,42 +834,57 @@ done
 
 
 #######################__RUFUS_Model__############################################
-if [  -z "$_arg_min" ]
+#if [ $_arg_exome == "FALSE" ] #[	-z "$_arg_min" ]
+if [       -z "$_arg_min" ]
 then
-    echo "min not provided, building model" 
-    if [ -e "$ProbandGenerator.Jhash.histo.7.7.model" ]
-    then
-        echo "skipping model"
-	MutantMinCov=$(head -2 "$ProbandGenerator".Jhash.histo.7.7.model | tail -1 )
-	echo "mutant min coverage from generated model is $MutantMinCov"
-
-	MutantSC=$(head -4 "$ProbandGenerator".Jhash.histo.7.7.model | tail -1 )
-	echo "mutant SC coverage from generated model is $MutantSC"
-	MaxHashDepth=$(echo "$MutantSC * 5" | bc)
-	echo "MaxHashDepth = $MaxHashDepth"
-
-    else
-	echo "staring model"
-         "$RUFUSmodel" "$ProbandGenerator".Jhash.histo $K 150 $Threads
-        echo "done with model"
+	echo "exome not set, assuming data is whole genome, bulding model" #echo "min not provided, building model" 
 	if [ -e "$ProbandGenerator.Jhash.histo.7.7.model" ]
 	then
-		MutantMinCov=$(head -2 "$ProbandGenerator".Jhash.histo.7.7.model | tail -1 )
-		echo "mutant min coverage from generated model is $MutantMinCov"
-   		
-		MutantSC=$(head -4 "$ProbandGenerator".Jhash.histo.7.7.model | tail -1 )
-        	echo "mutant SC coverage from generated model is $MutantSC"
-        	MaxHashDepth=$(echo "$MutantSC * 5" | bc)
-        	echo "MaxHashDepth = $MaxHashDepth"
+	 	echo "skipping model"
 	else
-		echo "ERROR, model didn't run properly"
-		exit
+		echo "staring model"
+		"$RUFUSmodel" "$ProbandGenerator".Jhash.histo $K 150 $Threads
+		for parent in "${ParentGenerators[@]}"
+		do
+			"$RUFUSmodel" "$parent".Jhash.histo $K 150 $Threads
+		done
+		echo "done with model"
 	fi 
-    fi
+
+	if [ -z "$_arg_min" ]
+	then
+		if [ -e "$ProbandGenerator".Jhash.histo.7.7.model ]
+		then 
+			MutantMinCov=$(head -2 "$ProbandGenerator".Jhash.histo.7.7.model | tail -1 )
+			echo "mutant min coverage from generated model is $MutantMinCov"
+	 			
+			MutantSC=$(head -4 "$ProbandGenerator".Jhash.histo.7.7.model | tail -1 )
+			echo "mutant SC coverage from generated model is $MutantSC"
+			MaxHashDepth=$(echo "$MutantSC * 5" | bc)
+			echo "MaxHashDepth = $MaxHashDepth"
+		else
+			echo "ERROR Model didnt run correcntly, exiting"
+			return -1
+		fi
+	else
+		echo "min coverage provided of $_arg_min, setting min kmer to that"
+		MutantMinCov="$_arg_min"
+	fi 
+		
 else 
-    echo "min was provided, min is $_arg_min" 
-    MutantMinCov="$_arg_min" 
-    touch "$ProbandGenerator".Jhash.histo.7.7.model
+	if [	-z "$_arg_min" ]
+	then 
+		echo "min coverage must be provided with an exome run"
+		return -1; 
+	else
+		echo "3" > "$ProbandGenerator".Jhash.histo.7.7.model; 
+		echo "$_arg_min" >> "$ProbandGenerator".Jhash.histo.7.7.model;
+		echo "3.1392e+09" >> "$ProbandGenerator".Jhash.histo.7.7.model;
+		echo "1000000" >> "$ProbandGenerator".Jhash.histo.7.7.model; 
+		echo "min was provided, min is $_arg_min" 
+		MutantMinCov="$_arg_min" 
+		#touch "$ProbandGenerator".Jhash.histo.7.7.model
+	fi
 fi
 ########################################################################################
 
@@ -828,7 +892,7 @@ if [ -z $MutantMinCov ]; then
 	echo "ERROR: No min coverage set, possible error in Model"
 	exit 100
 fi
-if [ "$MutantMinCov" -lt "3" ]
+if [ "$MutantMinCov" -lt "2" ]
         then
                 echo "ERROR, model couldnt pick a sensible lower cutoff, check your subject bam file"
                 exit
@@ -843,7 +907,12 @@ else
     then 
     	rm  "$ProbandGenerator".temp
     fi
+    echo " mkfifo "$ProbandGenerator".temp"
+    echo " $modifiedJelly merge "$ProbandGenerator".Jhash $(echo $parentsString) $(echo $parentsExcludeString)  > "$ProbandGenerator".temp & \n"
+    echo "bash $PullSampleHashes $ProbandGenerator.Jhash "$ProbandGenerator".temp $MutantMinCov $MaxHashDepth\n"
     mkfifo "$ProbandGenerator".temp
+    echo "parent string = $parentsString"
+    echo "parent exclude string = $parentsExcludeString"
      $modifiedJelly merge "$ProbandGenerator".Jhash $(echo $parentsString) $(echo $parentsExcludeString)  > "$ProbandGenerator".temp & 
      bash $PullSampleHashes $ProbandGenerator.Jhash "$ProbandGenerator".temp $MutantMinCov $MaxHashDepth > "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList 
     wait
@@ -886,18 +955,19 @@ then
 		    mkfifo "$ProbandGenerator".temp.mate1.fastq "$ProbandGenerator".temp.mate2.fastq
 		    sleep 1
 		      bash "$ProbandGenerator" | "$RDIR"/bin/PassThroughSamCheck.stranded "$ProbandGenerator".filter.chr  "$ProbandGenerator".temp >  "$ProbandGenerator".temp &
-		       $RUFUSfilterFASTQ  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp.mate1.fastq "$ProbandGenerator".temp.mate2.fastq "$ProbandGenerator" "$K" 13 1 "$(echo $Threads -2 | bc)" &
+		       $RUFUSfilterFASTQ  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp.mate1.fastq "$ProbandGenerator".temp.mate2.fastq "$ProbandGenerator" "$K" $_filterMinQ $_arg_filterK "$(echo $Threads -2 | bc)" &
 		    
 		    wait
 		else
 			echo "Running RUFUS.filter from paired FASTQ files"
 		
 			
-			echo "$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  <(bash $_arg_fastqA) <(bash $_arg_fastqB) "$ProbandGenerator" $K 13 1 "$(echo $Threads -2 | bc)""
+			echo "$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  <(bash $_arg_fastqA) <(bash $_arg_fastqB) "$ProbandGenerator" $K $_filterMinQ $_arg_filterK "$(echo $Threads -2 | bc)""
 	
-			#$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  <(bash $_arg_fastqA) <(bash $_arg_fastqB) "$ProbandGenerator" $K 13 1 "$(echo $Threads -2 | bc)"
-			echo $RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  $_arg_fastqA $_arg_fastqB "$ProbandGenerator" $K 13 1 "$(echo $Threads -2 | bc)"
-			$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  $_arg_fastqA $_arg_fastqB "$ProbandGenerator" $K 13 1 "$(echo $Threads -2 | bc)"
+			#$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  <(bash $_arg_fastqA) <(bash $_arg_fastqB) "$ProbandGenerator" $K $_filterMinQ $_arg_filterK "$(echo $Threads -2 | bc)"
+			echo $RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  $_arg_fastqA $_arg_fastqB "$ProbandGenerator" $K $_filterMinQ $_arg_filterK "$(echo $Threads -2 | bc)"
+			#$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  $_arg_fastqA $_arg_fastqB "$ProbandGenerator" $K $_filterMinQ $_arg_filterK "$(echo $Threads -2 | bc)"
+			$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  <(zcat $_arg_fastqA) <(zcat $_arg_fastqB) "$ProbandGenerator" $K $_filterMinQ $_arg_filterK "$(echo $Threads -2 | bc)"
 			wait
 		fi
 	fi
@@ -947,7 +1017,7 @@ else
 	            fi
 	                mkfifo "$ProbandGenerator".temp
 	              bash "$ProbandGenerator" | "$RDIR"/bin/PassThroughSamCheck.stranded.se "$ProbandGenerator".filter.chr  "$ProbandGenerator".temp >  "$ProbandGenerator".temp &
-	               $RUFUSfilterFASTQse  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp  "$ProbandGenerator" "$K" 13 1 "$(echo $Threads -2 | bc)" &
+	               $RUFUSfilterFASTQse  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$ProbandGenerator".temp  "$ProbandGenerator" "$K" $_filterMinQ $_arg_filterK "$(echo $Threads -2 | bc)" &
 		    wait
 		else
 			echo "Running RUFUS.filter from single FASTQ files"
@@ -1002,6 +1072,7 @@ else
     echo "Starting RUFUS overlap"
     echo " bash  $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 5 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$_MaxAlleleSize" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash""
      bash  $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 5 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$_MaxAlleleSize" "$_assemblySpeed" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
+    #bash  $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 3 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$_MaxAlleleSize" "$_assemblySpeed" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
     echo "Done with RUFUS overlap"
 fi
 ##############################################################################################
@@ -1024,10 +1095,10 @@ echo "ar_mosaic = $_arg_mosaic"
 if [ "$_arg_mosaic" == "TRUE" ]
 then
 	echo "including mosaic"; 
-	bash $RDIR/scripts/VilterAutosomeOnly ./Intermediates/$ProbandGenerator.V2.overlap.hashcount.fastq.bam.sorted.vcf > ./$ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf
+	bash $RDIR/scripts/VilterAutosomeOnly ./Intermediates/$ProbandGenerator.V2.overlap.hashcount.fastq.bam.sorted.vcf | perl ~/bin/RUFUS/scripts/ColapsDuplicateCalls.stream.pl > ./$ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf
 else
 	echo "excluding mosaic"; 
-	bash $RDIR/scripts/VilterAutosomeOnly.withoutMosaic ./Intermediates/$ProbandGenerator.V2.overlap.hashcount.fastq.bam.sorted.vcf > ./$ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf
+	bash $RDIR/scripts/VilterAutosomeOnly.withoutMosaic ./Intermediates/$ProbandGenerator.V2.overlap.hashcount.fastq.bam.sorted.vcf | perl ~/bin/RUFUS/scripts/ColapsDuplicateCalls.stream.pl > ./$ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf
 fi
 
 bgzip -f ./$ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf

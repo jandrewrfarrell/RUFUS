@@ -844,7 +844,7 @@ int main(int argc, char* argv[]) {
 			ModelSum += model[KmerCount][CopyNumber];
 		}
 
-		if (ModelSum / ((float)ErrorModel[KmerCount] + ModelSum) > 0.9) {
+		if (ModelSum / ((float)ErrorModel[KmerCount] + ModelSum) > 0.5) {
 			CutOff = KmerCount;
 		}
 	}
@@ -860,8 +860,8 @@ int main(int argc, char* argv[]) {
 
 		cout << "prob not error = " << num / (num + ErrorDist[k]) << endl;
 
-		if (num / (num + ErrorDist[k]) > 0.9) {
-			kcutoff = k - 1;
+		if (num / (num + ErrorDist[k]) > 0.5) {
+			kcutoff = k ;//- 1;
 			cout << "this one" << endl;
 			break;
 		}

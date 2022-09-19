@@ -12,7 +12,7 @@ sub trim($)
 }
 
 
-open (Fastq , $ARGV[0]) || die "ERROR could not open sam file";
+open (Fastq , $ARGV[0]) || die "ERROR could not open vcf file";
 
 my $l1 = "";
 my $lastLine = "";
@@ -27,18 +27,22 @@ my $counter = 0;
 while ($l1 = <Fastq>)
 {
 	my $FC = substr($l1 , 0, 1);
-	if ($FC == "#")
+	#print "line = $l1\n"; 
+	if ($FC eq "#")
 	{
+	#	print "header\n"; 
 		print "$l1";
 	}
 	else
 	{
+		
 		@temp = split(/\t/, $l1);	
 		$counter = $counter+1;
 		chomp ($l1);
+	#	print " if ($temp[0] == $chr && $temp[1] == $pos && $temp[3] == $ref && $temp[4] == $alt)\n";
 		if ($temp[0] == $chr && $temp[1] == $pos && $temp[3] == $ref && $temp[4] == $alt)
 		{
-				#print "$l1\n+++$lastLine\n"; 
+	#			print "$l1\n+++$lastLine\n"; 
 		}
 		else
 		{

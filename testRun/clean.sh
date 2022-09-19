@@ -1,1 +1,1 @@
-rm -r *.generator* check mer_counts_merged.jf TempOverlap Intermediates
+rm -r *.generator*  mer_counts_merged.jf TempOverlap Intermediates

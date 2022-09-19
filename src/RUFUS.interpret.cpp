@@ -53,6 +53,7 @@ int totalAdded;
 int MaxVarentSize = 1000; 
 int ParLowCovThreshold = 7; 
 int SegThreshold = 10;
+int SegThresholdCigar = 10; 
 ofstream VCFOutFile;
 ofstream BEDOutFile;
 ofstream BEDBigStuff;
@@ -701,7 +702,7 @@ string SamRead::filterSV()
 		if (StrandBias >0.99 || StrandBias < 0.01)
 			Filter+="SB;"; 
 	}
-	if(AlignmentSegments > SegThreshold || AlignmentSegmentsCigar > SegThreshold)
+	if(AlignmentSegments > SegThreshold || AlignmentSegmentsCigar > SegThresholdCigar)
 	{
 		Filter+="PA;"; 
 	}
@@ -2583,7 +2584,7 @@ void SamRead::parseMutations( char *argv[], vector<SamRead>& reads)
 	string reff = "";
 	string alt = "";
 	string varType = "";
-	for(int i = 0; i<cigarString.size(); i++)
+	for(int i = 25; i<cigarString.size()-25; i++)
 	{
 		reff = ""; 
 		alt = "";
@@ -2764,7 +2765,7 @@ void SamRead::parseMutations( char *argv[], vector<SamRead>& reads)
 								{
 									streak[k]++; 
 									cout << " LC HASH FOUND streak = " << streak[k] ;
-									if (streak[k] >=3)
+									if (streak[k] >=1)
 									{
 										cout << " LC STREAK FOUND streak = " <<  streak[k] ; 
 			       			     				LowCov = true;
@@ -2793,7 +2794,7 @@ void SamRead::parseMutations( char *argv[], vector<SamRead>& reads)
  				if (Genotype.find("1") == std::string::npos) {
 					Denovo = "Mosaic";
 				} 
-				if (AlignmentSegments > SegThreshold or AlignmentSegmentsCigar > SegThreshold)
+				if (AlignmentSegments > SegThreshold or AlignmentSegmentsCigar > SegThresholdCigar)
 				{
 				  	Denovo = "PoorAlignment"; 
 					stringstream ss;
@@ -2920,7 +2921,7 @@ void SamRead::parseMutations( char *argv[], vector<SamRead>& reads)
 			////////////////////////Writing var out to file/////////////////////////
 				cout       << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" <<Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << SupportingHashes << "\t" << Filter << "\t" << StructCall <<"FEX=" << InfoFilter << ";RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";" << "CVT=" << CompressedVarType << ";HD="; 
 				
-				VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" << Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << Score << /*SupportingHashes << "/" << PossibleAltKmer << */ "\t" << Filter << "\t" << "PH=" << phase << ";EN=" << w1 << "," << w2<< "," << w3<< "," << w4<< "," << w5 << "," << refContext << ";FEX=" << InfoFilter << ";FS=" << SupportingHashes << "/" << PossibleAltKmer << ";RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";SB=" << StrandBias << ";" << "AS=" << AlignmentSegments << "-" << AlignmentSegmentsCigar << ";" << "CVT=" << CompressedVarType << ";HD="; 
+				VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" << Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << Score << /*SupportingHashes << "/" << PossibleAltKmer << */ "\t" << Filter << "\t" << "PH=" << phase << ";CP=" << i << "/" << cigarString.size() << ";EN=" << w1 << "," << w2<< "," << w3<< "," << w4<< "," << w5 << "," << refContext << ";FEX=" << InfoFilter << ";FS=" << SupportingHashes << "/" << PossibleAltKmer << ";RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";SB=" << StrandBias << ";" << "AS=" << AlignmentSegments << "-" << AlignmentSegmentsCigar << ";" << "CVT=" << CompressedVarType << ";HD="; 
 				//VCFOutFile << ChrPositions[startPos] << "\t" <<Positions[startPos] << "\t" << CompressedVarType <<"-" << Denovo /*"."*/  << "\t" << reff << "\t" << alt << "\t" << Score << /*SupportingHashes << "/" << PossibleAltKmer << */ "\t" << Filter << "\t" << StructCall << "PH=" << phase << ";FEX=" << InfoFilter << ";FS=" << SupportingHashes << "/" << PossibleAltKmer << ";RN=" << name << ";MQ=" << mapQual << ";cigar=" << cigar << ";SB=" << StrandBias << ";" << "AS=" << AlignmentSegments << "-" << AlignmentSegmentsCigar << ";" << "CVT=" << CompressedVarType << ";HD="; 
 
 				for (int j = 0; j < HashCounts.size(); j++) 
@@ -5281,7 +5282,7 @@ options:\
 	string ExcludeFilePath = ""; 
 	string MobBam = ""; 
 	 SegThreshold = 10; 
-	int MinMapQual = 0; 
+	int MinMapQual = 40; 
 	for(int i = 1; i< argc; i++)
 	{
 		cout << i << " = " << argv[i] << endl; 
@@ -5333,7 +5334,8 @@ options:\
 		}
 		else if (p == "-as")
 		{
-			SegThreshold = atoi(argv[i+1]); 
+			SegThreshold = atoi(argv[i+1]);
+			SegThresholdCigar = atoi(argv[i+1]);
 			i++;
 			cout << "AlignmentSegmentThreshold = " << SegThreshold << endl; 
 		}
@@ -5418,7 +5420,7 @@ options:\
 	{	ProcessHighAndLowDist(); 
 
 		cout << "checking Dist File" << endl;
-        	for (int copy =0; copy < 5; copy++)
+        	/*for (int copy =0; copy < 5; copy++)
         	{
         	        for (int k = 0; k < 11; k++)
         	        {
@@ -5426,7 +5428,7 @@ options:\
         	        }
         	        cout << endl;
 	
-	        }
+	        }*/
 		cout << "done checking dist file " << endl; 	
 		cout << "checking priors " << endl; 
 		for (int i = 0; i < GenPrior.size(); i++)
@@ -5725,6 +5727,7 @@ options:\
 	VCFOutFile << "##FORMAT=<ID=RO,Number=1,Type=Integer,Description=\"Mode of reference kmer counts\">" << endl;
 	VCFOutFile << "##FORMAT=<ID=AO,Number=1,Type=Integer,Description=\"Mode of alt kmer counts\">" << endl;
 	VCFOutFile << "##INFO=<ID=PH,Number=1,Type=String,Description=\"If read backed phasing is possible, the name of the sample that the variant was inherited from\">" << endl;
+	VCFOutFile << "##INFO=<ID=CP,Number=1,Type=String,Description=\"position of the call within the assembled contig\">" << endl;
 	VCFOutFile << "##INFO=<ID=EN,Number=1,Type=String,Description=\"in development, something to do with entropy\">" << endl;
 	VCFOutFile << "##INFO=<ID=FEX,Number=1,Type=String,Description=\"Filters failed and value\">" << endl;
 	VCFOutFile << "##INFO=<ID=SB,Number=1,Type=Float,Description=\"Strand Bias of the aassembled contig\">" << endl;
@@ -5734,7 +5737,7 @@ options:\
 	VCFOutFile << "##INFO=<ID=AO,Number=1,Type=Integer,Description=\"Alternate allele observations, with partial observations recorded fractionally\">"<<endl;
 	VCFOutFile << "##INFO=<ID=HD,Number=.,Type=String,Description=\"Hash counts for each k-mer overlapping the vareint, -1 indicates no info\">"<< endl;
 	VCFOutFile << "##INFO=<ID=RN,Number=1,Type=String,Description=\"Name of contig that produced the call\">"<< endl;
-	VCFOutFile << "##INFO=<ID=FS,Number=1,Type=String,Description=\"Full score, supporthing kmers \\ possible varient kmers based on sequence\">"<< endl;
+	VCFOutFile << "##INFO=<ID=FS,Number=1,Type=String,Description=\"Full score, supporting kmers possible varient kmers based on sequence\">"<< endl;
 	VCFOutFile << "##INFO=<ID=MQ,Number=1,Type=Integer,Description=\"Mapping quality of the contig that created the call\">"<< endl;
 	VCFOutFile << "##INFO=<ID=cigar,Number=1,Type=String,Description=\"Cigar string for the contig that created the call\">"<< endl;
 	VCFOutFile << "##INFO=<ID=VT,Number=1,Type=String,Description=\"Varient Type\">"<< endl;	
@@ -6528,7 +6531,7 @@ options:\
 															alt << "[" << reads[reads[i].alignments[1]].chr << ":" << reads[reads[i].alignments[1]].pos+sbp -1 << "["; 
 															Format <<InterpretInsertSize(insertseq); 
 															Format <<InterpretTargetSize(targetsize) << "_";  
-															Format <<  "bnd_" << reads[i].BNDid;
+															Format <<  "TRANS_" << reads[i].BNDid;
 															SVDES = "Translocation"; 
 														}
 														else if ( reads[i].clipPattern == "mc" && GetReadOrientation(reads[i].flag) !=GetReadOrientation( reads[reads[i].alignments[1]].flag))
@@ -6540,7 +6543,7 @@ options:\
 															alt << "]" << reads[reads[i].alignments[1]].chr << ":" << reads[reads[i].alignments[1]].pos+sbp -1 << "]";
 															Format <<InterpretInsertSize(insertseq);
 															Format <<InterpretTargetSize(targetsize) << "_";
-															Format << "bnd_" << reads[i].BNDid;
+															Format << "InvTRANS_" << reads[i].BNDid;
 															SVDES = "InvertedTranslocation"; 
 														}
 													}
@@ -6552,13 +6555,13 @@ options:\
 														if ( reads[i].clipPattern == "cm" && GetReadOrientation(reads[i].flag) == GetReadOrientation(reads[reads[i].alignments[1]].flag))
 														{
 															alt << "]" << reads[reads[i].alignments[1]].chr << ":" << reads[reads[i].alignments[1]].pos + sbp /*check could be +1*/ << "]" << altseq; 
-		       											 		Format << "bnd_" << reads[i].BNDid ;
+		       											 		Format << "TRANS_" << reads[i].BNDid ;
 															SVDES = "Translocation";
 														}
 														else if ( reads[i].clipPattern == "cm" && GetReadOrientation(reads[i].flag) != GetReadOrientation(reads[reads[i].alignments[1]].flag))
 														{										
 															alt << "[" << reads[reads[i].alignments[1]].chr << ":" << reads[reads[i].alignments[1]].pos+ sbp -1 /*check could be +1*/  << "[" << altseq;
-															Format << "bnd_" << reads[i].BNDid ;
+															Format << "InvTRANS_" << reads[i].BNDid ;
 															SVDES = "InvertedTranslocation";
 														}	
 													}								
@@ -6605,7 +6608,7 @@ options:\
 			
 													//buildng up info field
 													stringstream info;
-										       			info << "SVTYPE=BND;MATEID=bnd_" << reads[reads[i].alignments[1]].BNDid << ";";
+										       			info << "SVTYPE=TRANS;MATEID=TRANS_" << reads[reads[i].alignments[1]].BNDid << ";";
 													info << "SVID=" << CurrentSVeventID<< ";"; 
 													if (SVDES !="")
 													{info << "SVDES=" << SVDES << ";";}
@@ -6652,13 +6655,13 @@ options:\
 														if ( reads[i+j].clipPattern == "mc" && GetReadOrientation(reads[i+j].flag) == GetReadOrientation(reads[reads[i+j].alignments[1]].flag))
 														{
 															altj << altseq << "[" << reads[reads[i+j].alignments[1]].chr << ":" << reads[reads[i+j].alignments[1]].pos+ sbpj  << "[";
-															Format << "bnd_" << reads[i+j].BNDid;
+															Format << "TRANS_" << reads[i+j].BNDid;
 															SVDES = "Translocation";
 														}
 														else if ( reads[i+j].clipPattern == "mc" && GetReadOrientation(reads[i+j].flag) !=GetReadOrientation( reads[reads[i+j].alignments[1]].flag))
 														{
 															altj << altseq << "]" << reads[reads[i+j].alignments[1]].chr << ":" << reads[reads[i+j].alignments[1]].pos+ sbpj << "]";
-															 Format << "bnd_" << reads[i+j].BNDid;
+															 Format << "InvTRANS_" << reads[i+j].BNDid;
 															SVDES = "InvertedTranslocation";
 														}
 													}
@@ -6670,13 +6673,13 @@ options:\
 														if ( reads[i+j].clipPattern == "cm" && GetReadOrientation(reads[i+j].flag) == GetReadOrientation(reads[reads[i+j].alignments[1]].flag))
 														{
 															altj << "]" << reads[reads[i+j].alignments[1]].chr << ":" << reads[reads[i+j].alignments[1]].pos+ sbpj << "]" << altseq;
-															 Format << "bnd_" << reads[i+j].BNDid;
+															 Format << "TRANS_" << reads[i+j].BNDid;
 															SVDES = "Translocation";
 														}
 														else if	 ( reads[i+j].clipPattern == "cm" && GetReadOrientation(reads[i+j].flag) != GetReadOrientation(reads[reads[i+j].alignments[1]].flag))
 														{	
 													 	       altj << "[" << reads[reads[i+j].alignments[1]].chr << ":" << reads[reads[i+j].alignments[1]].pos+sbpj << "[" << altseq;
-															 Format << "bnd_" << reads[i+j].BNDid;
+															 Format << "InvTRANS_" << reads[i+j].BNDid;
 															SVDES = "InvertedTranslocation";
 														}
 													}
@@ -6710,7 +6713,7 @@ options:\
 														InfoFilter +=FullfilterB;
 														Filter = "fail";
 													}	
-													info << "SVTYPE=BND;MATEID=bnd_" << reads[reads[i+j].alignments[1]].BNDid << ";";
+													info << "SVTYPE=BND;MATEID=TRANS_" << reads[reads[i+j].alignments[1]].BNDid << ";";
 													info << "SVID=" << CurrentSVeventID << ";";
 													if (SVDES !="")
 													{info << "SVDES=" << SVDES << ";";}

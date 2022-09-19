@@ -372,6 +372,35 @@ string TrimNends(string S, string& qual) {
 	qual = NewQ;
 	return NewS;
 }
+string ReplaceLowQBase(string S, string qual, int min) {
+        string NewS = "";
+        for (int i = 0; i < S.size() ; i++) {
+        	if ( int(qual.c_str()[i]) - 33 < min)
+		{NewS = NewS + 'N' ;}
+		else
+                {NewS = NewS + S.c_str()[i] ;}
+        }
+        return NewS;
+}
+string TrimKends(string S, string& qual, int TrimLen) {
+	string NewS = "";
+	string NewQ = "";
+	if (S.size()-TrimLen-TrimLen > 0)
+	{
+		for (int i = TrimLen; i < S.size()-TrimLen ; i++) {
+	//		cout << "i = " << i << endl; 
+			NewS = NewS + S.c_str()[i] ;
+			NewQ = NewQ + qual.c_str()[i];
+		}
+	//	cout << "TRIM CEHCK\n" << S << "\n" << "               " << NewS << "\n" << qual << "\n               " << NewQ << endl; 
+	}
+	else
+	{
+		cout << "Warning read is shorter than the clipping length, just returning the read" << endl; 
+	}
+	qual = NewQ;
+	return NewS;
+}
 
 string TrimLowCoverageEnds(string S, string& quals, string& depth, int cutoff) {
 	bool base = false;
@@ -488,13 +517,13 @@ string FlipStrands(string strand) {
 }
 
 void compresStrand(string S, int& F, int& R) {
-        for (int i = 0; i < S.size(); i++) {
-                if (S.c_str()[i] == '+')
-                        F++;
-                else if (S.c_str()[i] == '-')
-                        R++;
-        }
-        return;
+	for (int i = 0; i < S.size(); i++) {
+		if (S.c_str()[i] == '+')
+			F++;
+		else if (S.c_str()[i] == '-')
+			R++;
+	}
+	return;
 }
 int CountHashes(string seq)
 {
@@ -638,7 +667,7 @@ int main(int argc, char* argv[]) {
 
 	while (getline(MutHashFile, L1)) {
 		vector<string> temp;
-		temp = Util::Split(L1, '\t');
+	/*	temp = Util::Split(L1, '\t');
 
 		if (temp.size() == 2) {
 			unsigned long b = Util::HashToLong(temp[0]);
@@ -653,14 +682,14 @@ int main(int argc, char* argv[]) {
 			Mutations.insert(pair<unsigned long, int>(revb, 0));
 			HashSize = temp[3].size();
 		}
-		if (temp.size() == 1) {
+		if (temp.size() == 1) {*/
 			temp = Util::Split(L1, ' ');
 			unsigned long b = Util::HashToLong(temp[0]);
 			unsigned long revb = Util::HashToLong(Util::RevComp(temp[0]));
 			Mutations.insert(pair<unsigned long, int>(b, 0));
 			Mutations.insert(pair<unsigned long, int>(revb, 0));
 			HashSize = temp[0].size();
-		}
+		//}
 	}
 
 	if (HashSize == -1)
@@ -677,8 +706,9 @@ int main(int argc, char* argv[]) {
 			cout << "Read in " << counter << " reads, with " << goodreads << " aligned reads, " << unalignedCounter<< " unaligned reads, " << lowMapQual << "low map qual and " << other <<" other with rejected " << Rejects
 					 << " reads\r";
 		}
-
 		vector<string> temp = Util::Split(L1, '\t');
+		temp[9] = ReplaceLowQBase(temp[9],temp[10], 36); 
+		temp[9] = TrimKends(temp[9], temp[10], 15);
 		int ReadSize = temp[10].size();
 		bool b[16];
 		int v = atoi(temp[1].c_str()); 
@@ -694,15 +724,16 @@ int main(int argc, char* argv[]) {
 		//}
 		//else 
 		{
-			int lowq = NumLowQbases(temp[10], 20); 
+			int lowq = NumLowQbases(temp[10], 20);
+			int length=temp[10].length(); 
 			DupCheck[temp[9]] == true; 
-			if (b[8] or b[11] or b[10] or temp[9].length() < 100 or lowq > 50) 
+			if (b[8] or b[11] or b[10] or temp[9].length() < 50 or ((double) lowq / (double) length > 0.33)) 
 			{
 				//cout << "rejected" << endl; 
 				//cout << L1 << endl; 
 				Rejects++;
 			} 
-			else if ( b[2] )//or atoi(temp[4].c_str())<5) 
+			else if (b[2])//or atoi(temp[4].c_str())<5) 
 			{
 				if (b[2])
 					unalignedCounter++;
@@ -780,10 +811,10 @@ int main(int argc, char* argv[]) {
 					if (hashes > 0)
 					{
 						if (b[0]== 0)
-                                                {
-                                                        strand.push_back(".");
-                                                }
-                                                else if (b[4] == 0) 
+						{
+							strand.push_back(".");
+						}
+						else if (b[4] == 0) 
 						{
 							strand.push_back("+");
 						}
@@ -1021,8 +1052,8 @@ int main(int argc, char* argv[]) {
 
 				count++;
 				int F = 0;
-                                int R = 0;
-                                compresStrand(strand[i], F, R);
+				int R = 0;
+				compresStrand(strand[i], F, R);
 				report << "@NODE_" << argv[6] << "_" << i << "_L=" << sequenes[i].size() << "_D=" << maxDep  << ":" << F << ":" << R << ":" << endl;
 				report << sequenes[i] << endl;
 				report << "+" << endl;
