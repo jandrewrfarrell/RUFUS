@@ -1113,7 +1113,7 @@ string SamRead::createStructGenotype(int spot)
 	{
 		ss <<"\t" << ShittyGenotyper(ParAlt[i], ParRef[i]) << ":" << ParAlt[i]+ParRef[i] << ":" << ParRef[i] << ":" << ParAlt[i];
 	}
-	cout << "returning " << ss << endl;
+	cout << "returning " << ss.str() << endl;
 	return ss.str(); 
 } 
 int SamRead::BreakPoint()
