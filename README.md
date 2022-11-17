@@ -40,6 +40,7 @@ make
 If you have gcc-4.9.2 as your default compiler, you may instead use
 
 ```
+mkdir bin
 cd bin
 cmake ../ -DCMAKE_C_COMPILER=$(which gcc) -DCMAKE_CXX_COMPILER=$(which g++)
 make
