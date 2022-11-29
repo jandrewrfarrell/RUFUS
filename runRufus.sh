@@ -1,4 +1,5 @@
 #!/bin/bash
+#check this dev branch thing
 
 set -e 
 
@@ -415,9 +416,11 @@ fi
 
 if [ -z $_arg_threads ]
 then
-    echo "You must provide a number of threads to use [--threads|-t] (we recommend 40 threads if available)"
-    echo "Killing run with non-zero exit status"
-    kill -9 $$
+    echo "no thread argument given, running with all avaialble threads = $(nproc)"; 
+    $_arg_threads = $(nproc); 
+    #echo "You must provide a number of threads to use [--threads|-t] (we recommend 40 threads if available)"
+    #echo "Killing run with non-zero exit status"
+    #kill -9 $$
 fi
 
 if [ ${#_arg_exclude[@]} -eq "0" ] && [ ${#_arg_controls[@]} -eq "0" ]
@@ -966,8 +969,8 @@ then
 	
 			#$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  <(bash $_arg_fastqA) <(bash $_arg_fastqB) "$ProbandGenerator" $K $_filterMinQ $_arg_filterK "$(echo $Threads -2 | bc)"
 			echo $RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  $_arg_fastqA $_arg_fastqB "$ProbandGenerator" $K $_filterMinQ $_arg_filterK "$(echo $Threads -2 | bc)"
-			#$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  $_arg_fastqA $_arg_fastqB "$ProbandGenerator" $K $_filterMinQ $_arg_filterK "$(echo $Threads -2 | bc)"
-			$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  <(zcat $_arg_fastqA) <(zcat $_arg_fastqB) "$ProbandGenerator" $K $_filterMinQ $_arg_filterK "$(echo $Threads -2 | bc)"
+			$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  $_arg_fastqA $_arg_fastqB "$ProbandGenerator" $K $_filterMinQ $_arg_filterK "$(echo $Threads -2 | bc)"
+			#$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  <(zcat $_arg_fastqA) <(zcat $_arg_fastqB) "$ProbandGenerator" $K $_filterMinQ $_arg_filterK "$(echo $Threads -2 | bc)"
 			wait
 		fi
 	fi
