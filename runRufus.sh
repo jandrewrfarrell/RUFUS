@@ -303,6 +303,28 @@ assign_positional_args
 # [ <-- needed because of Argbash
 
 ##############################__CHECK_FOR_MANDATORY_PARAMS__#################################################
+echo "Arguments are :";  
+echo "  _arg_exclude=$_arg_exclude" 
+echo "  _arg_controls=$_arg_controls" 
+echo "  _arg_subject=$_arg_subject" 
+echo "  _arg_ref=$_arg_ref" 
+echo "  _arg_threads=$_arg_threads" 
+echo "  _arg_kmersize=$_arg_kmersize" 
+echo "  _arg_min=$_arg_min" 
+echo "  _arg_refhash=$_arg_refhash" 
+echo "  _arg_saliva=$_arg_saliva" 
+echo "  _arg_exome=$_arg_exome" 
+echo "  _MaxAlleleSize=$_MaxAlleleSize" 
+echo "  _arg_mosaic=$_arg_mosaic" 
+echo "  _assemblySpeed=$_assemblySpeed" 
+echo "  _parallel_jelly=$_parallel_jelly" 
+echo "  _pairedEnd=$_pairedEnd" 
+echo "  _arg_region=$_arg_region" 
+echo "  _arg_filterK=$_arg_filterK" 
+echo "  _arg_ParLowK=$_arg_ParLowK" 
+echo "  _filterMinQ=$_filterMinQ" 
+
+
 if [ -z $_arg_kmersize ]
 then 
  echo "You must provide a minimum kmer size [--kmersize|-k] (we recommend a kmer size of 25)"
@@ -325,13 +347,6 @@ then
     echo "Killing run with non-zero exit status"
     kill -9 $$
 fi
-
-echo "_arg_ParLowK = $_arg_ParLowK"
-echo "_arg_filterK = $_arg_filterK"
-echo "_filterMinQ = $_filterMinQ"
-echo "_arg_fastqA = $_arg_fastqA"
-echo "_arg_fastqB = $_arg_fastqB"
-
 
 
 #########__remove -e and --exclude from _arg_exclude array__################
