@@ -178,6 +178,11 @@ parse_commandline ()
 		_arg_controls+=("$2")
 		shift
 		;;
+            -e|--exclude)
+	    	test $# -lt 2 && die "Missing value for the optional argument '$key'." 1
+		_arg_exclude+=("$2")
+		shift
+		;;
 	    -m|--min)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_arg_min="$2"
@@ -303,9 +308,18 @@ assign_positional_args
 # [ <-- needed because of Argbash
 
 ##############################__CHECK_FOR_MANDATORY_PARAMS__#################################################
-echo "Arguments are :";  
-echo "  _arg_exclude=$_arg_exclude" 
-echo "  _arg_controls=$_arg_controls" 
+echo "~~~~~~~~~~~~ printing out paramater values used in script ~~~~~~~~~~~~~~~~"
+echo "  _arg_exclude=:"
+	for each in "${_arg_exclude[@]}"                           
+	do                                                         
+	  	echo "		$each"
+	done           
+echo "  _arg_controls=:"
+	for each in "${_arg_controls[@]}"                           #
+	do                                                          #
+		echo "		$each"                                              #
+	done           
+
 echo "  _arg_subject=$_arg_subject" 
 echo "  _arg_ref=$_arg_ref" 
 echo "  _arg_threads=$_arg_threads" 
@@ -590,18 +604,18 @@ fi
 
 
 ###################__PRINT_VARIABLES_USED__######################################
-echo "~~~~~~~~~~~~ printing out paramater values used in script ~~~~~~~~~~~~~~~~"
-echo "value of ProbandGenerator $ProbandGenerator"
-echo "Value of ParentGenerators:"
-for parent  in "${ParentGenerators[@]}"
-do
-  echo " $parent"
-done
-echo "Value of K is: $K"
-echo "Value of Threads is: $Threads"
-echo "value of ref is: $ref"
-echo "value of min is: $_arg_min" 
-echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+#echo "~~~~~~~~~~~~ printing out paramater values used in script ~~~~~~~~~~~~~~~~"
+#echo "value of ProbandGenerator $ProbandGenerator"
+#echo "Value of ParentGenerators:"
+#for parent  in "${ParentGenerators[@]}"
+#do
+#  echo " $parent"
+#done
+#echo "Value of K is: $K"
+#echo "Value of Threads is: $Threads"
+#echo "value of ref is: $ref"
+#echo "value of min is: $_arg_min" 
+#echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 #################################################################################
 
 
@@ -811,8 +825,10 @@ if [ "$MutantMinCov" -lt "2" ]
                 echo "ERROR, model couldnt pick a sensible lower cutoff, check your subject bam file"
                 exit
         fi
-echo "made it "
 #################################__HASH_LIST_FILTER__#####################################
+
+echo "########### Running Mutant Hash Identification ##############"
+
 if [ -s "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList ]
 then 
     echo "skipping $ProbandGenerator.HashList pull "
@@ -821,19 +837,13 @@ else
     then 
     	rm  "$ProbandGenerator".temp
     fi
-    echo " mkfifo "$ProbandGenerator".temp"
-    echo " $modifiedJelly merge "$ProbandGenerator".Jhash $(echo $parentsString) $(echo $parentsExcludeString)  > "$ProbandGenerator".temp & \n"
-    echo "bash $PullSampleHashes $ProbandGenerator.Jhash "$ProbandGenerator".temp $MutantMinCov $MaxHashDepth\n"
     mkfifo "$ProbandGenerator".temp
-    echo "parent string = $parentsString"
-    echo "parent exclude string = $parentsExcludeString"
-     $modifiedJelly merge "$ProbandGenerator".Jhash $(echo $parentsString) $(echo $parentsExcludeString)  > "$ProbandGenerator".temp & 
-     bash $PullSampleHashes $ProbandGenerator.Jhash "$ProbandGenerator".temp $MutantMinCov $MaxHashDepth > "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList 
+    $modifiedJelly merge "$ProbandGenerator".Jhash $(echo $parentsString) $(echo $parentsExcludeString)  > "$ProbandGenerator".temp & 
+    bash $PullSampleHashes $ProbandGenerator.Jhash "$ProbandGenerator".temp $MutantMinCov $MaxHashDepth > "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList 
     wait
     
 fi
 
-echo "made it here "
 ########################################################################################
 
 #wc -l "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList | awk '{print $1}'
@@ -844,10 +854,8 @@ if [ $(head  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList | wc -l | awk '
 fi
 
 ######################__RUFUS_FILTER__##################################################
-echo "starting RUFUS filter"
+echo "########### starting RUFUS filter ###########"
 
-echo "_arg_fastqA = $_arg_fastqA"
-echo "_arg_fastqB = $_arg_fastqB"
 if [ $_pairedEnd == "true" ]
 then 
 	if [ -e "$ProbandGenerator".Mutations.Mate1.fastq ]
@@ -981,9 +989,9 @@ fi
 ###################__RUFUS_OVERLAP__#############################################
 if [ -e $ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf.gz ]
 then
-    echo "Skipping overlap step"
+    echo "########### Skipping overlap step ###########"
 else
-    echo "Starting RUFUS overlap"
+    echo "########### Starting RUFUS overlap ###########"
     echo " bash  $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 5 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$_MaxAlleleSize" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash""
      bash  $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 5 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$_MaxAlleleSize" "$_assemblySpeed" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
     #bash  $RUFUSOverlap "$_arg_ref" "$ProbandGenerator".Mutations.fastq 3 $ProbandGenerator "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList "$K" "$Threads" "$_MaxAlleleSize" "$_assemblySpeed" "$ProbandGenerator".Jhash "$parentsString" "$_arg_ref_bwa" "$_arg_refhash"
