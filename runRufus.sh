@@ -75,16 +75,16 @@ print_help ()
     printf 'Usage: %s [-s|--subject <arg>] [-r|--ref <arg>] [-t|--threads <arg>] [-k|--kmersize <arg>] [-m|--min <arg>] [-h|--help] [<controls-1>] ... [<controls-n>] ...\n' "$0"
     printf "\t%s\n" "-c, --controls: bam files containing the control subjects ()"
     printf "\t%s\n" "-s,--subject: bam file containing the subject of interest (no default)"
-    printf "\t%s\n" "--se: subject bam file is single end reads, not paired (default is to assume paired end data)"
+    printf "\t%s\n" "-se, --single_end_reads: subject bam file is single end reads, not paired (default is to assume paired end data)"
     printf "\t%s\n" "-r,--ref: file path to the desired reference file (no default)"
     printf "\t%s\n" "-cr,--cramref: file path to the desired reference file to decompress input cram files (no default)"
     printf "\t%s\n" "-t,--threads: number of threads to use (no default) (min 3)"
     printf "\t%s\n" "-k,--kersize: size of k-mer to use (no default)"
     printf "\t%s\n" "-m,--min: overwrites the minimum k-mer count to call variant (no default)"
-    printf "\t%s\n" "--saliva: flag to indicate that the subject sample is a buccal swab and likely contains a significant fractino of contaminant DNA"
-    printf "\t%s\n" "--exome: flat go set if your input data is exome sequecing. Sugjested you also set -m, default is -m 20"
-    printf "\t%s\n" "--MaxAllele: Max size for insert/deletion events to put the entire alt sequence in. (default 1000)"
-    printf "\t%s\n" "-L: Reprot Mosaic/Low Frequency/Somatic variants (default FALSE)"
+    printf "\t%s\n" "-i, --saliva: flag to indicate that the subject sample is a buccal swab and likely contains a significant fractino of contaminant DNA"
+    printf "\t%s\n" "-ex, --exome: flat go set if your input data is exome sequecing. Sugjested you also set -m, default is -m 20"
+    printf "\t%s\n" "-mx, --MaxAllele: Max size for insert/deletion events to put the entire alt sequence in. (default 1000)"
+    printf "\t%s\n" "-L, --Report_Low_Freq: Reprot Mosaic/Low Frequency/Somatic variants (default FALSE)"
     printf "\t%s\n" "-h,--help: HELP!!!!!!!!!!!!!!!"
 }
 
@@ -95,7 +95,7 @@ print_devhelp ()
 s-n>] ...\n' "$0"
     printf "\t%s\n" "-c, --controls: bam files containing the control subjects"
     printf "\t%s\n" "-s,--subject: bam file containing the subject of interest (no default)"
-    printf "\t%s\n" "--se: subject bam file is single end reads, not paired (default is to assume paired end data)"
+    printf "\t%s\n" "-se, --single_end_reads: subject bam file is single end reads, not paired (default is to assume paired end data)"
     printf "\t%s\n" "-r,--ref: file path to the desired reference file (no default)"
     printf "\t%s\n" "-cr,--cramref: file path to the desired reference file to decompress input cram files (no default)"
     printf "\t%s\n" "-t,--threads: number of threads to use (no default) (min 3)"
@@ -103,15 +103,18 @@ s-n>] ...\n' "$0"
     printf "\t%s\n" "-e,--exclude: Jhash file of kmers to exclude from mutation list (no default)"
     printf "\t%s\n" "-k,--kersize: size of k-mer to use (no default)"
     printf "\t%s\n" "-m,--min: overwrites the minimum k-mer count to call variant (no default)"
-    printf "\t%s\n" "--MaxAllele: Max size for insert/deletion events to put the entire alt sequence in. (default 1000)"
-    printf "\t%s\n" "--saliva: flag to indicate that the subject sample is a buccal swab and likely contains a significant fractino of contaminant DNA"
-    printf "\t%s\n" "-L: Reprot Mosaic/Low Frequency/Somatic variants (default FALSE)"
-    printf "\t%s\n" "--exome: flat go set if your input data is exome sequecing. Sugjested you also set -m, default is -m 20"
+    printf "\t%s\n" "-mx, --MaxAllele: Max size for insert/deletion events to put the entire alt sequence in. (default 1000)"
+    printf "\t%s\n" "-i, --saliva: flag to indicate that the subject sample is a buccal swab and likely contains a significant fractino of contaminant DNA"
+    printf "\t%s\n" "-L, --Report_Low_Freq: Reprot Mosaic/Low Frequency/Somatic variants (default FALSE)"
+    printf "\t%s\n" "-ex, --exome: flat go set if your input data is exome sequecing. Sugjested you also set -m, default is -m 20"
     printf "\t%s\n" "-q1,--fastq1: If starting from fastq files, a list of the mate1 fastq files to improve RUFUS.ilter"
     printf "\t%s\n" "-q2,--fastq2: If starting from fastq files, a list of the mate2 fastq files to improve RUFUS.ilter"
-    printf "\t%s\n" "--vs: use very short assembly methods, recomneded when you are expecting over 10,000 variants "
-    printf "\t%s\n" "--pj: parallelize jellyfish step, only use if you have more than 96G of ram"
-    printf "\t%s\n" "--region: Run RUFUS only on a samtools style region"
+    printf "\t%s\n" "-vs, --Very_Short_Assembly: use very short assembly methods, recomneded when you are expecting over 10,000 variants "
+    printf "\t%s\n" "-pj, --Parallelize_Jelly: parallelize jellyfish step, only use if you have more than 96G of ram"
+    printf "\t%s\n" "-R, --Region: Run RUFUS only on a samtools style region"
+    printf "\t%s\n" "-fk, --filterK: Kmer threshold for number of kmers required to keep a read during filtering (default = 1)"
+    printf "\t%s\n" "-fq, --filterMinQ: Minimum base quality for fitler step, any kmer with any bases lower than this quality will be ignored (default = 15)"
+    printf "\t%s\n" "-pl, --ParLowK: Lowest kmer count to be kept when counting parent jellyfish tables (default = 2, using 1 will SIGNIFICANTLY increase run time and isnt advised" 
     printf "\t%s\n" "-h,--help: HELP!!!!!!!!!!!!!!!"
     printf "\t%s\n" "-d,--devhelp: HELP!!! for developers"
 }
@@ -127,22 +130,10 @@ parse_commandline ()
 		_arg_subject="$2"
 		shift
 		;;
-	    --subject=*)
-		_arg_subject="${_key##--subject=}"
-		;;
-	    -s)
-		_arg_subject="${_key##-s}"
-		;;
 	    -r|--ref)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_arg_ref="$2"
 		shift
-		;;
-	    --ref=*)
-		_arg_ref="${_key##--ref=}"
-		;;
-	    -r*)
-		_arg_ref="${_key##-r}"
 		;;
             
 	    -cr|--cramref)
@@ -150,23 +141,11 @@ parse_commandline ()
 		_arg_cramref="$2"
 		shift
 		;;
-	    --cramref*)
-		_arg_cramref="${_key##--cramref=}"
-	    	;;
-	    -cr*)
-		 _arg_cramref="${_key##-cr}"
-		;;
 	    
 	    -q1|--fastq1)
                  test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
                 _arg_fastqA="$2"
                 shift
-                ;;
-            --fastq1=*)
-                _arg_fastqA="${_key##--fastq1=}"
-                ;;
-            -q1*)
-                 _arg_fastqA="${_key##-q1}"
                 ;;
 	    
 	    -q2|--fastq2)
@@ -174,13 +153,6 @@ parse_commandline ()
                 _arg_fastqB="$2"
                 shift
                 ;;
-            --fastq2=*)
-                _arg_fastqB="${_key##--fastq2=}"
-                ;;
-            -q2*)
-                 _arg_fastqB="${_key##-q2}"
-                ;;
-	    
 	    -t|--threads)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_arg_threads="$2"
@@ -190,61 +162,21 @@ parse_commandline ()
                 fi
 		shift
 		;;
-	    --threads=*)
-		_arg_threads="${_key##--threads=}"
-		 if ! [[ $_arg_threads =~ $re ]] ; then
-                       echo "Threads must be a number "
-                       exit 100
-                fi
-		;;
-	    -t*)
-		_arg_threads="${_key##-t}"
-		 if ! [[ $_arg_threads =~ $re ]] ; then
-                       echo "Threads must be a number "
-                       exit 100
-                fi
-		;;
-
-            -f|--refhash)
+            
+	    -f|--refhash)
                 test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
                 _arg_refhash="$2"
                 shift
-                ;;
-            --refhash=*)
-                _arg_refhash="${_key##--refhash=}"
-                ;;
-            -f*)
-                _arg_refhash="${_key##-f}"
                 ;;
 	    -k|--kmersize)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_arg_kmersize="$2"
 		shift
 		;;
-	    --kmersize=*)
-		_arg_kmersize="${_key##--kmersize=}"
-		 if ! [[ $_arg_kmersize =~ $re ]] ; then
-                       echo "kmer size must be a number "
-                       exit 100
-                fi
-		;;
-	    -k*)
-		_arg_kmersize="${_key##-k}"
-		if ! [[ $_arg_kmersize =~ $re ]] ; then
-                       echo "kmer size must be a number "
-                       exit 100
-                fi
-		;;
 	    -c|--controls)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_arg_controls+=("$2")
 		shift
-		;;
-	    --controls=*)
-		_arg_controls+=("${_key##--controls=}")
-		;;
-	    -c*)
-		_arg_controls+=("${_key##-c}")
 		;;
 	    -m|--min)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
@@ -255,79 +187,61 @@ parse_commandline ()
                 fi
 		shift
 		;;
-	    --min=*)
-		_arg_min="${_key##--min=}"
-		if ! [[ $_arg_min =~ $re ]] ; then
-                       echo "arg -m must be a number "
-                       exit 100
-                fi
-		;;
-	    -m*)
-		_arg_min="${_key##-m}"
-		if ! [[ $_arg_min =~ $re ]] ; then
-                       echo "arg -m must be a number "
-                       exit 100
-                fi
-		;;
-	     --filterK)
+	     -fk|--filterK)
 	     	 test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
                 _arg_filterK=$2
                 if ! [[ $_arg_filterK =~ $re ]] ; then
-                       echo "arg --filterK must be a number "
+                       echo "arg -fk or --filterK must be a number "
                        exit 100
                 fi
 		shift
                 ;;
-	     --filterMinQ)
+	     -fq|--filterMinQ)
                  test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-                echo "found a filter min q call "
 		_filterMinQ=$2
                 if ! [[ $_filterMinQ =~ $re ]] ; then
-                       echo "arg --filterK must be a number "
+                       echo "arg -fq or --filterMinQ must be a number "
                        exit 100
                 fi
                 shift
                 ;;	
-	     --ParLowK)
+	     -pl|--ParLowK)
                  test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
                 _arg_ParLowK=$2
                 if ! [[ $_arg_ParLowK =~ $re ]] ; then
-                       echo "arg --ParLowK must be a number "
+                       echo "arg -pl or --ParLowK must be a number "
                        exit 100
                 fi
                 shift
                 ;;
-	   --region)
-	   	echo "region passed"
+	   -R|--region)
 	   	test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_arg_region="$2"
 		shift
-		echo "$_arg_region"
-		echo "region = $_arg_region"
                 if  [[ -z $_arg_region  ]] ; then
                        echo "arg region must not be empyt "
                        exit 100
                 fi
                 ;;	
-	    --saliva)
+	    -i|--saliva)
 	        _arg_saliva="TRUE"
-		echo "Saliva subject sample provided"
+		echo "INFO: Saliva subject sample provided"
 		;;
-	    --vs)
+	    -vs|--Very_Short_Assembly|--vs)
                 _assemblySpeed="veryfast"
-                echo "Very fast assembly being used"
+                echo "INFO: Very fast assembly being used"
                 ;;
-	   --se)
+	   -se|--single_end_reads|--se)
 	   	_pairedEnd="false"
-		echo "Sample Bam file is single end data"
+		echo "INFO: Sample Bam file is single end data"
 		;;
-	   --pj)
+	   -pj|--Parallelize_Jelly|--pj)
                 _parallel_jelly="yes"
-                echo "Paralellizing jellyfish, assuming 3 samples"
+                echo "INFO: Paralellizing jellyfish, assuming 3 samples"
                 ;; 
-	    --exome)
+	    -ex|--exome)
 	       _arg_exome="TRUE"
-	       echo "Exome run"
+	       echo "INFO: Exome run"
 	       ;;
 	    -A|--MaxAllele)
 	       test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
@@ -336,28 +250,13 @@ parse_commandline ()
 		       echo "MaxAlleleSize must be a number "
 		       exit 100
 	       fi
-	       echo "_MaxAlleleSize set to $_MaxAlleleSize"
+	       echo "INFO: MaxAlleleSize set to $_MaxAlleleSize"
 	       shift
 	       ;;
-	    --MaxAllele=*)
-                _MaxAlleleSize="${_key##--MaxAllele=}"
-		if ! [[ $_MaxAlleleSize =~ $re ]] ; then
-                       echo "MaxAlleleSize must be a number "
-                       exit 100
-                fi
-		echo "other spot _MaxAlleleSize set to $_MaxAlleleSize"
-                ;;
-	    -L)
+	    -L|--Report_Low_Freq)
 	      _arg_mosaic="TRUE"
-	      echo "Reporting mosaic/low frequence variants"
+	      echo "INFO: Reporting mosaic/low frequence variants"
 	      ;;
-	    -A*)
-	   	_MaxAlleleSize="${_key##-A}"
-		if ! [[ $_MaxAlleleSize =~ $re ]] ; then
-                       echo "MaxAlleleSize must be a number "
-                       exit 100
-                fi
-		;;
 	    -h|--help)
 		print_help
 		exit 0
@@ -370,12 +269,9 @@ parse_commandline ()
                 print_devhelp
                 exit 0
                 ;;
-            -d*)
-                print_devhelp
-                exit 0
-                ;;
-
 	    *)
+		echo "ERROR: Unkown argument $1"; 
+		exit 100
 		_positionals+=("$1")
 		;;
 
@@ -417,7 +313,7 @@ fi
 if [ -z $_arg_threads ]
 then
     echo "no thread argument given, running with all avaialble threads = $(nproc)"; 
-    $_arg_threads = $(nproc); 
+    _arg_threads=$(nproc); 
     #echo "You must provide a number of threads to use [--threads|-t] (we recommend 40 threads if available)"
     #echo "Killing run with non-zero exit status"
     #kill -9 $$
