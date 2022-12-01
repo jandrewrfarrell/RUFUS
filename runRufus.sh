@@ -772,7 +772,8 @@ then
 	if [ -z "$_arg_min" ]
 	then
 		if [ -e "$ProbandGenerator".Jhash.histo.7.7.model ]
-		then 
+		then
+			echo "$(grep Best\ Model "$ProbandGenerator".Jhash.histo.7.7.out)"
 			MutantMinCov=$(head -2 "$ProbandGenerator".Jhash.histo.7.7.model | tail -1 )
 			echo "INFO: mutant min coverage from generated model is $MutantMinCov"
 	 			
