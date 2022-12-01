@@ -71,216 +71,218 @@ _arg_ParLowK=2
 _filterMinQ=15
 print_help ()
 {
-    printf "%s\n" "The general script's help msg"
-    printf 'Usage: %s [-s|--subject <arg>] [-r|--ref <arg>] [-t|--threads <arg>] [-k|--kmersize <arg>] [-m|--min <arg>] [-h|--help] [<controls-1>] ... [<controls-n>] ...\n' "$0"
-    printf "\t%s\n" "-c, --controls: bam files containing the control subjects ()"
-    printf "\t%s\n" "-s,--subject: bam file containing the subject of interest (no default)"
-    printf "\t%s\n" "-se, --single_end_reads: subject bam file is single end reads, not paired (default is to assume paired end data)"
-    printf "\t%s\n" "-r,--ref: file path to the desired reference file (no default)"
-    printf "\t%s\n" "-cr,--cramref: file path to the desired reference file to decompress input cram files (no default)"
-    printf "\t%s\n" "-t,--threads: number of threads to use (no default) (min 3)"
-    printf "\t%s\n" "-k,--kersize: size of k-mer to use (no default)"
-    printf "\t%s\n" "-m,--min: overwrites the minimum k-mer count to call variant (no default)"
-    printf "\t%s\n" "-i, --saliva: flag to indicate that the subject sample is a buccal swab and likely contains a significant fractino of contaminant DNA"
-    printf "\t%s\n" "-ex, --exome: flat go set if your input data is exome sequecing. Sugjested you also set -m, default is -m 20"
-    printf "\t%s\n" "-mx, --MaxAllele: Max size for insert/deletion events to put the entire alt sequence in. (default 1000)"
-    printf "\t%s\n" "-L, --Report_Low_Freq: Reprot Mosaic/Low Frequency/Somatic variants (default FALSE)"
-    printf "\t%s\n" "-h,--help: HELP!!!!!!!!!!!!!!!"
+	printf "%s\n" "The general script's help msg"
+	printf 'Usage: %s [-s|--subject <arg>] [-r|--ref <arg>] [-t|--threads <arg>] [-k|--kmersize <arg>] [-m|--min <arg>] [-h|--help] [<controls-1>] ... [<controls-n>] ...\n' "$0"
+	printf "\t%s\n" "-c, --controls: bam/cram/fastq/generator file for the sequence data of the control sample (can be used multipe times)"
+	printf "\t%s\n" "-s,--subject: bam file containing the subject of interest (no default, only one subject per run for now)"
+	printf "\t%s\n" "-se, --single_end_reads: subject bam file is single end reads, not paired (default is to assume paired end data)"
+	printf "\t%s\n" "-r,--ref: file path to the desired reference file (no default)"
+	printf "\t%s\n" "-cr,--cramref: file path to the desired reference file to decompress input cram files (no default)"
+	printf "\t%s\n" "-t,--threads: number of threads to use (no default) (min 3)"
+	printf "\t%s\n" "-k,--kersize: size of k-mer to use (no default)"
+	printf "\t%s\n" "-m,--min: overwrites the minimum k-mer count to call variant (no default)"
+	printf "\t%s\n" "-i, --saliva: flag to indicate that the subject sample is a buccal swab and likely contains a significant fractino of contaminant DNA"
+	printf "\t%s\n" "-ex, --exome: flat go set if your input data is exome sequecing. Sugjested you also set -m, default is -m 20"
+	printf "\t%s\n" "-mx, --MaxAllele: Max size for insert/deletion events to put the entire alt sequence in. (default 1000)"
+	printf "\t%s\n" "-L, --Report_Low_Freq: Reprot Mosaic/Low Frequency/Somatic variants (default FALSE)"
+	printf "\t%s\n" "-h,--help: HELP!!!!!!!!!!!!!!!"
+	printf "\t%s\n" "-d: Dev Help, more options that can be confusing"
 }
 
 print_devhelp ()
 {
-    printf "%s\n" "The general script's help msg"
-    printf 'Usage: %s [-s|--subject <arg>] [-r|--ref <arg>] [-t|--threads <arg>] [-k|--kmersize <arg>] [-m|--min <arg>] [-h|--help] [<controls-1>] ... [<control\
+	printf "%s\n" "The general script's help msg"
+	printf 'Usage: %s [-s|--subject <arg>] [-r|--ref <arg>] [-t|--threads <arg>] [-k|--kmersize <arg>] [-m|--min <arg>] [-h|--help] [<controls-1>] ... [<control\
 s-n>] ...\n' "$0"
-    printf "\t%s\n" "-c, --controls: bam files containing the control subjects"
-    printf "\t%s\n" "-s,--subject: bam file containing the subject of interest (no default)"
-    printf "\t%s\n" "-se, --single_end_reads: subject bam file is single end reads, not paired (default is to assume paired end data)"
-    printf "\t%s\n" "-r,--ref: file path to the desired reference file (no default)"
-    printf "\t%s\n" "-cr,--cramref: file path to the desired reference file to decompress input cram files (no default)"
-    printf "\t%s\n" "-t,--threads: number of threads to use (no default) (min 3)"
-    printf "\t%s\n" "-f,--refhash: Jhash file containing reference hashList (no default)"
-    printf "\t%s\n" "-e,--exclude: Jhash file of kmers to exclude from mutation list (no default)"
-    printf "\t%s\n" "-k,--kersize: size of k-mer to use (no default)"
-    printf "\t%s\n" "-m,--min: overwrites the minimum k-mer count to call variant (no default)"
-    printf "\t%s\n" "-mx, --MaxAllele: Max size for insert/deletion events to put the entire alt sequence in. (default 1000)"
-    printf "\t%s\n" "-i, --saliva: flag to indicate that the subject sample is a buccal swab and likely contains a significant fractino of contaminant DNA"
-    printf "\t%s\n" "-L, --Report_Low_Freq: Reprot Mosaic/Low Frequency/Somatic variants (default FALSE)"
-    printf "\t%s\n" "-ex, --exome: flat go set if your input data is exome sequecing. Sugjested you also set -m, default is -m 20"
-    printf "\t%s\n" "-q1,--fastq1: If starting from fastq files, a list of the mate1 fastq files to improve RUFUS.ilter"
-    printf "\t%s\n" "-q2,--fastq2: If starting from fastq files, a list of the mate2 fastq files to improve RUFUS.ilter"
-    printf "\t%s\n" "-vs, --Very_Short_Assembly: use very short assembly methods, recomneded when you are expecting over 10,000 variants "
-    printf "\t%s\n" "-pj, --Parallelize_Jelly: parallelize jellyfish step, only use if you have more than 96G of ram"
-    printf "\t%s\n" "-R, --Region: Run RUFUS only on a samtools style region"
-    printf "\t%s\n" "-fk, --filterK: Kmer threshold for number of kmers required to keep a read during filtering (default = 1)"
-    printf "\t%s\n" "-fq, --filterMinQ: Minimum base quality for fitler step, any kmer with any bases lower than this quality will be ignored (default = 15)"
-    printf "\t%s\n" "-pl, --ParLowK: Lowest kmer count to be kept when counting parent jellyfish tables (default = 2, using 1 will SIGNIFICANTLY increase run time and isnt advised" 
-    printf "\t%s\n" "-h,--help: HELP!!!!!!!!!!!!!!!"
-    printf "\t%s\n" "-d,--devhelp: HELP!!! for developers"
+	printf "\t%s\n" "-c, --controls: bam/cram/fastq/generator file for the sequence data of the control sample (can be used multipe times)"
+	printf "\t%s\n" "-s,--subject: bam file containing the subject of interest (no default, only one subject per run for now)"
+	printf "\t%s\n" "-se, --single_end_reads: subject bam file is single end reads, not paired (default is to assume paired end data)"
+	printf "\t%s\n" "-r,--ref: file path to the desired reference file (no default)"
+	printf "\t%s\n" "-cr,--cramref: file path to the desired reference file to decompress input cram files (no default)"
+	printf "\t%s\n" "-t,--threads: number of threads to use (no default) (min 3)"
+	printf "\t%s\n" "-f,--refhash: Jhash file containing reference hashList (no default)"
+	printf "\t%s\n" "-e,--exclude: Jhash file of kmers to exclude from mutation list, k must be  (no default, can be used multiple times)"
+	printf "\t%s\n" "-k,--kersize: size of k-mer to use (no default)"
+	printf "\t%s\n" "-m,--min: overwrites the minimum k-mer count to call variant (no default)"
+	printf "\t%s\n" "-mx, --MaxAllele: Max size for insert/deletion events to put the entire alt sequence in. (default 1000)"
+	printf "\t%s\n" "-i, --saliva: flag to indicate that the subject sample is a buccal swab and likely contains a significant fractino of contaminant DNA"
+	printf "\t%s\n" "-L, --Report_Low_Freq: Reprot Mosaic/Low Frequency/Somatic variants (default FALSE)"
+	printf "\t%s\n" "-ex, --exome: flat go set if your input data is exome sequecing. Sugjested you also set -m, default for exome is -m 20 (EXPERIMENTAL values used here have not been exhaustivly tested)"
+	printf "\t%s\n" "-q1,--fastq1: If starting from fastq files, a list of the mate1 fastq files to improve RUFUS.ilter"
+	printf "\t%s\n" "-q2,--fastq2: If starting from fastq files, a list of the mate2 fastq files to improve RUFUS.ilter"
+	printf "\t%s\n" "-vs, --Very_Short_Assembly: use very short assembly methods, recomneded when you are expecting over 10,000 variants "
+	printf "\t%s\n" "-pj, --Parallelize_Jelly: parallelize jellyfish step, only use if you have more than 96G of ram"
+	printf "\t%s\n" "-R, --Region: Run RUFUS only on a samtools style region"
+	printf "\t%s\n" "-fk, --filterK: Kmer threshold for number of kmers required to keep a read during filtering (default = 1)"
+	printf "\t%s\n" "-fq, --filterMinQ: Minimum base quality for fitler step, any kmer with any bases lower than this quality will be ignored (default = 15)"
+	printf "\t%s\n" "-pl, --ParLowK: Lowest kmer count to be kept when counting parent jellyfish tables (default = 2, using 1 will SIGNIFICANTLY increase run time and isnt advised)" 
+	printf "\t\t%s\n" "This can be useful when you know you have low level contamination and want to remove kmers up to a certain count"
+	printf "\t%s\n" "-h,--help: HELP!!!!!!!!!!!!!!!"
+	printf "\t%s\n" "-d,--devhelp: HELP!!! for developers"
+	
 }
 re='^[0-9]+$'; 
 parse_commandline ()
 {
-    while test $# -gt 0
-    do
+	while test $# -gt 0
+	do
 	_key="$1"
 	case "$_key" in
-	    -s|--subject)
+	-s|--subject)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_arg_subject="$2"
 		shift
 		;;
-	    -r|--ref)
+	-r|--ref)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_arg_ref="$2"
 		shift
 		;;
-            
-	    -cr|--cramref)
-	         test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+			
+	-cr|--cramref)
+		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_arg_cramref="$2"
 		shift
 		;;
-	    
-	    -q1|--fastq1)
-                 test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-                _arg_fastqA="$2"
-                shift
-                ;;
-	    
-	    -q2|--fastq2)
-                 test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-                _arg_fastqB="$2"
-                shift
-                ;;
-	    -t|--threads)
+		
+	-q1|--fastq1)
+		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+		_arg_fastqA="$2"
+		shift
+		;;
+	-q2|--fastq2)
+		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+		_arg_fastqB="$2"
+		shift
+		;;
+	-t|--threads)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_arg_threads="$2"
 		if ! [[ $_arg_threads =~ $re ]] ; then
-                       echo "Threads must be a number "
-                       exit 100
-                fi
+			echo "Threads must be a number "
+			exit 100
+		fi
 		shift
 		;;
-            
-	    -f|--refhash)
-                test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-                _arg_refhash="$2"
-                shift
-                ;;
-	    -k|--kmersize)
+			
+	-f|--refhash)
+		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+		_arg_refhash="$2"
+		shift
+		;;
+	-k|--kmersize)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_arg_kmersize="$2"
 		shift
 		;;
-	    -c|--controls)
+	-c|--controls)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_arg_controls+=("$2")
 		shift
 		;;
-            -e|--exclude)
-	    	test $# -lt 2 && die "Missing value for the optional argument '$key'." 1
+	-e|--exclude)
+		test $# -lt 2 && die "Missing value for the optional argument '$key'." 1
 		_arg_exclude+=("$2")
 		shift
 		;;
-	    -m|--min)
+	-m|--min)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_arg_min="$2"
 		if ! [[ $_arg_min =~ $re ]] ; then
-                       echo "arg -m must be a number "
-                       exit 100
-                fi
+			echo "arg -m must be a number "
+			exit 100
+		fi
 		shift
 		;;
-	     -fk|--filterK)
-	     	 test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-                _arg_filterK=$2
-                if ! [[ $_arg_filterK =~ $re ]] ; then
-                       echo "arg -fk or --filterK must be a number "
-                       exit 100
-                fi
+	-fk|--filterK)
+		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+		_arg_filterK=$2
+		if ! [[ $_arg_filterK =~ $re ]] ; then
+			echo "arg -fk or --filterK must be a number "
+			exit 100
+		fi
 		shift
-                ;;
-	     -fq|--filterMinQ)
-                 test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+		;;
+	-fq|--filterMinQ)
+		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		_filterMinQ=$2
-                if ! [[ $_filterMinQ =~ $re ]] ; then
-                       echo "arg -fq or --filterMinQ must be a number "
-                       exit 100
-                fi
-                shift
-                ;;	
-	     -pl|--ParLowK)
-                 test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-                _arg_ParLowK=$2
-                if ! [[ $_arg_ParLowK =~ $re ]] ; then
-                       echo "arg -pl or --ParLowK must be a number "
-                       exit 100
-                fi
-                shift
-                ;;
-	   -R|--region)
-	   	test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-		_arg_region="$2"
+		if ! [[ $_filterMinQ =~ $re ]] ; then
+			echo "arg -fq or --filterMinQ must be a number "
+			exit 100
+		fi
 		shift
-                if  [[ -z $_arg_region  ]] ; then
-                       echo "arg region must not be empyt "
-                       exit 100
-                fi
-                ;;	
-	    -i|--saliva)
-	        _arg_saliva="TRUE"
+		;;	
+	-pl|--ParLowK)
+		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+		_arg_ParLowK=$2
+		if ! [[ $_arg_ParLowK =~ $re ]] ; then
+			echo "arg -pl or --ParLowK must be a number "
+			exit 100
+		fi
+		shift
+		;;
+	-R|--region)
+		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+		_arg_region="$2"
+		if  [[ -z $_arg_region  ]] ; then
+			echo "arg region must not be empyt "
+			exit 100
+		fi
+		shift
+		;;	
+	-i|--saliva)
+		_arg_saliva="TRUE"
 		echo "INFO: Saliva subject sample provided"
 		;;
-	    -vs|--Very_Short_Assembly|--vs)
-                _assemblySpeed="veryfast"
-                echo "INFO: Very fast assembly being used"
-                ;;
-	   -se|--single_end_reads|--se)
-	   	_pairedEnd="false"
+	-vs|--Very_Short_Assembly|--vs)
+		_assemblySpeed="veryfast"
+		echo "INFO: Very fast assembly being used"
+		;;
+	-se|--single_end_reads|--se)
+		_pairedEnd="false"
 		echo "INFO: Sample Bam file is single end data"
 		;;
-	   -pj|--Parallelize_Jelly|--pj)
-                _parallel_jelly="yes"
-                echo "INFO: Paralellizing jellyfish, assuming 3 samples"
-                ;; 
-	    -ex|--exome)
-	       _arg_exome="TRUE"
-	       echo "INFO: Exome run"
-	       ;;
-	    -A|--MaxAllele)
-	       test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-	       _MaxAlleleSize="$2"
-	       if ! [[ $_MaxAlleleSize =~ $re ]] ; then
-		       echo "MaxAlleleSize must be a number "
-		       exit 100
-	       fi
-	       echo "INFO: MaxAlleleSize set to $_MaxAlleleSize"
-	       shift
-	       ;;
-	    -L|--Report_Low_Freq)
-	      _arg_mosaic="TRUE"
-	      echo "INFO: Reporting mosaic/low frequence variants"
-	      ;;
-	    -h|--help)
+	-pj|--Parallelize_Jelly|--pj)
+		_parallel_jelly="yes"
+		echo "INFO: Paralellizing jellyfish, assuming 3 samples"
+		;; 
+	-ex|--exome)
+		_arg_exome="TRUE"
+		echo "INFO: Exome run"
+		;;
+	-A|--MaxAllele)
+		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+		_MaxAlleleSize="$2"
+		if ! [[ $_MaxAlleleSize =~ $re ]] ; then
+			echo "MaxAlleleSize must be a number "
+			exit 100
+		fi
+		echo "INFO: MaxAlleleSize set to $_MaxAlleleSize"
+		shift
+		;;
+	-L|--Report_Low_Freq)
+		_arg_mosaic="TRUE"
+		echo "INFO: Reporting mosaic/low frequence variants"
+		;;
+	-h|--help)
 		print_help
 		exit 0
 		;;
-	    -h*)
+		-h*)
 		print_help
 		exit 0
 		;;
-	    -d|--devhelp)
-                print_devhelp
-                exit 0
-                ;;
-	    *)
+	-d|--devhelp)
+		print_devhelp
+		exit 0
+		;;
+	*)
 		echo "ERROR: Unkown argument $1"; 
 		exit 100
 		_positionals+=("$1")
 		;;
 
-	        esac
+	esac
 	shift
 	done
 }
@@ -302,12 +304,12 @@ assign_positional_args ()
 
 
 parse_commandline "$@"
-assign_positional_args
+#assign_positional_args
 ##exit
 
 # [ <-- needed because of Argbash
 
-##############################__CHECK_FOR_MANDATORY_PARAMS__#################################################
+##############################__Print out all parameters__#################################################
 echo "~~~~~~~~~~~~ printing out paramater values used in script ~~~~~~~~~~~~~~~~"
 echo "  _arg_exclude=:"
 	for each in "${_arg_exclude[@]}"                           
@@ -338,7 +340,7 @@ echo "  _arg_filterK=$_arg_filterK"
 echo "  _arg_ParLowK=$_arg_ParLowK" 
 echo "  _filterMinQ=$_filterMinQ" 
 
-
+##############################__CHECK_FOR_MANDATORY_PARAMS__#################################################
 if [ -z $_arg_kmersize ]
 then 
  echo "You must provide a minimum kmer size [--kmersize|-k] (we recommend a kmer size of 25)"
@@ -350,14 +352,11 @@ if [ -z $_arg_threads ]
 then
     echo "no thread argument given, running with all avaialble threads = $(nproc)"; 
     _arg_threads=$(nproc); 
-    #echo "You must provide a number of threads to use [--threads|-t] (we recommend 40 threads if available)"
-    #echo "Killing run with non-zero exit status"
-    #kill -9 $$
 fi
 
 if [ ${#_arg_exclude[@]} -eq "0" ] && [ ${#_arg_controls[@]} -eq "0" ]
 then
-    echo "You must provide RUFUS with atleast one control sample"
+    echo "You must provide RUFUS with atleast one control or exclude sample"
     echo "Killing run with non-zero exit status"
     kill -9 $$
 fi
@@ -380,11 +379,11 @@ done
 _arg_exclude=("${new_array[@]}")
 unset new_arary
 unset ExcludeTemp
-##########################################################
+########################Setting up Exome Run EXPERIMENTAL ##################################
 
 if [ $_arg_exome == "TRUE" ]; then 
 	echo "Exome run set.  Setting max kmer to 1M and saliva = true and making sure a lower cutoff was set "
-	MaxHashDepth=1000000
+	MaxHashDepth=100000000
 	_arg_saliva="TRUE"
 
 	if [ -z $_arg_min ]
@@ -455,6 +454,9 @@ then
     echo "Killing run with non-zero status"
     kill -9 $$
 fi
+
+
+###### when we add PB need to check its reference stuff here 
 ###########################################################################
 
 refFileName=$(basename "$parent")
@@ -496,20 +498,22 @@ echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 #########__CREATE_ALL_GENERATOR_FILES_AND_VARIABLES__#############
 ProbandFileName=$(basename "$_arg_subject")
 ProbandExtension="${ProbandFileName##*.}"
-echo "proband extension is $ProbandExtension"
+#echo "proband extension is $ProbandExtension"
 
+
+######## chekcing proband extension, FASTQ is not handeled, need to add that, for the meantime generator dumping to SAM needs to be used #############
 if [[ "$ProbandExtension" != "cram" ]] && [[ "$ProbandExtension" != "bam" ]] || [[ ! -e "$_arg_subject" ]] && [[ "$ProbandExtension" != "generator" ]]
 then 
     echo "The proband bam/generator file" "$_arg_subject" " was not provided or does not exist; killing run with non-zero exit status"
     kill -9 $$
 elif [[ "$ProbandExtension" == "bam" ]]
 then
-    echo "you provided the proband cram file" "$_arg_subject"
+#   echo "you provided the proband cram file" "$_arg_subject"
     ProbandGenerator="$ProbandFileName".generator
     echo "samtools view -F 3328 $_arg_subject $_arg_region" > "$ProbandGenerator"
 elif [[ "$ProbandExtension" == "cram" ]]
 then
-    echo "you provided the proband cram file" "$_arg_subject"
+#   echo "you provided the proband cram file" "$_arg_subject"
     ProbandGenerator="$ProbandFileName".generator
     if [ "$_arg_cramref" == "" ]
     then
@@ -519,7 +523,7 @@ then
     echo "samtools view -F 3328 -T $_arg_cramref $_arg_subject  $_arg_region" > "$ProbandGenerator"
 elif [[ "$ProbandExtension" = "generator" ]]
 then
-    echo "you provided the proband bam file" "$_arg_subject"
+#   echo "you provided the proband bam file" "$_arg_subject"
     ProbandGenerator="$ProbandFileName"
 else 
     echo "unknown error during generator generation, killing run with non-zero exit status"
@@ -534,9 +538,9 @@ for parent in "${Parents[@]}"
 do 
     parentFileName=$(basename "$parent")
     ParentFileNames=$ParentFileNames$space$parent
-    echo "parent file name is" "$parentFileName"
+#    echo "parent file name is" "$parentFileName"
     parentExtension="${parentFileName##*.}"
-    echo "parent file extension name is" "$parentExtension"
+#    echo "parent file extension name is" "$parentExtension"
 
     if  [[ "$parentExtension" != "cram" ]] && [[ "$parentExtension" != "bam" ]]  && [[ "$parentExtension" != "generator" ]] 
     then
@@ -547,7 +551,7 @@ do
 	    parentGenerator="$parentFileName".generator
 	    ParentGenerators+=("$parentGenerator")
 	    echo "samtools view -F 3328 $parent  $_arg_region" > "$parentGenerator"
-	    echo "You provided the control bam file" "$parent"
+#	    echo "You provided the control bam file" "$parent"
     elif [[ "$parentExtension" == "cram" ]] 
     then
             parentGenerator="$parentFileName".generator
@@ -558,12 +562,12 @@ do
 		 kill -9 $$ 
 	    fi
             echo "samtools view -F 3328 -T $_arg_cramref $parent  $_arg_region" > "$parentGenerator"
-            echo "You provided the control cram file" "$parent"    
+ #           echo "You provided the control cram file" "$parent"    
     elif [[ "$parentExtension" = "generator" ]]
     then
 	parentGenerator="$parentFileName"
         ParentGenerators+=("$parentGenerator")
-	echo "You provided the control bam file" "$parent"
+#	echo "You provided the control bam file" "$parent"
     fi
 done
 #################################################################
@@ -626,24 +630,11 @@ else
     echo "privided refhash of: " "$_arg_refhash"
 fi
 
-#####__CHECK_IF_MIN_IS_PROVIDED__#####
-#if [ -z $_arg_min ] && [ $_arg_exome == "TRUE" ]; then
-#	echo "Exome run, min must bet set, auto setting to 20"
-#	_arg_min="20"
-#fi
-
-if [ -z "$_arg_min" ]
+if ! [ -z "$_arg_min" ]
 then
-      echo "\$_arg_min is empty"
-else
       echo "\$_arg_min is NOT empty"
       MutantMinCov=$_arg_min
 fi
-
- 
-
-echo "_arg_min is $_arg_min"
-echo "MutantMinCov is $MutantMinCov"
 ######################################
 
 
@@ -655,7 +646,7 @@ jhash=".Jhash"
 
 for parent in "${ParentGenerators[@]}"
 do
-  echo "parent is  $parent "
+  #echo "parent is  $parent "
   parentsString=$parentsString$space$parent$jhash
 done
 for exclude in "${_arg_exclude[@]}"
@@ -688,7 +679,7 @@ samblaster=$RDIR/bin/externals/samblaster/src/samblaster_project/samblaster
 ####################__GENERATE_JHASH_FILES_FROM_JELLYFISH__#####################
 if [ $_parallel_jelly == "yes" ]
 then 
-
+	######## TODO insted of assuming 3 samples, 
 	JThreads=$(( Threads / 3 ))
 	if [ "$JThreads" -lt 3 ]
 	then
@@ -701,8 +692,7 @@ then
 	      bash $RunJelly $parent $K $(echo $JThreads -2 | bc) $_arg_ParLowK  &
 	done
 	
-	# bash $RunJelly $ProbandGenerator $K  $Threads 2
-	 bash $RunJelly $ProbandGenerator $K $(echo $JThreads -2 | bc) 2  & 
+	bash $RunJelly $ProbandGenerator $K $(echo $JThreads -2 | bc) 2  & 
 	wait
 else
         JThreads=$Threads
@@ -718,14 +708,13 @@ else
 
         # bash $RunJelly $ProbandGenerator $K  $Threads 2
          bash $RunJelly $ProbandGenerator $K $(echo $JThreads -2 | bc) 2  
-        wait
 fi 	
 ##############################################################################
 
 
 
 ###########################_EMPTY_JHASH_CHECK##############################
-
+########TODO just checking file size isnt a great idea, when jellyfish fales the fiels arent zero size
 for parent in "${ParentGenerators[@]}"
 do
     ## Check Jhash files are not empty
@@ -752,6 +741,7 @@ fi
 
 
 ##################__GENERATE_JHASH_HISTOGRAMS__#################################
+######TODO I can probably get rid of this if I just make model read either tab or space
 perl -ni -e 's/ /\t/;print' "$ProbandGenerator".Jhash.histo
 for parent in "${ParentGenerators[@]}"
 do
@@ -763,7 +753,7 @@ done
 
 #######################__RUFUS_Model__############################################
 #if [ $_arg_exome == "FALSE" ] #[	-z "$_arg_min" ]
-if [       -z "$_arg_min" ]
+if [ -z "$_arg_min" ]  && [ $_arg_exome == "FALSE" ]
 then
 	echo "exome not set, assuming data is whole genome, bulding model" #echo "min not provided, building model" 
 	if [ -e "$ProbandGenerator.Jhash.histo.7.7.model" ]
@@ -771,10 +761,10 @@ then
 	 	echo "skipping model"
 	else
 		echo "staring model"
-		"$RUFUSmodel" "$ProbandGenerator".Jhash.histo $K 150 $Threads
+		"$RUFUSmodel" "$ProbandGenerator".Jhash.histo $K 150 $Threads > "$ProbandGenerator".Jhash.histo.7.7.out 
 		for parent in "${ParentGenerators[@]}"
 		do
-			"$RUFUSmodel" "$parent".Jhash.histo $K 150 $Threads
+			"$RUFUSmodel" "$parent".Jhash.histo $K 150 $Threads > "$parent".Jhash.histo.7.7.out & 
 		done
 		echo "done with model"
 	fi 
@@ -784,12 +774,12 @@ then
 		if [ -e "$ProbandGenerator".Jhash.histo.7.7.model ]
 		then 
 			MutantMinCov=$(head -2 "$ProbandGenerator".Jhash.histo.7.7.model | tail -1 )
-			echo "mutant min coverage from generated model is $MutantMinCov"
+			echo "INFO: mutant min coverage from generated model is $MutantMinCov"
 	 			
 			MutantSC=$(head -4 "$ProbandGenerator".Jhash.histo.7.7.model | tail -1 )
-			echo "mutant SC coverage from generated model is $MutantSC"
+			echo "INFO: mutant SC coverage from generated model is $MutantSC"
 			MaxHashDepth=$(echo "$MutantSC * 5" | bc)
-			echo "MaxHashDepth = $MaxHashDepth"
+			echo "INFO: MaxHashDepth = $MaxHashDepth"
 		else
 			echo "ERROR Model didnt run correcntly, exiting"
 			return -1
@@ -805,6 +795,7 @@ else
 		echo "min coverage must be provided with an exome run"
 		return -1; 
 	else
+####TODO: check what im dond here
 		echo "3" > "$ProbandGenerator".Jhash.histo.7.7.model; 
 		echo "$_arg_min" >> "$ProbandGenerator".Jhash.histo.7.7.model;
 		echo "3.1392e+09" >> "$ProbandGenerator".Jhash.histo.7.7.model;
@@ -821,10 +812,10 @@ if [ -z $MutantMinCov ]; then
 	exit 100
 fi
 if [ "$MutantMinCov" -lt "2" ]
-        then
-                echo "ERROR, model couldnt pick a sensible lower cutoff, check your subject bam file"
-                exit
-        fi
+then
+	echo "ERROR, model couldnt pick a sensible lower cutoff, check your subject bam file"
+        exit
+fi
 #################################__HASH_LIST_FILTER__#####################################
 
 echo "########### Running Mutant Hash Identification ##############"
@@ -846,8 +837,6 @@ fi
 
 ########################################################################################
 
-#wc -l "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList | awk '{print $1}'
-#if [ $(wc -l "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList | awk '{print $1}') -eq "0" ]; then 
 if [ $(head  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList | wc -l | awk '{print $1}') -eq "0" ]; then
 	echo "ERROR: No mutant hashes identfied, either the files are exactly the same of something went wrong in previous step" 
 	exit 100

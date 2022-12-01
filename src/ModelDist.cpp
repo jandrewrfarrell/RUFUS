@@ -540,8 +540,8 @@ int main(int argc, char* argv[]) {
 #pragma omp parallel for num_threads(11)
 			for (int x = 0; x <= 10; x++) {
 				values[x] =
-		testModelLog(bestSC, bestS, Flow + (((Fhigh - Flow) / 10) * x),
-					 bestSK, bestP, histo2, Inflection, 5, Ybar, Rsq);
+				testModelLog(bestSC, bestS, Flow + (((Fhigh - Flow) / 10) * x),
+				 bestSK, bestP, histo2, Inflection, 5, Ybar, Rsq);
 			}
 
 			double lowest = values[0];
