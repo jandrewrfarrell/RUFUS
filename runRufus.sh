@@ -3,9 +3,6 @@
 
 set -e 
 
-echo "checking for samtools"
-which samtools 
-echo "samtools found"
 # This is a rather minimal example Argbash potential
 # Example taken from http://argbash.readthedocs.io/en/stable/example.html
 
@@ -74,6 +71,7 @@ print_help ()
 	printf "%s\n" "The general script's help msg"
 	printf 'Usage: %s [-s|--subject <arg>] [-r|--ref <arg>] [-t|--threads <arg>] [-k|--kmersize <arg>] [-m|--min <arg>] [-h|--help] [<controls-1>] ... [<controls-n>] ...\n' "$0"
 	printf "\t%s\n" "-c, --controls: bam/cram/fastq/generator file for the sequence data of the control sample (can be used multipe times)"
+	printf "\t%s\n" "-e,--exclude: Jhash file of kmers to exclude from mutation list, k must be  (no default, can be used multiple times)"
 	printf "\t%s\n" "-s,--subject: bam file containing the subject of interest (no default, only one subject per run for now)"
 	printf "\t%s\n" "-se, --single_end_reads: subject bam file is single end reads, not paired (default is to assume paired end data)"
 	printf "\t%s\n" "-r,--ref: file path to the desired reference file (no default)"
@@ -82,7 +80,6 @@ print_help ()
 	printf "\t%s\n" "-k,--kersize: size of k-mer to use (no default)"
 	printf "\t%s\n" "-m,--min: overwrites the minimum k-mer count to call variant (no default)"
 	printf "\t%s\n" "-i, --saliva: flag to indicate that the subject sample is a buccal swab and likely contains a significant fractino of contaminant DNA"
-	printf "\t%s\n" "-ex, --exome: flat go set if your input data is exome sequecing. Sugjested you also set -m, default is -m 20"
 	printf "\t%s\n" "-mx, --MaxAllele: Max size for insert/deletion events to put the entire alt sequence in. (default 1000)"
 	printf "\t%s\n" "-L, --Report_Low_Freq: Reprot Mosaic/Low Frequency/Somatic variants (default FALSE)"
 	printf "\t%s\n" "-h,--help: HELP!!!!!!!!!!!!!!!"
@@ -95,21 +92,27 @@ print_devhelp ()
 	printf 'Usage: %s [-s|--subject <arg>] [-r|--ref <arg>] [-t|--threads <arg>] [-k|--kmersize <arg>] [-m|--min <arg>] [-h|--help] [<controls-1>] ... [<control\
 s-n>] ...\n' "$0"
 	printf "\t%s\n" "-c, --controls: bam/cram/fastq/generator file for the sequence data of the control sample (can be used multipe times)"
-	printf "\t%s\n" "-s,--subject: bam file containing the subject of interest (no default, only one subject per run for now)"
-	printf "\t%s\n" "-se, --single_end_reads: subject bam file is single end reads, not paired (default is to assume paired end data)"
-	printf "\t%s\n" "-r,--ref: file path to the desired reference file (no default)"
-	printf "\t%s\n" "-cr,--cramref: file path to the desired reference file to decompress input cram files (no default)"
-	printf "\t%s\n" "-t,--threads: number of threads to use (no default) (min 3)"
+        printf "\t%s\n" "-e,--exclude: Jhash file of kmers to exclude from mutation list, k must be  (no default, can be used multiple times)"
+        printf "\t%s\n" "-s,--subject: bam file containing the subject of interest (no default, only one subject per run for now)"
+        printf "\t%s\n" "-se, --single_end_reads: subject bam file is single end reads, not paired (default is to assume paired end data)"
+        printf "\t%s\n" "-r,--ref: file path to the desired reference file (no default)"
+        printf "\t%s\n" "-cr,--cramref: file path to the desired reference file to decompress input cram files (no default)"
+        printf "\t%s\n" "-t,--threads: number of threads to use (no default) (min 3)"
+        printf "\t%s\n" "-k,--kersize: size of k-mer to use (no default)"
+        printf "\t%s\n" "-m,--min: overwrites the minimum k-mer count to call variant (no default)"
+        printf "\t%s\n" "-i, --saliva: flag to indicate that the subject sample is a buccal swab and likely contains a significant fractino of contaminant DNA"
+        printf "\t%s\n" "-mx, --MaxAllele: Max size for insert/deletion events to put the entire alt sequence in. (default 1000)"
+        printf "\t%s\n" "-L, --Report_Low_Freq: Reprot Mosaic/Low Frequency/Somatic variants (default FALSE)"	
+	
+	printf "\t%s\n" "################################################################################################"	
+	printf "\t%s\n" "Extra options, mosstly experimental or algorithm parameters that you normaly dont need to adjust"
+	printf "\t%s\n" "################################################################################################"
+
 	printf "\t%s\n" "-f,--refhash: Jhash file containing reference hashList (no default)"
-	printf "\t%s\n" "-e,--exclude: Jhash file of kmers to exclude from mutation list, k must be  (no default, can be used multiple times)"
-	printf "\t%s\n" "-k,--kersize: size of k-mer to use (no default)"
-	printf "\t%s\n" "-m,--min: overwrites the minimum k-mer count to call variant (no default)"
 	printf "\t%s\n" "-mx, --MaxAllele: Max size for insert/deletion events to put the entire alt sequence in. (default 1000)"
-	printf "\t%s\n" "-i, --saliva: flag to indicate that the subject sample is a buccal swab and likely contains a significant fractino of contaminant DNA"
-	printf "\t%s\n" "-L, --Report_Low_Freq: Reprot Mosaic/Low Frequency/Somatic variants (default FALSE)"
-	printf "\t%s\n" "-ex, --exome: flat go set if your input data is exome sequecing. Sugjested you also set -m, default for exome is -m 20 (EXPERIMENTAL values used here have not been exhaustivly tested)"
-	printf "\t%s\n" "-q1,--fastq1: If starting from fastq files, a list of the mate1 fastq files to improve RUFUS.ilter"
-	printf "\t%s\n" "-q2,--fastq2: If starting from fastq files, a list of the mate2 fastq files to improve RUFUS.ilter"
+	printf "\t%s\n" "-ex, --exome: flag to set if your input data is exome sequecing.  Distirbution model is not used, -m = 20, saliva fix is set, max kmer depth seet to 1million (EXPERIMENTAL values used here have not been exhaustivly tested)"
+	printf "\t%s\n" "-q1,--fastq1: If starting from fastq files, a list of the mate1 fastq files to improve RUFUS.filter"
+	printf "\t%s\n" "-q2,--fastq2: If starting from fastq files, a list of the mate2 fastq files to improve RUFUS.filter"
 	printf "\t%s\n" "-vs, --Very_Short_Assembly: use very short assembly methods, recomneded when you are expecting over 10,000 variants "
 	printf "\t%s\n" "-pj, --Parallelize_Jelly: parallelize jellyfish step, only use if you have more than 96G of ram"
 	printf "\t%s\n" "-R, --Region: Run RUFUS only on a samtools style region"
