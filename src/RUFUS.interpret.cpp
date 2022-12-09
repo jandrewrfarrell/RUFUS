@@ -343,6 +343,7 @@ int search(long int& fd, string hash, char* fileptr)
 	}
 	close(fd); 
 
+	return -1; //this better not ever happen, should return in one of the if statesments above
 }
 
 bool fncomp (char lhs, char rhs) {return lhs<rhs;}
@@ -1114,7 +1115,7 @@ string SamRead::createStructGenotype(int spot)
 	{
 		ss <<"\t" << ShittyGenotyper(ParAlt[i], ParRef[i]) << ":" << ParAlt[i]+ParRef[i] << ":" << ParRef[i] << ":" << ParAlt[i];
 	}
-	cout << "returning " << ss << endl;
+	cout << "returning " << ss.str() << endl;
 	return ss.str(); 
 } 
 int SamRead::BreakPoint()
@@ -3392,7 +3393,7 @@ int findBreak(SamRead& read)
 		}
 	}
 
-
+	return -1; //this better never happen, should retrun from the if statemtns above
 }
 SamRead BetterWay(vector<SamRead> reads)
 {
@@ -4408,7 +4409,6 @@ SamRead BetterWay(vector<SamRead> reads)
 	reads[A].write(); 
 	//FullOutreads[A].writeVertical(); 
 	return reads[A];
-	cout << "Out Of SamReadBetterWay " << endl;
 }
 int SamRead::CheckBasesAligned()
 {
@@ -5228,7 +5228,7 @@ void ProcessHighAndLowDist()
 		Dist1XCutoff = 100000;
 	
 }
-main (int argc, char *argv[])
+int main (int argc, char *argv[])
 {
 
 cout << "###########################RUNNING THIS ONE#########################" << endl; 
