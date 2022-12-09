@@ -1010,10 +1010,10 @@ echo "ar_mosaic = $_arg_mosaic"
 if [ "$_arg_mosaic" == "TRUE" ]
 then
 	echo "including mosaic"; 
-	bash $RDIR/scripts/VilterAutosomeOnly ./Intermediates/$ProbandGenerator.V2.overlap.hashcount.fastq.bam.sorted.vcf | perl ~/bin/RUFUS/scripts/ColapsDuplicateCalls.stream.pl > ./$ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf
+	bash $RDIR/scripts/VilterAutosomeOnly ./Intermediates/$ProbandGenerator.V2.overlap.hashcount.fastq.bam.sorted.vcf | perl $RDIR/scripts/ColapsDuplicateCalls.stream.pl > ./$ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf
 else
 	echo "excluding mosaic"; 
-	bash $RDIR/scripts/VilterAutosomeOnly.withoutMosaic ./Intermediates/$ProbandGenerator.V2.overlap.hashcount.fastq.bam.sorted.vcf | perl ~/bin/RUFUS/scripts/ColapsDuplicateCalls.stream.pl > ./$ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf
+	bash $RDIR/scripts/VilterAutosomeOnly.withoutMosaic ./Intermediates/$ProbandGenerator.V2.overlap.hashcount.fastq.bam.sorted.vcf | perl $RDIR/scripts/ColapsDuplicateCalls.stream.pl > ./$ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf
 fi
 
 bgzip -f ./$ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf
