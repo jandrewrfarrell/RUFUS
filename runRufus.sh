@@ -66,6 +66,7 @@ _arg_region=
 _arg_filterK=1
 _arg_ParLowK=2
 _filterMinQ=15
+_arg_stop="nope"
 print_help ()
 {
 	printf "%s\n" "The general script's help msg"
@@ -119,6 +120,9 @@ s-n>] ...\n' "$0"
 	printf "\t%s\n" "-fk, --filterK: Kmer threshold for number of kmers required to keep a read during filtering (default = 1)"
 	printf "\t%s\n" "-fq, --filterMinQ: Minimum base quality for fitler step, any kmer with any bases lower than this quality will be ignored (default = 15)"
 	printf "\t%s\n" "-pl, --ParLowK: Lowest kmer count to be kept when counting parent jellyfish tables (default = 2, using 1 will SIGNIFICANTLY increase run time and isnt advised)" 
+	printf "\t%s\n" "-StJ: Stop run after jellyfish steps" #TODO: dont requre reference and other non needed options if this is set
+	printf "\t%s\n" "-StH: Stop run after hash compare steps" #TODO: dont requre reference and other non needed options if this is set
+	printf "\t%s\n" "-StF: Stop run after filter steps" 
 	printf "\t\t%s\n" "This can be useful when you know you have low level contamination and want to remove kmers up to a certain count"
 	printf "\t%s\n" "-h,--help: HELP!!!!!!!!!!!!!!!"
 	printf "\t%s\n" "-d,--devhelp: HELP!!! for developers"
@@ -278,6 +282,19 @@ parse_commandline ()
 	-d|--devhelp)
 		print_devhelp
 		exit 0
+		;;
+	-StJ)
+		_arg_stop="jelly"; 
+		echo "Stopping run after jellyfish steps"; 
+		;;
+	-StH)
+		_arg_stop="hash"; 
+		echo "Stopping run after Hash compare steps";
+		;;
+	
+	-StF)
+		_arg_stop="filter"
+		echo "Stopping run after filter steps"; 
 		;;
 	*)
 		echo "ERROR: Unkown argument $1"; 
@@ -715,7 +732,6 @@ fi
 ##############################################################################
 
 
-
 ###########################_EMPTY_JHASH_CHECK##############################
 ########TODO just checking file size isnt a great idea, when jellyfish fales the fiels arent zero size
 for parent in "${ParentGenerators[@]}"
@@ -763,7 +779,7 @@ then
 	then
 	 	echo "skipping model"
 	else
-		echo "staring model"
+		echo "starting model"
 		"$RUFUSmodel" "$ProbandGenerator".Jhash.histo $K 150 $Threads > "$ProbandGenerator".Jhash.histo.7.7.out 
 		for parent in "${ParentGenerators[@]}"
 		do
@@ -811,6 +827,13 @@ else
 fi
 ########################################################################################
 
+if [ "$_arg_stop" = "jelly" ];
+then
+        echo "-StJ used, stopping run";
+        exit 1;
+fi
+#######################################################################################
+
 if [ -z $MutantMinCov ]; then 
 	echo "ERROR: No min coverage set, possible error in Model"
 	exit 100
@@ -845,7 +868,12 @@ if [ $(head  "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList | wc -l | awk '
 	echo "ERROR: No mutant hashes identfied, either the files are exactly the same of something went wrong in previous step" 
 	exit 100
 fi
-
+########################################################################################
+if [ "$_arg_stop" = "hash" ];
+then
+        echo "-StH used, stopping run";
+        exit 1;
+fi
 ######################__RUFUS_FILTER__##################################################
 echo "########### starting RUFUS filter ###########"
 
@@ -978,7 +1006,12 @@ if [ $( samtools view "$ProbandGenerator".Mutations.fastq.bam | head | wc -l | a
         echo "ERROR: BWA failed on "$ProbandGenerator".Mutations.fastq.  Either the files are exactly the same of something went wrong in previous step" 
         exit 100
 fi 
-
+#################################################################################
+if [ "$_arg_stop" = "filter" ];
+then
+        echo "-StF used, stopping run";
+        exit 1;
+fi
 ###################__RUFUS_OVERLAP__#############################################
 if [ -e $ProbandGenerator.V2.overlap.hashcount.fastq.bam.FINAL.vcf.gz ]
 then
