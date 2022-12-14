@@ -362,17 +362,25 @@ echo "  _filterMinQ=$_filterMinQ"
 
 ##############################__CHECK_FOR_MANDATORY_PARAMS__#################################################
 if [ -z $_arg_kmersize ]
-then 
- echo "You must provide a minimum kmer size [--kmersize|-k] (we recommend a kmer size of 25)"
- echo "Killing run with non-zero exit status"
- kill -9 $$
+then
+ echo "INFO: You did not profide a kmer size, running with the default 25"
+ _arg_kmersize="25"
+ #echo "You must provide a kmer size [--kmersize|-k] (we recommend a kmer size of 25)"
+ #echo "Killing run with non-zero exit status"
+ #kill -9 $$
 fi
 
 if [ -z $_arg_threads ]
 then
-    echo "no thread argument given, running with all avaialble threads = $(nproc)"; 
+    echo "INFO: no thread argument given, running with all avaialble threads = $(nproc)"; 
     _arg_threads=$(nproc); 
 fi
+
+if [ -z $_arg_subject ]
+then 
+	echo "ERROR: you must provide a subject sample (sample you want to call variants in)"
+	kill -9 $$
+fi 
 
 if [ ${#_arg_exclude[@]} -eq "0" ] && [ ${#_arg_controls[@]} -eq "0" ]
 then
