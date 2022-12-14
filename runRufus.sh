@@ -322,10 +322,10 @@ assign_positional_args ()
 	done
 }
 
+which samtools || die "ERROR, samtools not installed, exiting"
+which bamtools || die "ERROR, bamtools not installed, exiting"
 
 parse_commandline "$@"
-#assign_positional_args
-##exit
 
 # [ <-- needed because of Argbash
 
