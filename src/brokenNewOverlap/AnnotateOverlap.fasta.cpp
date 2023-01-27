@@ -51,11 +51,10 @@ int main(int argc, char *argv[]) {
   string L4;
   unsigned long LongHash;
   bool notdone = true;
-//	cout << "staring has reading" << endl; 
+
   while (getline(MutHashFile, L1)) {
-  //  cout << L1 << endl; 
     vector<string> temp;
-    temp = Util::Split(L1, ' ');
+    temp = Util::Split(L1, '\t');
 
     if (temp.size() == 2) {
       unsigned long b = Util::HashToLong(temp[0].c_str());
@@ -68,7 +67,7 @@ int main(int argc, char *argv[]) {
 		       pair<unsigned long, unsigned int>(b, atoi(temp[2].c_str())));
       HashSize = temp[3].length();
     } else if (temp.size() == 1) {
-      temp = Util::Split(L1, '\t');
+      temp = Util::Split(L1, ' ');
       unsigned long b = Util::HashToLong(temp[0].c_str());
       Mutations.insert(
 		       pair<unsigned long, unsigned int>(b, atoi(temp[1].c_str())));
@@ -76,7 +75,7 @@ int main(int argc, char *argv[]) {
     }
   }
   MutHashFile.close();
-//	cout << "read in has list fine " << endl; 
+
   int who = RUSAGE_SELF;
   struct rusage usage;
   int b = getrusage(RUSAGE_SELF, &usage);
@@ -88,8 +87,6 @@ int main(int argc, char *argv[]) {
   while (getline(MutFile, L1)) {
     lines++;
     getline(MutFile, L2);
-    getline(MutFile, L3);
-    getline(MutFile, L4);
     vector<int> positions;
     vector<int> HashPos;
 
@@ -133,7 +130,7 @@ int main(int argc, char *argv[]) {
         }
       }
     }
-    cout << L1 << ":MH" << MutHashesFound << endl << L2 << endl << L3 << endl;
+    cout << L1 << ":MH" << MutHashesFound << endl << L2 << endl << "+" << endl;
 
     if (HashPos[0] < 93)
       cout << char(HashPos[0] + 33);
