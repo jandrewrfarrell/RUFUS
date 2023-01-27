@@ -1,6 +1,7 @@
 #!/bin/bash
 #check this dev branch thing
 
+
 set -e 
 
 # This is a rather minimal example Argbash potential
@@ -323,7 +324,7 @@ assign_positional_args ()
 }
 
 which samtools || die "ERROR, samtools not installed, exiting"
-which bamtools || die "ERROR, bamtools not installed, exiting"
+#which bamtools || die "ERROR, bamtools not installed, exiting"
 
 parse_commandline "$@"
 
