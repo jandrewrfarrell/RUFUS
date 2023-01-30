@@ -110,7 +110,8 @@ add_executable(RUFUS.interpret
 )
 target_link_libraries(RUFUS.interpret
 	${RUFUS_UTIL}
-	${FASTAHACK_LIB}
+	${FASTAHACK_S_LIB}
+	${FASTAHACK_F_LIB}
 )
 
 add_executable(ReplaceQwithDinFASTQD
