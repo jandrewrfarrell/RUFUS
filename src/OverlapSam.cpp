@@ -528,7 +528,7 @@ void compresStrand(string S, int& F, int& R) {
 int CountHashes(string seq)
 {
 	int count=0; 
-	for (int i = 0; i < seq.size()-HashSize; i++)
+	for (int i = 0; i < (int) seq.size()-HashSize; i++)
 	{
 		string hash = seq.substr(i, HashSize); 
 		size_t found = hash.find("N");
@@ -707,7 +707,7 @@ int main(int argc, char* argv[]) {
 					 << " reads\r";
 		}
 		vector<string> temp = Util::Split(L1, '\t');
-		temp[9] = ReplaceLowQBase(temp[9],temp[10], 36); 
+		temp[9] = ReplaceLowQBase(temp[9],temp[10], 10); 
 		temp[9] = TrimKends(temp[9], temp[10], 15);
 		int ReadSize = temp[10].size();
 		bool b[16];
