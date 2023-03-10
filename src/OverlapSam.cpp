@@ -43,7 +43,7 @@ int Align3(vector<string>& sequenes, vector<string>& quals, string Ap, string Aq
 	{
 		end = sequenes.size();
 	}
-
+	if (FullOut == true ) {cout << "staring alignemtn from " << start << " to " << end<< endl;} 
 	#pragma omp parallel for shared(Ap, Aqp, index, overlap, bestScore) num_threads(Threads)
 	for (int j = start; j < end; j++) 
 	{
@@ -125,10 +125,11 @@ int Align3(vector<string>& sequenes, vector<string>& quals, string Ap, string Aq
 			{
 				cout << "	Score = " << score << endl;
 			}
-
+			
 			float percent = score / (window);
 			if (percent >= minPercent) 
 			{
+				 if (FullOut == true ) {cout << percent << " = " << score << " / " << window << endl;}
 				if (LocalBestScore < score) 
 				{
 					LocalBestScore = score;
@@ -176,6 +177,7 @@ int Align3(vector<string>& sequenes, vector<string>& quals, string Ap, string Aq
 				float percent = score / (k);
 				if (percent >= minPercent) 
 				{
+					 if (FullOut == true ) {cout << "percentsecond = " << percent << " = " << score << " / " << k << endl;}
 					if (LocalBestScore < score) 
 					{
 						LocalBestScore = score;
@@ -212,6 +214,7 @@ int Align3(vector<string>& sequenes, vector<string>& quals, string Ap, string Aq
 				float percent = score / (k);
 				if (percent >= minPercent) 
 				{
+					 if (FullOut == true ) {cout << "percentthird = " << percent << " = " << score << " / " << k << endl;}
 					if (LocalBestScore < score) 
 					{
 						LocalBestScore = score;
@@ -528,7 +531,7 @@ void compresStrand(string S, int& F, int& R) {
 int CountHashes(string seq)
 {
 	int count=0; 
-	for (int i = 0; i < (int) seq.size()-HashSize; i++)
+	for (int i = 0; i < seq.size()-HashSize; i++)
 	{
 		string hash = seq.substr(i, HashSize); 
 		size_t found = hash.find("N");
@@ -611,7 +614,7 @@ int main(int argc, char* argv[]) {
 	ss << argv[5] << ".fastq";
 	FirstPassFile = ss.str();
 	report.open(FirstPassFile.c_str());
-
+	cout << "min percent check = " << MinPercent << endl; 
 	if (report.is_open()) {
 	} else {
 		cout << "ERROR, Mut-Output file could not be opened - " << FirstPassFile << endl;
@@ -908,9 +911,7 @@ int main(int argc, char* argv[]) {
 			int revk = -1;
 			int revbestIndex = -1;
 			int revbooya =
-	Align3(sequenes, qual, revA, revAqual, i, revk, revbestIndex,
-
-				 MinPercent, PerfectMatch, MinOverlap, Threads);
+			Align3(sequenes, qual, revA, revAqual, i, revk, revbestIndex, MinPercent, PerfectMatch, MinOverlap, Threads);
 			if (FullOut) {
 				cout << "best reverse score is " << revbooya << " k is " << revk
 						 << endl;
