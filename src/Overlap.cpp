@@ -29,7 +29,7 @@
 
 using namespace std;
 
-bool FullOut = true;
+bool FullOut = false;
 
 int RebuildHashTable(vector<string>& sequenes, int Ai, int SearchHash, unordered_map<unsigned long, vector<int>>& Hashes, int Threads, unordered_map<unsigned long, int>& Hashesize) 
 {
@@ -51,7 +51,6 @@ int RebuildHashTable(vector<string>& sequenes, int Ai, int SearchHash, unordered
 		//pragma omp critical (sequenes)
 		{Sequence = sequenes[i];}
 		int LoopLimit = Sequence.size() - SearchHash;
-
 		for (int j = 0; j < LoopLimit; j++) {
 			string hash = Sequence.substr(j, SearchHash);
 			size_t found = hash.find('N');
@@ -72,7 +71,7 @@ int RebuildHashTable(vector<string>& sequenes, int Ai, int SearchHash, unordered
 	{
 		Hashesize[it->first] = it->second.size(); 
 	}
-	cout << "\nDone Rebulding HashTable\n";
+	cout << "\nDone Rebulding HashTable size is " << Hashes.size() << endl;
 	return 0;
 }
 
@@ -97,7 +96,7 @@ int PrepairSearchList(string A, int Ai,	unordered_map<unsigned long, vector<int>
 				int holder = 0; 
 				#pragma omp atomic 
 				holder += Hashes[LongHash][i];
-				if (holder > Ai + 1) {
+				if (holder > Ai ){//+ 1) {
 
 					if (Positions.count(holder) > 0) {
 			Positions[holder]++;
@@ -123,13 +122,15 @@ int PrepairSearchList(string A, int Ai,	unordered_map<unsigned long, vector<int>
 
 	NumberPos = added;
 	map<int, int>::iterator uspos;
-	map<double, int> SortedPositions;
-	double trick = 0.0;
+	multimap<int, int> SortedPositions;
 
-	for (uspos = Positions.begin(); uspos != Positions.end(); ++uspos) {
-		trick++;
-		SortedPositions[(double)uspos->second + (2.0 / trick)] = uspos->first;
-	}
+        for (uspos = Positions.begin(); uspos != Positions.end(); ++uspos) {
+                if (uspos->second > ACT)
+                {
+                        SortedPositions.insert(std::make_pair(uspos->second,uspos->first));
+                }
+        }
+
 
 	if (FullOut) {
 		cout << "found - " << Positions.size() << " possible locations" << endl;
@@ -138,20 +139,22 @@ int PrepairSearchList(string A, int Ai,	unordered_map<unsigned long, vector<int>
 	map<double, int>::iterator pos;
 	vector<int> indexes;
 	int sanity = 0;
+	
 
-	for (pos = SortedPositions.end(); pos != SortedPositions.begin(); --pos) {
-
+	for (auto pos = SortedPositions.rbegin() ; pos !=  SortedPositions.rend(); pos++)
+        {
 		if (pos->first >= ACT) {
-			indexes.push_back(pos->second + 0);
+                	indexes.push_back(pos->second + 0);
 			sanity++;
 
-			if (sanity > 1000) {
-				hitIndexLimit = true;
-				NumberIndex = sanity;
-				break;
-			}
-		}
-	}
+                        if (sanity > 1000) {
+                                hitIndexLimit = true;
+                                NumberIndex = sanity;
+                                break;
+                        }
+                }
+
+        }
 
 	NumberIndex = sanity;
 	#pragma omp critical (array)
