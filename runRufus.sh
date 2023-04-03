@@ -84,6 +84,7 @@ print_help ()
 	printf "\t%s\n" "-i, --saliva: flag to indicate that the subject sample is a buccal swab and likely contains a significant fractino of contaminant DNA"
 	printf "\t%s\n" "-mx, --MaxAllele: Max size for insert/deletion events to put the entire alt sequence in. (default 1000)"
 	printf "\t%s\n" "-L, --Report_Low_Freq: Reprot Mosaic/Low Frequency/Somatic variants (default FALSE)"
+	printf "\t%s\n" "-CLEAN: Does not do a rufus run but cleans up intermediate files created by RUFUS" 
 	printf "\t%s\n" "-h,--help: HELP!!!!!!!!!!!!!!!"
 	printf "\t%s\n" "-d: Dev Help, more options that can be confusing"
 }
@@ -105,7 +106,8 @@ s-n>] ...\n' "$0"
         printf "\t%s\n" "-i, --saliva: flag to indicate that the subject sample is a buccal swab and likely contains a significant fractino of contaminant DNA"
         printf "\t%s\n" "-mx, --MaxAllele: Max size for insert/deletion events to put the entire alt sequence in. (default 1000)"
         printf "\t%s\n" "-L, --Report_Low_Freq: Reprot Mosaic/Low Frequency/Somatic variants (default FALSE)"	
-	
+	printf "\t%s\n" "-CLEAN: Does not do a rufus run but cleans up intermediate files created by RUFUS" 
+
 	printf "\t%s\n" "################################################################################################"	
 	printf "\t%s\n" "Extra options, mosstly experimental or algorithm parameters that you normaly dont need to adjust"
 	printf "\t%s\n" "################################################################################################"
@@ -185,8 +187,33 @@ parse_commandline ()
 		;;
 	-c|--controls)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-		_arg_controls+=("$2")
-		shift
+		echo "checking parent count $#"
+		refFileName=$(basename "$2")
+		refExtension="${refFileName##*.}"
+		genName=$refFileName
+		if [[ $refExtension == 'fastq' ]] || [[ $refExtension == 'fq' ]] || [[ $refExtension == 'gz' ]] ; then 
+			echo "" > "$refFileName".generator
+			_arg_controls+=("$2")
+		fi 
+		while [[ $2 != -* ]]; do
+			refFileName=$(basename "$2")
+		        refExtension="${refFileName##*.}"
+			echo "refext4nsion = $refExtension"
+			if [ $refExtension = "fastq" ] || [ $refExtension = "fq" ] || [ $refExtension = "gz" ]
+			then 
+				echo "cool we found a fastq"
+				if [[ $refExtension == 'gz' ]]
+				then 
+					echo "perl $RDIR/scripts/FastqToSam.pl <(zcat $2)" >> "$genName".generator
+				else
+					echo "perl $RDIR/scripts/FastqToSam.pl <(cat $2)" >> "$genName".generator
+				fi
+			else
+				echo "even cooler, fond one thats not a fastq" 
+				_arg_controls+=("$2")
+			fi
+			shift
+		done
 		;;
 	-e|--exclude)
 		test $# -lt 2 && die "Missing value for the optional argument '$key'." 1
@@ -296,6 +323,12 @@ parse_commandline ()
 	-StF)
 		_arg_stop="filter"
 		echo "Stopping run after filter steps"; 
+		;;
+	-CLEAN)
+		echo "cleaning up intermeidate files";
+		rm *generator.Jhash *generator.Jhash.histo *generator.Jhash.histo.7.7.dist *generator.Jhash.histo.7.7.out *generator.Jhash.histo.7.7.prob *generator.k25_c4.HashList *generator.Mutations.Mate1.fastq *generator.Mutations.Mate2.fastq *.generator.temp *.generator.temp.mate1.fastq *.temp.mate2.fastq *.generator.V2.overlap.fastq *.generator.V2.overlap.fastqd *.generator.V2.overlap.hashcount.fastq *.generator.V2.overlap.hashcount.fastq.bam.vcf *.generator.V2.overlap.hashcount.fastq.bam.vcf.bed;  
+		echo "cleanup done";
+		exit 1; 
 		;;
 	*)
 		echo "ERROR: Unkown argument $1"; 
@@ -1001,12 +1034,18 @@ fi
 ########################################################################################
 if [ $_arg_saliva == "TRUE" ]
 then 
-	echo "saliva sample provided, only using aligned mutant contigs" 
-	mv "$ProbandGenerator".Mutations.fastq.bam "$ProbandGenerator".Mutations.fastq.FULL.bam 
-	samtools index "$ProbandGenerator".Mutations.fastq.FULL.bam
-	rm "$ProbandGenerator".Mutations.fastq.bam.bai
-	samtools view -F 12 -b "$ProbandGenerator".Mutations.fastq.FULL.bam > "$ProbandGenerator".Mutations.fastq.bam
-	samtools index "$ProbandGenerator".Mutations.fastq.bam
+	echo "saliva sample provided, only using aligned mutant contigs"
+	if [ -e  "$ProbandGenerator".Mutations.fastq.FULL.bam ]
+	then 
+		echo "skipping saliva filter"
+	else
+		
+		mv "$ProbandGenerator".Mutations.fastq.bam "$ProbandGenerator".Mutations.fastq.FULL.bam 
+		samtools index "$ProbandGenerator".Mutations.fastq.FULL.bam
+		rm "$ProbandGenerator".Mutations.fastq.bam.bai
+		samtools view -F 12 -b "$ProbandGenerator".Mutations.fastq.FULL.bam > "$ProbandGenerator".Mutations.fastq.bam
+		samtools index "$ProbandGenerator".Mutations.fastq.bam
+	fi
 fi
 
 
