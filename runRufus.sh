@@ -72,9 +72,9 @@ print_help ()
 {
 	printf "%s\n" "The general script's help msg"
 	printf 'Usage: %s [-s|--subject <arg>] [-r|--ref <arg>] [-t|--threads <arg>] [-k|--kmersize <arg>] [-m|--min <arg>] [-h|--help] [<controls-1>] ... [<controls-n>] ...\n' "$0"
-	printf "\t%s\n" "-c, --controls: bam/cram/fastq/generator file for the sequence data of the control sample (can be used multipe times)"
+	printf "\t%s\n" "-s,--subject: bam/cram/fastq(or pair of fastq files)/generator file containing the subject of interest (no default, only one subject per run for now)"
+	printf "\t%s\n" "-c, --controls: bam/cram/fastq(or pair of fastq files)/generator file for the sequence data of the control sample (can be used multipe times)"
 	printf "\t%s\n" "-e,--exclude: Jhash file of kmers to exclude from mutation list, k must be  (no default, can be used multiple times)"
-	printf "\t%s\n" "-s,--subject: bam file containing the subject of interest (no default, only one subject per run for now)"
 	printf "\t%s\n" "-se, --single_end_reads: subject bam file is single end reads, not paired (default is to assume paired end data)"
 	printf "\t%s\n" "-r,--ref: file path to the desired reference file (no default)"
 	printf "\t%s\n" "-cr,--cramref: file path to the desired reference file to decompress input cram files (no default)"
@@ -94,9 +94,9 @@ print_devhelp ()
 	printf "%s\n" "The general script's help msg"
 	printf 'Usage: %s [-s|--subject <arg>] [-r|--ref <arg>] [-t|--threads <arg>] [-k|--kmersize <arg>] [-m|--min <arg>] [-h|--help] [<controls-1>] ... [<control\
 s-n>] ...\n' "$0"
-	printf "\t%s\n" "-c, --controls: bam/cram/fastq/generator file for the sequence data of the control sample (can be used multipe times)"
+	printf "\t%s\n" "-s,--subject: bam/cram/fastq(or pair of fastq files)/generator file containing the subject of interest (no default, only one subject per run for now)"
+	printf "\t%s\n" "-c, --controls: bam/cram/fastq(or pair of fastq files)/generator file for the sequence data of the control sample (can be used multipe times)"
         printf "\t%s\n" "-e,--exclude: Jhash file of kmers to exclude from mutation list, k must be  (no default, can be used multiple times)"
-        printf "\t%s\n" "-s,--subject: bam file containing the subject of interest (no default, only one subject per run for now)"
         printf "\t%s\n" "-se, --single_end_reads: subject bam file is single end reads, not paired (default is to assume paired end data)"
         printf "\t%s\n" "-r,--ref: file path to the desired reference file (no default)"
         printf "\t%s\n" "-cr,--cramref: file path to the desired reference file to decompress input cram files (no default)"
