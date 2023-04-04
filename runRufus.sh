@@ -140,8 +140,32 @@ parse_commandline ()
 	case "$_key" in
 	-s|--subject)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-		_arg_subject="$2"
-		shift
+		FileName=$(basename "$2")
+                Extension="${FileName##*.}"
+                genName=$FileName
+                if [[ $Extension == 'fastq' ]] || [[ $Extension == 'fq' ]] || [[ $Extension == 'gz' ]] ; then
+                        echo "" > "$FileName".generator
+                        _arg_subject=("$FileName".generator)
+                fi
+                while [[ $2 != -* ]]; do
+                        FileName=$(basename "$2")
+                        Extension="${FileName##*.}"
+                        echo "ext4nsion = $Extension"
+                        if [ $Extension = "fastq" ] || [ $Extension = "fq" ] || [ $Extension = "gz" ]
+                        then
+                                echo "cool we found a fastq"
+                                if [[ $Extension == 'gz' ]]
+                                then
+                                        echo "perl $RDIR/scripts/FastqToSam.pl <(zcat $2)" >> "$genName".generator
+                                else
+                                        echo "perl $RDIR/scripts/FastqToSam.pl <(cat $2)" >> "$genName".generator
+                                fi
+                        else
+                                echo "even cooler, fond one thats not a fastq" 
+                                _arg_subject=("$2")
+                        fi
+                        shift
+                done	
 		;;
 	-r|--ref)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
@@ -188,21 +212,21 @@ parse_commandline ()
 	-c|--controls)
 		test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 		echo "checking parent count $#"
-		refFileName=$(basename "$2")
-		refExtension="${refFileName##*.}"
-		genName=$refFileName
-		if [[ $refExtension == 'fastq' ]] || [[ $refExtension == 'fq' ]] || [[ $refExtension == 'gz' ]] ; then 
-			echo "" > "$refFileName".generator
-			_arg_controls+=("$2")
+		FileName=$(basename "$2")
+		Extension="${FileName##*.}"
+		genName=$FileName
+		if [[ $Extension == 'fastq' ]] || [[ $Extension == 'fq' ]] || [[ $Extension == 'gz' ]] ; then 
+			echo "" > "$FileName".generator
+			_arg_controls+=("$FileName".generator)
 		fi 
 		while [[ $2 != -* ]]; do
-			refFileName=$(basename "$2")
-		        refExtension="${refFileName##*.}"
-			echo "refext4nsion = $refExtension"
-			if [ $refExtension = "fastq" ] || [ $refExtension = "fq" ] || [ $refExtension = "gz" ]
+			FileName=$(basename "$2")
+		        Extension="${FileName##*.}"
+			echo "refext4nsion = $Extension"
+			if [ $Extension = "fastq" ] || [ $Extension = "fq" ] || [ $Extension = "gz" ]
 			then 
 				echo "cool we found a fastq"
-				if [[ $refExtension == 'gz' ]]
+				if [[ $Extension == 'gz' ]]
 				then 
 					echo "perl $RDIR/scripts/FastqToSam.pl <(zcat $2)" >> "$genName".generator
 				else
@@ -945,14 +969,17 @@ then
 		    wait
 		else
 			echo "Running RUFUS.filter from paired FASTQ files"
-		
-			
-			echo "$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  <(bash $_arg_fastqA) <(bash $_arg_fastqB) "$ProbandGenerator" $K $_filterMinQ $_arg_filterK "$(echo $Threads -2 | bc)""
-	
-			#$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  <(bash $_arg_fastqA) <(bash $_arg_fastqB) "$ProbandGenerator" $K $_filterMinQ $_arg_filterK "$(echo $Threads -2 | bc)"
-			echo $RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  $_arg_fastqA $_arg_fastqB "$ProbandGenerator" $K $_filterMinQ $_arg_filterK "$(echo $Threads -2 | bc)"
-			$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  $_arg_fastqA $_arg_fastqB "$ProbandGenerator" $K $_filterMinQ $_arg_filterK "$(echo $Threads -2 | bc)"
-			#$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  <(zcat $_arg_fastqA) <(zcat $_arg_fastqB) "$ProbandGenerator" $K $_filterMinQ $_arg_filterK "$(echo $Threads -2 | bc)"
+			FileName=$(basename $_arg_fastqA)
+			Extension="${FileName##*.}"
+			if [[ $Extension == 'gz' ]]
+			then
+				echo "Compressed fastq files found"
+				$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  <(zcat $_arg_fastqA) <(zcat $_arg_fastqB) "$ProbandGenerator" $K $_filterMinQ $_arg_filterK "$(echo $Threads -2 | bc)"
+
+			else
+				echo "Uncompressed fastq files found" 
+				$RUFUSfilterFASTQ "$ProbandGenerator".k"$K"_c"$MutantMinCov".HashList  $_arg_fastqA $_arg_fastqB "$ProbandGenerator" $K $_filterMinQ $_arg_filterK "$(echo $Threads -2 | bc)"
+			fi
 			wait
 		fi
 	fi
