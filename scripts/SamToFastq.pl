@@ -21,10 +21,13 @@ while ($l1 = <>)
 {
 	@temp = split(/\t/, $l1);	
 	$counter = $counter+1;
-	print "\@$temp[0]\n";
-	print "$temp[9]\n";
-	print "+\n";
-	print "$temp[10]\n";
+	if (length($temp[9] > 25))
+	{
+		print "\@$temp[0]\n";
+		print "$temp[9]\n";
+		print "+\n";
+		print "$temp[10]\n";
+	}
 	
 }
 #Call should be GFFfile, FastaReff, SNPFilePath

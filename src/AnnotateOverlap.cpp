@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
   bool notdone = true;
 //	cout << "staring has reading" << endl; 
   while (getline(MutHashFile, L1)) {
-  //  cout << L1 << endl; 
+//    cout << L1 << endl; 
     vector<string> temp;
     temp = Util::Split(L1, ' ');
 

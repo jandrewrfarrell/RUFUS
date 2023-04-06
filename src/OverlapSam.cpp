@@ -38,7 +38,7 @@ int Align3(vector<string>& sequenes, vector<string>& quals, string Ap, string Aq
 	int bestScore = 0;
 	int NumReads = sequenes.size();
 	int start = Ai + 1;
-	int end = start + 3; 
+	int end = start + 10; 
 	if (end > sequenes.size()) 
 	{
 		end = sequenes.size();
@@ -361,12 +361,15 @@ string TrimNends(string S, string& qual) {
 	string NewS = "";
 	string NewQ = "";
 	for (int i = S.size() - 1; i >= 0; i--) {
-		if (base) {
+		if (base) 
+		{
 			NewS = S.c_str()[i] + NewS;
 			NewQ = qual.c_str()[i] + NewQ;
-		} else if (S.c_str()[i] != 'A' && S.c_str()[i] != 'C' &&
-							 S.c_str()[i] != 'G' && S.c_str()[i] != 'T') {
-		} else {
+		} 
+		else if (S.c_str()[i] != 'A' && S.c_str()[i] != 'C' && S.c_str()[i] != 'G' && S.c_str()[i] != 'T') 
+		{} 
+		else 
+		{
 			base = true;
 			NewS = S.c_str()[i] + NewS;
 			NewQ = qual.c_str()[i] + NewQ;
@@ -711,7 +714,7 @@ int main(int argc, char* argv[]) {
 		}
 		vector<string> temp = Util::Split(L1, '\t');
 		temp[9] = ReplaceLowQBase(temp[9],temp[10], 10); 
-		temp[9] = TrimKends(temp[9], temp[10], 15);
+		//temp[9] = TrimKends(temp[9], temp[10], 15);
 		int ReadSize = temp[10].size();
 		bool b[16];
 		int v = atoi(temp[1].c_str()); 
