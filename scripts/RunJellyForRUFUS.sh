@@ -26,7 +26,7 @@ else
 	fi
 	mkfifo $GEN.fq
 	bash $GEN | $RDIR/bin/PassThroughSamCheck $GEN.Jelly.chr > $GEN.fq &
-	$JELLYFISH count --disk -m $K -L $L -s 1G -t $T -o $GEN.Jhash -C $GEN.fq
+	$JELLYFISH count --disk -m $K -L $L -s 8G -t $T -o $GEN.Jhash -C $GEN.fq
 	rm $GEN.Jhash.temp
 	rm $GEN.fq
 
