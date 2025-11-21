@@ -5088,6 +5088,8 @@ void LastDitch(vector<SamRead>& reads, int i, int A, int B, int& CurrentSVeventI
 		qual = 0; 
 	stringstream info;	
 	info << "SVTYPE=BND;MATEID=bnd_" << reads[reads[i].alignments[B]].BNDid << ";";
+	//if (SVDES !="") 
+	info << "SVDES=" << SVDES << ";";	
 	string phase="none"; 
 	if (reads[reads[i].alignments[A]].phase != "none")
 		phase = reads[reads[i].alignments[A]].phase; 
