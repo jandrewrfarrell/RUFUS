@@ -104,6 +104,12 @@ add_executable(RUFUS.Filter
 target_link_libraries(RUFUS.Filter
 	${RUFUS_UTIL}
 )
+add_executable(RUFUS.Filter.single
+        RUFUS.Filter.ss.cpp
+	)
+target_link_libraries(RUFUS.Filter.single
+        ${RUFUS_UTIL}
+	)
 
 add_executable(RUFUS.interpret
 	RUFUS.interpret.cpp
