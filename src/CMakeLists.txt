@@ -44,7 +44,9 @@ add_library(rufus_core STATIC
 add_executable(PassThroughSamCheck.stranded
 	PassThroughSamCheck.stranded.cpp
 )
-
+add_executable(PassThroughSamCheck.stranded.se
+	PassThroughSamCheck.stranded.se.cpp
+)
 add_executable(PassThroughSamCheck
 	PassThroughSamCheck.cpp
 )
